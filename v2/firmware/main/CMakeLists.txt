@@ -5,3 +5,11 @@ idf_component_register(
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/blip_component.cmake)
 blip_configure_component(${COMPONENT_LIB})
+
+if(BLIP_DIAGNOSTICS_HIL_FORCE_BOOT_LOOP)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_DIAGNOSTICS_HIL_FORCE_BOOT_LOOP=1)
+endif()
+
+if(BLIP_DIAGNOSTICS_HIL_CLEAR_SAFE_MODE)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_DIAGNOSTICS_HIL_CLEAR_SAFE_MODE=1)
+endif()

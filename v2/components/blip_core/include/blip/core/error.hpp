@@ -15,6 +15,7 @@ enum class ErrorDomain : std::uint8_t {
     scheduler,
     event,
     storage,
+    diagnostics,
 };
 
 enum class ErrorCode : std::uint16_t {

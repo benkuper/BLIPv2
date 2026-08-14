@@ -24,6 +24,8 @@ The composition root will remain thin: reusable production behavior belongs in
 the component directories under [`../components/`](../components/).
 
 The committed custom partition table is sized for a 2 MiB device and reserves
-an 896 KiB `storage` LittleFS partition. The internal storage component formats
-that partition only when it is completely erased; unrecognized nonblank media
-fails closed so legacy data is not silently destroyed.
+an 896 KiB `storage` LittleFS partition followed by a 64 KiB `coredump`
+partition. The internal storage component formats its partition only when it is
+completely erased; unrecognized nonblank media fails closed so legacy data is
+not silently destroyed. Coredumps are validated at boot, retained without
+overwrite, and erased only by an explicit diagnostics action.
