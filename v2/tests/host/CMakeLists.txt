@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(blip_v2_host_tests LANGUAGES CXX)
 
 enable_testing()
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
 add_library(blip_core_host STATIC
     ../../components/blip_core/src/descriptor_json.cpp
@@ -43,6 +44,10 @@ add_test(NAME blip_scheduler_tests COMMAND blip_scheduler_tests)
 
 add_library(blip_storage_host STATIC
     ../../components/blip_storage/src/atomic_file_store.cpp
+    ../../components/blip_storage/src/imported_settings.cpp
+    ../../components/blip_storage/src/legacy_import_coordinator.cpp
+    ../../components/blip_storage/src/legacy_settings_importer.cpp
+    ../../components/blip_storage/src/migration_registry.cpp
     ../../components/blip_storage/src/settings_store.cpp
 )
 target_include_directories(blip_storage_host PUBLIC ../../components/blip_storage/include)
@@ -68,3 +73,29 @@ else()
     target_compile_options(blip_file_storage_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_file_storage_tests COMMAND blip_file_storage_tests)
+
+add_executable(blip_migration_tests blip_migration_tests.cpp)
+target_link_libraries(blip_migration_tests PRIVATE blip_storage_host)
+target_compile_definitions(blip_migration_tests PRIVATE
+    BLIP_V1_SETTINGS_FIXTURE="${CMAKE_CURRENT_SOURCE_DIR}/../fixtures/v1/settings/representative.msgpack")
+if(MSVC)
+    target_compile_options(blip_migration_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0 /D_CRT_SECURE_NO_WARNINGS)
+else()
+    target_compile_options(blip_migration_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_migration_tests COMMAND blip_migration_tests)
+
+add_executable(blip_legacy_import_dump blip_legacy_import_dump.cpp)
+target_link_libraries(blip_legacy_import_dump PRIVATE blip_storage_host)
+if(MSVC)
+    target_compile_options(blip_legacy_import_dump PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0 /D_CRT_SECURE_NO_WARNINGS)
+else()
+    target_compile_options(blip_legacy_import_dump PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(
+    NAME blip_legacy_settings_fixture
+    COMMAND ${Python3_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/validate_legacy_settings_import.py
+        --tool $<TARGET_FILE:blip_legacy_import_dump>
+        --source ${CMAKE_CURRENT_SOURCE_DIR}/../fixtures/v1/settings/representative.msgpack
+        --expected ${CMAKE_CURRENT_SOURCE_DIR}/../fixtures/v1/settings/expected-import.json)

@@ -2,6 +2,7 @@
 #include "blip/core/registry.hpp"
 #include "blip/core/scheduler.hpp"
 #include "blip/resources/broker.hpp"
+#include "blip/storage/legacy_settings_import_component.hpp"
 #include "blip/storage/littlefs_storage_component.hpp"
 #include "blip/storage/nvs_settings_component.hpp"
 #include "esp_idf_version.h"
@@ -18,8 +19,8 @@ namespace {
 
 constexpr char kTag[] = "blip_bootstrap";
 constexpr std::uint32_t kBootstrapSchemaVersion = 1U;
-constexpr std::array<std::string_view, 2> kBootstrapDependencies{"storage.settings",
-                                                                 "storage.files.internal"};
+constexpr std::array<std::string_view, 3> kBootstrapDependencies{
+    "storage.settings", "storage.files.internal", "storage.legacy_import"};
 
 static_assert(ESP_IDF_VERSION == ESP_IDF_VERSION_VAL(6, 0, 2),
               "BLIP V2 work package 1.1 requires ESP-IDF 6.0.2");
@@ -57,7 +58,8 @@ class BootstrapComponent final : public blip::core::Component {
 BootstrapComponent bootstrap_component{};
 blip::storage::NvsSettingsComponent settings_component{};
 blip::storage::LittleFsStorageComponent file_storage_component{};
-blip::core::Registry<3> registry{};
+blip::storage::LegacySettingsImportComponent legacy_import_component{settings_component.settings()};
+blip::core::Registry<4> registry{};
 
 class EspMonotonicClock final : public blip::core::Clock {
   public:
@@ -70,6 +72,13 @@ EspMonotonicClock monotonic_clock{};
 blip::core::Scheduler<4> scheduler{monotonic_clock};
 blip::resources::Broker<1, 1> resource_broker{};
 
+[[nodiscard]] const char* legacy_import_status() noexcept {
+    return legacy_import_component.disposition() ==
+                   blip::storage::LegacyImportDisposition::no_source
+               ? "none"
+               : "confirmed";
+}
+
 [[nodiscard]] bool start_registry() noexcept {
     const auto storage_status = registry.add(settings_component);
     if (!storage_status) {
@@ -77,6 +86,10 @@ blip::resources::Broker<1, 1> resource_broker{};
     }
     const auto file_storage_status = registry.add(file_storage_component);
     if (!file_storage_status) {
+        return false;
+    }
+    const auto import_status = registry.add(legacy_import_component);
+    if (!import_status) {
         return false;
     }
     const auto add_status = registry.add(bootstrap_component);
@@ -87,7 +100,16 @@ blip::resources::Broker<1, 1> resource_broker{};
     if (!validation_status) {
         return false;
     }
-    return registry.start_all().ok();
+    const auto started = registry.start_all();
+    if (!started.ok()) {
+        const auto& error = started.primary;
+        ESP_LOGE(kTag, "registry start failed component=%.*s operation=%.*s detail=%.*s",
+                 static_cast<int>(error.component.size()), error.component.data(),
+                 static_cast<int>(error.operation.size()), error.operation.data(),
+                 static_cast<int>(error.detail.size()), error.detail.data());
+        return false;
+    }
+    return true;
 }
 
 } // namespace
@@ -97,9 +119,14 @@ extern "C" void app_main() {
         ESP_LOGE(kTag, "BLIP_V2_REGISTRY_FAILED");
         return;
     }
+    if (!legacy_import_component.confirm_boot()) {
+        ESP_LOGE(kTag, "BLIP_V2_IMPORT_CONFIRM_FAILED");
+        static_cast<void>(registry.stop_all());
+        return;
+    }
     ESP_LOGI(kTag,
              "BLIP_V2_BOOTSTRAP_READY schema=%lu registry=1 scheduler=ready resources=ready "
-             "settings=nvs-v1 files=littlefs-v1 target=%s idf=%s",
-             static_cast<unsigned long>(kBootstrapSchemaVersion), CONFIG_IDF_TARGET,
-             esp_get_idf_version());
+             "settings=nvs-v1 files=littlefs-v1 legacy_import=%s target=%s idf=%s",
+             static_cast<unsigned long>(kBootstrapSchemaVersion), legacy_import_status(),
+             CONFIG_IDF_TARGET, esp_get_idf_version());
 }

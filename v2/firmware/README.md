@@ -16,6 +16,10 @@ Replace `esp32` with `esp32s3` or `esp32c6` for the other profiles. Generated
 configuration stays in the selected build directory. The dependency resolver
 uses a separate committed lock for each target.
 
+The startup task has an 8 KiB bounded stack so the depth-limited V1 settings
+parser can run before registry confirmation. ESP-IDF releases this transient
+stack after `app_main` returns; runtime components do not retain it.
+
 The composition root will remain thin: reusable production behavior belongs in
 the component directories under [`../components/`](../components/).
 

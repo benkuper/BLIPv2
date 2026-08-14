@@ -20,3 +20,4 @@ wire protocols, or public OSC paths.
 | --- | --- |
 | [2.1](2.1-versioned-nvs-settings.md) | Versioned per-component NVS records with two-slot interrupted-save recovery; implementation ready, merge held behind open Gate A hardware qualification |
 | [2.2](2.2-atomic-file-storage.md) | Versioned atomic LittleFS files and an optional two-slot SD service with bounded recovery |
+| [2.3](2.3-settings-migration-v1-import.md) | Ordered schema migrations and a bounded, journaled, physically qualified V1 settings import |
