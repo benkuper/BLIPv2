@@ -26,7 +26,7 @@ using namespace blip::transport;
         }                                                                                          \
     } while (false)
 
-constexpr std::array<ParameterDescriptor, 1> kProbeParameters{{
+constexpr std::array<ParameterDescriptor, 2> kProbeParameters{{
     {"value",
      "Value",
      ValueType::integer,
@@ -34,6 +34,14 @@ constexpr std::array<ParameterDescriptor, 1> kProbeParameters{{
      false,
      ScalarValue::from_integer(0),
      {true, -100, 100, 1},
+     ""},
+    {"secret",
+     "Secret",
+     ValueType::string,
+     Access::write_only,
+     true,
+     ScalarValue::from_string(""),
+     {},
      ""},
 }};
 constexpr std::array<ActionDescriptor, 1> kProbeActions{{
@@ -76,6 +84,10 @@ class ProbeComponent final : public Component {
     }
     [[nodiscard]] Status write_parameter(std::string_view id,
                                          const ScalarValue& value) noexcept override {
+        if (started_ && id == "secret" && value.type == ValueType::string) {
+            secret_writes_++;
+            return Status::success();
+        }
         if (!started_ || id != "value") {
             return Status::failure(
                 {ErrorDomain::control, ErrorCode::not_found, descriptor().id, "write", id});
@@ -83,6 +95,7 @@ class ProbeComponent final : public Component {
         value_ = value.integer;
         return Status::success();
     }
+    [[nodiscard]] std::size_t secret_writes() const noexcept { return secret_writes_; }
     [[nodiscard]] Status invoke_action(std::string_view id, std::span<const ScalarValue>,
                                        std::span<ScalarValue>,
                                        std::size_t& output_count) noexcept override {
@@ -98,6 +111,7 @@ class ProbeComponent final : public Component {
   private:
     std::int64_t value_{};
     bool started_{};
+    std::size_t secret_writes_{};
 };
 
 bool envelope_round_trip_and_corruption() {
@@ -223,6 +237,12 @@ bool registry_control_dispatch_validates_schema() {
     const std::array<ScalarValue, 1> out_of_range{{ScalarValue::from_integer(101)}};
     BLIP_CHECK(!controls.execute(
         {ControlOperation::write_parameter, "blip.probe", "value", out_of_range}, response));
+    const std::array<ScalarValue, 1> secret{{ScalarValue::from_string("hidden")}};
+    BLIP_CHECK(controls.execute({ControlOperation::write_parameter, "blip.probe", "secret", secret},
+                                response));
+    BLIP_CHECK(probe.secret_writes() == 1U);
+    BLIP_CHECK(!controls.execute({ControlOperation::read_parameter, "blip.probe", "secret", {}},
+                                 response));
     BLIP_CHECK(
         controls.execute({ControlOperation::invoke_action, "blip.probe", "reset", {}}, response));
     BLIP_CHECK(

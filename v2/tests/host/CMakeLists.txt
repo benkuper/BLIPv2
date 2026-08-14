@@ -135,3 +135,23 @@ add_test(
         --tool $<TARGET_FILE:blip_legacy_import_dump>
         --source ${CMAKE_CURRENT_SOURCE_DIR}/../fixtures/v1/settings/representative.msgpack
         --expected ${CMAKE_CURRENT_SOURCE_DIR}/../fixtures/v1/settings/expected-import.json)
+
+add_library(blip_network_host STATIC
+    ../../components/blip_network/src/provisioning_form.cpp
+    ../../components/blip_network/src/wifi_config.cpp
+    ../../components/blip_network/src/wifi_state_machine.cpp
+)
+target_include_directories(blip_network_host PUBLIC ../../components/blip_network/include)
+target_link_libraries(blip_network_host PUBLIC blip_storage_host)
+target_compile_features(blip_network_host PUBLIC cxx_std_20)
+
+add_executable(blip_network_tests blip_network_tests.cpp)
+target_link_libraries(blip_network_tests PRIVATE blip_network_host)
+if(MSVC)
+    target_compile_options(blip_network_host PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+    target_compile_options(blip_network_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_network_host PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+    target_compile_options(blip_network_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_network_tests COMMAND blip_network_tests)

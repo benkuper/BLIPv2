@@ -1,5 +1,6 @@
 # blip_transport
 
-Reserved for the versioned transport envelope and Serial, Wi-Fi, BLE, ESP-NOW,
-and compatibility adapters.
-
+Owns the versioned transport envelope and Serial implementation, plus future BLE,
+ESP-NOW, and compatibility protocol adapters. Wi-Fi station/AP lifecycle and IP
+provisioning live in `blip_network`; network protocols consume its `transport.wifi`
+service without taking ownership of the radio lifecycle.

@@ -6,7 +6,8 @@ set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/../components/blip_core"
     "${CMAKE_CURRENT_LIST_DIR}/../components/blip_resources"
     "${CMAKE_CURRENT_LIST_DIR}/../components/blip_storage"
-    "${CMAKE_CURRENT_LIST_DIR}/../components/blip_transport")
+    "${CMAKE_CURRENT_LIST_DIR}/../components/blip_transport"
+    "${CMAKE_CURRENT_LIST_DIR}/../components/blip_network")
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 

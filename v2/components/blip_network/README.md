@@ -1,0 +1,18 @@
+# blip_network
+
+Owns the ESP-IDF Wi-Fi station/AP lifecycle and the bounded provisioning surface. The
+component persists one versioned configuration through `storage.settings`, normalizes
+imported V1 `/wifi` settings, exposes credentials as write-only control data, and starts
+an open `BLIP-XXXXXX` SoftAP with a fixed-size HTTP form whenever credentials are absent
+or a station connection times out.
+
+Serial configuration reports success after radio application and NVS persistence.
+SoftAP POST reports HTTP 202 after persistence, then applies the radio change after a
+one-second response grace period. The AP remains available while station association is
+pending and is removed after a station-only connection succeeds.
+
+Transport protocols that use the resulting IP service remain in their own components;
+this component provides `transport.wifi` and owns the shared 2.4 GHz Wi-Fi radio request.
+
+See [work package 2.6](../../../docs/v2/work-packages/2.6-wifi-provisioning.md) for
+the settings format, state values, limits, verification, and rollback procedure.

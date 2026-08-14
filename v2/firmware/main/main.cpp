@@ -3,6 +3,7 @@
 #include "blip/core/esp_diagnostics_component.hpp"
 #include "blip/core/registry.hpp"
 #include "blip/core/scheduler.hpp"
+#include "blip/network/esp_wifi_component.hpp"
 #include "blip/resources/broker.hpp"
 #include "blip/storage/legacy_settings_import_component.hpp"
 #include "blip/storage/littlefs_storage_component.hpp"
@@ -23,9 +24,9 @@ namespace {
 
 constexpr char kTag[] = "blip_bootstrap";
 constexpr std::uint32_t kBootstrapSchemaVersion = 1U;
-constexpr std::array<std::string_view, 5> kBootstrapDependencies{
-    "diagnostics.runtime", "storage.settings", "storage.files.internal", "storage.legacy_import",
-    "transport.serial"};
+constexpr std::array<std::string_view, 6> kBootstrapDependencies{
+    "diagnostics.runtime",   "storage.settings", "storage.files.internal",
+    "storage.legacy_import", "transport.serial", "transport.wifi"};
 constexpr std::array<std::string_view, 2> kRecoveryDependencies{"diagnostics.runtime",
                                                                 "transport.serial"};
 constexpr std::array<blip::core::ParameterDescriptor, 1> kBootstrapParameters{{
@@ -146,8 +147,9 @@ blip::core::EspDiagnosticsComponent diagnostics_component{};
 blip::storage::NvsSettingsComponent settings_component{};
 blip::storage::LittleFsStorageComponent file_storage_component{};
 blip::storage::LegacySettingsImportComponent legacy_import_component{settings_component.settings()};
-blip::core::Registry<7> registry{};
-blip::core::RegistryControlService<7> control_component{registry};
+blip::network::EspWifiComponent wifi_component{settings_component.settings()};
+blip::core::Registry<8> registry{};
+blip::core::RegistryControlService<8> control_component{registry};
 blip::transport::EspSerialTransportComponent serial_transport_component{control_component};
 
 class EspMonotonicClock final : public blip::core::Clock {
@@ -197,6 +199,10 @@ blip::resources::Broker<1, 1> resource_broker{};
         }
         const auto import_status = registry.add(legacy_import_component);
         if (!import_status) {
+            return false;
+        }
+        const auto wifi_status = registry.add(wifi_component);
+        if (!wifi_status) {
             return false;
         }
         const auto add_status = registry.add(bootstrap_component);
@@ -279,10 +285,13 @@ extern "C" void app_main() {
     ESP_LOGI(kTag,
              "BLIP_V2_BOOTSTRAP_READY schema=%lu registry=1 scheduler=ready resources=ready "
              "settings=nvs-v1 files=littlefs-v1 legacy_import=%s diagnostics=structured-v1 "
-             "serial=blip-envelope-v1 "
+             "serial=blip-envelope-v1 wifi_state=%u wifi_ap=%.*s "
              "safe_mode=0 reset=%s coredump=%s coredump_id=%08lx heap_free=%lu "
              "heap_largest=%lu stack_hwm=%lu target=%s idf=%s",
              static_cast<unsigned long>(kBootstrapSchemaVersion), legacy_import_status(),
+             static_cast<unsigned>(wifi_component.connection_state()),
+             static_cast<int>(wifi_component.access_point_ssid().size()),
+             wifi_component.access_point_ssid().data(),
              blip::core::reset_cause_name(diagnostics.boot.reset_cause).data(),
              blip::core::coredump_status_name(diagnostics.coredump.status),
              static_cast<unsigned long>(diagnostics.coredump.identity_crc32),

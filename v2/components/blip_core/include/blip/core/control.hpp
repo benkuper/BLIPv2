@@ -144,6 +144,10 @@ class RegistryControlService final : public Component, public ControlService {
             return failure(ErrorCode::not_found, request.component_id, "read-parameter",
                            "parameter-not-found");
         }
+        if (parameter->access == Access::write_only) {
+            return failure(ErrorCode::invalid_state, request.component_id, "read-parameter",
+                           "write-only");
+        }
         if (!request.values.empty()) {
             return failure(ErrorCode::invalid_argument, request.component_id, "read-parameter",
                            "values-not-allowed");
@@ -166,7 +170,7 @@ class RegistryControlService final : public Component, public ControlService {
             return failure(ErrorCode::not_found, request.component_id, "write-parameter",
                            "parameter-not-found");
         }
-        if (parameter->access != Access::read_write) {
+        if (parameter->access == Access::read_only) {
             return failure(ErrorCode::invalid_state, request.component_id, "write-parameter",
                            "read-only");
         }

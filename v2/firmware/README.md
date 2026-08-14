@@ -1,8 +1,8 @@
 # Firmware application
 
-This is the ESP-IDF 6.0.2 application composition root. Work package 1.1 is a
-minimal C++20 bootstrap only; it contains no production subsystem or hardware
-configuration.
+This is the ESP-IDF 6.0.2 application composition root. It remains intentionally
+thin while composing the registry, diagnostics, storage, serial control, and Wi-Fi
+services implemented by the component libraries.
 
 After activating an ESP-IDF 6.0.2 environment, build one initial target from
 the repository root with:
@@ -28,9 +28,9 @@ COBS-framed BLIP envelope on UART0 (ESP32) or native USB Serial/JTAG (S3/C6).
 The host client and examples are in
 [`../tools/control/`](../tools/control/README.md).
 
-The committed custom partition table is sized for a 2 MiB device and reserves
-an 896 KiB `storage` LittleFS partition followed by a 64 KiB `coredump`
-partition. The internal storage component formats its partition only when it is
+The committed custom partition table is sized for a 2 MiB device and reserves a
+1.5 MiB factory application, a 384 KiB `storage` LittleFS partition, and a 64 KiB
+`coredump` partition. The internal storage component formats its partition only when it is
 completely erased; unrecognized nonblank media fails closed so legacy data is
 not silently destroyed. Coredumps are validated at boot, retained without
 overwrite, and erased only by an explicit diagnostics action.

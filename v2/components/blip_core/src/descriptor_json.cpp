@@ -83,6 +83,18 @@ class Writer {
     return "unknown";
 }
 
+[[nodiscard]] constexpr std::string_view access_name(Access access) noexcept {
+    switch (access) {
+    case Access::read_only:
+        return "read_only";
+    case Access::write_only:
+        return "write_only";
+    case Access::read_write:
+        return "read_write";
+    }
+    return "unknown";
+}
+
 [[nodiscard]] constexpr std::string_view
 resource_class_name(ResourceClass resource_class) noexcept {
     switch (resource_class) {
@@ -179,8 +191,7 @@ Result<std::size_t> write_descriptor_json(const ComponentDescriptor& descriptor,
                          writer.append(",\"type\":") &&
                          writer.quoted(value_type_name(parameter.type)) &&
                          writer.append(",\"access\":") &&
-                         writer.quoted(parameter.access == Access::read_only ? "read_only"
-                                                                             : "read_write") &&
+                         writer.quoted(access_name(parameter.access)) &&
                          writer.append(",\"persisted\":") &&
                          writer.append(parameter.persisted ? "true" : "false") &&
                          writer.append(",\"default\":") &&

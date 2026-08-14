@@ -292,7 +292,7 @@ bool complete_descriptor_json() {
         FieldDescriptor{"value", ValueType::integer, true}};
     constexpr std::array<FieldDescriptor, 1> event_fields{
         FieldDescriptor{"ok", ValueType::boolean, true}};
-    constexpr std::array<ParameterDescriptor, 1> parameters{
+    constexpr std::array<ParameterDescriptor, 2> parameters{
         ParameterDescriptor{"level",
                             "Level",
                             ValueType::integer,
@@ -300,7 +300,15 @@ bool complete_descriptor_json() {
                             true,
                             ScalarValue::from_integer(1),
                             {true, 0.0, 10.0, 1.0},
-                            "units"}};
+                            "units"},
+        ParameterDescriptor{"secret",
+                            "Secret",
+                            ValueType::string,
+                            blip::core::Access::write_only,
+                            true,
+                            ScalarValue::from_string(""),
+                            {},
+                            ""}};
     const std::array<ActionDescriptor, 1> actions{
         ActionDescriptor{"apply", "Apply", action_fields}};
     const std::array<EventDescriptor, 1> events{EventDescriptor{"changed", event_fields}};
@@ -316,6 +324,8 @@ bool complete_descriptor_json() {
     BLIP_CHECK(json.starts_with("{\"schema_version\":1"));
     BLIP_CHECK(json.find("\"id\":\"test.synthetic\"") != std::string_view::npos);
     BLIP_CHECK(json.find("\"parameters\":[{\"id\":\"level\"") != std::string_view::npos);
+    BLIP_CHECK(json.find("\"id\":\"secret\"") != std::string_view::npos);
+    BLIP_CHECK(json.find("\"access\":\"write_only\"") != std::string_view::npos);
     BLIP_CHECK(json.find("\"actions\":[{\"id\":\"apply\"") != std::string_view::npos);
     BLIP_CHECK(json.find("\"events\":[{\"id\":\"changed\"") != std::string_view::npos);
 

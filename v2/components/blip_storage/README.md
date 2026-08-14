@@ -24,7 +24,7 @@ directly.
 The internal service uses verified temporary-file replacement. The optional SD
 service uses two full generations and a checked pointer, tolerating filesystems
 whose replacement durability is weaker. Neither service automatically formats
-nonblank unknown media. The generic targets enable only the internal 896 KiB
+nonblank unknown media. The generic targets enable only the internal 384 KiB
 LittleFS partition and assign no SD pins.
 
 See [the 2.1 work-package record](../../../docs/v2/work-packages/2.1-versioned-nvs-settings.md),

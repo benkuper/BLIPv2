@@ -7,7 +7,7 @@
 namespace blip::core {
 
 enum class ValueType : std::uint8_t { boolean, integer, number, string };
-enum class Access : std::uint8_t { read_only, read_write };
+enum class Access : std::uint8_t { read_only, write_only, read_write };
 enum class DisablePolicy : std::uint8_t { live, reboot_required };
 
 struct ScalarValue {

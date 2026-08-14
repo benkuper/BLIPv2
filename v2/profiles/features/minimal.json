@@ -1,5 +1,28 @@
 {
   "schema_version": 1,
-  "resources": [],
-  "features": []
+  "resources": [
+    {
+      "class": "radio",
+      "id": "radio0",
+      "capacity": 1,
+      "capabilities": ["wifi-2.4ghz"]
+    }
+  ],
+  "features": [
+    {
+      "id": "transport.wifi",
+      "requests": [
+        {
+          "class": "radio",
+          "logical_name": "wifi",
+          "ownership": "multiplexed",
+          "alternatives": ["radio0"],
+          "amount": 1,
+          "capabilities": ["wifi-2.4ghz"],
+          "incompatible_features": [],
+          "live_reacquire": true
+        }
+      ]
+    }
+  ]
 }
