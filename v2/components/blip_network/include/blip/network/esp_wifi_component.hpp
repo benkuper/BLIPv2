@@ -21,9 +21,15 @@
 
 namespace blip::network {
 
+class HttpRootDelegate {
+  public:
+    virtual ~HttpRootDelegate() = default;
+    [[nodiscard]] virtual esp_err_t handle_http_root(httpd_req_t* request) noexcept = 0;
+};
+
 class EspWifiComponent final : public core::Component {
   public:
-    static constexpr std::size_t kPortalTaskStackBytes = 4096;
+    static constexpr std::size_t kPortalTaskStackBytes = 8192;
     static constexpr std::size_t kWorkerTaskStackBytes = 6144;
     static constexpr std::size_t kWorkerTaskStackWords =
         kWorkerTaskStackBytes / sizeof(StackType_t);
@@ -56,6 +62,9 @@ class EspWifiComponent final : public core::Component {
         return configuration_failures_.load();
     }
     [[nodiscard]] std::uint32_t worker_stack_headroom_bytes() const noexcept;
+    [[nodiscard]] bool set_http_root_delegate(HttpRootDelegate& delegate) noexcept;
+    void clear_http_root_delegate(const HttpRootDelegate& delegate) noexcept;
+    [[nodiscard]] bool local_ipv4(std::span<char> output, std::size_t& size) const noexcept;
 
   private:
     [[nodiscard]] core::Status load_config() noexcept;
@@ -139,8 +148,10 @@ class EspWifiComponent final : public core::Component {
     std::atomic<bool> worker_quiesced_{true};
     std::atomic<std::uint32_t> active_callbacks_{};
     std::atomic<WifiConnectionState> public_state_{WifiConnectionState::off};
+    std::atomic<bool> public_ap_active_{};
     std::atomic<std::uint32_t> configuration_updates_{};
     std::atomic<std::uint32_t> configuration_failures_{};
+    std::atomic<HttpRootDelegate*> http_root_delegate_{};
 };
 
 static_assert(sizeof(EspWifiComponent) <= 10240,

@@ -3,11 +3,23 @@
 #include "blip/core/component.hpp"
 #include "blip/core/fixed_vector.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <string_view>
 
 namespace blip::core {
+
+class RegistryView {
+  public:
+    virtual ~RegistryView() = default;
+    [[nodiscard]] virtual std::size_t component_count() const noexcept = 0;
+    [[nodiscard]] virtual const ComponentDescriptor&
+    component_descriptor(std::size_t index) const noexcept = 0;
+    [[nodiscard]] virtual std::size_t dynamic_control_count() const noexcept = 0;
+    [[nodiscard]] virtual const DynamicControl&
+    dynamic_control(std::size_t index) const noexcept = 0;
+};
 
 template <std::size_t MaxComponents> struct StartupReport {
     Error primary{};
@@ -16,7 +28,8 @@ template <std::size_t MaxComponents> struct StartupReport {
     [[nodiscard]] constexpr bool ok() const noexcept { return !primary.valid(); }
 };
 
-template <std::size_t MaxComponents, std::size_t MaxDynamicControls = 16> class Registry {
+template <std::size_t MaxComponents, std::size_t MaxDynamicControls = 16>
+class Registry final : public RegistryView {
   public:
     struct Entry {
         const ComponentDescriptor* descriptor{};
@@ -235,12 +248,16 @@ template <std::size_t MaxComponents, std::size_t MaxDynamicControls = 16> class 
     }
 
     [[nodiscard]] constexpr std::size_t size() const noexcept { return entries_.size(); }
+    [[nodiscard]] std::size_t component_count() const noexcept override { return entries_.size(); }
+    [[nodiscard]] const ComponentDescriptor&
+    component_descriptor(std::size_t index) const noexcept override {
+        return *entries_[index].descriptor;
+    }
     [[nodiscard]] constexpr bool closed() const noexcept { return closed_; }
-    [[nodiscard]] constexpr std::size_t dynamic_control_count() const noexcept {
+    [[nodiscard]] std::size_t dynamic_control_count() const noexcept override {
         return dynamic_controls_.size();
     }
-    [[nodiscard]] constexpr const DynamicControl&
-    dynamic_control(std::size_t index) const noexcept {
+    [[nodiscard]] const DynamicControl& dynamic_control(std::size_t index) const noexcept override {
         return dynamic_controls_[index];
     }
 
@@ -293,6 +310,40 @@ template <std::size_t MaxComponents, std::size_t MaxDynamicControls = 16> class 
         return true;
     }
 
+    [[nodiscard]] static bool valid_legacy_id(std::string_view id) noexcept {
+        if (id.empty() || !((id.front() >= 'a' && id.front() <= 'z') ||
+                            (id.front() >= 'A' && id.front() <= 'Z'))) {
+            return false;
+        }
+        for (const char character : id) {
+            const bool valid =
+                (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') ||
+                (character >= '0' && character <= '9') || character == '_' || character == '-';
+            if (!valid) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    [[nodiscard]] static bool same_scalar(const ScalarValue& left,
+                                          const ScalarValue& right) noexcept {
+        if (left.type != right.type) {
+            return false;
+        }
+        switch (left.type) {
+        case ValueType::boolean:
+            return left.boolean == right.boolean;
+        case ValueType::integer:
+            return left.integer == right.integer;
+        case ValueType::number:
+            return left.number == right.number;
+        case ValueType::string:
+            return left.string == right.string;
+        }
+        return false;
+    }
+
     [[nodiscard]] static bool valid_fields(std::span<const FieldDescriptor> fields) noexcept {
         for (std::size_t index = 0; index < fields.size(); ++index) {
             if (!valid_public_id(fields[index].id)) {
@@ -339,6 +390,55 @@ template <std::size_t MaxComponents, std::size_t MaxDynamicControls = 16> class 
             for (std::size_t prior = 0; prior < index; ++prior) {
                 if (descriptor.parameters[prior].id == parameter.id) {
                     return false;
+                }
+            }
+        }
+        for (std::size_t index = 0; index < descriptor.legacy_parameters.size(); ++index) {
+            const auto& alias = descriptor.legacy_parameters[index];
+            const auto parameter =
+                std::find_if(descriptor.parameters.begin(), descriptor.parameters.end(),
+                             [&alias](const ParameterDescriptor& candidate) {
+                                 return candidate.id == alias.parameter_id;
+                             });
+            if (parameter == descriptor.parameters.end() || !valid_legacy_id(alias.id) ||
+                alias.label.empty() ||
+                (alias.enum_values.empty() && alias.type != parameter->type) ||
+                (!alias.enum_values.empty() && alias.type != ValueType::string)) {
+                return false;
+            }
+            for (std::size_t prior = 0; prior < index; ++prior) {
+                if (descriptor.legacy_parameters[prior].parameter_id == alias.parameter_id ||
+                    descriptor.legacy_parameters[prior].id == alias.id) {
+                    return false;
+                }
+            }
+            for (const auto& other : descriptor.parameters) {
+                if (other.id != alias.parameter_id && other.id == alias.id) {
+                    return false;
+                }
+            }
+            for (const auto& action : descriptor.actions) {
+                if (action.id == alias.id) {
+                    return false;
+                }
+            }
+            for (const auto& event : descriptor.events) {
+                if (event.id == alias.id) {
+                    return false;
+                }
+            }
+            for (std::size_t value_index = 0; value_index < alias.enum_values.size();
+                 ++value_index) {
+                const auto& value = alias.enum_values[value_index];
+                if (value.canonical_value.type != parameter->type || value.label.empty()) {
+                    return false;
+                }
+                for (std::size_t prior = 0; prior < value_index; ++prior) {
+                    if (alias.enum_values[prior].label == value.label ||
+                        same_scalar(alias.enum_values[prior].canonical_value,
+                                    value.canonical_value)) {
+                        return false;
+                    }
                 }
             }
         }
@@ -409,6 +509,11 @@ template <std::size_t MaxComponents, std::size_t MaxDynamicControls = 16> class 
         }
         for (const auto& parameter : entry->descriptor->parameters) {
             if (parameter.id == control.id) {
+                return true;
+            }
+        }
+        for (const auto& alias : entry->descriptor->legacy_parameters) {
+            if (alias.id == control.id) {
                 return true;
             }
         }

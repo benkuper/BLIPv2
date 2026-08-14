@@ -11,7 +11,7 @@
 
 namespace blip::core {
 
-inline constexpr std::size_t kMaxControlValues = 4;
+inline constexpr std::size_t kMaxControlValues = 8;
 
 enum class ControlOperation : std::uint8_t {
     read_parameter = 1,

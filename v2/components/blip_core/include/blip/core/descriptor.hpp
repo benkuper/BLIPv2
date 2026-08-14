@@ -70,6 +70,19 @@ struct ParameterDescriptor {
     std::string_view unit{};
 };
 
+struct LegacyEnumValue {
+    ScalarValue canonical_value{};
+    std::string_view label{};
+};
+
+struct LegacyParameterAlias {
+    std::string_view parameter_id{};
+    std::string_view id{};
+    std::string_view label{};
+    ValueType type{ValueType::integer};
+    std::span<const LegacyEnumValue> enum_values{};
+};
+
 struct ActionDescriptor {
     std::string_view id{};
     std::string_view label{};
@@ -141,6 +154,7 @@ struct ComponentDescriptor {
     std::span<const std::string_view> required_services{};
     std::span<const std::string_view> optional_services{};
     std::span<const ParameterDescriptor> parameters{};
+    std::span<const LegacyParameterAlias> legacy_parameters{};
     std::span<const ActionDescriptor> actions{};
     std::span<const EventDescriptor> events{};
     std::span<const DiagnosticDescriptor> diagnostics{};

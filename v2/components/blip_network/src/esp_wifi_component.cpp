@@ -18,13 +18,39 @@ namespace blip::network {
 namespace {
 
 constexpr char kTag[] = "blip_wifi";
-constexpr std::array<std::string_view, 1> kProvidedServices{"transport.wifi"};
+constexpr std::array<std::string_view, 2> kProvidedServices{"transport.wifi", "network.http"};
 constexpr std::array<std::string_view, 2> kRequiredServices{"storage.settings",
                                                             "storage.legacy_import"};
 constexpr std::array<std::string_view, 1> kRadioAlternatives{"radio0"};
 constexpr std::array<core::ResourceRequest, 1> kResources{{
     {core::ResourceClass::radio, "wifi", core::OwnershipMode::multiplexed, kRadioAlternatives, 0, 1,
      0, 0x01, 0, true},
+}};
+constexpr std::array<core::LegacyEnumValue, 3> kLegacyModeValues{{
+    {core::ScalarValue::from_integer(0), "Wifi"},
+    {core::ScalarValue::from_integer(1), "AP"},
+    {core::ScalarValue::from_integer(2), "Wifi+AP"},
+}};
+constexpr std::array<core::LegacyEnumValue, 4> kLegacyTxPowerValues{{
+    {core::ScalarValue::from_integer(0), "15dBm"},
+    {core::ScalarValue::from_integer(1), "17dBm"},
+    {core::ScalarValue::from_integer(2), "19.5dBm"},
+    {core::ScalarValue::from_integer(3), "20.5dBm"},
+}};
+constexpr std::array<core::LegacyEnumValue, 4> kLegacyProtocolValues{{
+    {core::ScalarValue::from_integer(0), "11B"},
+    {core::ScalarValue::from_integer(1), "11BG"},
+    {core::ScalarValue::from_integer(2), "11BGN"},
+    {core::ScalarValue::from_integer(3), "AX"},
+}};
+constexpr std::array<core::LegacyParameterAlias, 7> kLegacyParameters{{
+    {"mode", "mode", "Mode", core::ValueType::string, kLegacyModeValues},
+    {"password", "pass", "Pass", core::ValueType::string, {}},
+    {"manual_ip", "manualIP", "Manual IP", core::ValueType::string, {}},
+    {"manual_gateway", "manualGateway", "Manual Gateway", core::ValueType::string, {}},
+    {"channel_scan", "channelScanMode", "Channel Scan Mode", core::ValueType::boolean, {}},
+    {"tx_power", "txPower", "Tx Power", core::ValueType::string, kLegacyTxPowerValues},
+    {"protocol", "wifiProtocol", "Wifi Protocol", core::ValueType::string, kLegacyProtocolValues},
 }};
 constexpr std::array<core::MetadataEntry, 5> kMetadata{{
     {"legacy_path", "/wifi"},
@@ -181,6 +207,7 @@ constexpr char kProvisionAccepted[] =
     descriptor.provided_services = kProvidedServices;
     descriptor.required_services = kRequiredServices;
     descriptor.parameters = kParameters;
+    descriptor.legacy_parameters = kLegacyParameters;
     descriptor.actions = kActions;
     descriptor.events = kEvents;
     descriptor.diagnostics = kDiagnostics;
@@ -475,12 +502,18 @@ core::Status EspWifiComponent::start_portal_locked() noexcept {
         .method = HTTP_GET,
         .handler = root_handler,
         .user_ctx = this,
+        .is_websocket = true,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr,
     };
     const httpd_uri_t provision_uri{
         .uri = "/provision",
         .method = HTTP_POST,
         .handler = provision_handler,
         .user_ctx = this,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr,
     };
     if (httpd_register_uri_handler(portal_, &root) != ESP_OK ||
         httpd_register_uri_handler(portal_, &provision_uri) != ESP_OK) {
@@ -500,6 +533,7 @@ void EspWifiComponent::stop_portal_locked() noexcept {
 
 void EspWifiComponent::update_public_state_locked() noexcept {
     public_state_.store(state_machine_.state());
+    public_ap_active_.store(state_machine_.ap_active());
 }
 
 void EspWifiComponent::update_signal_locked() noexcept {
@@ -553,11 +587,9 @@ core::Status EspWifiComponent::reconfigure_radio_locked() noexcept {
     if (!status) {
         return status;
     }
-    if (state_machine_.ap_active()) {
-        status = start_portal_locked();
-        if (!status) {
-            return status;
-        }
+    status = start_portal_locked();
+    if (!status) {
+        return status;
     }
     if (transition.connect_station) {
         const esp_err_t connected = esp_wifi_connect();
@@ -753,6 +785,7 @@ core::Status EspWifiComponent::stop() noexcept {
         vTaskDelay(pdMS_TO_TICKS(1));
     }
     public_state_.store(WifiConnectionState::off);
+    public_ap_active_.store(false);
     reconfigure_pending_ = false;
     pending_defer_radio_ = false;
     deferred_apply_pending_ = false;
@@ -1062,9 +1095,46 @@ void EspWifiComponent::handle_event(esp_event_base_t event_base, std::int32_t ev
 }
 
 esp_err_t EspWifiComponent::handle_root(httpd_req_t* request) noexcept {
+    auto* delegate = http_root_delegate_.load();
+    const int socket = httpd_req_to_sockfd(request);
+    const bool websocket =
+        socket >= 0 && httpd_ws_get_fd_info(request->handle, socket) == HTTPD_WS_CLIENT_WEBSOCKET;
+    const bool query = httpd_req_get_url_query_len(request) != 0U;
+    if (delegate != nullptr && (websocket || query || !public_ap_active_.load())) {
+        return delegate->handle_http_root(request);
+    }
     httpd_resp_set_type(request, "text/html; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return httpd_resp_send(request, kPortalHtml, HTTPD_RESP_USE_STRLEN);
+}
+
+bool EspWifiComponent::set_http_root_delegate(HttpRootDelegate& delegate) noexcept {
+    HttpRootDelegate* expected{};
+    return http_root_delegate_.compare_exchange_strong(expected, &delegate) ||
+           expected == &delegate;
+}
+
+void EspWifiComponent::clear_http_root_delegate(const HttpRootDelegate& delegate) noexcept {
+    HttpRootDelegate* expected = const_cast<HttpRootDelegate*>(&delegate);
+    static_cast<void>(http_root_delegate_.compare_exchange_strong(expected, nullptr));
+}
+
+bool EspWifiComponent::local_ipv4(std::span<char> output, std::size_t& size) const noexcept {
+    size = 0;
+    if (!started_.load() || output.size() < 16U) {
+        return false;
+    }
+    esp_netif_t* netif = public_state_.load() == WifiConnectionState::connected
+                             ? station_netif_
+                             : access_point_netif_;
+    esp_netif_ip_info_t information{};
+    if (netif == nullptr || esp_netif_get_ip_info(netif, &information) != ESP_OK ||
+        esp_ip4addr_ntoa(&information.ip, output.data(), static_cast<int>(output.size())) ==
+            nullptr) {
+        return false;
+    }
+    size = std::char_traits<char>::length(output.data());
+    return size != 0U;
 }
 
 esp_err_t EspWifiComponent::handle_provision(httpd_req_t* request) noexcept {

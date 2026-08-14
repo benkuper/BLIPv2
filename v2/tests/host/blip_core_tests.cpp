@@ -20,6 +20,8 @@ using blip::core::ErrorDomain;
 using blip::core::EventDescriptor;
 using blip::core::FieldDescriptor;
 using blip::core::FixedVector;
+using blip::core::LegacyEnumValue;
+using blip::core::LegacyParameterAlias;
 using blip::core::ParameterDescriptor;
 using blip::core::Registry;
 using blip::core::ScalarValue;
@@ -286,6 +288,56 @@ bool bounded_extension_transaction() {
     return true;
 }
 
+bool legacy_alias_validation_and_dynamic_collision() {
+    constexpr std::array<ParameterDescriptor, 1> parameters{{
+        {"mode",
+         "Mode",
+         ValueType::integer,
+         blip::core::Access::read_write,
+         true,
+         ScalarValue::from_integer(0),
+         {true, 0, 1, 1},
+         {}},
+    }};
+    constexpr std::array<LegacyEnumValue, 2> enum_values{{
+        {ScalarValue::from_integer(0), "Mode A"},
+        {ScalarValue::from_integer(1), "Mode B"},
+    }};
+    const std::array<LegacyParameterAlias, 1> aliases{{
+        {"mode", "legacyMode", "Legacy Mode", ValueType::string, enum_values},
+    }};
+    CallLog log{};
+    auto valid_descriptor = descriptor("test.alias");
+    valid_descriptor.parameters = parameters;
+    valid_descriptor.legacy_parameters = aliases;
+    TestComponent valid{valid_descriptor, log};
+    Registry<1> valid_registry{};
+    BLIP_CHECK(valid_registry.add(valid));
+    BLIP_CHECK(valid_registry.validate());
+
+    auto collision = valid_registry.begin_extension();
+    BLIP_CHECK(collision.add(DynamicControl{"test.alias", DynamicControlKind::parameter,
+                                            "legacyMode", ValueType::string}));
+    const auto collision_status = collision.commit();
+    BLIP_CHECK(!collision_status);
+    BLIP_CHECK(collision_status.error().code == ErrorCode::duplicate_id);
+
+    constexpr std::array<LegacyParameterAlias, 1> missing_parameter{{
+        {"absent", "legacyMode", "Legacy Mode", ValueType::integer, {}},
+    }};
+    auto invalid_descriptor = descriptor("test.invalid_alias");
+    invalid_descriptor.parameters = parameters;
+    invalid_descriptor.legacy_parameters = missing_parameter;
+    TestComponent invalid{invalid_descriptor, log};
+    Registry<1> invalid_registry{};
+    BLIP_CHECK(invalid_registry.add(invalid));
+    const auto invalid_status = invalid_registry.validate();
+    BLIP_CHECK(!invalid_status);
+    BLIP_CHECK(invalid_status.error().code == ErrorCode::validation_failed);
+    BLIP_CHECK(invalid.validate_calls == 0);
+    return true;
+}
+
 bool complete_descriptor_json() {
     constexpr std::array<std::string_view, 1> provided{"service.synthetic"};
     constexpr std::array<FieldDescriptor, 1> action_fields{
@@ -309,15 +361,23 @@ bool complete_descriptor_json() {
                             ScalarValue::from_string(""),
                             {},
                             ""}};
+    constexpr std::array<LegacyEnumValue, 2> legacy_values{{
+        {ScalarValue::from_integer(0), "Low"},
+        {ScalarValue::from_integer(1), "High"},
+    }};
+    const std::array<LegacyParameterAlias, 1> legacy_parameters{{
+        {"level", "legacyLevel", "Legacy Level", ValueType::string, legacy_values},
+    }};
     const std::array<ActionDescriptor, 1> actions{
         ActionDescriptor{"apply", "Apply", action_fields}};
     const std::array<EventDescriptor, 1> events{EventDescriptor{"changed", event_fields}};
     auto value = descriptor("test.synthetic", provided);
     value.display_name = "Synthetic";
     value.parameters = parameters;
+    value.legacy_parameters = legacy_parameters;
     value.actions = actions;
     value.events = events;
-    std::array<char, 1024> output{};
+    std::array<char, 2048> output{};
     const auto result = blip::core::write_descriptor_json(value, output);
     BLIP_CHECK(result);
     const std::string_view json{output.data(), result.value()};
@@ -325,6 +385,9 @@ bool complete_descriptor_json() {
     BLIP_CHECK(json.find("\"id\":\"test.synthetic\"") != std::string_view::npos);
     BLIP_CHECK(json.find("\"parameters\":[{\"id\":\"level\"") != std::string_view::npos);
     BLIP_CHECK(json.find("\"id\":\"secret\"") != std::string_view::npos);
+    BLIP_CHECK(json.find("\"legacy_parameters\":[{\"parameter_id\":\"level\"") !=
+               std::string_view::npos);
+    BLIP_CHECK(json.find("\"label\":\"High\"") != std::string_view::npos);
     BLIP_CHECK(json.find("\"access\":\"write_only\"") != std::string_view::npos);
     BLIP_CHECK(json.find("\"actions\":[{\"id\":\"apply\"") != std::string_view::npos);
     BLIP_CHECK(json.find("\"events\":[{\"id\":\"changed\"") != std::string_view::npos);
@@ -347,6 +410,7 @@ int main() {
         {"partial start cleanup and causes", partial_start_cleanup_and_causes},
         {"lifecycle idempotence and quiescence", lifecycle_idempotence_and_quiescence},
         {"bounded extension transaction", bounded_extension_transaction},
+        {"legacy alias validation and collision", legacy_alias_validation_and_dynamic_collision},
         {"complete descriptor JSON", complete_descriptor_json},
     };
     return run_tests(tests);

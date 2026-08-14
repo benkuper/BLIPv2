@@ -4,6 +4,7 @@
 #include "blip/core/registry.hpp"
 #include "blip/core/scheduler.hpp"
 #include "blip/network/esp_wifi_component.hpp"
+#include "blip/oscquery/esp_oscquery_component.hpp"
 #include "blip/resources/broker.hpp"
 #include "blip/storage/legacy_settings_import_component.hpp"
 #include "blip/storage/littlefs_storage_component.hpp"
@@ -24,9 +25,9 @@ namespace {
 
 constexpr char kTag[] = "blip_bootstrap";
 constexpr std::uint32_t kBootstrapSchemaVersion = 1U;
-constexpr std::array<std::string_view, 6> kBootstrapDependencies{
-    "diagnostics.runtime",   "storage.settings", "storage.files.internal",
-    "storage.legacy_import", "transport.serial", "transport.wifi"};
+constexpr std::array<std::string_view, 7> kBootstrapDependencies{
+    "diagnostics.runtime", "storage.settings", "storage.files.internal", "storage.legacy_import",
+    "transport.serial",    "transport.wifi",   "discovery.oscquery"};
 constexpr std::array<std::string_view, 2> kRecoveryDependencies{"diagnostics.runtime",
                                                                 "transport.serial"};
 constexpr std::array<blip::core::ParameterDescriptor, 1> kBootstrapParameters{{
@@ -148,9 +149,11 @@ blip::storage::NvsSettingsComponent settings_component{};
 blip::storage::LittleFsStorageComponent file_storage_component{};
 blip::storage::LegacySettingsImportComponent legacy_import_component{settings_component.settings()};
 blip::network::EspWifiComponent wifi_component{settings_component.settings()};
-blip::core::Registry<8> registry{};
-blip::core::RegistryControlService<8> control_component{registry};
+blip::core::Registry<9> registry{};
+blip::core::RegistryControlService<9> control_component{registry};
 blip::transport::EspSerialTransportComponent serial_transport_component{control_component};
+blip::oscquery::EspOscQueryComponent oscquery_component{registry, control_component,
+                                                        wifi_component};
 
 class EspMonotonicClock final : public blip::core::Clock {
   public:
@@ -203,6 +206,10 @@ blip::resources::Broker<1, 1> resource_broker{};
         }
         const auto wifi_status = registry.add(wifi_component);
         if (!wifi_status) {
+            return false;
+        }
+        const auto oscquery_status = registry.add(oscquery_component);
+        if (!oscquery_status) {
             return false;
         }
         const auto add_status = registry.add(bootstrap_component);
@@ -285,10 +292,12 @@ extern "C" void app_main() {
     ESP_LOGI(kTag,
              "BLIP_V2_BOOTSTRAP_READY schema=%lu registry=1 scheduler=ready resources=ready "
              "settings=nvs-v1 files=littlefs-v1 legacy_import=%s diagnostics=structured-v1 "
-             "serial=blip-envelope-v1 wifi_state=%u wifi_ap=%.*s "
+             "serial=blip-envelope-v1 osc=udp9000-oscquery-v1 osc_stack_hwm=%lu "
+             "wifi_state=%u wifi_ap=%.*s "
              "safe_mode=0 reset=%s coredump=%s coredump_id=%08lx heap_free=%lu "
              "heap_largest=%lu stack_hwm=%lu target=%s idf=%s",
              static_cast<unsigned long>(kBootstrapSchemaVersion), legacy_import_status(),
+             static_cast<unsigned long>(oscquery_component.task_stack_headroom_bytes()),
              static_cast<unsigned>(wifi_component.connection_state()),
              static_cast<int>(wifi_component.access_point_ssid().size()),
              wifi_component.access_point_ssid().data(),

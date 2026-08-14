@@ -20,6 +20,7 @@ pinned commit and source path used to derive it.
 | Implementation work-package records | [work-packages/](work-packages/) |
 | Milestone 1 verification | [work-packages/milestone-1-evidence.md](work-packages/milestone-1-evidence.md) |
 | Work package 2.1 settings contract | [work-packages/2.1-versioned-nvs-settings.md](work-packages/2.1-versioned-nvs-settings.md) |
+| Work package 2.7 OSC/OSCQuery contract | [work-packages/2.7-osc-oscquery.md](work-packages/2.7-osc-oscquery.md) |
 | Append-only gate evidence | [evidence/](evidence/) |
 
 ## Scope boundary

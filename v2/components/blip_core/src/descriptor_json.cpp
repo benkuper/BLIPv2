@@ -207,6 +207,24 @@ Result<std::size_t> write_descriptor_json(const ComponentDescriptor& descriptor,
                          writer.append(",\"unit\":") && writer.quoted(parameter.unit) &&
                          writer.append("}");
               }) &&
+        writer.append(",\"legacy_parameters\":") &&
+        array(writer, descriptor.legacy_parameters,
+              [&writer](const LegacyParameterAlias& alias) {
+                  return writer.append("{\"parameter_id\":") && writer.quoted(alias.parameter_id) &&
+                         writer.append(",\"id\":") && writer.quoted(alias.id) &&
+                         writer.append(",\"label\":") && writer.quoted(alias.label) &&
+                         writer.append(",\"type\":") &&
+                         writer.quoted(value_type_name(alias.type)) &&
+                         writer.append(",\"enum_values\":") &&
+                         array(writer, alias.enum_values,
+                               [&writer](const LegacyEnumValue& value) {
+                                   return writer.append("{\"canonical_value\":") &&
+                                          scalar(writer, value.canonical_value) &&
+                                          writer.append(",\"label\":") &&
+                                          writer.quoted(value.label) && writer.append("}");
+                               }) &&
+                         writer.append("}");
+              }) &&
         writer.append(",\"actions\":") &&
         array(writer, descriptor.actions,
               [&writer](const ActionDescriptor& action) {

@@ -155,3 +155,25 @@ else()
     target_compile_options(blip_network_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_network_tests COMMAND blip_network_tests)
+
+add_library(blip_oscquery_host STATIC
+    ../../components/blip_oscquery/src/legacy_osc.cpp
+    ../../components/blip_oscquery/src/osc.cpp
+    ../../components/blip_oscquery/src/oscquery.cpp
+)
+target_include_directories(blip_oscquery_host PUBLIC ../../components/blip_oscquery/include)
+target_link_libraries(blip_oscquery_host PUBLIC blip_core_host)
+target_compile_features(blip_oscquery_host PUBLIC cxx_std_20)
+
+add_executable(blip_oscquery_tests blip_oscquery_tests.cpp)
+target_link_libraries(blip_oscquery_tests PRIVATE blip_oscquery_host)
+target_compile_definitions(blip_oscquery_tests PRIVATE
+    BLIP_V1_FIXTURES="${CMAKE_CURRENT_SOURCE_DIR}/../fixtures/v1")
+if(MSVC)
+    target_compile_options(blip_oscquery_host PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+    target_compile_options(blip_oscquery_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_oscquery_host PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+    target_compile_options(blip_oscquery_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_oscquery_tests COMMAND blip_oscquery_tests)

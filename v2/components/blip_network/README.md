@@ -12,7 +12,10 @@ one-second response grace period. The AP remains available while station associa
 pending and is removed after a station-only connection succeeds.
 
 Transport protocols that use the resulting IP service remain in their own components;
-this component provides `transport.wifi` and owns the shared 2.4 GHz Wi-Fi radio request.
+this component provides `transport.wifi` and `network.http`, owns the shared 2.4 GHz
+Wi-Fi radio request, and runs the bounded 8 KiB port-80 server used by provisioning and
+OSCQuery. While the public AP is active, plain `GET /` retains the setup form; OSCQuery
+queries and WebSocket upgrades are delegated to the registered protocol component.
 
 See [work package 2.6](../../../docs/v2/work-packages/2.6-wifi-provisioning.md) for
 the settings format, state values, limits, verification, and rollback procedure.
