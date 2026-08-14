@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "resources": [
+    {
+      "class": "gpio",
+      "id": "gpio.4",
+      "capacity": 1,
+      "capabilities": ["input", "output"]
+    }
+  ],
+  "features": [
+    {
+      "id": "feature.button",
+      "requests": [
+        {
+          "class": "gpio",
+          "logical_name": "button",
+          "ownership": "exclusive",
+          "alternatives": ["gpio.4"],
+          "amount": 1,
+          "capabilities": ["input"]
+        }
+      ]
+    },
+    {
+      "id": "feature.led",
+      "requests": [
+        {
+          "class": "gpio",
+          "logical_name": "led_data",
+          "ownership": "exclusive",
+          "alternatives": ["gpio.4"],
+          "amount": 1,
+          "capabilities": ["output"]
+        }
+      ]
+    }
+  ]
+}

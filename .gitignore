@@ -1,0 +1,19 @@
+# ESP-IDF and CMake build output
+build/
+build-*/
+v2/firmware/build/
+v2/firmware/build-*/
+v2/firmware/managed_components/
+v2/firmware/sdkconfig
+v2/firmware/sdkconfig.old
+
+# Python cache and local environments
+__pycache__/
+*.py[cod]
+.venv/
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

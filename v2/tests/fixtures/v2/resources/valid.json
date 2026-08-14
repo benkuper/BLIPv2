@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "resources": [
+    {
+      "class": "i2c",
+      "id": "i2c.0",
+      "capacity": 2,
+      "capabilities": ["fast-mode"]
+    }
+  ],
+  "features": [
+    {
+      "id": "sensor.a",
+      "requests": [
+        {
+          "class": "i2c",
+          "logical_name": "sensor_a",
+          "ownership": "bus-member",
+          "alternatives": ["i2c.0"],
+          "amount": 1,
+          "capabilities": ["fast-mode"],
+          "member_key": 40,
+          "incompatible_features": [],
+          "live_reacquire": true
+        }
+      ]
+    },
+    {
+      "id": "sensor.b",
+      "requests": [
+        {
+          "class": "i2c",
+          "logical_name": "sensor_b",
+          "ownership": "bus-member",
+          "alternatives": ["i2c.0"],
+          "amount": 1,
+          "capabilities": ["fast-mode"],
+          "member_key": 41,
+          "incompatible_features": [],
+          "live_reacquire": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blip.dev/schemas/v2/resource-manifest.schema.json",
+  "title": "BLIP V2 resource manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "resources", "features"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["class", "id", "capacity", "capabilities"],
+        "properties": {
+          "class": {
+            "enum": ["gpio", "rmt", "spi", "i2c", "uart", "timer", "dma", "internal_memory", "psram", "radio"]
+          },
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9._-]+$" },
+          "capacity": { "type": "integer", "minimum": 1 },
+          "capabilities": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^[a-z][a-z0-9._-]*$" },
+            "uniqueItems": true
+          },
+          "reserved_for": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "requests"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9._-]+$" },
+          "requests": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["class", "logical_name", "ownership", "alternatives", "amount", "capabilities"],
+              "properties": {
+                "class": { "type": "string" },
+                "logical_name": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+                "ownership": { "enum": ["exclusive", "shared-read", "bus-member", "multiplexed"] },
+                "alternatives": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": { "type": "string" }
+                },
+                "amount": { "type": "integer", "minimum": 1 },
+                "capabilities": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "uniqueItems": true
+                },
+                "member_key": { "type": "integer", "minimum": 0 },
+                "incompatible_features": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "uniqueItems": true
+                },
+                "live_reacquire": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

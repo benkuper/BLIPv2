@@ -1,0 +1,110 @@
+name: V2 CI
+
+on:
+  push:
+    branches: [v2]
+    paths:
+      - ".github/workflows/v2-ci.yml"
+      - ".clang-format"
+      - ".editorconfig"
+      - "docs/v2/**"
+      - "v2/**"
+  pull_request:
+    paths:
+      - ".github/workflows/v2-ci.yml"
+      - ".clang-format"
+      - ".editorconfig"
+      - "docs/v2/**"
+      - "v2/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v2-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IDF_IMAGE: espressif/idf:v6.0.2@sha256:0d8c9773d48a327233f9c1d7c654ff0bcf133ae24503ea2e97a57cfe02b8cb67
+
+jobs:
+  host:
+    name: Foundation and bootstrap contracts
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Validate Milestone 0 fixtures
+        run: python v2/tests/host/validate_foundation.py
+      - name: Validate work package 1.1 contracts
+        run: python v2/tests/host/validate_bootstrap.py
+      - name: Validate resource manifests
+        run: python v2/tests/host/validate_resource_manifests.py
+      - name: Configure C++ host tests
+        run: cmake -S v2/tests/host -B build/host -G Ninja -D CMAKE_BUILD_TYPE=Debug
+      - name: Build C++ host tests
+        run: cmake --build build/host --parallel
+      - name: Run C++ host tests
+        run: ctest --test-dir build/host --output-on-failure
+
+  format:
+    name: C++ formatting
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Install pinned formatter
+        run: python -m pip install --disable-pip-version-check clang-format==18.1.8
+      - name: Check formatting
+        run: >-
+          find v2 -type f \( -name '*.cpp' -o -name '*.hpp' -o -name '*.h' \)
+          -exec clang-format --dry-run --Werror {} +
+
+  firmware:
+    name: Firmware (${{ matrix.target }})
+    needs: [host, format]
+    runs-on: ubuntu-24.04
+    container: espressif/idf:v6.0.2@sha256:0d8c9773d48a327233f9c1d7c654ff0bcf133ae24503ea2e97a57cfe02b8cb67
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [esp32, esp32s3, esp32c6]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Verify ESP-IDF version
+        shell: bash
+        run: |
+          grep -Fxq "set(IDF_VERSION_MAJOR 6)" "$IDF_PATH/tools/cmake/version.cmake"
+          grep -Fxq "set(IDF_VERSION_MINOR 0)" "$IDF_PATH/tools/cmake/version.cmake"
+          grep -Fxq "set(IDF_VERSION_PATCH 2)" "$IDF_PATH/tools/cmake/version.cmake"
+      - name: Build first clean tree
+        shell: bash
+        run: >-
+          idf.py -C v2/firmware -B "$GITHUB_WORKSPACE/build/${{ matrix.target }}-a"
+          -D "IDF_TARGET=${{ matrix.target }}" build
+      - name: Validate first build contract
+        shell: bash
+        run: >-
+          python v2/tests/host/validate_firmware_build.py
+          --build-dir "build/${{ matrix.target }}-a"
+          --target "${{ matrix.target }}"
+      - name: Build second clean tree
+        shell: bash
+        run: >-
+          idf.py -C v2/firmware -B "$GITHUB_WORKSPACE/build/${{ matrix.target }}-b"
+          -D "IDF_TARGET=${{ matrix.target }}" build
+      - name: Check reproducible application image
+        shell: bash
+        run: >-
+          cmp "build/${{ matrix.target }}-a/blip-v2.bin"
+          "build/${{ matrix.target }}-b/blip-v2.bin"
+      - name: Ensure dependency lock is unchanged
+        shell: bash
+        run: git diff --exit-code -- "v2/firmware/dependencies.lock.${{ matrix.target }}"
+      - name: Report image size
+        shell: bash
+        run: >-
+          idf.py -C v2/firmware -B "$GITHUB_WORKSPACE/build/${{ matrix.target }}-a"
+          size

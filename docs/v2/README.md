@@ -1,4 +1,4 @@
-# BLIP V2 planning foundation
+# BLIP V2 architecture and evidence
 
 This directory records the contracts that must be stable before production V2
 firmware starts. The baseline is BLIP V1 commit
@@ -6,7 +6,7 @@ firmware starts. The baseline is BLIP V1 commit
 The repository does not vendor that source; every V1 observation below names the
 pinned commit and source path used to derive it.
 
-## Milestone 0 deliverables
+## Deliverables
 
 | Deliverable | Location |
 | --- | --- |
@@ -17,6 +17,8 @@ pinned commit and source path used to derive it.
 | PR and issue dependency map | [dependency-map.md](dependency-map.md) |
 | Architecture decisions | [adr/](adr/) |
 | V1 compatibility fixtures | [`v2/tests/fixtures/v1/`](../../v2/tests/fixtures/v1/) |
+| Implementation work-package records | [work-packages/](work-packages/) |
+| Milestone 1 verification | [work-packages/milestone-1-evidence.md](work-packages/milestone-1-evidence.md) |
 
 ## Scope boundary
 
@@ -25,6 +27,10 @@ validation only. It intentionally contains no ESP-IDF application or production
 component implementation. V1 public behavior is documented, not silently
 redesigned. The V2 contracts use versioned envelopes and schemas from their
 first implementation even where V1 did not.
+
+Milestone 1 adds the independently buildable V2 core beside that preserved
+baseline. Its work-package records distinguish host/build evidence from the
+physical-board evidence still required to close Gate A.
 
 ## Decision status
 
@@ -43,4 +49,3 @@ Milestone 0 is complete when:
 4. Target/profile manifests validate against their schema.
 5. Every later work package has an explicit dependency and acceptance evidence.
 6. No V1 source file has been changed, moved, or deleted.
-

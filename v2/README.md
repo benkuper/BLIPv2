@@ -1,11 +1,12 @@
 # BLIP V2
 
-This tree is reserved for the ESP-IDF/C++20 firmware, reusable components,
+This tree contains the ESP-IDF/C++20 firmware, reusable components,
 profiles, web application, build tools, and compatibility tests described in
-[`docs/v2/`](../docs/v2/). Milestone 0 intentionally contains contracts and
-fixtures only; production firmware starts in work package 1.1.
+[`docs/v2/`](../docs/v2/). Milestone 0 established the contracts and fixtures.
+Milestone 1 adds the reproducible firmware bootstrap, registry/lifecycle,
+descriptors, resource broker, scheduler, and event bus. Physical-board Gate A
+evidence remains separate from host and clean-build completion.
 
 The legacy Arduino source is not vendored in this standalone development
 repository. Compatibility evidence is anchored to its immutable upstream commit
 and can be inspected without merging the histories.
-

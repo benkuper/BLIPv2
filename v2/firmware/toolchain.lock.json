@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "esp_idf": {
+    "version": "6.0.2",
+    "git_tag": "v6.0.2",
+    "git_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+    "container_image": "espressif/idf:v6.0.2",
+    "container_digest": "sha256:0d8c9773d48a327233f9c1d7c654ff0bcf133ae24503ea2e97a57cfe02b8cb67"
+  },
+  "formatters": {
+    "clang_format": "18.1.8"
+  },
+  "github_actions": {
+    "actions/checkout": "11bd71901bbe5b1630ceea73d27597364c9af683"
+  },
+  "component_locks": {
+    "esp32": "dependencies.lock.esp32",
+    "esp32s3": "dependencies.lock.esp32s3",
+    "esp32c6": "dependencies.lock.esp32c6"
+  }
+}

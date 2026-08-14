@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "resources": [
+    {
+      "class": "gpio",
+      "id": "gpio.0",
+      "capacity": 1,
+      "capabilities": ["output"],
+      "reserved_for": "system.flash"
+    }
+  ],
+  "features": [
+    {
+      "id": "feature.user",
+      "requests": [
+        {
+          "class": "gpio",
+          "logical_name": "data",
+          "ownership": "exclusive",
+          "alternatives": ["gpio.0"],
+          "amount": 1,
+          "capabilities": ["output"]
+        }
+      ]
+    }
+  ]
+}

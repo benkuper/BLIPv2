@@ -1,0 +1,9 @@
+version: "0.1.0"
+description: "BLIP V2 firmware composition root"
+targets:
+  - esp32
+  - esp32s3
+  - esp32c6
+dependencies:
+  idf:
+    version: "==6.0.2"
