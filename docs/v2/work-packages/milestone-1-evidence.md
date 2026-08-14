@@ -31,11 +31,12 @@ size and memory regions are from ESP-IDF's `idf_size.py --format json2` report.
 ## Gate disposition
 
 The implementation and local build portions of work packages 1.1–1.5 are
-complete. Physical ESP32 and ESP32-C6 boards now have passing `A-02` boot
-readiness records under [`evidence/gate-a/`](../evidence/gate-a/): 242 ms on an
-Adafruit HUZZAH32 Feather and 224 ms on a Seeed Studio XIAO ESP32C6. Gate A is
-not claimed complete: ESP32-S3 boot evidence, 100 cold boots, runtime heap
-reserve, and task stack high-water marks remain open. The readiness marker is:
+complete. Physical boards for all three target families now have passing `A-02`
+boot readiness records under [`evidence/gate-a/`](../evidence/gate-a/): 242 ms
+on an Adafruit HUZZAH32 Feather, 252 ms on an M5 Dial/StampS3, and 224 ms on a
+Seeed Studio XIAO ESP32C6. Gate A is not claimed complete: 100 cold boots,
+runtime heap reserve, and task stack high-water marks remain open. The readiness
+marker is:
 
 ```text
 BLIP_V2_BOOTSTRAP_READY schema=1 registry=1 scheduler=ready resources=ready target=<target> idf=<version>
