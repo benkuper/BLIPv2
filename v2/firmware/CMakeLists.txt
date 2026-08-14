@@ -4,7 +4,8 @@ cmake_minimum_required(VERSION 3.22)
 set(SDKCONFIG "${CMAKE_BINARY_DIR}/sdkconfig")
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/../components/blip_core"
-    "${CMAKE_CURRENT_LIST_DIR}/../components/blip_resources")
+    "${CMAKE_CURRENT_LIST_DIR}/../components/blip_resources"
+    "${CMAKE_CURRENT_LIST_DIR}/../components/blip_storage")
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 

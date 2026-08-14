@@ -9,8 +9,12 @@ The ESP-IDF/C++20 Milestone 1 core now includes the reproducible bootstrap,
 component registry/lifecycle, typed descriptors, resource broker, scheduler,
 and bounded event bus. See the
 [verification record](docs/v2/work-packages/milestone-1-evidence.md). Production
-features remain gated by the dependency map and Gate A still requires physical
-board evidence.
+features remain gated by the dependency map and Gate A still requires its
+100-cold-boot and memory/stack evidence.
+
+The next package, [versioned per-component NVS settings](docs/v2/work-packages/2.1-versioned-nvs-settings.md),
+has host and three-target build evidence but is intentionally held behind those
+open Gate A rows.
 
 Run the offline foundation check with:
 

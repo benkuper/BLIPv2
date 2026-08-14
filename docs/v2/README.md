@@ -19,6 +19,7 @@ pinned commit and source path used to derive it.
 | V1 compatibility fixtures | [`v2/tests/fixtures/v1/`](../../v2/tests/fixtures/v1/) |
 | Implementation work-package records | [work-packages/](work-packages/) |
 | Milestone 1 verification | [work-packages/milestone-1-evidence.md](work-packages/milestone-1-evidence.md) |
+| Work package 2.1 settings contract | [work-packages/2.1-versioned-nvs-settings.md](work-packages/2.1-versioned-nvs-settings.md) |
 | Append-only gate evidence | [evidence/](evidence/) |
 
 ## Scope boundary
@@ -32,6 +33,10 @@ first implementation even where V1 did not.
 Milestone 1 adds the independently buildable V2 core beside that preserved
 baseline. Its work-package records distinguish host/build evidence from the
 physical-board evidence still required to close Gate A.
+
+Work package 2.1 is implemented in the working V2 line but remains merge-gated
+by Gate A. Its record fixes the first V2 persisted byte format and distinguishes
+host interruption simulation from hardware qualification.
 
 ## Decision status
 

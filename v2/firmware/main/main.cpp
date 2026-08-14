@@ -2,18 +2,22 @@
 #include "blip/core/registry.hpp"
 #include "blip/core/scheduler.hpp"
 #include "blip/resources/broker.hpp"
+#include "blip/storage/nvs_settings_component.hpp"
 #include "esp_idf_version.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"
 #include "sdkconfig.h"
 
+#include <array>
 #include <cstdint>
+#include <string_view>
 
 namespace {
 
 constexpr char kTag[] = "blip_bootstrap";
 constexpr std::uint32_t kBootstrapSchemaVersion = 1U;
+constexpr std::array<std::string_view, 1> kBootstrapDependencies{"storage.settings"};
 
 static_assert(ESP_IDF_VERSION == ESP_IDF_VERSION_VAL(6, 0, 2),
               "BLIP V2 work package 1.1 requires ESP-IDF 6.0.2");
@@ -24,6 +28,7 @@ static_assert(ESP_IDF_VERSION == ESP_IDF_VERSION_VAL(6, 0, 2),
     descriptor.id = "blip.bootstrap";
     descriptor.display_name = "BLIP bootstrap";
     descriptor.description = "Milestone 1 registry self-test component";
+    descriptor.required_services = kBootstrapDependencies;
     descriptor.settings = {1, 1};
     descriptor.disable_policy = blip::core::DisablePolicy::reboot_required;
     return descriptor;
@@ -48,7 +53,8 @@ class BootstrapComponent final : public blip::core::Component {
 };
 
 BootstrapComponent bootstrap_component{};
-blip::core::Registry<1> registry{};
+blip::storage::NvsSettingsComponent settings_component{};
+blip::core::Registry<2> registry{};
 
 class EspMonotonicClock final : public blip::core::Clock {
   public:
@@ -62,6 +68,10 @@ blip::core::Scheduler<4> scheduler{monotonic_clock};
 blip::resources::Broker<1, 1> resource_broker{};
 
 [[nodiscard]] bool start_registry() noexcept {
+    const auto storage_status = registry.add(settings_component);
+    if (!storage_status) {
+        return false;
+    }
     const auto add_status = registry.add(bootstrap_component);
     if (!add_status) {
         return false;
@@ -82,7 +92,7 @@ extern "C" void app_main() {
     }
     ESP_LOGI(kTag,
              "BLIP_V2_BOOTSTRAP_READY schema=%lu registry=1 scheduler=ready resources=ready "
-             "target=%s idf=%s",
+             "settings=nvs-v1 target=%s idf=%s",
              static_cast<unsigned long>(kBootstrapSchemaVersion), CONFIG_IDF_TARGET,
              esp_get_idf_version());
 }

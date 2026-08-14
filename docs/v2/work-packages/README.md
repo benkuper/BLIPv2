@@ -1,4 +1,6 @@
-# Milestone 1 work packages
+# V2 implementation work packages
+
+## Milestone 1
 
 | Work package | Result |
 | --- | --- |
@@ -11,3 +13,9 @@
 
 These packages add only V2 paths. They do not change V1 source, persisted state,
 wire protocols, or public OSC paths.
+
+## Milestone 2
+
+| Work package | Result |
+| --- | --- |
+| [2.1](2.1-versioned-nvs-settings.md) | Versioned per-component NVS records with two-slot interrupted-save recovery; implementation ready, merge held behind open Gate A hardware qualification |

@@ -40,3 +40,21 @@ else()
     target_compile_options(blip_scheduler_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_scheduler_tests COMMAND blip_scheduler_tests)
+
+add_library(blip_storage_host STATIC
+    ../../components/blip_storage/src/settings_store.cpp
+)
+target_include_directories(blip_storage_host PUBLIC ../../components/blip_storage/include)
+target_link_libraries(blip_storage_host PUBLIC blip_core_host)
+target_compile_features(blip_storage_host PUBLIC cxx_std_20)
+
+add_executable(blip_storage_tests blip_storage_tests.cpp)
+target_link_libraries(blip_storage_tests PRIVATE blip_storage_host)
+if(MSVC)
+    target_compile_options(blip_storage_host PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+    target_compile_options(blip_storage_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_storage_host PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+    target_compile_options(blip_storage_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_storage_tests COMMAND blip_storage_tests)

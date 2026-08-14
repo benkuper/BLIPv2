@@ -14,6 +14,7 @@ enum class ErrorDomain : std::uint8_t {
     resource,
     scheduler,
     event,
+    storage,
 };
 
 enum class ErrorCode : std::uint16_t {
@@ -39,6 +40,13 @@ enum class ErrorCode : std::uint16_t {
     cancelled,
     wrong_task_context,
     recursive_dispatch,
+    not_found,
+    io_failed,
+    storage_full,
+    corrupt_data,
+    incompatible_version,
+    verification_failed,
+    generation_exhausted,
 };
 
 struct Error {
