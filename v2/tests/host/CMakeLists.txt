@@ -85,6 +85,7 @@ add_library(blip_storage_host STATIC
     ../../components/blip_storage/src/legacy_settings_importer.cpp
     ../../components/blip_storage/src/migration_registry.cpp
     ../../components/blip_storage/src/settings_store.cpp
+    ../../components/blip_storage/src/web_asset_store.cpp
 )
 target_include_directories(blip_storage_host PUBLIC ../../components/blip_storage/include)
 target_link_libraries(blip_storage_host PUBLIC blip_core_host)
@@ -109,6 +110,17 @@ else()
     target_compile_options(blip_file_storage_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_file_storage_tests COMMAND blip_file_storage_tests)
+
+add_executable(blip_web_asset_tests blip_web_asset_tests.cpp)
+target_link_libraries(blip_web_asset_tests PRIVATE blip_storage_host)
+target_compile_definitions(blip_web_asset_tests PRIVATE
+    BLIP_FACTORY_WEB_BUNDLE="${CMAKE_CURRENT_SOURCE_DIR}/../../components/blip_storage/factory_web.bundle")
+if(MSVC)
+    target_compile_options(blip_web_asset_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_web_asset_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_web_asset_tests COMMAND blip_web_asset_tests)
 
 add_executable(blip_migration_tests blip_migration_tests.cpp)
 target_link_libraries(blip_migration_tests PRIVATE blip_storage_host)

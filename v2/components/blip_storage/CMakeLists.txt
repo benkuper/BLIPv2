@@ -13,6 +13,9 @@ idf_component_register(
         "src/posix_file_backend.cpp"
         "src/sd_file_storage_component.cpp"
         "src/settings_store.cpp"
+        "src/web_asset_store.cpp"
+    EMBED_FILES
+        "factory_web.bundle"
     INCLUDE_DIRS "include"
     REQUIRES blip_core esp_partition joltwallet__littlefs nvs_flash vfs)
 

@@ -350,12 +350,23 @@ bool host_info_matches_v1_contract() {
     return true;
 }
 
+bool http_content_negotiation_preserves_oscquery_root() {
+    BLIP_CHECK(route_http_get("/", false, false) == HttpGetSurface::oscquery);
+    BLIP_CHECK(route_http_get("/", true, true) == HttpGetSurface::oscquery);
+    BLIP_CHECK(route_http_get("/", false, true) == HttpGetSurface::web_asset);
+    BLIP_CHECK(route_http_get("/src/app.js", false, false) == HttpGetSurface::web_asset);
+    BLIP_CHECK(route_http_get("/api/web-assets", false, false) == HttpGetSurface::asset_status);
+    BLIP_CHECK(route_http_get("/src/app.js", true, false) == HttpGetSurface::not_found);
+    return true;
+}
+
 constexpr TestCase kTests[]{
     {"v1 datagrams", v1_datagrams_decode_and_reencode_exactly},
     {"types and rejection", all_supported_types_round_trip_and_bad_padding_fails},
     {"registry OSC routing", legacy_endpoint_routes_registry_controls_and_discovery},
     {"registry OSCQuery", oscquery_is_registry_derived_and_filters_config},
-    {"host info", host_info_matches_v1_contract}};
+    {"host info", host_info_matches_v1_contract},
+    {"HTTP content negotiation", http_content_negotiation_preserves_oscquery_root}};
 
 } // namespace
 

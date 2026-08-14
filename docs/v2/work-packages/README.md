@@ -31,3 +31,4 @@ wire protocols, or public OSC paths.
 | Work package | Result |
 | --- | --- |
 | [3.1](3.1-schema-web-shell.md) | Dependency-free controls generated from the live registry schema |
+| [3.2](3.2-filesystem-web-assets.md) | Deterministic, verified web bundles with atomic LittleFS replacement and on-device serving |

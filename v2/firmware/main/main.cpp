@@ -152,8 +152,8 @@ blip::network::EspWifiComponent wifi_component{settings_component.settings()};
 blip::core::Registry<9> registry{};
 blip::core::RegistryControlService<9> control_component{registry};
 blip::transport::EspSerialTransportComponent serial_transport_component{control_component};
-blip::oscquery::EspOscQueryComponent oscquery_component{registry, control_component,
-                                                        wifi_component};
+blip::oscquery::EspOscQueryComponent oscquery_component{registry, control_component, wifi_component,
+                                                        file_storage_component.web_assets()};
 
 class EspMonotonicClock final : public blip::core::Clock {
   public:
@@ -291,12 +291,17 @@ extern "C" void app_main() {
     }
     ESP_LOGI(kTag,
              "BLIP_V2_BOOTSTRAP_READY schema=%lu registry=1 scheduler=ready resources=ready "
-             "settings=nvs-v1 files=littlefs-v1 legacy_import=%s diagnostics=structured-v1 "
+             "settings=nvs-v1 files=littlefs-v1 web=bundle-v1 web_version=%lu "
+             "web_assets=%lu web_bytes=%lu legacy_import=%s diagnostics=structured-v1 "
              "serial=blip-envelope-v1 osc=udp9000-oscquery-v1 osc_stack_hwm=%lu "
              "wifi_state=%u wifi_ap=%.*s "
              "safe_mode=0 reset=%s coredump=%s coredump_id=%08lx heap_free=%lu "
              "heap_largest=%lu stack_hwm=%lu target=%s idf=%s",
-             static_cast<unsigned long>(kBootstrapSchemaVersion), legacy_import_status(),
+             static_cast<unsigned long>(kBootstrapSchemaVersion),
+             static_cast<unsigned long>(file_storage_component.web_assets().info().bundle_version),
+             static_cast<unsigned long>(file_storage_component.web_assets().info().asset_count),
+             static_cast<unsigned long>(file_storage_component.web_assets().info().total_size),
+             legacy_import_status(),
              static_cast<unsigned long>(oscquery_component.task_stack_headroom_bytes()),
              static_cast<unsigned>(wifi_component.connection_state()),
              static_cast<int>(wifi_component.access_point_ssid().size()),

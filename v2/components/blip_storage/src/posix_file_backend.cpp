@@ -1,6 +1,7 @@
 #include "blip/storage/posix_file_backend.hpp"
 
 #include <cerrno>
+#include <climits>
 #include <cstdio>
 #include <cstring>
 #include <sys/stat.h>
@@ -17,6 +18,8 @@ PosixFileBackend::PosixFileBackend(std::string_view root) noexcept {
     root_size_ = root.size();
     valid_ = true;
 }
+
+PosixFileBackend::~PosixFileBackend() { abort_write(); }
 
 core::Error PosixFileBackend::errno_error(std::string_view operation, int value) noexcept {
     core::ErrorCode code = core::ErrorCode::io_failed;
@@ -172,6 +175,128 @@ core::Status PosixFileBackend::remove(std::string_view path) noexcept {
         return core::Status::failure(errno_error("file-remove", errno));
     }
     return core::Status::success();
+}
+
+core::Result<std::size_t> PosixFileBackend::file_size(std::string_view path) noexcept {
+    std::array<char, kMaxFullPathBytes> resolved{};
+    if (!full_path(path, resolved)) {
+        return core::Result<std::size_t>::failure({core::ErrorDomain::storage,
+                                                   core::ErrorCode::invalid_argument,
+                                                   {},
+                                                   "file-size",
+                                                   "path-too-long"});
+    }
+    struct stat state {};
+    if (::stat(resolved.data(), &state) != 0) {
+        return core::Result<std::size_t>::failure(errno_error("file-size", errno));
+    }
+    if (state.st_size < 0) {
+        return core::Result<std::size_t>::failure({core::ErrorDomain::storage,
+                                                   core::ErrorCode::corrupt_data,
+                                                   {},
+                                                   "file-size",
+                                                   "negative"});
+    }
+    return core::Result<std::size_t>::success(static_cast<std::size_t>(state.st_size));
+}
+
+core::Result<std::size_t> PosixFileBackend::read_at(std::string_view path, std::size_t offset,
+                                                    std::span<std::byte> output) noexcept {
+    std::array<char, kMaxFullPathBytes> resolved{};
+    if (!full_path(path, resolved) || offset > static_cast<std::size_t>(LONG_MAX)) {
+        return core::Result<std::size_t>::failure({core::ErrorDomain::storage,
+                                                   core::ErrorCode::invalid_argument,
+                                                   {},
+                                                   "file-read-at",
+                                                   "path-or-offset"});
+    }
+    std::FILE* file = std::fopen(resolved.data(), "rb");
+    if (file == nullptr) {
+        return core::Result<std::size_t>::failure(errno_error("file-open-read-at", errno));
+    }
+    if (std::fseek(file, static_cast<long>(offset), SEEK_SET) != 0) {
+        const int error = errno;
+        std::fclose(file);
+        return core::Result<std::size_t>::failure(errno_error("file-seek", error));
+    }
+    const std::size_t count =
+        output.empty() ? 0U : std::fread(output.data(), 1, output.size(), file);
+    if (std::ferror(file) != 0) {
+        const int error = errno;
+        std::fclose(file);
+        return core::Result<std::size_t>::failure(errno_error("file-read-at", error));
+    }
+    if (std::fclose(file) != 0) {
+        return core::Result<std::size_t>::failure(errno_error("file-close", errno));
+    }
+    return core::Result<std::size_t>::success(count);
+}
+
+core::Status PosixFileBackend::begin_write(std::string_view path) noexcept {
+    if (write_file_ != nullptr) {
+        return core::Status::failure({core::ErrorDomain::storage,
+                                      core::ErrorCode::invalid_state,
+                                      {},
+                                      "file-begin-write",
+                                      "write-active"});
+    }
+    std::array<char, kMaxFullPathBytes> resolved{};
+    if (!full_path(path, resolved)) {
+        return core::Status::failure({core::ErrorDomain::storage,
+                                      core::ErrorCode::invalid_argument,
+                                      {},
+                                      "file-begin-write",
+                                      "path-too-long"});
+    }
+    const auto directory_status = create_parent_directories(resolved);
+    if (!directory_status) {
+        return directory_status;
+    }
+    write_file_ = std::fopen(resolved.data(), "wb");
+    return write_file_ == nullptr
+               ? core::Status::failure(errno_error("file-open-stream-write", errno))
+               : core::Status::success();
+}
+
+core::Status PosixFileBackend::append_write(std::span<const std::byte> value) noexcept {
+    if (write_file_ == nullptr || value.empty()) {
+        return core::Status::failure({core::ErrorDomain::storage,
+                                      core::ErrorCode::invalid_state,
+                                      {},
+                                      "file-append-write",
+                                      write_file_ == nullptr ? "not-started" : "empty"});
+    }
+    if (std::fwrite(value.data(), 1, value.size(), write_file_) != value.size()) {
+        return core::Status::failure(errno_error("file-append-write", errno));
+    }
+    return core::Status::success();
+}
+
+core::Status PosixFileBackend::finish_write() noexcept {
+    if (write_file_ == nullptr) {
+        return core::Status::failure({core::ErrorDomain::storage,
+                                      core::ErrorCode::invalid_state,
+                                      {},
+                                      "file-finish-write",
+                                      "not-started"});
+    }
+    if (std::fflush(write_file_) != 0 || ::fsync(::fileno(write_file_)) != 0) {
+        const int error = errno;
+        std::fclose(write_file_);
+        write_file_ = nullptr;
+        return core::Status::failure(errno_error("file-stream-flush", error));
+    }
+    std::FILE* file = write_file_;
+    write_file_ = nullptr;
+    return std::fclose(file) == 0 ? core::Status::success()
+                                  : core::Status::failure(errno_error("file-stream-close", errno));
+}
+
+void PosixFileBackend::abort_write() noexcept {
+    if (write_file_ != nullptr) {
+        static_cast<void>(std::fclose(write_file_));
+        write_file_ = nullptr;
+    }
 }
 
 } // namespace blip::storage

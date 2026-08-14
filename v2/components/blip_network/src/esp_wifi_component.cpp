@@ -492,13 +492,14 @@ core::Status EspWifiComponent::start_portal_locked() noexcept {
     configuration.stack_size = kPortalTaskStackBytes;
     configuration.max_open_sockets = 4;
     configuration.lru_purge_enable = true;
+    configuration.uri_match_fn = httpd_uri_match_wildcard;
     if (httpd_start(&portal_, &configuration) != ESP_OK) {
         portal_ = nullptr;
         return core::Status::failure(
             wifi_error(core::ErrorCode::start_failed, "start-portal", "http-server-failed"));
     }
     const httpd_uri_t root{
-        .uri = "/",
+        .uri = "/*",
         .method = HTTP_GET,
         .handler = root_handler,
         .user_ctx = this,
@@ -515,8 +516,18 @@ core::Status EspWifiComponent::start_portal_locked() noexcept {
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr,
     };
+    const httpd_uri_t web_asset_update_uri{
+        .uri = "/api/web-assets",
+        .method = HTTP_PUT,
+        .handler = root_handler,
+        .user_ctx = this,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr,
+    };
     if (httpd_register_uri_handler(portal_, &root) != ESP_OK ||
-        httpd_register_uri_handler(portal_, &provision_uri) != ESP_OK) {
+        httpd_register_uri_handler(portal_, &provision_uri) != ESP_OK ||
+        httpd_register_uri_handler(portal_, &web_asset_update_uri) != ESP_OK) {
         stop_portal_locked();
         return core::Status::failure(
             wifi_error(core::ErrorCode::start_failed, "start-portal", "handler-register-failed"));
@@ -1100,7 +1111,8 @@ esp_err_t EspWifiComponent::handle_root(httpd_req_t* request) noexcept {
     const bool websocket =
         socket >= 0 && httpd_ws_get_fd_info(request->handle, socket) == HTTPD_WS_CLIENT_WEBSOCKET;
     const bool query = httpd_req_get_url_query_len(request) != 0U;
-    if (delegate != nullptr && (websocket || query || !public_ap_active_.load())) {
+    const bool root = std::string_view{request->uri} == "/";
+    if (delegate != nullptr && (websocket || query || !root || !public_ap_active_.load())) {
         return delegate->handle_http_root(request);
     }
     httpd_resp_set_type(request, "text/html; charset=utf-8");

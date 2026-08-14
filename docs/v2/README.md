@@ -22,6 +22,7 @@ pinned commit and source path used to derive it.
 | Work package 2.1 settings contract | [work-packages/2.1-versioned-nvs-settings.md](work-packages/2.1-versioned-nvs-settings.md) |
 | Work package 2.7 OSC/OSCQuery contract | [work-packages/2.7-osc-oscquery.md](work-packages/2.7-osc-oscquery.md) |
 | Work package 3.1 schema-driven web shell | [work-packages/3.1-schema-web-shell.md](work-packages/3.1-schema-web-shell.md) |
+| Work package 3.2 filesystem-managed web assets | [work-packages/3.2-filesystem-web-assets.md](work-packages/3.2-filesystem-web-assets.md) |
 | Append-only gate evidence | [evidence/](evidence/) |
 
 ## Scope boundary

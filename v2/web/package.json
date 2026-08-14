@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "python ../tools/web/pack_web_assets.py --source . --check ../components/blip_storage/factory_web.bundle",
     "test": "node --test"
   },
   "engines": {

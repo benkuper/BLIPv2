@@ -17,7 +17,8 @@ namespace {
 
 constexpr char kTag[] = "blip_oscquery";
 constexpr std::array<std::string_view, 2> kProvidedServices{"transport.osc", "discovery.oscquery"};
-constexpr std::array<std::string_view, 2> kRequiredServices{"control.dispatch", "network.http"};
+constexpr std::array<std::string_view, 3> kRequiredServices{"control.dispatch", "network.http",
+                                                            "storage.web_assets"};
 constexpr std::array<core::MetadataEntry, 4> kMetadata{{
     {"legacy_path", "/comm/osc"},
     {"osc_transport", "udp"},
@@ -148,14 +149,23 @@ class HttpChunkSink final : public TextSink {
     bool ok_{true};
 };
 
+[[nodiscard]] bool request_accepts_html(httpd_req_t* request) noexcept {
+    std::array<char, 128> accept{};
+    const std::size_t size = httpd_req_get_hdr_value_len(request, "Accept");
+    return size != 0U && size < accept.size() &&
+           httpd_req_get_hdr_value_str(request, "Accept", accept.data(), accept.size()) == ESP_OK &&
+           std::string_view{accept.data(), size}.find("text/html") != std::string_view::npos;
+}
+
 } // namespace
 
 const core::ComponentDescriptor EspOscQueryComponent::descriptor_{oscquery_descriptor()};
 
 EspOscQueryComponent::EspOscQueryComponent(const core::RegistryView& registry,
                                            core::ControlService& controls,
-                                           network::EspWifiComponent& wifi) noexcept
-    : registry_(&registry), controls_(&controls), wifi_(&wifi),
+                                           network::EspWifiComponent& wifi,
+                                           storage::WebAssetStore& web_assets) noexcept
+    : registry_(&registry), controls_(&controls), wifi_(&wifi), web_assets_(&web_assets),
       identity_{
           {device_id_.data(), device_id_.size() - 1U}, "BLIP V2", "BLIP V2", "0.1.0", kOscPort},
       udp_endpoint_(registry, controls, identity_),
@@ -332,12 +342,23 @@ esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
          httpd_req_get_url_query_str(request, query.data(), query.size()) != ESP_OK)) {
         return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "invalid query");
     }
+    const std::string_view path{request->uri};
+    const std::string_view query_text{query.data(), query_size};
+    switch (route_http_get(path, !query_text.empty(), request_accepts_html(request))) {
+    case HttpGetSurface::web_asset:
+        return handle_asset_get(request, path);
+    case HttpGetSurface::asset_status:
+        return handle_asset_status(request);
+    case HttpGetSurface::not_found:
+        return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "unknown endpoint");
+    case HttpGetSurface::oscquery:
+        break;
+    }
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     httpd_resp_set_hdr(request, "Access-Control-Allow-Origin", "*");
     HttpChunkSink sink{request};
     core::Status status = core::Status::success();
-    const std::string_view query_text{query.data(), query_size};
     if (query_text == "HOST_INFO") {
         status = write_oscquery_host_info(identity_, sink);
     } else if (query_text.empty() || query_text == "config=1" || query_text == "config=0") {
@@ -346,6 +367,114 @@ esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
         return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "unknown OSCQuery query");
     }
     return status ? sink.finish() : ESP_FAIL;
+}
+
+esp_err_t EspOscQueryComponent::handle_asset_get(httpd_req_t* request,
+                                                 std::string_view path) noexcept {
+    const auto* asset = web_assets_->find(path);
+    if (asset == nullptr) {
+        return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "asset not found");
+    }
+    const auto content_type = storage::content_type_name(asset->content_type);
+    const auto cache_control = storage::cache_control_name(asset->cache_policy);
+    httpd_resp_set_type(request, content_type.data());
+    httpd_resp_set_hdr(request, "Cache-Control", cache_control.data());
+    httpd_resp_set_hdr(request, "X-Content-Type-Options", "nosniff");
+    if (asset->encoding == storage::WebContentEncoding::gzip) {
+        httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
+    }
+    if (asset->content_type == storage::WebContentType::html) {
+        httpd_resp_set_hdr(request, "Content-Security-Policy",
+                           "default-src 'self'; connect-src 'self' ws: wss:; style-src 'self'; "
+                           "img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'");
+        httpd_resp_set_hdr(request, "Vary", "Accept, Accept-Encoding");
+    }
+    std::array<char, 32> etag{};
+    const int etag_size = std::snprintf(etag.data(), etag.size(), "\"%08lx-%lu\"",
+                                        static_cast<unsigned long>(asset->crc32),
+                                        static_cast<unsigned long>(asset->stored_size));
+    if (etag_size <= 0 || static_cast<std::size_t>(etag_size) >= etag.size()) {
+        return ESP_FAIL;
+    }
+    httpd_resp_set_hdr(request, "ETag", etag.data());
+    std::size_t offset{};
+    while (offset < asset->stored_size) {
+        const auto loaded = web_assets_->read(*asset, offset, http_asset_buffer_);
+        if (!loaded || loaded.value() == 0U ||
+            httpd_resp_send_chunk(request, reinterpret_cast<const char*>(http_asset_buffer_.data()),
+                                  loaded.value()) != ESP_OK) {
+            return ESP_FAIL;
+        }
+        offset += loaded.value();
+    }
+    return httpd_resp_send_chunk(request, nullptr, 0);
+}
+
+esp_err_t EspOscQueryComponent::handle_asset_status(httpd_req_t* request) noexcept {
+    if (!web_assets_->active()) {
+        return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "assets unavailable");
+    }
+    const auto& info = web_assets_->info();
+    std::array<char, 160> response{};
+    const int size = std::snprintf(
+        response.data(), response.size(),
+        "{\"format\":%u,\"bundle_version\":%lu,\"assets\":%lu,\"bytes\":%lu,"
+        "\"crc32\":\"%08lx\"}",
+        static_cast<unsigned>(storage::kWebAssetBundleFormatVersion),
+        static_cast<unsigned long>(info.bundle_version),
+        static_cast<unsigned long>(info.asset_count), static_cast<unsigned long>(info.total_size),
+        static_cast<unsigned long>(info.bundle_crc32));
+    if (size <= 0 || static_cast<std::size_t>(size) >= response.size()) {
+        return ESP_FAIL;
+    }
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    return httpd_resp_send(request, response.data(), size);
+}
+
+esp_err_t EspOscQueryComponent::handle_asset_upload(httpd_req_t* request) noexcept {
+    const std::size_t expected = request->content_len;
+    auto status = web_assets_->begin_install(expected);
+    if (!status) {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "invalid bundle size");
+    }
+    std::size_t received_total{};
+    std::size_t timeouts{};
+    while (received_total < expected) {
+        const std::size_t requested =
+            std::min(http_asset_buffer_.size(), expected - received_total);
+        const int received =
+            httpd_req_recv(request, reinterpret_cast<char*>(http_asset_buffer_.data()), requested);
+        if (received == HTTPD_SOCK_ERR_TIMEOUT && timeouts++ < 8U) {
+            continue;
+        }
+        if (received <= 0) {
+            web_assets_->cancel_install();
+            return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "incomplete bundle");
+        }
+        timeouts = 0;
+        status = web_assets_->append_install(
+            {http_asset_buffer_.data(), static_cast<std::size_t>(received)});
+        if (!status) {
+            web_assets_->cancel_install();
+            return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR,
+                                       "bundle write failed");
+        }
+        received_total += static_cast<std::size_t>(received);
+    }
+    const auto installed = web_assets_->finish_install();
+    if (!installed) {
+        const auto code = installed.error().code;
+        const bool invalid = code == core::ErrorCode::corrupt_data ||
+                             code == core::ErrorCode::incompatible_version ||
+                             code == core::ErrorCode::verification_failed;
+        return httpd_resp_send_err(
+            request, invalid ? HTTPD_400_BAD_REQUEST : HTTPD_500_INTERNAL_SERVER_ERROR,
+            invalid ? "bundle verification failed" : "bundle commit failed");
+    }
+    httpd_resp_set_status(request, "204 No Content");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    return httpd_resp_send(request, nullptr, 0);
 }
 
 esp_err_t EspOscQueryComponent::handle_websocket(httpd_req_t* request) noexcept {
@@ -411,7 +540,14 @@ esp_err_t EspOscQueryComponent::handle_http_root(httpd_req_t* request) noexcept 
     const int socket = httpd_req_to_sockfd(request);
     const bool websocket =
         socket >= 0 && httpd_ws_get_fd_info(request->handle, socket) == HTTPD_WS_CLIENT_WEBSOCKET;
-    const esp_err_t result = websocket ? handle_websocket(request) : handle_http_get(request);
+    esp_err_t result{};
+    if (websocket) {
+        result = handle_websocket(request);
+    } else if (request->method == HTTP_PUT && std::string_view{request->uri} == "/api/web-assets") {
+        result = handle_asset_upload(request);
+    } else {
+        result = handle_http_get(request);
+    }
     record_minimum(http_stack_headroom_bytes_,
                    static_cast<std::uint32_t>(uxTaskGetStackHighWaterMark(nullptr)) *
                        sizeof(StackType_t));

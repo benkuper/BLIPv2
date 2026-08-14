@@ -21,8 +21,8 @@ python -m http.server 8080 --directory v2/web
 ```
 
 Open `http://localhost:8080/?device=http://192.0.2.8`, replacing the device URL
-as needed. Without `device`, the shell uses its own origin, which is the final
-on-device behavior planned for work package 3.2.
+as needed. Without `device`, the shell uses its own origin, which is also its
+on-device behavior.
 
 Run the deterministic model, transport, and parser suite with:
 
@@ -30,10 +30,28 @@ Run the deterministic model, transport, and parser suite with:
 npm test --prefix v2/web
 ```
 
+Verify that the checked-in factory bundle exactly matches these sources with:
+
+```powershell
+npm run build --prefix v2/web
+```
+
+The packer can also produce and atomically upload a separately versioned bundle
+to a device on a trusted local network:
+
+```powershell
+python v2/tools/web/pack_web_assets.py --source v2/web `
+  --output build/web/assets.bundle --upload http://192.0.2.8
+```
+
 ## Scope boundary
 
-Work package 3.1 commits the source shell and its registry/OSCQuery contract.
-It does not embed, compress, sign, upload, or serve these assets from firmware;
-versioned asset bundles and filesystem management belong to work package 3.2.
-The current HTTP/WebSocket control surface is unauthenticated and intended only
-for a trusted local network.
+Work package 3.1 defines the source shell and its registry/OSCQuery contract.
+Work package 3.2 deterministically compresses it, embeds a recovery copy, serves
+the active LittleFS bundle, and accepts verified atomic replacements. Bundle
+updates are not cryptographically signed in this package. The current
+HTTP/WebSocket control and asset-update surfaces are unauthenticated and
+intended only for a trusted local network.
+
+See [the 3.2 work-package record](../../docs/v2/work-packages/3.2-filesystem-web-assets.md)
+for the binary format, HTTP routes, recovery rules, and build evidence.
