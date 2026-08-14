@@ -79,6 +79,11 @@ jobs:
           grep -Fxq "set(IDF_VERSION_MAJOR 6)" "$IDF_PATH/tools/cmake/version.cmake"
           grep -Fxq "set(IDF_VERSION_MINOR 0)" "$IDF_PATH/tools/cmake/version.cmake"
           grep -Fxq "set(IDF_VERSION_PATCH 2)" "$IDF_PATH/tools/cmake/version.cmake"
+      - name: Snapshot dependency lock
+        shell: bash
+        run: >-
+          cp "v2/firmware/dependencies.lock.${{ matrix.target }}"
+          "$RUNNER_TEMP/dependencies.lock.${{ matrix.target }}.before"
       - name: Build first clean tree
         shell: bash
         run: |
@@ -105,7 +110,7 @@ jobs:
       - name: Ensure dependency lock is unchanged
         shell: bash
         run: >-
-          git -C "$GITHUB_WORKSPACE" diff --exit-code --
+          cmp "$RUNNER_TEMP/dependencies.lock.${{ matrix.target }}.before"
           "v2/firmware/dependencies.lock.${{ matrix.target }}"
       - name: Report image size
         shell: bash
