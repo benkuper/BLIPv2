@@ -81,9 +81,10 @@ jobs:
           grep -Fxq "set(IDF_VERSION_PATCH 2)" "$IDF_PATH/tools/cmake/version.cmake"
       - name: Build first clean tree
         shell: bash
-        run: >-
-          idf.py -C v2/firmware -B "$GITHUB_WORKSPACE/build/${{ matrix.target }}-a"
-          -D "IDF_TARGET=${{ matrix.target }}" build
+        run: |
+          . "$IDF_PATH/export.sh"
+          idf.py -C v2/firmware -B "$GITHUB_WORKSPACE/build/${{ matrix.target }}-a" \
+            -D "IDF_TARGET=${{ matrix.target }}" build
       - name: Validate first build contract
         shell: bash
         run: >-
@@ -92,9 +93,10 @@ jobs:
           --target "${{ matrix.target }}"
       - name: Build second clean tree
         shell: bash
-        run: >-
-          idf.py -C v2/firmware -B "$GITHUB_WORKSPACE/build/${{ matrix.target }}-b"
-          -D "IDF_TARGET=${{ matrix.target }}" build
+        run: |
+          . "$IDF_PATH/export.sh"
+          idf.py -C v2/firmware -B "$GITHUB_WORKSPACE/build/${{ matrix.target }}-b" \
+            -D "IDF_TARGET=${{ matrix.target }}" build
       - name: Check reproducible application image
         shell: bash
         run: >-
@@ -105,6 +107,6 @@ jobs:
         run: git diff --exit-code -- "v2/firmware/dependencies.lock.${{ matrix.target }}"
       - name: Report image size
         shell: bash
-        run: >-
-          idf.py -C v2/firmware -B "$GITHUB_WORKSPACE/build/${{ matrix.target }}-a"
-          size
+        run: |
+          . "$IDF_PATH/export.sh"
+          idf.py -C v2/firmware -B "$GITHUB_WORKSPACE/build/${{ matrix.target }}-a" size
