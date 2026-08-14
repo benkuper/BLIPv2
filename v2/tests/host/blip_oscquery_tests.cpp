@@ -356,6 +356,7 @@ bool http_content_negotiation_preserves_oscquery_root() {
     BLIP_CHECK(route_http_get("/", false, true) == HttpGetSurface::web_asset);
     BLIP_CHECK(route_http_get("/src/app.js", false, false) == HttpGetSurface::web_asset);
     BLIP_CHECK(route_http_get("/api/web-assets", false, false) == HttpGetSurface::asset_status);
+    BLIP_CHECK(route_http_get("/api/firmware", false, false) == HttpGetSurface::update_status);
     BLIP_CHECK(route_http_get("/src/app.js", true, false) == HttpGetSurface::not_found);
     return true;
 }

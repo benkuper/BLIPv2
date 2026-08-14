@@ -3,6 +3,7 @@
 #include "blip/oscquery/oscquery.hpp"
 #include "esp_log.h"
 #include "esp_mac.h"
+#include "esp_system.h"
 #include "lwip/inet.h"
 #include "lwip/sockets.h"
 
@@ -17,8 +18,8 @@ namespace {
 
 constexpr char kTag[] = "blip_oscquery";
 constexpr std::array<std::string_view, 2> kProvidedServices{"transport.osc", "discovery.oscquery"};
-constexpr std::array<std::string_view, 3> kRequiredServices{"control.dispatch", "network.http",
-                                                            "storage.web_assets"};
+constexpr std::array<std::string_view, 4> kRequiredServices{"control.dispatch", "network.http",
+                                                            "storage.web_assets", "firmware.ota"};
 constexpr std::array<core::MetadataEntry, 4> kMetadata{{
     {"legacy_path", "/comm/osc"},
     {"osc_transport", "udp"},
@@ -157,6 +158,19 @@ class HttpChunkSink final : public TextSink {
            std::string_view{accept.data(), size}.find("text/html") != std::string_view::npos;
 }
 
+template <std::size_t Capacity>
+[[nodiscard]] bool read_header(httpd_req_t* request, const char* name,
+                               std::array<char, Capacity>& output,
+                               std::string_view& value) noexcept {
+    const std::size_t size = httpd_req_get_hdr_value_len(request, name);
+    if (size == 0U || size >= output.size() ||
+        httpd_req_get_hdr_value_str(request, name, output.data(), output.size()) != ESP_OK) {
+        return false;
+    }
+    value = {output.data(), size};
+    return true;
+}
+
 } // namespace
 
 const core::ComponentDescriptor EspOscQueryComponent::descriptor_{oscquery_descriptor()};
@@ -164,8 +178,10 @@ const core::ComponentDescriptor EspOscQueryComponent::descriptor_{oscquery_descr
 EspOscQueryComponent::EspOscQueryComponent(const core::RegistryView& registry,
                                            core::ControlService& controls,
                                            network::EspWifiComponent& wifi,
-                                           storage::WebAssetStore& web_assets) noexcept
+                                           storage::WebAssetStore& web_assets,
+                                           ota::UpdateService& updates) noexcept
     : registry_(&registry), controls_(&controls), wifi_(&wifi), web_assets_(&web_assets),
+      updates_(&updates),
       identity_{
           {device_id_.data(), device_id_.size() - 1U}, "BLIP V2", "BLIP V2", "0.1.0", kOscPort},
       udp_endpoint_(registry, controls, identity_),
@@ -349,6 +365,8 @@ esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
         return handle_asset_get(request, path);
     case HttpGetSurface::asset_status:
         return handle_asset_status(request);
+    case HttpGetSurface::update_status:
+        return handle_update_status(request);
     case HttpGetSurface::not_found:
         return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "unknown endpoint");
     case HttpGetSurface::oscquery:
@@ -367,6 +385,95 @@ esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
         return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "unknown OSCQuery query");
     }
     return status ? sink.finish() : ESP_FAIL;
+}
+
+esp_err_t EspOscQueryComponent::handle_update_status(httpd_req_t* request) noexcept {
+    const auto& status = updates_->status();
+    std::array<char, 192> response{};
+    const int size = std::snprintf(
+        response.data(), response.size(),
+        "{\"state\":\"%s\",\"received_bytes\":%lu,\"expected_bytes\":%lu,"
+        "\"signature_enforced\":%s}",
+        ota::update_state_name(status.state), static_cast<unsigned long>(status.received_bytes),
+        static_cast<unsigned long>(status.expected_bytes),
+        status.signature_enforced ? "true" : "false");
+    if (size <= 0 || static_cast<std::size_t>(size) >= response.size()) {
+        return ESP_FAIL;
+    }
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    return httpd_resp_send(request, response.data(), size);
+}
+
+esp_err_t EspOscQueryComponent::handle_firmware_upload(httpd_req_t* request) noexcept {
+    std::array<char, 65> sha_text{};
+    std::array<char, 32> project_text{};
+    std::array<char, 32> version_text{};
+    std::array<char, 16> target_text{};
+    std::array<char, 32> profile_text{};
+    std::string_view sha{};
+    std::string_view project{};
+    std::string_view version{};
+    std::string_view target{};
+    std::string_view profile{};
+    if (!read_header(request, "X-BLIP-SHA256", sha_text, sha) ||
+        !read_header(request, "X-BLIP-Project", project_text, project) ||
+        !read_header(request, "X-BLIP-Version", version_text, version) ||
+        !read_header(request, "X-BLIP-Target", target_text, target) ||
+        !read_header(request, "X-BLIP-Profile", profile_text, profile)) {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "missing update metadata");
+    }
+    const auto digest = ota::parse_sha256_hex(sha);
+    if (!digest) {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "invalid SHA-256");
+    }
+    const ota::UpdateManifest manifest{
+        request->content_len, digest.value(), project, version, target, profile};
+    auto status = updates_->begin(manifest);
+    if (!status) {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "update rejected");
+    }
+    std::size_t received_total{};
+    std::size_t timeouts{};
+    while (received_total < manifest.image_size) {
+        const std::size_t requested =
+            std::min(http_asset_buffer_.size(), manifest.image_size - received_total);
+        const int received =
+            httpd_req_recv(request, reinterpret_cast<char*>(http_asset_buffer_.data()), requested);
+        if (received == HTTPD_SOCK_ERR_TIMEOUT && timeouts++ < 8U) {
+            continue;
+        }
+        if (received <= 0) {
+            updates_->cancel();
+            return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "incomplete image");
+        }
+        timeouts = 0;
+        status = updates_->append({http_asset_buffer_.data(), static_cast<std::size_t>(received)});
+        if (!status) {
+            return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR,
+                                       "flash write failed");
+        }
+        received_total += static_cast<std::size_t>(received);
+    }
+    status = updates_->finish();
+    if (!status) {
+        const bool invalid = status.error().code == core::ErrorCode::corrupt_data ||
+                             status.error().code == core::ErrorCode::incompatible_version ||
+                             status.error().code == core::ErrorCode::verification_failed;
+        return httpd_resp_send_err(
+            request, invalid ? HTTPD_400_BAD_REQUEST : HTTPD_500_INTERNAL_SERVER_ERROR,
+            invalid ? "image verification failed" : "image activation failed");
+    }
+    httpd_resp_set_status(request, "202 Accepted");
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    const esp_err_t sent =
+        httpd_resp_send(request, "{\"accepted\":true,\"restarting\":true}", HTTPD_RESP_USE_STRLEN);
+    if (sent == ESP_OK) {
+        vTaskDelay(pdMS_TO_TICKS(100));
+        esp_restart();
+    }
+    return sent;
 }
 
 esp_err_t EspOscQueryComponent::handle_asset_get(httpd_req_t* request,
@@ -545,6 +652,8 @@ esp_err_t EspOscQueryComponent::handle_http_root(httpd_req_t* request) noexcept 
         result = handle_websocket(request);
     } else if (request->method == HTTP_PUT && std::string_view{request->uri} == "/api/web-assets") {
         result = handle_asset_upload(request);
+    } else if (request->method == HTTP_PUT && std::string_view{request->uri} == "/api/firmware") {
+        result = handle_firmware_upload(request);
     } else {
         result = handle_http_get(request);
     }

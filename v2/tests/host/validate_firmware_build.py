@@ -50,6 +50,13 @@ def main() -> int:
     require("CONFIG_APP_REPRODUCIBLE_BUILD=y" in sdkconfig, "reproducible build is disabled")
     require("# CONFIG_COMPILER_CXX_EXCEPTIONS is not set" in sdkconfig, "exceptions are enabled")
     require("# CONFIG_COMPILER_CXX_RTTI is not set" in sdkconfig, "RTTI is enabled")
+    require("CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y" in sdkconfig,
+            "OTA rollback is disabled")
+    require("CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y" in sdkconfig,
+            "4 MiB flash layout is not selected")
+
+    image_size = (build_dir / "blip-v2.bin").stat().st_size
+    require(image_size <= 0x190000, "application image exceeds an OTA slot")
 
     entries = json.loads((build_dir / "compile_commands.json").read_text(encoding="utf-8"))
     commands = owned_commands(entries)

@@ -7,7 +7,8 @@ Milestones 1 and 2 provide the reproducible firmware core, storage, diagnostics,
 Serial/USB, Wi-Fi, and OSC/OSCQuery. Milestone 3 now provides a browser shell
 whose controls are generated exclusively from the live registry schema and a
 separately versioned, verified LittleFS bundle that serves that shell from the
-device.
+device. It also provides profile-checked A/B firmware updates whose new slot is
+confirmed only after the complete boot composition is healthy.
 
 The legacy Arduino source is not vendored in this standalone development
 repository. Compatibility evidence is anchored to its immutable upstream commit

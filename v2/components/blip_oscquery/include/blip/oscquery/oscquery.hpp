@@ -9,7 +9,13 @@
 
 namespace blip::oscquery {
 
-enum class HttpGetSurface : std::uint8_t { oscquery, web_asset, asset_status, not_found };
+enum class HttpGetSurface : std::uint8_t {
+    oscquery,
+    web_asset,
+    asset_status,
+    update_status,
+    not_found
+};
 
 [[nodiscard]] constexpr HttpGetSurface route_http_get(std::string_view path, bool has_query,
                                                       bool accepts_html) noexcept {
@@ -18,6 +24,9 @@ enum class HttpGetSurface : std::uint8_t { oscquery, web_asset, asset_status, no
     }
     if (path == "/api/web-assets") {
         return HttpGetSurface::asset_status;
+    }
+    if (path == "/api/firmware") {
+        return HttpGetSurface::update_status;
     }
     if (path == "/" && !accepts_html) {
         return HttpGetSurface::oscquery;

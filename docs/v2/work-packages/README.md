@@ -32,3 +32,4 @@ wire protocols, or public OSC paths.
 | --- | --- |
 | [3.1](3.1-schema-web-shell.md) | Dependency-free controls generated from the live registry schema |
 | [3.2](3.2-filesystem-web-assets.md) | Deterministic, verified web bundles with atomic LittleFS replacement and on-device serving |
+| [3.3](3.3-ab-ota-rollback.md) | Profile-checked A/B firmware updates with late boot confirmation and automatic rollback |

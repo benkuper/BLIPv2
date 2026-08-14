@@ -34,6 +34,24 @@ else()
 endif()
 add_test(NAME blip_diagnostics_tests COMMAND blip_diagnostics_tests)
 
+add_library(blip_ota_host STATIC
+    ../../components/blip_ota/src/update_service.cpp
+)
+target_include_directories(blip_ota_host PUBLIC ../../components/blip_ota/include)
+target_link_libraries(blip_ota_host PUBLIC blip_core_host)
+target_compile_features(blip_ota_host PUBLIC cxx_std_20)
+
+add_executable(blip_ota_tests blip_ota_tests.cpp)
+target_link_libraries(blip_ota_tests PRIVATE blip_ota_host)
+if(MSVC)
+    target_compile_options(blip_ota_host PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+    target_compile_options(blip_ota_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_ota_host PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+    target_compile_options(blip_ota_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_ota_tests COMMAND blip_ota_tests)
+
 add_library(blip_transport_host STATIC
     ../../components/blip_transport/src/envelope.cpp
     ../../components/blip_transport/src/legacy_serial_v1.cpp

@@ -28,9 +28,15 @@ COBS-framed BLIP envelope on UART0 (ESP32) or native USB Serial/JTAG (S3/C6).
 The host client and examples are in
 [`../tools/control/`](../tools/control/README.md).
 
-The committed custom partition table is sized for a 2 MiB device and reserves a
-1.5 MiB factory application, a 384 KiB `storage` LittleFS partition, and a 64 KiB
-`coredump` partition. The internal storage component formats its partition only when it is
-completely erased; unrecognized nonblank media fails closed so legacy data is
-not silently destroyed. Coredumps are validated at boot, retained without
-overwrite, and erased only by an explicit diagnostics action.
+The committed custom partition table targets 4 MiB devices and reserves two
+1.5625 MiB OTA application slots, 640 KiB `storage` LittleFS, a redundant 8 KiB OTA
+selection ledger, and 128 KiB `coredump`. The internal storage component formats
+its partition only when it is completely erased; unrecognized nonblank media
+fails closed so legacy data is not silently destroyed. Coredumps are validated
+at boot, retained without overwrite, and erased only by an explicit diagnostics
+action.
+
+This is a partition migration from work package 3.2 and requires a full-flash
+backup plus a full bootloader/partition/application install. Do not flash only
+the 3.3 application into the former factory slot. OTA usage and rollback details
+are recorded in [work package 3.3](../../docs/v2/work-packages/3.3-ab-ota-rollback.md).

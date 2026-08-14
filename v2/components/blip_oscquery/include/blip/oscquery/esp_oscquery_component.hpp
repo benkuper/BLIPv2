@@ -6,6 +6,7 @@
 #include "blip/network/esp_wifi_component.hpp"
 #include "blip/oscquery/legacy_osc.hpp"
 #include "blip/oscquery/osc.hpp"
+#include "blip/ota/update_service.hpp"
 #include "blip/storage/web_asset_store.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -25,8 +26,8 @@ class EspOscQueryComponent final : public core::Component, public network::HttpR
     static constexpr std::size_t kTaskStackWords = kTaskStackBytes / sizeof(StackType_t);
 
     EspOscQueryComponent(const core::RegistryView& registry, core::ControlService& controls,
-                         network::EspWifiComponent& wifi,
-                         storage::WebAssetStore& web_assets) noexcept;
+                         network::EspWifiComponent& wifi, storage::WebAssetStore& web_assets,
+                         ota::UpdateService& updates) noexcept;
 
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
     [[nodiscard]] core::Status start(const core::StartContext&) noexcept override;
@@ -46,6 +47,8 @@ class EspOscQueryComponent final : public core::Component, public network::HttpR
     [[nodiscard]] esp_err_t handle_asset_get(httpd_req_t* request, std::string_view path) noexcept;
     [[nodiscard]] esp_err_t handle_asset_status(httpd_req_t* request) noexcept;
     [[nodiscard]] esp_err_t handle_asset_upload(httpd_req_t* request) noexcept;
+    [[nodiscard]] esp_err_t handle_update_status(httpd_req_t* request) noexcept;
+    [[nodiscard]] esp_err_t handle_firmware_upload(httpd_req_t* request) noexcept;
     [[nodiscard]] esp_err_t handle_websocket(httpd_req_t* request) noexcept;
     [[nodiscard]] std::string_view local_ip() noexcept;
 
@@ -56,6 +59,7 @@ class EspOscQueryComponent final : public core::Component, public network::HttpR
     core::ControlService* controls_{};
     network::EspWifiComponent* wifi_{};
     storage::WebAssetStore* web_assets_{};
+    ota::UpdateService* updates_{};
     std::array<char, 18> device_id_{};
     std::array<char, 16> local_ip_buffer_{};
     DeviceIdentity identity_{};

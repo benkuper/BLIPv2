@@ -23,6 +23,7 @@ pinned commit and source path used to derive it.
 | Work package 2.7 OSC/OSCQuery contract | [work-packages/2.7-osc-oscquery.md](work-packages/2.7-osc-oscquery.md) |
 | Work package 3.1 schema-driven web shell | [work-packages/3.1-schema-web-shell.md](work-packages/3.1-schema-web-shell.md) |
 | Work package 3.2 filesystem-managed web assets | [work-packages/3.2-filesystem-web-assets.md](work-packages/3.2-filesystem-web-assets.md) |
+| Work package 3.3 A/B firmware OTA and rollback | [work-packages/3.3-ab-ota-rollback.md](work-packages/3.3-ab-ota-rollback.md) |
 | Append-only gate evidence | [evidence/](evidence/) |
 
 ## Scope boundary

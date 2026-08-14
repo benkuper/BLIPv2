@@ -5,6 +5,7 @@
 #include "blip/core/scheduler.hpp"
 #include "blip/network/esp_wifi_component.hpp"
 #include "blip/oscquery/esp_oscquery_component.hpp"
+#include "blip/ota/esp_ota_component.hpp"
 #include "blip/resources/broker.hpp"
 #include "blip/storage/legacy_settings_import_component.hpp"
 #include "blip/storage/littlefs_storage_component.hpp"
@@ -25,9 +26,9 @@ namespace {
 
 constexpr char kTag[] = "blip_bootstrap";
 constexpr std::uint32_t kBootstrapSchemaVersion = 1U;
-constexpr std::array<std::string_view, 7> kBootstrapDependencies{
+constexpr std::array<std::string_view, 8> kBootstrapDependencies{
     "diagnostics.runtime", "storage.settings", "storage.files.internal", "storage.legacy_import",
-    "transport.serial",    "transport.wifi",   "discovery.oscquery"};
+    "transport.serial",    "transport.wifi",   "firmware.ota",           "discovery.oscquery"};
 constexpr std::array<std::string_view, 2> kRecoveryDependencies{"diagnostics.runtime",
                                                                 "transport.serial"};
 constexpr std::array<blip::core::ParameterDescriptor, 1> kBootstrapParameters{{
@@ -149,11 +150,13 @@ blip::storage::NvsSettingsComponent settings_component{};
 blip::storage::LittleFsStorageComponent file_storage_component{};
 blip::storage::LegacySettingsImportComponent legacy_import_component{settings_component.settings()};
 blip::network::EspWifiComponent wifi_component{settings_component.settings()};
-blip::core::Registry<9> registry{};
-blip::core::RegistryControlService<9> control_component{registry};
+blip::ota::EspOtaComponent ota_component{"blip-v2", CONFIG_IDF_TARGET, "minimal"};
+blip::core::Registry<10> registry{};
+blip::core::RegistryControlService<10> control_component{registry};
 blip::transport::EspSerialTransportComponent serial_transport_component{control_component};
 blip::oscquery::EspOscQueryComponent oscquery_component{registry, control_component, wifi_component,
-                                                        file_storage_component.web_assets()};
+                                                        file_storage_component.web_assets(),
+                                                        ota_component.updates()};
 
 class EspMonotonicClock final : public blip::core::Clock {
   public:
@@ -171,6 +174,12 @@ blip::resources::Broker<1, 1> resource_broker{};
                    blip::storage::LegacyImportDisposition::no_source
                ? "none"
                : "confirmed";
+}
+
+void reject_pending_update() noexcept {
+    if (ota_component.pending_confirmation() && !ota_component.reject_boot()) {
+        ESP_LOGE(kTag, "BLIP_V2_OTA_ROLLBACK_FAILED");
+    }
 }
 
 [[nodiscard]] bool start_registry(bool safe_mode) noexcept {
@@ -208,6 +217,10 @@ blip::resources::Broker<1, 1> resource_broker{};
         if (!wifi_status) {
             return false;
         }
+        const auto ota_status = registry.add(ota_component);
+        if (!ota_status) {
+            return false;
+        }
         const auto oscquery_status = registry.add(oscquery_component);
         if (!oscquery_status) {
             return false;
@@ -236,11 +249,17 @@ blip::resources::Broker<1, 1> resource_broker{};
 } // namespace
 
 extern "C" void app_main() {
+    ota_component.prepare_boot();
     if (!diagnostics_component.prepare_boot()) {
         ESP_LOGE(kTag, "BLIP_V2_DIAGNOSTICS_PREPARE_FAILED");
+        reject_pending_update();
         return;
     }
     const bool safe_mode = diagnostics_component.safe_mode();
+    if (safe_mode && ota_component.pending_confirmation()) {
+        reject_pending_update();
+        return;
+    }
 #if defined(BLIP_DIAGNOSTICS_HIL_CLEAR_SAFE_MODE)
     if (safe_mode) {
         if (!diagnostics_component.clear_safe_mode()) {
@@ -253,6 +272,7 @@ extern "C" void app_main() {
 #endif
     if (!start_registry(safe_mode)) {
         ESP_LOGE(kTag, "BLIP_V2_REGISTRY_FAILED");
+        reject_pending_update();
         return;
     }
 #if defined(BLIP_DIAGNOSTICS_HIL_FORCE_BOOT_LOOP)
@@ -264,10 +284,17 @@ extern "C" void app_main() {
     if (!safe_mode && !legacy_import_component.confirm_boot()) {
         ESP_LOGE(kTag, "BLIP_V2_IMPORT_CONFIRM_FAILED");
         static_cast<void>(registry.stop_all());
+        reject_pending_update();
         return;
     }
     if (!diagnostics_component.confirm_boot()) {
         ESP_LOGE(kTag, "BLIP_V2_BOOT_CONFIRM_FAILED");
+        static_cast<void>(registry.stop_all());
+        reject_pending_update();
+        return;
+    }
+    if (!safe_mode && !ota_component.confirm_boot()) {
+        ESP_LOGE(kTag, "BLIP_V2_OTA_CONFIRM_FAILED");
         static_cast<void>(registry.stop_all());
         return;
     }
@@ -291,7 +318,7 @@ extern "C" void app_main() {
     }
     ESP_LOGI(kTag,
              "BLIP_V2_BOOTSTRAP_READY schema=%lu registry=1 scheduler=ready resources=ready "
-             "settings=nvs-v1 files=littlefs-v1 web=bundle-v1 web_version=%lu "
+             "settings=nvs-v1 files=littlefs-v1 web=bundle-v1 web_version=%lu ota=ab-v1 "
              "web_assets=%lu web_bytes=%lu legacy_import=%s diagnostics=structured-v1 "
              "serial=blip-envelope-v1 osc=udp9000-oscquery-v1 osc_stack_hwm=%lu "
              "wifi_state=%u wifi_ap=%.*s "

@@ -39,6 +39,7 @@ def validate_files() -> None:
         "v2/firmware/main/CMakeLists.txt",
         "v2/firmware/main/idf_component.yml",
         "v2/firmware/main/main.cpp",
+        "v2/firmware/partitions.csv",
         "v2/firmware/sdkconfig.defaults",
         "v2/firmware/toolchain.lock.json",
         "v2/firmware/version.txt",
@@ -97,8 +98,29 @@ def validate_build_contract() -> None:
         "CONFIG_APP_REPRODUCIBLE_BUILD=y",
         "CONFIG_COMPILER_CXX_EXCEPTIONS=n",
         "CONFIG_COMPILER_CXX_RTTI=n",
+        "CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y",
+        "CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y",
     ):
         require(option in sdkconfig, f"missing sdkconfig contract: {option}")
+
+    partitions = []
+    for line in read("v2/firmware/partitions.csv").splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        fields = [field.strip() for field in line.split(",")]
+        require(len(fields) >= 5, f"malformed partition row: {line}")
+        partitions.append((fields[0], fields[1], fields[2], int(fields[3], 0), int(fields[4], 0)))
+    by_name = {partition[0]: partition for partition in partitions}
+    require("factory" not in by_name, "A/B layout must not retain a factory app")
+    require(by_name["otadata"][4] == 0x2000, "OTA ledger must contain two sectors")
+    require(by_name["ota_0"][4] == by_name["ota_1"][4] == 0x190000,
+            "OTA slots must be equal 1.5625 MiB partitions")
+    ordered = sorted(partitions, key=lambda partition: partition[3])
+    for previous, current in zip(ordered, ordered[1:]):
+        require(previous[3] + previous[4] <= current[3],
+                f"overlapping partitions: {previous[0]} and {current[0]}")
+    require(max(offset + size for _, _, _, offset, size in partitions) <= 0x400000,
+            "partition layout exceeds 4 MiB")
 
     manifest = read("v2/firmware/main/idf_component.yml")
     require(f'version: "=={IDF_VERSION}"' in manifest, "component manifest does not pin ESP-IDF")
