@@ -1,0 +1,56 @@
+ets Jun  8 2016 00:22:57
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0040,len:6240
+load:0x40078000,len:15820
+load:0x40080400,len:3896
+entry 0x40080640
+I (26) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (26) boot: Multicore bootloader
+I (27) boot: chip revision: v1.0
+I (27) boot.esp32: SPI Speed      : 40MHz
+I (30) boot.esp32: SPI Mode       : DIO
+I (34) boot.esp32: SPI Flash Size : 2MB
+I (37) boot: Enabling RNG early entropy source...
+I (42) boot: Partition Table:
+I (44) boot: ## Label            Usage          Type ST Offset   Length
+I (51) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (57) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (64) boot:  2 factory          factory app      00 00 00010000 00100000
+I (70) boot: End of partition table
+I (74) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=064ach ( 25772) map
+I (90) esp_image: segment 1: paddr=000164d4 vaddr=3ffb0000 size=027a8h ( 10152) load
+I (94) esp_image: segment 2: paddr=00018c84 vaddr=40080000 size=07394h ( 29588) load
+I (108) esp_image: segment 3: paddr=00020020 vaddr=400d0020 size=09dcch ( 40396) map
+I (123) esp_image: segment 4: paddr=00029df4 vaddr=40087394 size=01ce8h (  7400) load
+I (126) esp_image: segment 5: paddr=0002bae4 vaddr=50000000 size=00028h (    40) load
+I (131) boot: Loaded app from partition at offset 0x10000
+I (132) boot: Disabling RNG early entropy source...
+I (148) cpu_start: Multicore app
+I (156) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (157) cpu_start: Pro cpu start user code
+I (157) cpu_start: cpu freq: 160000000 Hz
+I (158) app_init: Application information:
+I (162) app_init: Project name:     blip-v2
+I (166) app_init: App version:      0.1.0
+I (170) app_init: ELF file SHA256:  00cc0b89c...
+I (174) app_init: ESP-IDF:          v6.0.2
+I (178) efuse_init: Min chip rev:     v0.0
+I (182) efuse_init: Max chip rev:     v3.99
+I (186) efuse_init: Chip rev:         v1.0
+I (190) heap_init: Initializing. RAM available for dynamic allocation:
+I (196) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (201) heap_init: At 3FFB33E8 len 0002CC18 (179 KiB): DRAM
+I (206) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (212) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (217) heap_init: At 4008907C len 00016F84 (91 KiB): IRAM
+I (223) spi_flash: detected chip: gd
+I (226) spi_flash: flash io: dio
+W (229) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.
+I (242) main_task: Started on CPU0
+I (242) main_task: Calling app_main()
+I (242) blip_bootstrap: BLIP_V2_BOOTSTRAP_READY schema=1 registry=1 scheduler=ready resources=ready target=esp32 idf=v6.0.2
+I (252) main_task: Returned from app_main()

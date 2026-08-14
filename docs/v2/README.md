@@ -19,6 +19,7 @@ pinned commit and source path used to derive it.
 | V1 compatibility fixtures | [`v2/tests/fixtures/v1/`](../../v2/tests/fixtures/v1/) |
 | Implementation work-package records | [work-packages/](work-packages/) |
 | Milestone 1 verification | [work-packages/milestone-1-evidence.md](work-packages/milestone-1-evidence.md) |
+| Append-only gate evidence | [evidence/](evidence/) |
 
 ## Scope boundary
 
