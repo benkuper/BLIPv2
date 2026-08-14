@@ -104,7 +104,9 @@ jobs:
           "build/${{ matrix.target }}-b/blip-v2.bin"
       - name: Ensure dependency lock is unchanged
         shell: bash
-        run: git diff --exit-code -- "v2/firmware/dependencies.lock.${{ matrix.target }}"
+        run: >-
+          git -C "$GITHUB_WORKSPACE" diff --exit-code --
+          "v2/firmware/dependencies.lock.${{ matrix.target }}"
       - name: Report image size
         shell: bash
         run: |
