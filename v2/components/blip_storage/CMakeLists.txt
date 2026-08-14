@@ -1,10 +1,14 @@
 idf_component_register(
     SRCS
+        "src/atomic_file_store.cpp"
         "src/esp_nvs_blob_store.cpp"
+        "src/littlefs_storage_component.cpp"
         "src/nvs_settings_component.cpp"
+        "src/posix_file_backend.cpp"
+        "src/sd_file_storage_component.cpp"
         "src/settings_store.cpp"
     INCLUDE_DIRS "include"
-    REQUIRES blip_core nvs_flash)
+    REQUIRES blip_core esp_partition joltwallet__littlefs nvs_flash vfs)
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/blip_component.cmake)
 blip_configure_component(${COMPONENT_LIB})

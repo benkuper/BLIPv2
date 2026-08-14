@@ -19,3 +19,4 @@ wire protocols, or public OSC paths.
 | Work package | Result |
 | --- | --- |
 | [2.1](2.1-versioned-nvs-settings.md) | Versioned per-component NVS records with two-slot interrupted-save recovery; implementation ready, merge held behind open Gate A hardware qualification |
+| [2.2](2.2-atomic-file-storage.md) | Versioned atomic LittleFS files and an optional two-slot SD service with bounded recovery |

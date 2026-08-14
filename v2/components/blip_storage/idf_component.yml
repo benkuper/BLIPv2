@@ -1,0 +1,5 @@
+version: "0.2.0"
+description: "BLIP V2 transactional settings and file storage"
+dependencies:
+  joltwallet/littlefs:
+    version: "==1.21.1"

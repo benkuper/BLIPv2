@@ -18,3 +18,8 @@ uses a separate committed lock for each target.
 
 The composition root will remain thin: reusable production behavior belongs in
 the component directories under [`../components/`](../components/).
+
+The committed custom partition table is sized for a 2 MiB device and reserves
+an 896 KiB `storage` LittleFS partition. The internal storage component formats
+that partition only when it is completely erased; unrecognized nonblank media
+fails closed so legacy data is not silently destroyed.

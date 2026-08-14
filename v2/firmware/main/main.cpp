@@ -2,6 +2,7 @@
 #include "blip/core/registry.hpp"
 #include "blip/core/scheduler.hpp"
 #include "blip/resources/broker.hpp"
+#include "blip/storage/littlefs_storage_component.hpp"
 #include "blip/storage/nvs_settings_component.hpp"
 #include "esp_idf_version.h"
 #include "esp_log.h"
@@ -17,7 +18,8 @@ namespace {
 
 constexpr char kTag[] = "blip_bootstrap";
 constexpr std::uint32_t kBootstrapSchemaVersion = 1U;
-constexpr std::array<std::string_view, 1> kBootstrapDependencies{"storage.settings"};
+constexpr std::array<std::string_view, 2> kBootstrapDependencies{"storage.settings",
+                                                                 "storage.files.internal"};
 
 static_assert(ESP_IDF_VERSION == ESP_IDF_VERSION_VAL(6, 0, 2),
               "BLIP V2 work package 1.1 requires ESP-IDF 6.0.2");
@@ -54,7 +56,8 @@ class BootstrapComponent final : public blip::core::Component {
 
 BootstrapComponent bootstrap_component{};
 blip::storage::NvsSettingsComponent settings_component{};
-blip::core::Registry<2> registry{};
+blip::storage::LittleFsStorageComponent file_storage_component{};
+blip::core::Registry<3> registry{};
 
 class EspMonotonicClock final : public blip::core::Clock {
   public:
@@ -70,6 +73,10 @@ blip::resources::Broker<1, 1> resource_broker{};
 [[nodiscard]] bool start_registry() noexcept {
     const auto storage_status = registry.add(settings_component);
     if (!storage_status) {
+        return false;
+    }
+    const auto file_storage_status = registry.add(file_storage_component);
+    if (!file_storage_status) {
         return false;
     }
     const auto add_status = registry.add(bootstrap_component);
@@ -92,7 +99,7 @@ extern "C" void app_main() {
     }
     ESP_LOGI(kTag,
              "BLIP_V2_BOOTSTRAP_READY schema=%lu registry=1 scheduler=ready resources=ready "
-             "settings=nvs-v1 target=%s idf=%s",
+             "settings=nvs-v1 files=littlefs-v1 target=%s idf=%s",
              static_cast<unsigned long>(kBootstrapSchemaVersion), CONFIG_IDF_TARGET,
              esp_get_idf_version());
 }
