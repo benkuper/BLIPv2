@@ -1,0 +1,17 @@
+{
+  "fps": 30,
+  "group": 1,
+  "id": 2,
+  "groupColor": [
+    1.0,
+    0.25,
+    0.0
+  ],
+  "scripts": [
+    {
+      "name": "intro",
+      "start": 0.0,
+      "end": 0.1
+    }
+  ]
+}

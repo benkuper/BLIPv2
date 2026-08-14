@@ -1,0 +1,392 @@
+{
+  "fixture_set_version": 1,
+  "baseline": {
+    "repository": "https://github.com/Golden-Geek/BLIP.git",
+    "commit": "e567eeb5f20ba022595fd5b89a77fb17ba59ca94",
+    "firmware_version": "1.2.0",
+    "representative_profile": "creatorsballv2"
+  },
+  "generated_by": "v2/tests/fixtures/v1/generate.py",
+  "fixtures": [
+    {
+      "path": "espnow/message-float.bin",
+      "sha256": "4c8b2fd2b295b10d545c2200e5b6347b44cceec7ace0c0e4c3413e0fefc95f9a",
+      "size": 32,
+      "evidence": "source-derived",
+      "format": "blip-espnow-v1",
+      "source_paths": [
+        "src/Component/components/communication/espnow/ESPNowComponent.cpp",
+        "src/Common/var.h"
+      ],
+      "expected": {
+        "type": 0,
+        "ids": [
+          7,
+          7
+        ],
+        "address": "/leds/strip1",
+        "command": "brightness",
+        "values": [
+          {
+            "type": "f",
+            "value": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "path": "espnow/message-typed.bin",
+      "sha256": "5d72cb4775295e88f9567ea1ff824f82a4bf3fc63ed092b3cc137c7caa825943",
+      "size": 43,
+      "evidence": "source-derived",
+      "format": "blip-espnow-v1",
+      "source_paths": [
+        "src/Component/components/communication/espnow/ESPNowComponent.cpp",
+        "src/Common/var.h"
+      ],
+      "expected": {
+        "type": 0,
+        "ids": [
+          255,
+          255
+        ],
+        "address": "/script",
+        "command": "setParam",
+        "values": [
+          {
+            "type": "s",
+            "value": "gain"
+          },
+          {
+            "type": "f",
+            "value": 0.25
+          },
+          {
+            "type": "i",
+            "value": -2
+          },
+          {
+            "type": "b",
+            "value": true
+          },
+          {
+            "type": "p",
+            "value": [
+              1,
+              2,
+              255
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "espnow/packets.json",
+      "sha256": "91be8c71cfb3a6747a057cd519d7f03f2a8bec19b4de04a798ae4f4fbe47b6ff",
+      "size": 1272,
+      "evidence": "source-derived",
+      "format": "json",
+      "source_paths": [
+        "src/Component/components/communication/espnow/ESPNowComponent.cpp",
+        "src/Common/var.h"
+      ],
+      "expected": {
+        "records": 6
+      }
+    },
+    {
+      "path": "espnow/pairing-request.bin",
+      "sha256": "e4c4dc8820db4972223043f69514cd223b23ace6817c14a6dfc6118dd7c15d75",
+      "size": 2,
+      "evidence": "source-derived",
+      "format": "blip-espnow-v1",
+      "source_paths": [
+        "src/Component/components/communication/espnow/ESPNowComponent.cpp",
+        "src/Common/var.h"
+      ],
+      "expected": {
+        "type": 2,
+        "wifi_channel": 6
+      }
+    },
+    {
+      "path": "espnow/pairing-response.bin",
+      "sha256": "084fed08b978af4d7d196a7446a86b58009e636b611db16211b65a9aadff29c5",
+      "size": 1,
+      "evidence": "source-derived",
+      "format": "blip-espnow-v1",
+      "source_paths": [
+        "src/Component/components/communication/espnow/ESPNowComponent.cpp",
+        "src/Common/var.h"
+      ],
+      "expected": {
+        "type": 3
+      }
+    },
+    {
+      "path": "espnow/stream.bin",
+      "sha256": "be7c5799fd6a149762f77544bbb0fbd7ef2b8d3c90aa98528099bf0f9bde7560",
+      "size": 14,
+      "evidence": "source-derived",
+      "format": "blip-espnow-v1",
+      "source_paths": [
+        "src/Component/components/communication/espnow/ESPNowComponent.cpp",
+        "src/Common/var.h"
+      ],
+      "expected": {
+        "type": 1,
+        "universe": 2,
+        "start_channel": 1,
+        "rgb": [
+          [
+            255,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            0
+          ],
+          [
+            0,
+            0,
+            255
+          ]
+        ]
+      }
+    },
+    {
+      "path": "espnow/wake.bin",
+      "sha256": "4c989e7b0bdd8d9c81d6e18d9b1530fc7251a6cf81ff8db86bfcf5d6ab3b88cc",
+      "size": 2,
+      "evidence": "source-derived",
+      "format": "blip-espnow-v1",
+      "source_paths": [
+        "src/Component/components/communication/espnow/ESPNowComponent.cpp",
+        "src/Common/var.h"
+      ],
+      "expected": {
+        "type": 4,
+        "wifi_channel": 6
+      }
+    },
+    {
+      "path": "osc/brightness.osc",
+      "sha256": "9a2c4254456ce938993026603beadcc8b92cff11532cef0c1c9f7e95d6b998e2",
+      "size": 32,
+      "evidence": "source-derived",
+      "format": "osc-message",
+      "source_paths": [
+        "src/Component/components/communication/osc/OSCComponent.cpp"
+      ],
+      "expected": {
+        "address": "/leds/strip1/brightness",
+        "type_tags": "f",
+        "arguments": [
+          0.5
+        ]
+      }
+    },
+    {
+      "path": "osc/messages.json",
+      "sha256": "7368179ba80f9677bdc6bddaefeb41758e84fd4cbe6500eaa3d413b57a0a5edd",
+      "size": 506,
+      "evidence": "source-derived",
+      "format": "json",
+      "source_paths": [
+        "src/Component/components/communication/osc/OSCComponent.cpp"
+      ],
+      "expected": {
+        "records": 4
+      }
+    },
+    {
+      "path": "osc/ping.osc",
+      "sha256": "a1882c5f89770a247cb8f0580a6ec80f716b107474b1297a6f373ca40307219d",
+      "size": 24,
+      "evidence": "source-derived",
+      "format": "osc-message",
+      "source_paths": [
+        "src/Component/components/communication/osc/OSCComponent.cpp"
+      ],
+      "expected": {
+        "address": "/ping",
+        "type_tags": "s",
+        "arguments": [
+          "192.0.2.10"
+        ]
+      }
+    },
+    {
+      "path": "osc/save.osc",
+      "sha256": "7ccd79c7342ac23f9f5a511d08f5438092ea36b552bcf45d7dee4fa0511eda2b",
+      "size": 20,
+      "evidence": "source-derived",
+      "format": "osc-message",
+      "source_paths": [
+        "src/Component/components/communication/osc/OSCComponent.cpp"
+      ],
+      "expected": {
+        "address": "/settings/save",
+        "type_tags": "",
+        "arguments": []
+      }
+    },
+    {
+      "path": "osc/yo.osc",
+      "sha256": "660ecb55f13956b67cab5b2a8aba14d5288b496be092395c16555e78cd4b4a7f",
+      "size": 20,
+      "evidence": "source-derived",
+      "format": "osc-message",
+      "source_paths": [
+        "src/Component/components/communication/osc/OSCComponent.cpp"
+      ],
+      "expected": {
+        "address": "/yo",
+        "type_tags": "s",
+        "arguments": [
+          "192.0.2.10"
+        ]
+      }
+    },
+    {
+      "path": "oscquery/creatorsballv2.json",
+      "sha256": "023418d27129896e909f56b7d4a63964133e9170d768c7597e5ec9cac47f5e46",
+      "size": 43185,
+      "evidence": "source-derived",
+      "format": "oscquery-json",
+      "source_paths": [
+        "src/Component/Component.cpp",
+        "src/Component/components/communication/server/WebServerComponent.cpp",
+        "src/RootComponent.cpp"
+      ],
+      "expected": {
+        "profile": "creatorsballv2",
+        "root_path": ""
+      }
+    },
+    {
+      "path": "oscquery/host-info.json",
+      "sha256": "8923c44bf14232fbd75fe001c3c5ab41bfe534f629b568fa55a06cc5535567da",
+      "size": 475,
+      "evidence": "source-derived",
+      "format": "oscquery-host-info-json",
+      "source_paths": [
+        "src/Component/Component.cpp",
+        "src/Component/components/communication/server/WebServerComponent.cpp",
+        "src/RootComponent.cpp"
+      ],
+      "expected": {
+        "osc_port": 9000,
+        "transport": "UDP"
+      }
+    },
+    {
+      "path": "playback/demo.colors",
+      "sha256": "3e4d1418945dc26d9a86b280b3ea2223974c51e809aaa35e544b9c915b0f3487",
+      "size": 48,
+      "evidence": "source-derived",
+      "format": "blip-playback-v1-argb8",
+      "source_paths": [
+        "src/Component/components/ledstrip/Layer/layers/playback/LedStripPlaybackLayer.cpp",
+        "src/Common/color.h"
+      ],
+      "expected": {
+        "pixel_count": 4,
+        "frame_count": 3,
+        "frame_size": 16,
+        "byte_order": "ARGB"
+      }
+    },
+    {
+      "path": "playback/demo.expected.json",
+      "sha256": "9778108b01dc469aed1022a5cbcbbd7fb62ddde9bebdf98228054262ba8691b8",
+      "size": 926,
+      "evidence": "source-derived",
+      "format": "json",
+      "source_paths": [
+        "src/Component/components/ledstrip/Layer/layers/playback/LedStripPlaybackLayer.cpp",
+        "src/Common/color.h"
+      ],
+      "expected": {
+        "equals_decoded": "playback/demo.colors"
+      }
+    },
+    {
+      "path": "playback/demo.meta",
+      "sha256": "e708e910b7204c5d830c9aee48d2f436f3e0695ea0bbd4ff5fce965661a01746",
+      "size": 183,
+      "evidence": "source-derived",
+      "format": "blip-playback-v1-meta-json",
+      "source_paths": [
+        "src/Component/components/ledstrip/Layer/layers/playback/LedStripPlaybackLayer.cpp",
+        "src/Common/color.h"
+      ],
+      "expected": {
+        "color_file": "playback/demo.colors",
+        "pixel_count": 4
+      }
+    },
+    {
+      "path": "serial/messages.ndjson",
+      "sha256": "a5f3a213e4a42efd1f93d259c0901ccf791b02eb90a33322fa730466302834a6",
+      "size": 982,
+      "evidence": "source-derived",
+      "format": "ndjson",
+      "source_paths": [
+        "src/Component/components/communication/serial/SerialComponent.cpp",
+        "src/Common/StringHelpers.cpp"
+      ],
+      "expected": {
+        "records": 7
+      }
+    },
+    {
+      "path": "settings/expected-import.json",
+      "sha256": "d9995cb2e27efbb6236718b49006a880c21b48f027ab82d613418b8e1035a72d",
+      "size": 12059,
+      "evidence": "source-derived",
+      "format": "json",
+      "source_paths": [
+        "src/Common/Settings.cpp",
+        "src/Component/Component.cpp",
+        "src/Component/components/settings/SettingsComponent.cpp"
+      ],
+      "expected": {
+        "record_count": 112
+      }
+    },
+    {
+      "path": "settings/representative.json",
+      "sha256": "aacebf77ef5877d4ba3de3af1495818f638e00edcd09852bfa6060d10e1b015a",
+      "size": 4017,
+      "evidence": "source-derived",
+      "format": "json",
+      "source_paths": [
+        "src/Common/Settings.cpp",
+        "src/Component/Component.cpp",
+        "src/Component/components/settings/SettingsComponent.cpp"
+      ],
+      "expected": {
+        "nvs_namespace": "blip",
+        "nvs_key": "settings"
+      }
+    },
+    {
+      "path": "settings/representative.msgpack",
+      "sha256": "bd9bed78d610868b60ef820ef5f4471aab024331ebcf7fa86c154eed9344192e",
+      "size": 1773,
+      "evidence": "source-derived",
+      "format": "messagepack",
+      "source_paths": [
+        "src/Common/Settings.cpp",
+        "src/Component/Component.cpp",
+        "src/Component/components/settings/SettingsComponent.cpp"
+      ],
+      "expected": {
+        "equals_json": "settings/representative.json"
+      }
+    }
+  ]
+}

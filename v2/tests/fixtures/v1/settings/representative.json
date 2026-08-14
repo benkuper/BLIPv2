@@ -1,0 +1,176 @@
+{
+  "components": {
+    "comm": {
+      "enabled": true,
+      "components": {
+        "serial": {
+          "enabled": true,
+          "sendFeedback": true
+        },
+        "osc": {
+          "enabled": true,
+          "remoteHost": "192.0.2.10",
+          "remotePort": 10000,
+          "sendFeedback": true,
+          "isAlive": true
+        },
+        "espnow": {
+          "enabled": false,
+          "pairingMode": false,
+          "longRange": false,
+          "optimalRange": false,
+          "channel": 6,
+          "autoPairing": true,
+          "pairOnAnyData": true,
+          "sendFeedback": false
+        },
+        "server": {
+          "enabled": true,
+          "sendFeedback": true,
+          "sendDebugLogs": false,
+          "suspendUpdatesDuringUpload": true,
+          "suppressFeedbackDuringUpload": true
+        }
+      }
+    },
+    "settings": {
+      "enabled": true,
+      "propID": 7,
+      "deviceName": "Fixture BLIP",
+      "wakeUpButton": 19,
+      "wakeUpState": true
+    },
+    "leds": {
+      "enabled": true,
+      "count": 1,
+      "components": {
+        "strip1": {
+          "enabled": true,
+          "updateRate": 60,
+          "dataPin": 3,
+          "enPin": 21,
+          "clkPin": 2,
+          "invertStrip": false,
+          "multiLedMode": 0,
+          "maxPower": 1600,
+          "components": {
+            "playbackLayer": {
+              "enabled": true
+            },
+            "streamLayer": {
+              "enabled": true,
+              "universe": 0,
+              "startChannel": 1,
+              "use16Bits": false,
+              "includeAlpha": false,
+              "clearOnNoReception": true,
+              "noReceptionTime": 1.0
+            },
+            "scriptLayer": {
+              "enabled": true
+            },
+            "systemLayer": {
+              "enabled": true
+            },
+            "fx": {
+              "enabled": false,
+              "staticOffset": 0.0,
+              "offsetSpeed": 0.0,
+              "isolationSpeed": 0.0,
+              "isolationSmoothing": 0.0,
+              "isolationAxis": 0,
+              "swapOnFlip": false,
+              "showCalibration": false
+            }
+          }
+        }
+      }
+    },
+    "wifi": {
+      "enabled": true,
+      "mode": 0,
+      "ssid": "fixture-network",
+      "pass": "not-a-real-secret",
+      "manualIP": "",
+      "manualGateway": "",
+      "channelScanMode": true,
+      "txPower": 2,
+      "wifiProtocol": 2
+    },
+    "battery": {
+      "enabled": true,
+      "updateRate": 5,
+      "feedbackRate": 0.5,
+      "batteryPin": 6,
+      "chargePin": 14,
+      "chargeLedIntensity": 0.01,
+      "rawMin": 222,
+      "rawMax": 335,
+      "lowBatteryThreshold": 3.5,
+      "shutdownChargeNoSignal": 0,
+      "shutdownChargeSignalTimeout": 0
+    },
+    "files": {
+      "enabled": true,
+      "sdSCK": 8,
+      "sdMiso": 5,
+      "sdMosi": 4,
+      "sdCS": 15
+    },
+    "script": {
+      "enabled": true,
+      "updateRate": 50,
+      "scriptAtLaunch": ""
+    },
+    "dmxReceiver": {
+      "enabled": true,
+      "updateRate": 60
+    },
+    "buttons": {
+      "enabled": true,
+      "count": 1,
+      "components": {
+        "button1": {
+          "enabled": true,
+          "pin": 19,
+          "mode": 2,
+          "inverted": false,
+          "canShutDown": true
+        }
+      }
+    },
+    "ir": {
+      "enabled": true,
+      "pin1": 18,
+      "pin2": 20,
+      "value": 0.0,
+      "keepValueOnReboot": false
+    },
+    "motion": {
+      "updateRate": 100,
+      "connected": false,
+      "sendLevel": 1,
+      "orientationSendRate": 50,
+      "sdaPin": 0,
+      "sclPin": 1,
+      "intPin": 7,
+      "orientationXOffset": 0.0,
+      "flatThresholds": [
+        0.8,
+        2.0,
+        0.0
+      ],
+      "accelThresholds": [
+        0.8,
+        2.0,
+        4.0
+      ],
+      "diffThreshold": 8.0,
+      "semiFlatThreshold": 2.0,
+      "loftieThreshold": 12.0,
+      "singleThreshold": 25.0,
+      "angleOffset": 0.0,
+      "xOnCalibration": 0.0
+    }
+  }
+}

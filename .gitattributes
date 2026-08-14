@@ -1,0 +1,10 @@
+* text=auto
+*.md text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.ndjson text eol=lf
+*.meta text eol=lf
+*.bin binary
+*.colors binary
+*.msgpack binary
+*.osc binary

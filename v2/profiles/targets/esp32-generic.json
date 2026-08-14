@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "esp32-generic",
+  "status": "planning",
+  "idf_target": "esp32",
+  "build_contract": {
+    "esp_idf": "6.0.x",
+    "cpp_standard": "c++20",
+    "exceptions": false,
+    "rtti": false,
+    "warnings_as_errors": true
+  },
+  "reference_board": {
+    "required": true,
+    "id": null,
+    "evidence": "planned"
+  },
+  "pins": {
+    "policy": "board-manifest-required",
+    "assignments": {}
+  },
+  "gate_a": {
+    "status": "planned",
+    "required_evidence": ["clean-build", "flash", "boot", "registry-self-test"]
+  }
+}
+

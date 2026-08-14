@@ -1,0 +1,23 @@
+{
+  "EXTENSIONS": {
+    "ACCESS": true,
+    "CLIPMODE": false,
+    "CRITICAL": false,
+    "RANGE": true,
+    "TAGS": false,
+    "TYPE": true,
+    "UNIT": false,
+    "VALUE": true,
+    "LISTEN": true,
+    "PATH_ADDED": true,
+    "PATH_REMOVED": true,
+    "PATH_RENAMED": true,
+    "PATH_CHANGED": false
+  },
+  "NAME": "Fixture BLIP",
+  "VERSION": "1.2.0",
+  "DEVICE_TYPE": "Creators Ball V2",
+  "DEVICE_ID": "02:00:00:00:00:07",
+  "OSC_PORT": 9000,
+  "OSC_TRANSPORT": "UDP"
+}

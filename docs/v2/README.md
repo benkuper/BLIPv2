@@ -1,0 +1,46 @@
+# BLIP V2 planning foundation
+
+This directory records the contracts that must be stable before production V2
+firmware starts. The baseline is BLIP V1 commit
+[`e567eeb5f20ba022595fd5b89a77fb17ba59ca94`](https://github.com/Golden-Geek/BLIP/commit/e567eeb5f20ba022595fd5b89a77fb17ba59ca94).
+The repository does not vendor that source; every V1 observation below names the
+pinned commit and source path used to derive it.
+
+## Milestone 0 deliverables
+
+| Deliverable | Location |
+| --- | --- |
+| Baseline and evidence policy | [source-baseline.md](source-baseline.md) |
+| Complete V1 component and behavior inventory | [v1-inventory.md](v1-inventory.md) |
+| Public compatibility matrix | [compatibility.md](compatibility.md) |
+| Target profiles and measurable gates | [quality-gates.md](quality-gates.md) |
+| PR and issue dependency map | [dependency-map.md](dependency-map.md) |
+| Architecture decisions | [adr/](adr/) |
+| V1 compatibility fixtures | [`v2/tests/fixtures/v1/`](../../v2/tests/fixtures/v1/) |
+
+## Scope boundary
+
+Milestone 0 contains documentation, manifests, fixtures, and host-side fixture
+validation only. It intentionally contains no ESP-IDF application or production
+component implementation. V1 public behavior is documented, not silently
+redesigned. The V2 contracts use versioned envelopes and schemas from their
+first implementation even where V1 did not.
+
+## Decision status
+
+All ADRs in this milestone are **Accepted**. A later change requires a new ADR
+that supersedes the old one; editing an accepted decision in place is reserved
+for spelling and clarification that do not change its contract.
+
+## Definition of done
+
+Milestone 0 is complete when:
+
+1. Every compiled or placeholder V1 component is represented in the inventory.
+2. Each known public control, discovery, settings, file, and radio surface has a
+   compatibility disposition.
+3. The checked-in fixture manifest validates without network access or hardware.
+4. Target/profile manifests validate against their schema.
+5. Every later work package has an explicit dependency and acceptance evidence.
+6. No V1 source file has been changed, moved, or deleted.
+

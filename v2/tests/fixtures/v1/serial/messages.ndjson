@@ -1,0 +1,7 @@
+{"direction":"input","raw":"yo\n","special":"discovery"}
+{"direction":"output","raw":"wassup 02:00:00:00:00:07 \"Creators Ball V2\" \"Fixture BLIP\" \"1.2.0\"\n","special":"discovery"}
+{"direction":"input","raw":"settings.save\n","component":"settings","command":"save","values":[]}
+{"direction":"input","raw":"leds.strip1.brightness 0.5\n","component":"leds.strip1","command":"brightness","values":[{"type":"float","value":0.5}]}
+{"direction":"input","raw":"leds.strip1.playbackLayer.play demo,1.25\n","component":"leds.strip1.playbackLayer","command":"play","values":[{"type":"string","value":"demo"},{"type":"float","value":1.25}]}
+{"direction":"input","raw":"script.setParam gain,-2\n","component":"script","command":"setParam","values":[{"type":"string","value":"gain"},{"type":"string","value":"-2"}],"note":"negative token is a V1 string"}
+{"direction":"output","raw":"/leds_strip1.brightness 0.500000\n","source":"/leds_strip1","command":"brightness","values":["0.500000"]}

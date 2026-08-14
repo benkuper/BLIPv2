@@ -1,0 +1,1663 @@
+{
+  "DESCRIPTION": "Root",
+  "FULL_PATH": "",
+  "ACCESS": 0,
+  "CONTENTS": {
+    "shutdown": {
+      "DESCRIPTION": "Shutdown",
+      "ACCESS": 3,
+      "TYPE": "I",
+      "FULL_PATH": "/shutdown"
+    },
+    "restart": {
+      "DESCRIPTION": "Restart",
+      "ACCESS": 3,
+      "TYPE": "I",
+      "FULL_PATH": "/restart"
+    },
+    "standby": {
+      "DESCRIPTION": "Standby",
+      "ACCESS": 3,
+      "TYPE": "I",
+      "FULL_PATH": "/standby"
+    },
+    "switchToWifi": {
+      "DESCRIPTION": "Switch To Wifi",
+      "ACCESS": 3,
+      "TYPE": "I",
+      "FULL_PATH": "/switchToWifi"
+    },
+    "switchToESPNow": {
+      "DESCRIPTION": "Switch To ESPNow",
+      "ACCESS": 3,
+      "TYPE": "I",
+      "FULL_PATH": "/switchToESPNow"
+    },
+    "comm": {
+      "DESCRIPTION": "Comm",
+      "FULL_PATH": "/comm",
+      "ACCESS": 0,
+      "CONTENTS": {
+        "enabled": {
+          "DESCRIPTION": "Enabled",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/comm/enabled",
+          "VALUE": [
+            true
+          ]
+        },
+        "serial": {
+          "DESCRIPTION": "Serial",
+          "FULL_PATH": "/comm/serial",
+          "ACCESS": 0,
+          "CONTENTS": {
+            "enabled": {
+              "DESCRIPTION": "Enabled",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/comm/serial/enabled",
+              "VALUE": [
+                true
+              ]
+            },
+            "sendFeedback": {
+              "DESCRIPTION": "Send Feedback",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/comm/serial/sendFeedback",
+              "VALUE": [
+                true
+              ]
+            }
+          }
+        },
+        "osc": {
+          "DESCRIPTION": "Osc",
+          "FULL_PATH": "/comm/osc",
+          "ACCESS": 0,
+          "CONTENTS": {
+            "enabled": {
+              "DESCRIPTION": "Enabled",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/comm/osc/enabled",
+              "VALUE": [
+                true
+              ]
+            },
+            "remoteHost": {
+              "DESCRIPTION": "Remote Host",
+              "ACCESS": 3,
+              "TYPE": "s",
+              "FULL_PATH": "/comm/osc/remoteHost",
+              "VALUE": [
+                "192.0.2.10"
+              ]
+            },
+            "remotePort": {
+              "DESCRIPTION": "Remote Port",
+              "ACCESS": 3,
+              "TYPE": "i",
+              "FULL_PATH": "/comm/osc/remotePort",
+              "VALUE": [
+                10000
+              ]
+            },
+            "sendFeedback": {
+              "DESCRIPTION": "Send Feedback",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/comm/osc/sendFeedback",
+              "VALUE": [
+                true
+              ]
+            },
+            "isAlive": {
+              "DESCRIPTION": "Is Alive",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/comm/osc/isAlive",
+              "VALUE": [
+                true
+              ]
+            }
+          }
+        },
+        "espnow": {
+          "DESCRIPTION": "Espnow",
+          "FULL_PATH": "/comm/espnow",
+          "ACCESS": 0,
+          "CONTENTS": {
+            "enabled": {
+              "DESCRIPTION": "Enabled",
+              "ACCESS": 3,
+              "TYPE": "F",
+              "FULL_PATH": "/comm/espnow/enabled",
+              "VALUE": [
+                false
+              ]
+            },
+            "pairingMode": {
+              "DESCRIPTION": "Pairing Mode",
+              "ACCESS": 3,
+              "TYPE": "F",
+              "FULL_PATH": "/comm/espnow/pairingMode",
+              "VALUE": [
+                false
+              ]
+            },
+            "longRange": {
+              "DESCRIPTION": "Long Range",
+              "ACCESS": 3,
+              "TYPE": "F",
+              "FULL_PATH": "/comm/espnow/longRange",
+              "VALUE": [
+                false
+              ]
+            },
+            "optimalRange": {
+              "DESCRIPTION": "Optimal Range",
+              "ACCESS": 3,
+              "TYPE": "F",
+              "FULL_PATH": "/comm/espnow/optimalRange",
+              "VALUE": [
+                false
+              ]
+            },
+            "channel": {
+              "DESCRIPTION": "Channel",
+              "ACCESS": 3,
+              "TYPE": "i",
+              "FULL_PATH": "/comm/espnow/channel",
+              "VALUE": [
+                6
+              ]
+            },
+            "autoPairing": {
+              "DESCRIPTION": "Auto Pairing",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/comm/espnow/autoPairing",
+              "VALUE": [
+                true
+              ]
+            },
+            "pairOnAnyData": {
+              "DESCRIPTION": "Pair On Any Data",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/comm/espnow/pairOnAnyData",
+              "VALUE": [
+                true
+              ]
+            },
+            "sendFeedback": {
+              "DESCRIPTION": "Send Feedback",
+              "ACCESS": 3,
+              "TYPE": "F",
+              "FULL_PATH": "/comm/espnow/sendFeedback",
+              "VALUE": [
+                false
+              ]
+            }
+          }
+        },
+        "server": {
+          "DESCRIPTION": "Server",
+          "FULL_PATH": "/comm/server",
+          "ACCESS": 0,
+          "CONTENTS": {
+            "enabled": {
+              "DESCRIPTION": "Enabled",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/comm/server/enabled",
+              "VALUE": [
+                true
+              ]
+            },
+            "sendFeedback": {
+              "DESCRIPTION": "Send Feedback",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/comm/server/sendFeedback",
+              "VALUE": [
+                true
+              ]
+            },
+            "sendDebugLogs": {
+              "DESCRIPTION": "Send Debug Logs",
+              "ACCESS": 3,
+              "TYPE": "F",
+              "FULL_PATH": "/comm/server/sendDebugLogs",
+              "VALUE": [
+                false
+              ]
+            },
+            "suspendUpdatesDuringUpload": {
+              "DESCRIPTION": "Suspend Updates During Upload",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/comm/server/suspendUpdatesDuringUpload",
+              "VALUE": [
+                true
+              ]
+            },
+            "suppressFeedbackDuringUpload": {
+              "DESCRIPTION": "Suppress Feedback During Upload",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/comm/server/suppressFeedbackDuringUpload",
+              "VALUE": [
+                true
+              ]
+            }
+          }
+        }
+      }
+    },
+    "settings": {
+      "DESCRIPTION": "Settings",
+      "FULL_PATH": "/settings",
+      "ACCESS": 0,
+      "CONTENTS": {
+        "saveSettings": {
+          "DESCRIPTION": "Save Settings",
+          "ACCESS": 3,
+          "TYPE": "I",
+          "FULL_PATH": "/settings/saveSettings"
+        },
+        "clearSettings": {
+          "DESCRIPTION": "Clear Settings",
+          "ACCESS": 3,
+          "TYPE": "I",
+          "FULL_PATH": "/settings/clearSettings"
+        },
+        "factoryReset": {
+          "DESCRIPTION": "Factory Reset",
+          "ACCESS": 3,
+          "TYPE": "I",
+          "FULL_PATH": "/settings/factoryReset"
+        },
+        "enabled": {
+          "DESCRIPTION": "Enabled",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/settings/enabled",
+          "VALUE": [
+            true
+          ]
+        },
+        "propID": {
+          "DESCRIPTION": "Prop ID",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/settings/propID",
+          "VALUE": [
+            7
+          ]
+        },
+        "deviceName": {
+          "DESCRIPTION": "Device Name",
+          "ACCESS": 3,
+          "TYPE": "s",
+          "FULL_PATH": "/settings/deviceName",
+          "VALUE": [
+            "Fixture BLIP"
+          ]
+        },
+        "deviceType": {
+          "DESCRIPTION": "Device Type",
+          "ACCESS": 1,
+          "TYPE": "s",
+          "FULL_PATH": "/settings/deviceType",
+          "VALUE": [
+            "Creators Ball V2"
+          ]
+        },
+        "firmwareVersion": {
+          "DESCRIPTION": "Firmware Version",
+          "ACCESS": 1,
+          "TYPE": "s",
+          "FULL_PATH": "/settings/firmwareVersion",
+          "VALUE": [
+            "1.2.0"
+          ]
+        },
+        "wakeUpButton": {
+          "DESCRIPTION": "Wake Up Button",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/settings/wakeUpButton",
+          "VALUE": [
+            19
+          ]
+        },
+        "wakeUpState": {
+          "DESCRIPTION": "Wake Up State",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/settings/wakeUpState",
+          "VALUE": [
+            true
+          ]
+        }
+      }
+    },
+    "leds": {
+      "DESCRIPTION": "Leds",
+      "FULL_PATH": "/leds",
+      "ACCESS": 0,
+      "CONTENTS": {
+        "enabled": {
+          "DESCRIPTION": "Enabled",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/leds/enabled",
+          "VALUE": [
+            true
+          ]
+        },
+        "count": {
+          "DESCRIPTION": "Count",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/leds/count",
+          "VALUE": [
+            1
+          ]
+        },
+        "strip1": {
+          "DESCRIPTION": "Strip 1",
+          "FULL_PATH": "/leds/strip1",
+          "ACCESS": 0,
+          "CONTENTS": {
+            "enabled": {
+              "DESCRIPTION": "Enabled",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/leds/strip1/enabled",
+              "VALUE": [
+                true
+              ]
+            },
+            "updateRate": {
+              "DESCRIPTION": "Update Rate",
+              "ACCESS": 3,
+              "TYPE": "i",
+              "FULL_PATH": "/leds/strip1/updateRate",
+              "VALUE": [
+                60
+              ]
+            },
+            "count": {
+              "DESCRIPTION": "Count",
+              "ACCESS": 3,
+              "TYPE": "i",
+              "FULL_PATH": "/leds/strip1/count",
+              "VALUE": [
+                36
+              ]
+            },
+            "dataPin": {
+              "DESCRIPTION": "Data Pin",
+              "ACCESS": 3,
+              "TYPE": "i",
+              "FULL_PATH": "/leds/strip1/dataPin",
+              "VALUE": [
+                3
+              ]
+            },
+            "enPin": {
+              "DESCRIPTION": "En Pin",
+              "ACCESS": 3,
+              "TYPE": "i",
+              "FULL_PATH": "/leds/strip1/enPin",
+              "VALUE": [
+                21
+              ]
+            },
+            "clkPin": {
+              "DESCRIPTION": "Clk Pin",
+              "ACCESS": 3,
+              "TYPE": "i",
+              "FULL_PATH": "/leds/strip1/clkPin",
+              "VALUE": [
+                2
+              ]
+            },
+            "brightness": {
+              "DESCRIPTION": "Brightness",
+              "ACCESS": 3,
+              "TYPE": "f",
+              "FULL_PATH": "/leds/strip1/brightness",
+              "VALUE": [
+                0.5
+              ],
+              "RANGE": [
+                {
+                  "MIN": 0,
+                  "MAX": 2
+                }
+              ]
+            },
+            "invertStrip": {
+              "DESCRIPTION": "Invert Strip",
+              "ACCESS": 3,
+              "TYPE": "F",
+              "FULL_PATH": "/leds/strip1/invertStrip",
+              "VALUE": [
+                false
+              ]
+            },
+            "multiLedMode": {
+              "DESCRIPTION": "Multi Led Mode",
+              "ACCESS": 3,
+              "TYPE": "s",
+              "FULL_PATH": "/leds/strip1/multiLedMode",
+              "VALUE": [
+                "Full Color"
+              ],
+              "RANGE": [
+                {
+                  "VALS": [
+                    "Full Color",
+                    "Single Color",
+                    "Two Colors"
+                  ]
+                }
+              ]
+            },
+            "maxPower": {
+              "DESCRIPTION": "Max Power",
+              "ACCESS": 3,
+              "TYPE": "i",
+              "FULL_PATH": "/leds/strip1/maxPower",
+              "VALUE": [
+                1600
+              ]
+            },
+            "colorCorrection": {
+              "DESCRIPTION": "Color Correction",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/leds/strip1/colorCorrection",
+              "VALUE": [
+                true
+              ]
+            },
+            "playbackLayer": {
+              "DESCRIPTION": "Playback Layer",
+              "FULL_PATH": "/leds/strip1/playbackLayer",
+              "ACCESS": 0,
+              "CONTENTS": {
+                "enabled": {
+                  "DESCRIPTION": "Enabled",
+                  "ACCESS": 3,
+                  "TYPE": "T",
+                  "FULL_PATH": "/leds/strip1/playbackLayer/enabled",
+                  "VALUE": [
+                    true
+                  ]
+                },
+                "blendMode": {
+                  "DESCRIPTION": "Blend Mode",
+                  "ACCESS": 3,
+                  "TYPE": "i",
+                  "FULL_PATH": "/leds/strip1/playbackLayer/blendMode",
+                  "VALUE": [
+                    0
+                  ]
+                },
+                "idMode": {
+                  "DESCRIPTION": "Id Mode",
+                  "ACCESS": 3,
+                  "TYPE": "F",
+                  "FULL_PATH": "/leds/strip1/playbackLayer/idMode",
+                  "VALUE": [
+                    false
+                  ]
+                },
+                "loop": {
+                  "DESCRIPTION": "Loop",
+                  "ACCESS": 3,
+                  "TYPE": "F",
+                  "FULL_PATH": "/leds/strip1/playbackLayer/loop",
+                  "VALUE": [
+                    false
+                  ]
+                }
+              }
+            },
+            "streamLayer": {
+              "DESCRIPTION": "Stream Layer",
+              "FULL_PATH": "/leds/strip1/streamLayer",
+              "ACCESS": 0,
+              "CONTENTS": {
+                "enabled": {
+                  "DESCRIPTION": "Enabled",
+                  "ACCESS": 3,
+                  "TYPE": "T",
+                  "FULL_PATH": "/leds/strip1/streamLayer/enabled",
+                  "VALUE": [
+                    true
+                  ]
+                },
+                "blendMode": {
+                  "DESCRIPTION": "Blend Mode",
+                  "ACCESS": 3,
+                  "TYPE": "i",
+                  "FULL_PATH": "/leds/strip1/streamLayer/blendMode",
+                  "VALUE": [
+                    0
+                  ]
+                },
+                "universe": {
+                  "DESCRIPTION": "Universe",
+                  "ACCESS": 3,
+                  "TYPE": "i",
+                  "FULL_PATH": "/leds/strip1/streamLayer/universe",
+                  "VALUE": [
+                    0
+                  ]
+                },
+                "startChannel": {
+                  "DESCRIPTION": "Start Channel",
+                  "ACCESS": 3,
+                  "TYPE": "i",
+                  "FULL_PATH": "/leds/strip1/streamLayer/startChannel",
+                  "VALUE": [
+                    1
+                  ]
+                },
+                "use16Bits": {
+                  "DESCRIPTION": "Use 16Bits",
+                  "ACCESS": 3,
+                  "TYPE": "F",
+                  "FULL_PATH": "/leds/strip1/streamLayer/use16Bits",
+                  "VALUE": [
+                    false
+                  ]
+                },
+                "includeAlpha": {
+                  "DESCRIPTION": "Include Alpha",
+                  "ACCESS": 3,
+                  "TYPE": "F",
+                  "FULL_PATH": "/leds/strip1/streamLayer/includeAlpha",
+                  "VALUE": [
+                    false
+                  ]
+                },
+                "clearOnNoReception": {
+                  "DESCRIPTION": "Clear On No Reception",
+                  "ACCESS": 3,
+                  "TYPE": "T",
+                  "FULL_PATH": "/leds/strip1/streamLayer/clearOnNoReception",
+                  "VALUE": [
+                    true
+                  ]
+                },
+                "noReceptionTime": {
+                  "DESCRIPTION": "No Reception Time",
+                  "ACCESS": 3,
+                  "TYPE": "f",
+                  "FULL_PATH": "/leds/strip1/streamLayer/noReceptionTime",
+                  "VALUE": [
+                    1.0
+                  ]
+                }
+              }
+            },
+            "scriptLayer": {
+              "DESCRIPTION": "Script Layer",
+              "FULL_PATH": "/leds/strip1/scriptLayer",
+              "ACCESS": 0,
+              "CONTENTS": {
+                "enabled": {
+                  "DESCRIPTION": "Enabled",
+                  "ACCESS": 3,
+                  "TYPE": "T",
+                  "FULL_PATH": "/leds/strip1/scriptLayer/enabled",
+                  "VALUE": [
+                    true
+                  ]
+                },
+                "blendMode": {
+                  "DESCRIPTION": "Blend Mode",
+                  "ACCESS": 3,
+                  "TYPE": "i",
+                  "FULL_PATH": "/leds/strip1/scriptLayer/blendMode",
+                  "VALUE": [
+                    0
+                  ]
+                }
+              }
+            },
+            "systemLayer": {
+              "DESCRIPTION": "System Layer",
+              "FULL_PATH": "/leds/strip1/systemLayer",
+              "ACCESS": 0,
+              "CONTENTS": {
+                "enabled": {
+                  "DESCRIPTION": "Enabled",
+                  "ACCESS": 3,
+                  "TYPE": "T",
+                  "FULL_PATH": "/leds/strip1/systemLayer/enabled",
+                  "VALUE": [
+                    true
+                  ]
+                },
+                "blendMode": {
+                  "DESCRIPTION": "Blend Mode",
+                  "ACCESS": 3,
+                  "TYPE": "i",
+                  "FULL_PATH": "/leds/strip1/systemLayer/blendMode",
+                  "VALUE": [
+                    4
+                  ]
+                },
+                "showBattery": {
+                  "DESCRIPTION": "Show Battery",
+                  "ACCESS": 3,
+                  "TYPE": "F",
+                  "FULL_PATH": "/leds/strip1/systemLayer/showBattery",
+                  "VALUE": [
+                    false
+                  ]
+                },
+                "espSyncColor": {
+                  "DESCRIPTION": "Esp Sync Color",
+                  "ACCESS": 3,
+                  "TYPE": "r",
+                  "FULL_PATH": "/leds/strip1/systemLayer/espSyncColor",
+                  "VALUE": [
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                }
+              }
+            },
+            "fx": {
+              "DESCRIPTION": "Fx",
+              "FULL_PATH": "/leds/strip1/fx",
+              "ACCESS": 0,
+              "CONTENTS": {
+                "enabled": {
+                  "DESCRIPTION": "Enabled",
+                  "ACCESS": 3,
+                  "TYPE": "F",
+                  "FULL_PATH": "/leds/strip1/fx/enabled",
+                  "VALUE": [
+                    false
+                  ]
+                },
+                "staticOffset": {
+                  "DESCRIPTION": "Static Offset",
+                  "ACCESS": 3,
+                  "TYPE": "f",
+                  "FULL_PATH": "/leds/strip1/fx/staticOffset",
+                  "VALUE": [
+                    0.0
+                  ]
+                },
+                "offsetSpeed": {
+                  "DESCRIPTION": "Offset Speed",
+                  "ACCESS": 3,
+                  "TYPE": "f",
+                  "FULL_PATH": "/leds/strip1/fx/offsetSpeed",
+                  "VALUE": [
+                    0.0
+                  ]
+                },
+                "isolationSpeed": {
+                  "DESCRIPTION": "Isolation Speed",
+                  "ACCESS": 3,
+                  "TYPE": "f",
+                  "FULL_PATH": "/leds/strip1/fx/isolationSpeed",
+                  "VALUE": [
+                    0.0
+                  ]
+                },
+                "isolationSmoothing": {
+                  "DESCRIPTION": "Isolation Smoothing",
+                  "ACCESS": 3,
+                  "TYPE": "f",
+                  "FULL_PATH": "/leds/strip1/fx/isolationSmoothing",
+                  "VALUE": [
+                    0.0
+                  ]
+                },
+                "isolationAxis": {
+                  "DESCRIPTION": "Isolation Axis",
+                  "ACCESS": 3,
+                  "TYPE": "s",
+                  "FULL_PATH": "/leds/strip1/fx/isolationAxis",
+                  "VALUE": [
+                    "Projected Angle"
+                  ],
+                  "RANGE": [
+                    {
+                      "VALS": [
+                        "Projected Angle",
+                        "Yaw",
+                        "Pitch",
+                        "Roll"
+                      ]
+                    }
+                  ]
+                },
+                "swapOnFlip": {
+                  "DESCRIPTION": "Swap On Flip",
+                  "ACCESS": 3,
+                  "TYPE": "F",
+                  "FULL_PATH": "/leds/strip1/fx/swapOnFlip",
+                  "VALUE": [
+                    false
+                  ]
+                },
+                "showCalibration": {
+                  "DESCRIPTION": "Show Calibration",
+                  "ACCESS": 3,
+                  "TYPE": "F",
+                  "FULL_PATH": "/leds/strip1/fx/showCalibration",
+                  "VALUE": [
+                    false
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "wifi": {
+      "DESCRIPTION": "Wifi",
+      "FULL_PATH": "/wifi",
+      "ACCESS": 0,
+      "CONTENTS": {
+        "enabled": {
+          "DESCRIPTION": "Enabled",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/wifi/enabled",
+          "VALUE": [
+            true
+          ]
+        },
+        "mode": {
+          "DESCRIPTION": "Mode",
+          "ACCESS": 3,
+          "TYPE": "s",
+          "FULL_PATH": "/wifi/mode",
+          "VALUE": [
+            "Wifi"
+          ],
+          "RANGE": [
+            {
+              "VALS": [
+                "Wifi",
+                "AP",
+                "Wifi+AP"
+              ]
+            }
+          ]
+        },
+        "ssid": {
+          "DESCRIPTION": "Ssid",
+          "ACCESS": 3,
+          "TYPE": "s",
+          "FULL_PATH": "/wifi/ssid",
+          "VALUE": [
+            "fixture-network"
+          ]
+        },
+        "pass": {
+          "DESCRIPTION": "Pass",
+          "ACCESS": 3,
+          "TYPE": "s",
+          "FULL_PATH": "/wifi/pass",
+          "VALUE": [
+            "not-a-real-secret"
+          ]
+        },
+        "manualIP": {
+          "DESCRIPTION": "Manual IP",
+          "ACCESS": 3,
+          "TYPE": "s",
+          "FULL_PATH": "/wifi/manualIP",
+          "VALUE": [
+            ""
+          ]
+        },
+        "manualGateway": {
+          "DESCRIPTION": "Manual Gateway",
+          "ACCESS": 3,
+          "TYPE": "s",
+          "FULL_PATH": "/wifi/manualGateway",
+          "VALUE": [
+            ""
+          ]
+        },
+        "channelScanMode": {
+          "DESCRIPTION": "Channel Scan Mode",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/wifi/channelScanMode",
+          "VALUE": [
+            true
+          ]
+        },
+        "txPower": {
+          "DESCRIPTION": "Tx Power",
+          "ACCESS": 3,
+          "TYPE": "s",
+          "FULL_PATH": "/wifi/txPower",
+          "VALUE": [
+            "19.5dBm"
+          ],
+          "RANGE": [
+            {
+              "VALS": [
+                "15dBm",
+                "17dBm",
+                "19.5dBm",
+                "20.5dBm"
+              ]
+            }
+          ]
+        },
+        "wifiProtocol": {
+          "DESCRIPTION": "Wifi Protocol",
+          "ACCESS": 3,
+          "TYPE": "s",
+          "FULL_PATH": "/wifi/wifiProtocol",
+          "VALUE": [
+            "11BGN"
+          ],
+          "RANGE": [
+            {
+              "VALS": [
+                "11B",
+                "11BG",
+                "11BGN",
+                "AX"
+              ]
+            }
+          ]
+        },
+        "signal": {
+          "DESCRIPTION": "Signal",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/wifi/signal",
+          "VALUE": [
+            0.75
+          ]
+        }
+      }
+    },
+    "battery": {
+      "DESCRIPTION": "Battery",
+      "FULL_PATH": "/battery",
+      "ACCESS": 0,
+      "CONTENTS": {
+        "enabled": {
+          "DESCRIPTION": "Enabled",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/battery/enabled",
+          "VALUE": [
+            true
+          ]
+        },
+        "updateRate": {
+          "DESCRIPTION": "Update Rate",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/battery/updateRate",
+          "VALUE": [
+            5
+          ]
+        },
+        "feedbackRate": {
+          "DESCRIPTION": "Feedback Rate",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/battery/feedbackRate",
+          "VALUE": [
+            0.5
+          ]
+        },
+        "batteryPin": {
+          "DESCRIPTION": "Battery Pin",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/battery/batteryPin",
+          "VALUE": [
+            6
+          ]
+        },
+        "chargePin": {
+          "DESCRIPTION": "Charge Pin",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/battery/chargePin",
+          "VALUE": [
+            14
+          ]
+        },
+        "chargeLedIntensity": {
+          "DESCRIPTION": "Charge Led Intensity",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/battery/chargeLedIntensity",
+          "VALUE": [
+            0.01
+          ],
+          "RANGE": [
+            {
+              "MIN": 0,
+              "MAX": 1
+            }
+          ]
+        },
+        "rawMin": {
+          "DESCRIPTION": "Raw Min",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/battery/rawMin",
+          "VALUE": [
+            222
+          ]
+        },
+        "rawMax": {
+          "DESCRIPTION": "Raw Max",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/battery/rawMax",
+          "VALUE": [
+            335
+          ]
+        },
+        "lowBatteryThreshold": {
+          "DESCRIPTION": "Low Battery Threshold",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/battery/lowBatteryThreshold",
+          "VALUE": [
+            3.5
+          ]
+        },
+        "batteryLevel": {
+          "DESCRIPTION": "Battery Level",
+          "ACCESS": 1,
+          "TYPE": "f",
+          "FULL_PATH": "/battery/batteryLevel",
+          "VALUE": [
+            0.72
+          ],
+          "RANGE": [
+            {
+              "MIN": 0,
+              "MAX": 1
+            }
+          ]
+        },
+        "voltage": {
+          "DESCRIPTION": "Voltage",
+          "ACCESS": 1,
+          "TYPE": "f",
+          "FULL_PATH": "/battery/voltage",
+          "VALUE": [
+            3.95
+          ],
+          "RANGE": [
+            {
+              "MIN": 3.3,
+              "MAX": 4.2
+            }
+          ]
+        },
+        "charging": {
+          "DESCRIPTION": "Charging",
+          "ACCESS": 1,
+          "TYPE": "F",
+          "FULL_PATH": "/battery/charging",
+          "VALUE": [
+            false
+          ]
+        },
+        "shutdownChargeNoSignal": {
+          "DESCRIPTION": "Shutdown Charge No Signal",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/battery/shutdownChargeNoSignal",
+          "VALUE": [
+            0
+          ]
+        },
+        "shutdownChargeSignalTimeout": {
+          "DESCRIPTION": "Shutdown Charge Signal Timeout",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/battery/shutdownChargeSignalTimeout",
+          "VALUE": [
+            0
+          ]
+        }
+      }
+    },
+    "files": {
+      "DESCRIPTION": "Files",
+      "FULL_PATH": "/files",
+      "ACCESS": 0,
+      "CONTENTS": {
+        "enabled": {
+          "DESCRIPTION": "Enabled",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/files/enabled",
+          "VALUE": [
+            true
+          ]
+        },
+        "sdSCK": {
+          "DESCRIPTION": "Sd SCK",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/files/sdSCK",
+          "VALUE": [
+            8
+          ]
+        },
+        "sdMiso": {
+          "DESCRIPTION": "Sd Miso",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/files/sdMiso",
+          "VALUE": [
+            5
+          ]
+        },
+        "sdMosi": {
+          "DESCRIPTION": "Sd Mosi",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/files/sdMosi",
+          "VALUE": [
+            4
+          ]
+        },
+        "sdCS": {
+          "DESCRIPTION": "Sd CS",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/files/sdCS",
+          "VALUE": [
+            15
+          ]
+        }
+      }
+    },
+    "script": {
+      "DESCRIPTION": "Script",
+      "FULL_PATH": "/script",
+      "ACCESS": 0,
+      "CONTENTS": {
+        "enabled": {
+          "DESCRIPTION": "Enabled",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/script/enabled",
+          "VALUE": [
+            true
+          ]
+        },
+        "updateRate": {
+          "DESCRIPTION": "Update Rate",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/script/updateRate",
+          "VALUE": [
+            50
+          ]
+        },
+        "scriptAtLaunch": {
+          "DESCRIPTION": "Script At Launch",
+          "ACCESS": 3,
+          "TYPE": "s",
+          "FULL_PATH": "/script/scriptAtLaunch",
+          "VALUE": [
+            ""
+          ]
+        },
+        "universe": {
+          "DESCRIPTION": "Universe",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/script/universe",
+          "VALUE": [
+            0
+          ]
+        },
+        "startChannel": {
+          "DESCRIPTION": "Start Channel",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/script/startChannel",
+          "VALUE": [
+            1
+          ]
+        }
+      }
+    },
+    "dmxReceiver": {
+      "DESCRIPTION": "Dmx Receiver",
+      "FULL_PATH": "/dmxReceiver",
+      "ACCESS": 0,
+      "CONTENTS": {
+        "enabled": {
+          "DESCRIPTION": "Enabled",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/dmxReceiver/enabled",
+          "VALUE": [
+            true
+          ]
+        },
+        "updateRate": {
+          "DESCRIPTION": "Update Rate",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/dmxReceiver/updateRate",
+          "VALUE": [
+            60
+          ]
+        }
+      }
+    },
+    "buttons": {
+      "DESCRIPTION": "Buttons",
+      "FULL_PATH": "/buttons",
+      "ACCESS": 0,
+      "CONTENTS": {
+        "enabled": {
+          "DESCRIPTION": "Enabled",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/buttons/enabled",
+          "VALUE": [
+            true
+          ]
+        },
+        "count": {
+          "DESCRIPTION": "Count",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/buttons/count",
+          "VALUE": [
+            1
+          ]
+        },
+        "button1": {
+          "DESCRIPTION": "Button 1",
+          "FULL_PATH": "/buttons/button1",
+          "ACCESS": 0,
+          "CONTENTS": {
+            "enabled": {
+              "DESCRIPTION": "Enabled",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/buttons/button1/enabled",
+              "VALUE": [
+                true
+              ]
+            },
+            "pin": {
+              "DESCRIPTION": "Pin",
+              "ACCESS": 3,
+              "TYPE": "i",
+              "FULL_PATH": "/buttons/button1/pin",
+              "VALUE": [
+                19
+              ]
+            },
+            "mode": {
+              "DESCRIPTION": "Mode",
+              "ACCESS": 3,
+              "TYPE": "s",
+              "FULL_PATH": "/buttons/button1/mode",
+              "VALUE": [
+                "Digital Input Pulldown"
+              ],
+              "RANGE": [
+                {
+                  "VALS": [
+                    "Digital Input",
+                    "Digital Input Pullup",
+                    "Digital Input Pulldown",
+                    "Analog Input",
+                    "Digital Output",
+                    "Analog Output",
+                    "Digital Oscillator",
+                    "Analog Oscillator",
+                    "Touch"
+                  ]
+                }
+              ]
+            },
+            "inverted": {
+              "DESCRIPTION": "Inverted",
+              "ACCESS": 3,
+              "TYPE": "F",
+              "FULL_PATH": "/buttons/button1/inverted",
+              "VALUE": [
+                false
+              ]
+            },
+            "value": {
+              "DESCRIPTION": "Value",
+              "ACCESS": 3,
+              "TYPE": "f",
+              "FULL_PATH": "/buttons/button1/value",
+              "VALUE": [
+                0.0
+              ],
+              "RANGE": [
+                {
+                  "MIN": 0,
+                  "MAX": 1
+                }
+              ]
+            },
+            "multiPressCount": {
+              "DESCRIPTION": "Multi Press Count",
+              "ACCESS": 1,
+              "TYPE": "i",
+              "FULL_PATH": "/buttons/button1/multiPressCount",
+              "VALUE": [
+                0
+              ]
+            },
+            "longPress": {
+              "DESCRIPTION": "Long Press",
+              "ACCESS": 1,
+              "TYPE": "F",
+              "FULL_PATH": "/buttons/button1/longPress",
+              "VALUE": [
+                false
+              ]
+            },
+            "veryLongPress": {
+              "DESCRIPTION": "Very Long Press",
+              "ACCESS": 1,
+              "TYPE": "F",
+              "FULL_PATH": "/buttons/button1/veryLongPress",
+              "VALUE": [
+                false
+              ]
+            },
+            "canShutDown": {
+              "DESCRIPTION": "Can Shut Down",
+              "ACCESS": 3,
+              "TYPE": "T",
+              "FULL_PATH": "/buttons/button1/canShutDown",
+              "VALUE": [
+                true
+              ]
+            }
+          }
+        }
+      }
+    },
+    "ir": {
+      "DESCRIPTION": "Ir",
+      "FULL_PATH": "/ir",
+      "ACCESS": 0,
+      "CONTENTS": {
+        "enabled": {
+          "DESCRIPTION": "Enabled",
+          "ACCESS": 3,
+          "TYPE": "T",
+          "FULL_PATH": "/ir/enabled",
+          "VALUE": [
+            true
+          ]
+        },
+        "pin1": {
+          "DESCRIPTION": "Pin 1",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/ir/pin1",
+          "VALUE": [
+            18
+          ]
+        },
+        "pin2": {
+          "DESCRIPTION": "Pin 2",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/ir/pin2",
+          "VALUE": [
+            20
+          ]
+        },
+        "value": {
+          "DESCRIPTION": "Value",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/ir/value",
+          "VALUE": [
+            0.0
+          ],
+          "RANGE": [
+            {
+              "MIN": 0,
+              "MAX": 1
+            }
+          ]
+        },
+        "keepValueOnReboot": {
+          "DESCRIPTION": "Keep Value On Reboot",
+          "ACCESS": 3,
+          "TYPE": "F",
+          "FULL_PATH": "/ir/keepValueOnReboot",
+          "VALUE": [
+            false
+          ]
+        }
+      }
+    },
+    "motion": {
+      "DESCRIPTION": "Motion",
+      "FULL_PATH": "/motion",
+      "ACCESS": 0,
+      "CONTENTS": {
+        "enabled": {
+          "DESCRIPTION": "Enabled",
+          "ACCESS": 3,
+          "TYPE": "F",
+          "FULL_PATH": "/motion/enabled",
+          "VALUE": [
+            false
+          ]
+        },
+        "updateRate": {
+          "DESCRIPTION": "Update Rate",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/motion/updateRate",
+          "VALUE": [
+            100
+          ]
+        },
+        "connected": {
+          "DESCRIPTION": "Connected",
+          "ACCESS": 3,
+          "TYPE": "F",
+          "FULL_PATH": "/motion/connected",
+          "VALUE": [
+            false
+          ]
+        },
+        "sendLevel": {
+          "DESCRIPTION": "Send Level",
+          "ACCESS": 3,
+          "TYPE": "s",
+          "FULL_PATH": "/motion/sendLevel",
+          "VALUE": [
+            "Orientation"
+          ],
+          "RANGE": [
+            {
+              "VALS": [
+                "None",
+                "Orientation",
+                "All"
+              ]
+            }
+          ]
+        },
+        "orientationSendRate": {
+          "DESCRIPTION": "Orientation Send Rate",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/motion/orientationSendRate",
+          "VALUE": [
+            50
+          ]
+        },
+        "sdaPin": {
+          "DESCRIPTION": "Sda Pin",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/motion/sdaPin",
+          "VALUE": [
+            0
+          ]
+        },
+        "sclPin": {
+          "DESCRIPTION": "Scl Pin",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/motion/sclPin",
+          "VALUE": [
+            1
+          ]
+        },
+        "intPin": {
+          "DESCRIPTION": "Int Pin",
+          "ACCESS": 3,
+          "TYPE": "i",
+          "FULL_PATH": "/motion/intPin",
+          "VALUE": [
+            7
+          ]
+        },
+        "throwState": {
+          "DESCRIPTION": "Throw State",
+          "ACCESS": 3,
+          "TYPE": "s",
+          "FULL_PATH": "/motion/throwState",
+          "VALUE": [
+            "None"
+          ],
+          "RANGE": [
+            {
+              "VALS": [
+                "None",
+                "Flat",
+                "Single",
+                "Double",
+                "Flat Front",
+                "Loftie"
+              ]
+            }
+          ]
+        },
+        "orientation": {
+          "DESCRIPTION": "Orientation",
+          "ACCESS": 1,
+          "TYPE": "fff",
+          "FULL_PATH": "/motion/orientation",
+          "VALUE": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "RANGE": [
+            {
+              "MIN": -180,
+              "MAX": 180
+            },
+            {
+              "MIN": -90,
+              "MAX": 90
+            },
+            {
+              "MIN": -180,
+              "MAX": 180
+            }
+          ]
+        },
+        "accel": {
+          "DESCRIPTION": "Accel",
+          "ACCESS": 1,
+          "TYPE": "fff",
+          "FULL_PATH": "/motion/accel",
+          "VALUE": [
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        "gyro": {
+          "DESCRIPTION": "Gyro",
+          "ACCESS": 1,
+          "TYPE": "fff",
+          "FULL_PATH": "/motion/gyro",
+          "VALUE": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "linearAccel": {
+          "DESCRIPTION": "Linear Accel",
+          "ACCESS": 1,
+          "TYPE": "fff",
+          "FULL_PATH": "/motion/linearAccel",
+          "VALUE": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "projectedAngle": {
+          "DESCRIPTION": "Projected Angle",
+          "ACCESS": 1,
+          "TYPE": "f",
+          "FULL_PATH": "/motion/projectedAngle",
+          "VALUE": [
+            0.0
+          ]
+        },
+        "spinCount": {
+          "DESCRIPTION": "Spin Count",
+          "ACCESS": 1,
+          "TYPE": "i",
+          "FULL_PATH": "/motion/spinCount",
+          "VALUE": [
+            0
+          ]
+        },
+        "spin": {
+          "DESCRIPTION": "Spin",
+          "ACCESS": 1,
+          "TYPE": "f",
+          "FULL_PATH": "/motion/spin",
+          "VALUE": [
+            0.0
+          ]
+        },
+        "activity": {
+          "DESCRIPTION": "Activity",
+          "ACCESS": 1,
+          "TYPE": "f",
+          "FULL_PATH": "/motion/activity",
+          "VALUE": [
+            0.0
+          ]
+        },
+        "orientationXOffset": {
+          "DESCRIPTION": "Orientation XOffset",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/motion/orientationXOffset",
+          "VALUE": [
+            0.0
+          ]
+        },
+        "flatThresholds": {
+          "DESCRIPTION": "Flat Thresholds",
+          "ACCESS": 3,
+          "TYPE": "fff",
+          "FULL_PATH": "/motion/flatThresholds",
+          "VALUE": [
+            0.8,
+            2.0,
+            0.0
+          ]
+        },
+        "accelThresholds": {
+          "DESCRIPTION": "Accel Thresholds",
+          "ACCESS": 3,
+          "TYPE": "fff",
+          "FULL_PATH": "/motion/accelThresholds",
+          "VALUE": [
+            0.8,
+            2.0,
+            4.0
+          ]
+        },
+        "diffThreshold": {
+          "DESCRIPTION": "Diff Threshold",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/motion/diffThreshold",
+          "VALUE": [
+            8.0
+          ]
+        },
+        "semiFlatThreshold": {
+          "DESCRIPTION": "Semi Flat Threshold",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/motion/semiFlatThreshold",
+          "VALUE": [
+            2.0
+          ]
+        },
+        "loftieThreshold": {
+          "DESCRIPTION": "Loftie Threshold",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/motion/loftieThreshold",
+          "VALUE": [
+            12.0
+          ]
+        },
+        "singleThreshold": {
+          "DESCRIPTION": "Single Threshold",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/motion/singleThreshold",
+          "VALUE": [
+            25.0
+          ]
+        },
+        "angleOffset": {
+          "DESCRIPTION": "Angle Offset",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/motion/angleOffset",
+          "VALUE": [
+            0.0
+          ]
+        },
+        "xOnCalibration": {
+          "DESCRIPTION": "X On Calibration",
+          "ACCESS": 3,
+          "TYPE": "f",
+          "FULL_PATH": "/motion/xOnCalibration",
+          "VALUE": [
+            0.0
+          ]
+        }
+      }
+    }
+  }
+}

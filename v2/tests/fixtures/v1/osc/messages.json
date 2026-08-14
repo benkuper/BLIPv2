@@ -1,0 +1,32 @@
+[
+  {
+    "path": "osc/yo.osc",
+    "address": "/yo",
+    "type_tags": "s",
+    "arguments": [
+      "192.0.2.10"
+    ]
+  },
+  {
+    "path": "osc/brightness.osc",
+    "address": "/leds/strip1/brightness",
+    "type_tags": "f",
+    "arguments": [
+      0.5
+    ]
+  },
+  {
+    "path": "osc/save.osc",
+    "address": "/settings/save",
+    "type_tags": "",
+    "arguments": []
+  },
+  {
+    "path": "osc/ping.osc",
+    "address": "/ping",
+    "type_tags": "s",
+    "arguments": [
+      "192.0.2.10"
+    ]
+  }
+]

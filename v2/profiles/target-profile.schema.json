@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blip.dev/schemas/v2/target-profile.schema.json",
+  "title": "BLIP V2 target profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "status",
+    "idf_target",
+    "build_contract",
+    "reference_board",
+    "pins",
+    "gate_a"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "status": { "enum": ["planning", "bring-up", "supported"] },
+    "idf_target": { "enum": ["esp32", "esp32s3", "esp32c6"] },
+    "build_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["esp_idf", "cpp_standard", "exceptions", "rtti", "warnings_as_errors"],
+      "properties": {
+        "esp_idf": { "const": "6.0.x" },
+        "cpp_standard": { "const": "c++20" },
+        "exceptions": { "const": false },
+        "rtti": { "const": false },
+        "warnings_as_errors": { "const": true }
+      }
+    },
+    "reference_board": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "id", "evidence"],
+      "properties": {
+        "required": { "const": true },
+        "id": { "type": ["string", "null"] },
+        "evidence": { "enum": ["planned", "measured"] }
+      }
+    },
+    "pins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy", "assignments"],
+      "properties": {
+        "policy": { "const": "board-manifest-required" },
+        "assignments": { "type": "object", "maxProperties": 0 }
+      }
+    },
+    "gate_a": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "required_evidence"],
+      "properties": {
+        "status": { "enum": ["planned", "pass", "fail", "blocked"] },
+        "required_evidence": {
+          "type": "array",
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": { "enum": ["clean-build", "flash", "boot", "registry-self-test"] }
+        }
+      }
+    }
+  }
+}
+

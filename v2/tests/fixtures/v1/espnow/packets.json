@@ -1,0 +1,91 @@
+[
+  {
+    "path": "espnow/message-float.bin",
+    "type": 0,
+    "ids": [
+      7,
+      7
+    ],
+    "address": "/leds/strip1",
+    "command": "brightness",
+    "values": [
+      {
+        "type": "f",
+        "value": 0.5
+      }
+    ]
+  },
+  {
+    "path": "espnow/message-typed.bin",
+    "type": 0,
+    "ids": [
+      255,
+      255
+    ],
+    "address": "/script",
+    "command": "setParam",
+    "values": [
+      {
+        "type": "s",
+        "value": "gain"
+      },
+      {
+        "type": "f",
+        "value": 0.25
+      },
+      {
+        "type": "i",
+        "value": -2
+      },
+      {
+        "type": "b",
+        "value": true
+      },
+      {
+        "type": "p",
+        "value": [
+          1,
+          2,
+          255
+        ]
+      }
+    ]
+  },
+  {
+    "path": "espnow/stream.bin",
+    "type": 1,
+    "universe": 2,
+    "start_channel": 1,
+    "rgb": [
+      [
+        255,
+        0,
+        0
+      ],
+      [
+        0,
+        255,
+        0
+      ],
+      [
+        0,
+        0,
+        255
+      ]
+    ]
+  },
+  {
+    "path": "espnow/pairing-request.bin",
+    "type": 2,
+    "wifi_channel": 6
+  },
+  {
+    "path": "espnow/pairing-response.bin",
+    "type": 3
+  },
+  {
+    "path": "espnow/wake.bin",
+    "type": 4,
+    "wifi_channel": 6
+  }
+]

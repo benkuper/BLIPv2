@@ -1,0 +1,574 @@
+{
+  "schema_version": 1,
+  "source_format": "blip-settings-v1",
+  "values": [
+    {
+      "legacy_component_path": "comm",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "comm.serial",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "comm.serial",
+      "field": "sendFeedback",
+      "value": true
+    },
+    {
+      "legacy_component_path": "comm.osc",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "comm.osc",
+      "field": "remoteHost",
+      "value": "192.0.2.10"
+    },
+    {
+      "legacy_component_path": "comm.osc",
+      "field": "remotePort",
+      "value": 10000
+    },
+    {
+      "legacy_component_path": "comm.osc",
+      "field": "sendFeedback",
+      "value": true
+    },
+    {
+      "legacy_component_path": "comm.osc",
+      "field": "isAlive",
+      "value": true
+    },
+    {
+      "legacy_component_path": "comm.espnow",
+      "field": "enabled",
+      "value": false
+    },
+    {
+      "legacy_component_path": "comm.espnow",
+      "field": "pairingMode",
+      "value": false
+    },
+    {
+      "legacy_component_path": "comm.espnow",
+      "field": "longRange",
+      "value": false
+    },
+    {
+      "legacy_component_path": "comm.espnow",
+      "field": "optimalRange",
+      "value": false
+    },
+    {
+      "legacy_component_path": "comm.espnow",
+      "field": "channel",
+      "value": 6
+    },
+    {
+      "legacy_component_path": "comm.espnow",
+      "field": "autoPairing",
+      "value": true
+    },
+    {
+      "legacy_component_path": "comm.espnow",
+      "field": "pairOnAnyData",
+      "value": true
+    },
+    {
+      "legacy_component_path": "comm.espnow",
+      "field": "sendFeedback",
+      "value": false
+    },
+    {
+      "legacy_component_path": "comm.server",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "comm.server",
+      "field": "sendFeedback",
+      "value": true
+    },
+    {
+      "legacy_component_path": "comm.server",
+      "field": "sendDebugLogs",
+      "value": false
+    },
+    {
+      "legacy_component_path": "comm.server",
+      "field": "suspendUpdatesDuringUpload",
+      "value": true
+    },
+    {
+      "legacy_component_path": "comm.server",
+      "field": "suppressFeedbackDuringUpload",
+      "value": true
+    },
+    {
+      "legacy_component_path": "settings",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "settings",
+      "field": "propID",
+      "value": 7
+    },
+    {
+      "legacy_component_path": "settings",
+      "field": "deviceName",
+      "value": "Fixture BLIP"
+    },
+    {
+      "legacy_component_path": "settings",
+      "field": "wakeUpButton",
+      "value": 19
+    },
+    {
+      "legacy_component_path": "settings",
+      "field": "wakeUpState",
+      "value": true
+    },
+    {
+      "legacy_component_path": "leds",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "leds",
+      "field": "count",
+      "value": 1
+    },
+    {
+      "legacy_component_path": "leds.strip1",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "leds.strip1",
+      "field": "updateRate",
+      "value": 60
+    },
+    {
+      "legacy_component_path": "leds.strip1",
+      "field": "dataPin",
+      "value": 3
+    },
+    {
+      "legacy_component_path": "leds.strip1",
+      "field": "enPin",
+      "value": 21
+    },
+    {
+      "legacy_component_path": "leds.strip1",
+      "field": "clkPin",
+      "value": 2
+    },
+    {
+      "legacy_component_path": "leds.strip1",
+      "field": "invertStrip",
+      "value": false
+    },
+    {
+      "legacy_component_path": "leds.strip1",
+      "field": "multiLedMode",
+      "value": 0
+    },
+    {
+      "legacy_component_path": "leds.strip1",
+      "field": "maxPower",
+      "value": 1600
+    },
+    {
+      "legacy_component_path": "leds.strip1.playbackLayer",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "leds.strip1.streamLayer",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "leds.strip1.streamLayer",
+      "field": "universe",
+      "value": 0
+    },
+    {
+      "legacy_component_path": "leds.strip1.streamLayer",
+      "field": "startChannel",
+      "value": 1
+    },
+    {
+      "legacy_component_path": "leds.strip1.streamLayer",
+      "field": "use16Bits",
+      "value": false
+    },
+    {
+      "legacy_component_path": "leds.strip1.streamLayer",
+      "field": "includeAlpha",
+      "value": false
+    },
+    {
+      "legacy_component_path": "leds.strip1.streamLayer",
+      "field": "clearOnNoReception",
+      "value": true
+    },
+    {
+      "legacy_component_path": "leds.strip1.streamLayer",
+      "field": "noReceptionTime",
+      "value": 1.0
+    },
+    {
+      "legacy_component_path": "leds.strip1.scriptLayer",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "leds.strip1.systemLayer",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "leds.strip1.fx",
+      "field": "enabled",
+      "value": false
+    },
+    {
+      "legacy_component_path": "leds.strip1.fx",
+      "field": "staticOffset",
+      "value": 0.0
+    },
+    {
+      "legacy_component_path": "leds.strip1.fx",
+      "field": "offsetSpeed",
+      "value": 0.0
+    },
+    {
+      "legacy_component_path": "leds.strip1.fx",
+      "field": "isolationSpeed",
+      "value": 0.0
+    },
+    {
+      "legacy_component_path": "leds.strip1.fx",
+      "field": "isolationSmoothing",
+      "value": 0.0
+    },
+    {
+      "legacy_component_path": "leds.strip1.fx",
+      "field": "isolationAxis",
+      "value": 0
+    },
+    {
+      "legacy_component_path": "leds.strip1.fx",
+      "field": "swapOnFlip",
+      "value": false
+    },
+    {
+      "legacy_component_path": "leds.strip1.fx",
+      "field": "showCalibration",
+      "value": false
+    },
+    {
+      "legacy_component_path": "wifi",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "wifi",
+      "field": "mode",
+      "value": 0
+    },
+    {
+      "legacy_component_path": "wifi",
+      "field": "ssid",
+      "value": "fixture-network"
+    },
+    {
+      "legacy_component_path": "wifi",
+      "field": "pass",
+      "value": "not-a-real-secret"
+    },
+    {
+      "legacy_component_path": "wifi",
+      "field": "manualIP",
+      "value": ""
+    },
+    {
+      "legacy_component_path": "wifi",
+      "field": "manualGateway",
+      "value": ""
+    },
+    {
+      "legacy_component_path": "wifi",
+      "field": "channelScanMode",
+      "value": true
+    },
+    {
+      "legacy_component_path": "wifi",
+      "field": "txPower",
+      "value": 2
+    },
+    {
+      "legacy_component_path": "wifi",
+      "field": "wifiProtocol",
+      "value": 2
+    },
+    {
+      "legacy_component_path": "battery",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "battery",
+      "field": "updateRate",
+      "value": 5
+    },
+    {
+      "legacy_component_path": "battery",
+      "field": "feedbackRate",
+      "value": 0.5
+    },
+    {
+      "legacy_component_path": "battery",
+      "field": "batteryPin",
+      "value": 6
+    },
+    {
+      "legacy_component_path": "battery",
+      "field": "chargePin",
+      "value": 14
+    },
+    {
+      "legacy_component_path": "battery",
+      "field": "chargeLedIntensity",
+      "value": 0.01
+    },
+    {
+      "legacy_component_path": "battery",
+      "field": "rawMin",
+      "value": 222
+    },
+    {
+      "legacy_component_path": "battery",
+      "field": "rawMax",
+      "value": 335
+    },
+    {
+      "legacy_component_path": "battery",
+      "field": "lowBatteryThreshold",
+      "value": 3.5
+    },
+    {
+      "legacy_component_path": "battery",
+      "field": "shutdownChargeNoSignal",
+      "value": 0
+    },
+    {
+      "legacy_component_path": "battery",
+      "field": "shutdownChargeSignalTimeout",
+      "value": 0
+    },
+    {
+      "legacy_component_path": "files",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "files",
+      "field": "sdSCK",
+      "value": 8
+    },
+    {
+      "legacy_component_path": "files",
+      "field": "sdMiso",
+      "value": 5
+    },
+    {
+      "legacy_component_path": "files",
+      "field": "sdMosi",
+      "value": 4
+    },
+    {
+      "legacy_component_path": "files",
+      "field": "sdCS",
+      "value": 15
+    },
+    {
+      "legacy_component_path": "script",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "script",
+      "field": "updateRate",
+      "value": 50
+    },
+    {
+      "legacy_component_path": "script",
+      "field": "scriptAtLaunch",
+      "value": ""
+    },
+    {
+      "legacy_component_path": "dmxReceiver",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "dmxReceiver",
+      "field": "updateRate",
+      "value": 60
+    },
+    {
+      "legacy_component_path": "buttons",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "buttons",
+      "field": "count",
+      "value": 1
+    },
+    {
+      "legacy_component_path": "buttons.button1",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "buttons.button1",
+      "field": "pin",
+      "value": 19
+    },
+    {
+      "legacy_component_path": "buttons.button1",
+      "field": "mode",
+      "value": 2
+    },
+    {
+      "legacy_component_path": "buttons.button1",
+      "field": "inverted",
+      "value": false
+    },
+    {
+      "legacy_component_path": "buttons.button1",
+      "field": "canShutDown",
+      "value": true
+    },
+    {
+      "legacy_component_path": "ir",
+      "field": "enabled",
+      "value": true
+    },
+    {
+      "legacy_component_path": "ir",
+      "field": "pin1",
+      "value": 18
+    },
+    {
+      "legacy_component_path": "ir",
+      "field": "pin2",
+      "value": 20
+    },
+    {
+      "legacy_component_path": "ir",
+      "field": "value",
+      "value": 0.0
+    },
+    {
+      "legacy_component_path": "ir",
+      "field": "keepValueOnReboot",
+      "value": false
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "updateRate",
+      "value": 100
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "connected",
+      "value": false
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "sendLevel",
+      "value": 1
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "orientationSendRate",
+      "value": 50
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "sdaPin",
+      "value": 0
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "sclPin",
+      "value": 1
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "intPin",
+      "value": 7
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "orientationXOffset",
+      "value": 0.0
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "flatThresholds",
+      "value": [
+        0.8,
+        2.0,
+        0.0
+      ]
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "accelThresholds",
+      "value": [
+        0.8,
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "diffThreshold",
+      "value": 8.0
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "semiFlatThreshold",
+      "value": 2.0
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "loftieThreshold",
+      "value": 12.0
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "singleThreshold",
+      "value": 25.0
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "angleOffset",
+      "value": 0.0
+    },
+    {
+      "legacy_component_path": "motion",
+      "field": "xOnCalibration",
+      "value": 0.0
+    }
+  ]
+}
