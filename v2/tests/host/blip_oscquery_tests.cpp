@@ -21,7 +21,7 @@ using namespace blip::core;
 using namespace blip::oscquery;
 
 constexpr std::array<MetadataEntry, 1> kMetadata{{{"legacy_path", "/leds/strip1"}}};
-constexpr std::array<ParameterDescriptor, 3> kParameters{{
+constexpr std::array<ParameterDescriptor, 4> kParameters{{
     {"brightness",
      "Brightness",
      ValueType::number,
@@ -45,6 +45,14 @@ constexpr std::array<ParameterDescriptor, 3> kParameters{{
      true,
      ScalarValue::from_integer(0),
      {true, 0, 1, 1},
+     ""},
+    {"token",
+     "Token",
+     ValueType::string,
+     Access::write_only,
+     true,
+     ScalarValue::from_string(""),
+     {},
      ""},
 }};
 constexpr std::array<LegacyEnumValue, 2> kLegacyModeValues{{
@@ -295,6 +303,22 @@ bool oscquery_is_registry_derived_and_filters_config() {
     BLIP_CHECK(complete.value.find("/leds/strip1/brightness") != std::string::npos);
     BLIP_CHECK(complete.value.find("\"VALUE\":[0.75]") != std::string::npos);
     BLIP_CHECK(complete.value.find("\"RANGE\":[{\"MIN\":0,\"MAX\":1}]") != std::string::npos);
+    BLIP_CHECK(complete.value.find("\"BLIP_KIND\":\"component\"") != std::string::npos);
+    BLIP_CHECK(complete.value.find("\"BLIP_COMPONENT_ID\":\"blip.test_strip\"") !=
+               std::string::npos);
+    BLIP_CHECK(complete.value.find("\"BLIP_KIND\":\"parameter\"") != std::string::npos);
+    BLIP_CHECK(complete.value.find("\"BLIP_PERSISTED\":true") != std::string::npos);
+    BLIP_CHECK(complete.value.find("\"BLIP_STEP\":0.01") != std::string::npos);
+    BLIP_CHECK(complete.value.find("\"BLIP_UNIT\":\"ratio\"") != std::string::npos);
+    BLIP_CHECK(complete.value.find("\"token\":{\"DESCRIPTION\":\"Token\",\"ACCESS\":3,"
+                                   "\"TYPE\":\"s\",\"FULL_PATH\":\"/leds/strip1/token\","
+                                   "\"BLIP_KIND\":\"parameter\",\"BLIP_PERSISTED\":true,"
+                                   "\"BLIP_READABLE\":false,\"BLIP_WRITABLE\":true}") !=
+               std::string::npos);
+    BLIP_CHECK(complete.value.find("\"BLIP_KIND\":\"action\",\"BLIP_FIELDS\":[]") !=
+               std::string::npos);
+    BLIP_CHECK(complete.value.find("\"BLIP_KIND\":\"event\",\"BLIP_FIELDS\":[{\"ID\":\"value\","
+                                   "\"TYPE\":\"f\",\"REQUIRED\":true}]") != std::string::npos);
     BLIP_CHECK(complete.value.find("/leds/strip1/changed") != std::string::npos);
     BLIP_CHECK(complete.value.find("/leds/strip1/legacyMode") != std::string::npos);
     BLIP_CHECK(complete.value.find("\"VALUE\":[\"Mode A\"]") != std::string::npos);
@@ -304,6 +328,7 @@ bool oscquery_is_registry_derived_and_filters_config() {
     BLIP_CHECK(write_oscquery_tree(registry, controls, false, filtered));
     BLIP_CHECK(filtered.value.find("brightness") == std::string::npos);
     BLIP_CHECK(filtered.value.find("legacyMode") == std::string::npos);
+    BLIP_CHECK(filtered.value.find("token") == std::string::npos);
     BLIP_CHECK(filtered.value.find("/leds/strip1/level") != std::string::npos);
     BLIP_CHECK(registry.stop_all());
     return true;
@@ -320,6 +345,8 @@ bool host_info_matches_v1_contract() {
     BLIP_CHECK(sink.value.find("\"DEVICE_ID\":\"02:00:00:00:00:07\"") != std::string::npos);
     BLIP_CHECK(sink.value.find("\"OSC_PORT\":9000") != std::string::npos);
     BLIP_CHECK(sink.value.find("\"OSC_TRANSPORT\":\"UDP\"") != std::string::npos);
+    BLIP_CHECK(sink.value.find("\"BLIP_KIND\":true") != std::string::npos);
+    BLIP_CHECK(sink.value.find("\"BLIP_FIELDS\":true") != std::string::npos);
     return true;
 }
 

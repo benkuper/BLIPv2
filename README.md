@@ -5,16 +5,11 @@ This repository is the standalone development workspace for the
 indexed in [`docs/v2/`](docs/v2/) and anchored to BLIP V1 commit
 `e567eeb5f20ba022595fd5b89a77fb17ba59ca94`.
 
-The ESP-IDF/C++20 Milestone 1 core now includes the reproducible bootstrap,
-component registry/lifecycle, typed descriptors, resource broker, scheduler,
-and bounded event bus. See the
-[verification record](docs/v2/work-packages/milestone-1-evidence.md). Production
-features remain gated by the dependency map and Gate A still requires its
-100-cold-boot and memory/stack evidence.
-
-The next package, [versioned per-component NVS settings](docs/v2/work-packages/2.1-versioned-nvs-settings.md),
-has host and three-target build evidence but is intentionally held behind those
-open Gate A rows.
+The current V2 line includes the reproducible ESP-IDF/C++20 foundation, storage,
+diagnostics and safe mode, Serial/USB control, Wi-Fi provisioning, OSC/OSCQuery,
+and a schema-driven browser control shell. See the
+[work-package index](docs/v2/work-packages/README.md) and the
+[dependency map](docs/v2/dependency-map.md).
 
 Run the offline foundation check with:
 

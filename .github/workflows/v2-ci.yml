@@ -41,6 +41,8 @@ jobs:
         run: python v2/tests/host/validate_bootstrap.py
       - name: Validate resource manifests
         run: python v2/tests/host/validate_resource_manifests.py
+      - name: Test schema-driven web shell
+        run: npm test --prefix v2/web
       - name: Configure C++ host tests
         run: cmake -S v2/tests/host -B build/host -G Ninja -D CMAKE_BUILD_TYPE=Debug
       - name: Build C++ host tests

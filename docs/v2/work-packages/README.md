@@ -25,3 +25,9 @@ wire protocols, or public OSC paths.
 | [2.5](2.5-serial-transport.md) | Versioned common envelope, bounded Serial/USB control, host CLI, and normal/recovery hardware qualification |
 | [2.6](2.6-wifi-provisioning.md) | Versioned Wi-Fi station/AP management with serial and SoftAP provisioning |
 | [2.7](2.7-osc-oscquery.md) | Bounded OSC UDP and registry-generated OSCQuery HTTP/WebSocket discovery |
+
+## Milestone 3
+
+| Work package | Result |
+| --- | --- |
+| [3.1](3.1-schema-web-shell.md) | Dependency-free controls generated from the live registry schema |

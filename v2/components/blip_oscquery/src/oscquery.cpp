@@ -195,7 +195,8 @@ class TreeWriter {
         if (!valid) {
             return valid;
         }
-        if (!writer_.append("{\"DESCRIPTION\":\"Root\",\"FULL_PATH\":\"\",\"ACCESS\":0,")) {
+        if (!writer_.append("{\"DESCRIPTION\":\"Root\",\"FULL_PATH\":\"\",\"ACCESS\":0,"
+                            "\"BLIP_KIND\":\"root\",")) {
             return overflow();
         }
         bool first = true;
@@ -373,6 +374,24 @@ class TreeWriter {
                     !writer_.number(parameter.bounds.maximum) || !writer_.append("}]"))) {
             return false;
         }
+        if (!writer_.append(",\"BLIP_KIND\":\"parameter\",\"BLIP_PERSISTED\":")) {
+            return false;
+        }
+        if (!writer_.append(parameter.persisted ? "true" : "false") ||
+            !writer_.append(",\"BLIP_READABLE\":") ||
+            !writer_.append(parameter.access == core::Access::write_only ? "false" : "true") ||
+            !writer_.append(",\"BLIP_WRITABLE\":") ||
+            !writer_.append(parameter.access == core::Access::read_only ? "false" : "true")) {
+            return false;
+        }
+        if (parameter.bounds.present &&
+            (!writer_.append(",\"BLIP_STEP\":") || !writer_.number(parameter.bounds.step))) {
+            return false;
+        }
+        if (!parameter.unit.empty() &&
+            (!writer_.append(",\"BLIP_UNIT\":") || !writer_.quoted(parameter.unit))) {
+            return false;
+        }
         return writer_.append("}");
     }
 
@@ -391,6 +410,24 @@ class TreeWriter {
         return writer_.quoted({tags.data(), fields.size()});
     }
 
+    template <typename Fields>
+    [[nodiscard]] bool write_field_schema(const Fields& fields) noexcept {
+        if (!writer_.append(",\"BLIP_FIELDS\":[")) {
+            return false;
+        }
+        for (std::size_t index = 0; index < fields.size(); ++index) {
+            const char tag = type_tag(fields[index].type);
+            if ((index != 0U && !writer_.append(",")) || !writer_.append("{\"ID\":") ||
+                !writer_.quoted(fields[index].id) || !writer_.append(",\"TYPE\":") ||
+                !writer_.quoted({&tag, 1U}) || !writer_.append(",\"REQUIRED\":") ||
+                !writer_.append(fields[index].required ? "true" : "false") ||
+                !writer_.append("}")) {
+                return false;
+            }
+        }
+        return writer_.append("]");
+    }
+
     [[nodiscard]] bool write_action(const core::ActionDescriptor& action, std::string_view path,
                                     bool& first) noexcept {
         if (!begin_item(action.id, first) || !writer_.append("{\"DESCRIPTION\":") ||
@@ -398,7 +435,8 @@ class TreeWriter {
             !write_type_fields(action.arguments, true) || !writer_.append(",\"FULL_PATH\":")) {
             return false;
         }
-        return write_control_path(path, action.id) && writer_.append("}");
+        return write_control_path(path, action.id) && writer_.append(",\"BLIP_KIND\":\"action\"") &&
+               write_field_schema(action.arguments) && writer_.append("}");
     }
 
     [[nodiscard]] bool write_event(const core::EventDescriptor& event, std::string_view path,
@@ -408,7 +446,8 @@ class TreeWriter {
             !write_type_fields(event.fields, false) || !writer_.append(",\"FULL_PATH\":")) {
             return false;
         }
-        return write_control_path(path, event.id) && writer_.append("}");
+        return write_control_path(path, event.id) && writer_.append(",\"BLIP_KIND\":\"event\"") &&
+               write_field_schema(event.fields) && writer_.append("}");
     }
 
     [[nodiscard]] bool write_dynamic(const core::DynamicControl& control, std::string_view path,
@@ -426,7 +465,18 @@ class TreeWriter {
         if (!writer_.quoted({&tag, 1U}) || !writer_.append(",\"FULL_PATH\":")) {
             return false;
         }
-        return write_control_path(path, control.id) && writer_.append("}");
+        if (!write_control_path(path, control.id) || !writer_.append(",\"BLIP_KIND\":")) {
+            return false;
+        }
+        switch (control.kind) {
+        case core::DynamicControlKind::parameter:
+            return writer_.quoted("parameter") && writer_.append("}");
+        case core::DynamicControlKind::action:
+            return writer_.quoted("action") && writer_.append("}");
+        case core::DynamicControlKind::event:
+            return writer_.quoted("event") && writer_.append("}");
+        }
+        return false;
     }
 
     [[nodiscard]] bool write_control_path(std::string_view path, std::string_view id) noexcept {
@@ -523,7 +573,24 @@ class TreeWriter {
                 child_descriptor == nullptr ? segment : child_descriptor->display_name;
             if (!writer_.append("{\"DESCRIPTION\":") || !writer_.quoted(description) ||
                 !writer_.append(",\"FULL_PATH\":") || !writer_.quoted(child) ||
-                !writer_.append(",\"ACCESS\":0,")) {
+                !writer_.append(",\"ACCESS\":0,\"BLIP_KIND\":")) {
+                return false;
+            }
+            if (child_descriptor == nullptr) {
+                if (!writer_.quoted("namespace")) {
+                    return false;
+                }
+            } else if (!writer_.quoted("component") || !writer_.append(",\"BLIP_COMPONENT_ID\":") ||
+                       !writer_.quoted(child_descriptor->id) ||
+                       !writer_.append(",\"BLIP_SCHEMA_VERSION\":") ||
+                       !writer_.number(child_descriptor->schema_version) ||
+                       !writer_.append(",\"BLIP_DISABLE_POLICY\":") ||
+                       !writer_.quoted(child_descriptor->disable_policy == core::DisablePolicy::live
+                                           ? "live"
+                                           : "reboot-required")) {
+                return false;
+            }
+            if (!writer_.append(",")) {
                 return false;
             }
             bool ignored{};
@@ -549,7 +616,8 @@ core::Status write_oscquery_host_info(const DeviceIdentity& identity, TextSink& 
                        "\"CRITICAL\":false,\"RANGE\":true,\"TAGS\":false,\"TYPE\":true,"
                        "\"UNIT\":false,\"VALUE\":true,\"LISTEN\":true,"
                        "\"PATH_ADDED\":true,\"PATH_REMOVED\":true,\"PATH_RENAMED\":true,"
-                       "\"PATH_CHANGED\":false},\"NAME\":") ||
+                       "\"PATH_CHANGED\":false,\"BLIP_KIND\":true,\"BLIP_FIELDS\":true},"
+                       "\"NAME\":") ||
         !writer.quoted(identity.name) || !writer.append(",\"VERSION\":") ||
         !writer.quoted(identity.version) || !writer.append(",\"DEVICE_TYPE\":") ||
         !writer.quoted(identity.type) || !writer.append(",\"DEVICE_ID\":") ||

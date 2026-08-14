@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0a1118" />
+    <title>BLIP Control</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="BLIP control home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>BLIP</span>
+        </a>
+        <div class="connection" aria-live="polite">
+          <span id="connection-dot" class="connection-dot"></span>
+          <span id="connection-status">Offline</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="device-name">
+          <div>
+            <p class="eyebrow">Device control</p>
+            <h1 id="device-name">Find your signal.</h1>
+            <p id="device-meta" class="device-meta">
+              Connect to a BLIP device to build its controls from the live registry.
+            </p>
+          </div>
+          <button id="connect-button" class="primary-button" type="button">Connect</button>
+        </section>
+
+        <section class="toolbar" aria-label="Control filters">
+          <label class="search-field">
+            <span class="sr-only">Search controls</span>
+            <span class="search-glyph" aria-hidden="true"></span>
+            <input id="control-search" type="search" placeholder="Search controls" />
+          </label>
+          <label class="toggle-field">
+            <input id="show-config" type="checkbox" checked />
+            <span>Configuration</span>
+          </label>
+        </section>
+
+        <p id="notice" class="notice" role="status" hidden></p>
+        <section id="controls" class="control-grid" aria-label="Device controls"></section>
+      </main>
+    </div>
+
+    <template id="empty-state-template">
+      <article class="empty-state">
+        <span class="empty-glyph" aria-hidden="true">⌁</span>
+        <h2>No controls yet</h2>
+        <p>The live component registry will appear here after a device connects.</p>
+      </article>
+    </template>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
