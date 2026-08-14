@@ -44,15 +44,24 @@ def inspect_image(path: Path) -> tuple[int, str, str, str]:
     return size, digest.hexdigest(), project, version
 
 
-def upload(device: str, image: Path, target: str, profile: str) -> None:
+def upload(
+    device: str,
+    image: Path,
+    target: str,
+    profile: str,
+    interrupt_after: int | None = None,
+    timeout_seconds: float = 300.0,
+) -> None:
     size, digest, project, version = inspect_image(image)
+    if interrupt_after is not None and not 0 < interrupt_after < size:
+        raise ValueError("--interrupt-after must be greater than zero and smaller than the image")
     parsed = urlsplit(device)
     if parsed.scheme not in ("http", "https") or not parsed.hostname:
         raise ValueError("device must be an http:// or https:// origin")
     connection_type = (
         http.client.HTTPSConnection if parsed.scheme == "https" else http.client.HTTPConnection
     )
-    connection = connection_type(parsed.hostname, parsed.port, timeout=30)
+    connection = connection_type(parsed.hostname, parsed.port, timeout=timeout_seconds)
     endpoint = f"{parsed.path.rstrip('/')}/api/firmware"
     connection.putrequest("PUT", endpoint)
     connection.putheader("Content-Type", "application/octet-stream")
@@ -63,9 +72,24 @@ def upload(device: str, image: Path, target: str, profile: str) -> None:
     connection.putheader("X-BLIP-Target", target)
     connection.putheader("X-BLIP-Profile", profile)
     connection.endheaders()
+    sent = 0
     with image.open("rb") as source:
-        while chunk := source.read(65536):
+        while sent < size:
+            requested = min(65536, size - sent)
+            if interrupt_after is not None:
+                requested = min(requested, interrupt_after - sent)
+            chunk = source.read(requested)
+            if not chunk:
+                break
             connection.send(chunk)
+            sent += len(chunk)
+            if interrupt_after is not None and sent == interrupt_after:
+                connection.close()
+                print(
+                    f"PASS OTA transport interrupted after {sent}/{size} bytes: "
+                    f"{project} {version}, {target}/{profile}, sha256={digest}"
+                )
+                return
     response = connection.getresponse()
     body = response.read().decode("utf-8", errors="replace")
     connection.close()
@@ -84,6 +108,17 @@ def main() -> int:
     parser.add_argument("--target", required=True, choices=("esp32", "esp32s3", "esp32c6"))
     parser.add_argument("--profile", default="minimal")
     parser.add_argument("--inspect", action="store_true", help="validate and print metadata only")
+    parser.add_argument(
+        "--interrupt-after",
+        type=int,
+        help="close the connection after this many image bytes (HIL interruption test)",
+    )
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=300.0,
+        help="HTTP response timeout in seconds (default: 300)",
+    )
     args = parser.parse_args()
     if not args.inspect and args.device is None:
         parser.error("--device is required unless --inspect is used")
@@ -95,7 +130,14 @@ def main() -> int:
                 f"{size} bytes, sha256={digest}"
             )
         else:
-            upload(args.device, args.image, args.target, args.profile)
+            upload(
+                args.device,
+                args.image,
+                args.target,
+                args.profile,
+                args.interrupt_after,
+                args.timeout,
+            )
         return 0
     except (OSError, UnicodeDecodeError, ValueError, RuntimeError) as error:
         print(f"FAIL {error}", file=sys.stderr)

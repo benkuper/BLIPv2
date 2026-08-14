@@ -1,6 +1,7 @@
 #include "blip/network/esp_wifi_component.hpp"
 
 #include "blip/network/provisioning_form.hpp"
+#include "driver/gpio.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_mac.h"
@@ -52,14 +53,15 @@ constexpr std::array<core::LegacyParameterAlias, 7> kLegacyParameters{{
     {"tx_power", "txPower", "Tx Power", core::ValueType::string, kLegacyTxPowerValues},
     {"protocol", "wifiProtocol", "Wifi Protocol", core::ValueType::string, kLegacyProtocolValues},
 }};
-constexpr std::array<core::MetadataEntry, 5> kMetadata{{
+constexpr std::array<core::MetadataEntry, 6> kMetadata{{
     {"legacy_path", "/wifi"},
     {"radio", "2.4GHz Wi-Fi"},
     {"provisioning", "serial-or-softap"},
     {"softap_address", "192.168.4.1"},
     {"secret_policy", "password-write-only"},
+    {"antenna_modes", "0=board-default,1=onboard,2=external"},
 }};
-constexpr std::array<core::ParameterDescriptor, 13> kParameters{{
+constexpr std::array<core::ParameterDescriptor, 14> kParameters{{
     {"enabled",
      "Wi-Fi enabled",
      core::ValueType::boolean,
@@ -139,6 +141,14 @@ constexpr std::array<core::ParameterDescriptor, 13> kParameters{{
      true,
      core::ScalarValue::from_integer(0),
      {true, 0, 14, 1},
+     ""},
+    {"antenna",
+     "RF antenna selection",
+     core::ValueType::integer,
+     core::Access::read_write,
+     true,
+     core::ScalarValue::from_integer(0),
+     {true, 0, 2, 1},
      ""},
     {"signal",
      "Station signal",
@@ -484,6 +494,33 @@ core::Status EspWifiComponent::configure_protocol_locked() noexcept {
                            "configure-protocol", "tx-power-failed");
 }
 
+core::Status EspWifiComponent::configure_antenna_locked() noexcept {
+#if defined(BLIP_WIFI_RF_SWITCH_POWER_GPIO) && defined(BLIP_WIFI_RF_SWITCH_SELECT_GPIO)
+    const gpio_num_t power = static_cast<gpio_num_t>(BLIP_WIFI_RF_SWITCH_POWER_GPIO);
+    const gpio_num_t select = static_cast<gpio_num_t>(BLIP_WIFI_RF_SWITCH_SELECT_GPIO);
+    if (gpio_set_direction(power, GPIO_MODE_OUTPUT) != ESP_OK ||
+        gpio_set_level(power, BLIP_WIFI_RF_SWITCH_POWER_ACTIVE_LEVEL) != ESP_OK) {
+        return core::Status::failure(
+            wifi_error(core::ErrorCode::io_failed, "configure-antenna", "switch-power-failed"));
+    }
+    vTaskDelay(pdMS_TO_TICKS(100));
+    const bool external = config_.antenna == WifiAntenna::external;
+    if (gpio_set_direction(select, GPIO_MODE_OUTPUT) != ESP_OK ||
+        gpio_set_level(select, external ? BLIP_WIFI_RF_SWITCH_EXTERNAL_LEVEL
+                                        : !BLIP_WIFI_RF_SWITCH_EXTERNAL_LEVEL) != ESP_OK) {
+        return core::Status::failure(
+            wifi_error(core::ErrorCode::io_failed, "configure-antenna", "switch-select-failed"));
+    }
+    ESP_LOGI(kTag, "antenna=%s", external ? "external" : "onboard");
+    return core::Status::success();
+#else
+    return config_.antenna == WifiAntenna::board_default
+               ? core::Status::success()
+               : core::Status::failure(wifi_error(core::ErrorCode::resource_unavailable,
+                                                  "configure-antenna", "no-board-rf-switch"));
+#endif
+}
+
 core::Status EspWifiComponent::start_portal_locked() noexcept {
     if (portal_ != nullptr) {
         return core::Status::success();
@@ -525,9 +562,19 @@ core::Status EspWifiComponent::start_portal_locked() noexcept {
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr,
     };
+    const httpd_uri_t firmware_update_uri{
+        .uri = "/api/firmware",
+        .method = HTTP_PUT,
+        .handler = root_handler,
+        .user_ctx = this,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr,
+    };
     if (httpd_register_uri_handler(portal_, &root) != ESP_OK ||
         httpd_register_uri_handler(portal_, &provision_uri) != ESP_OK ||
-        httpd_register_uri_handler(portal_, &web_asset_update_uri) != ESP_OK) {
+        httpd_register_uri_handler(portal_, &web_asset_update_uri) != ESP_OK ||
+        httpd_register_uri_handler(portal_, &firmware_update_uri) != ESP_OK) {
         stop_portal_locked();
         return core::Status::failure(
             wifi_error(core::ErrorCode::start_failed, "start-portal", "handler-register-failed"));
@@ -570,10 +617,14 @@ core::Status EspWifiComponent::reconfigure_radio_locked() noexcept {
     if (!config_.enabled) {
         return core::Status::success();
     }
+    auto status = configure_antenna_locked();
+    if (!status) {
+        return status;
+    }
     const wifi_mode_t mode = state_machine_.station_active()
                                  ? (state_machine_.ap_active() ? WIFI_MODE_APSTA : WIFI_MODE_STA)
                                  : WIFI_MODE_AP;
-    auto status = platform_status(esp_wifi_set_mode(mode), "configure", "set-mode-failed");
+    status = platform_status(esp_wifi_set_mode(mode), "configure", "set-mode-failed");
     if (!status) {
         return status;
     }
@@ -834,6 +885,8 @@ core::Status EspWifiComponent::read_parameter(std::string_view id,
         output = core::ScalarValue::from_integer(static_cast<std::int64_t>(config_.protocol));
     } else if (id == "channel") {
         output = core::ScalarValue::from_integer(config_.channel);
+    } else if (id == "antenna") {
+        output = core::ScalarValue::from_integer(static_cast<std::int64_t>(config_.antenna));
     } else if (id == "signal") {
         const double signal = rssi_ <= -100 ? 0.0 : rssi_ >= -50 ? 1.0 : (rssi_ + 100) / 50.0;
         output = core::ScalarValue::from_number(signal);
@@ -896,6 +949,8 @@ core::Status EspWifiComponent::write_parameter(std::string_view id,
         candidate.protocol = static_cast<WifiProtocol>(value.integer);
     } else if (id == "channel" && value.type == core::ValueType::integer) {
         candidate.channel = static_cast<std::uint8_t>(value.integer);
+    } else if (id == "antenna" && value.type == core::ValueType::integer) {
+        candidate.antenna = static_cast<WifiAntenna>(value.integer);
     } else {
         unlock();
         static_cast<void>(xSemaphoreGive(request_mutex_));

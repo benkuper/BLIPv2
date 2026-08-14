@@ -1,0 +1,27 @@
+BLIP V2 work package 3.3 physical OTA evidence excerpt
+Board: Seeed Studio XIAO ESP32C6, COM8, MAC 98:88:e0:7f:ac:18
+
+Successful A/B update:
+I (587) boot: Loaded app from partition at offset 0x1b0000
+I (703) blip_ota: OTA state=pending-confirmation signed=0
+I (1203) blip_bootstrap: BLIP_V2_BOOTSTRAP_READY ... ota=ab-v1 ... target=esp32c6 idf=v6.0.2
+GET /api/firmware => {"state":"confirmed","received_bytes":0,"expected_bytes":0,"signature_enforced":false}
+
+Interrupted upload sweep:
+1/1207168 bytes closed => state=idle, active image continued
+4096/1207168 bytes closed => state=idle, active image continued
+603584/1207168 bytes closed => state=idle, active image continued
+
+Pre-confirmation fault and automatic rollback:
+I (589) boot: Loaded app from partition at offset 0x1b0000
+I (705) blip_ota: OTA state=pending-confirmation signed=0
+E (1245) blip_bootstrap: BLIP_OTA_HIL_ABORT_BEFORE_CONFIRM
+abort() was called at PC 0x4200fb59 on core 0
+I (590) boot: Loaded app from partition at offset 0x20000
+I (704) blip_diagnostics: ... "reset":"panic" ... "coredump":"valid"
+I (714) blip_ota: OTA state=confirmed signed=0
+I (1264) blip_bootstrap: BLIP_V2_BOOTSTRAP_READY ... ota=ab-v1 ... reset=panic ... target=esp32c6 idf=v6.0.2
+
+Cleanup:
+The retained HIL panic coredump was erased through blip.diagnostics/erase_coredump.
+The board was left on the confirmed production image in ota_0.

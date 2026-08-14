@@ -14,6 +14,16 @@ Values infer `true`/`false`, integer, number, then string. Prefix a value with
 `b:`, `i:`, `n:`, or `s:` to force its type. Device and protocol failures are
 printed as JSON on standard error and return exit code 2.
 
+Provision from a local two-line credentials file (SSID, then password) without
+putting the password in shell history or the process argument list:
+
+```powershell
+python v2/tools/control/blip_wifi_provision.py --port COM8 --credentials wifi.txt
+```
+
+Keep that credentials file excluded from version control. The helper prints
+only the SSID and success state.
+
 The codec-only check has no external dependency:
 
 ```powershell

@@ -24,6 +24,26 @@ using namespace blip::storage;
         }                                                                                          \
     } while (false)
 
+std::uint32_t settings_crc32(std::span<const std::byte> input) {
+    std::uint32_t crc = 0xffffffffU;
+    for (std::size_t index = 0; index < input.size(); ++index) {
+        const auto value =
+            index >= 8U && index < 12U ? 0U : std::to_integer<std::uint8_t>(input[index]);
+        crc ^= value;
+        for (std::uint8_t bit = 0; bit < 8U; ++bit) {
+            const std::uint32_t mask = 0U - (crc & 1U);
+            crc = (crc >> 1U) ^ (0xedb88320U & mask);
+        }
+    }
+    return ~crc;
+}
+
+void write_u32(std::span<std::byte> output, std::size_t offset, std::uint32_t value) {
+    for (std::size_t index = 0; index < 4U; ++index) {
+        output[offset + index] = static_cast<std::byte>(value >> (index * 8U));
+    }
+}
+
 bool native_config_round_trip_and_corruption() {
     WifiConfig config{};
     config.mode = WifiMode::station_and_ap;
@@ -35,6 +55,7 @@ bool native_config_round_trip_and_corruption() {
     config.tx_power_index = 3;
     config.protocol = WifiProtocol::ax;
     config.channel = 11;
+    config.antenna = WifiAntenna::external;
 
     std::array<std::byte, kMaxWifiSettingsBytes> encoded{};
     const auto encoded_size = encode_wifi_config(config, encoded);
@@ -66,11 +87,32 @@ bool config_validation_rejects_unsafe_credentials_and_addresses() {
     BLIP_CHECK(!validate_wifi_config(config));
     BLIP_CHECK(config.manual_gateway.assign("192.168.1.1"));
     BLIP_CHECK(validate_wifi_config(config, true));
+    config.antenna = static_cast<WifiAntenna>(3);
+    BLIP_CHECK(!validate_wifi_config(config, true));
     BLIP_CHECK(valid_ipv4("0.0.0.0"));
     BLIP_CHECK(valid_ipv4("255.255.255.255"));
     BLIP_CHECK(!valid_ipv4("1.2.3"));
     BLIP_CHECK(!valid_ipv4("1.2.3.4.5"));
     BLIP_CHECK(!valid_utf8(std::string_view{"\xc0\x80", 2}));
+    return true;
+}
+
+bool version_one_native_settings_migrate_to_board_default_antenna() {
+    WifiConfig config{};
+    BLIP_CHECK(config.ssid.assign("network"));
+    BLIP_CHECK(config.password.assign("valid-password"));
+    std::array<std::byte, kMaxWifiSettingsBytes> encoded{};
+    const auto size = encode_wifi_config(config, encoded);
+    BLIP_CHECK(size);
+    encoded[4] = std::byte{1};
+    encoded[5] = std::byte{0};
+    encoded[22] = std::byte{0};
+    write_u32(encoded, 8, settings_crc32({encoded.data(), size.value()}));
+
+    ImportedSettingsDecodeWorkspace workspace{};
+    const auto decoded = decode_wifi_config({encoded.data(), size.value()}, workspace);
+    BLIP_CHECK(decoded);
+    BLIP_CHECK(decoded.value().config.antenna == WifiAntenna::board_default);
     return true;
 }
 
@@ -189,6 +231,7 @@ int main() {
     const std::array tests{
         native_config_round_trip_and_corruption,
         config_validation_rejects_unsafe_credentials_and_addresses,
+        version_one_native_settings_migrate_to_board_default_antenna,
         legacy_wifi_payload_migrates_without_exposing_secret,
         provisioning_form_is_bounded_and_strict,
         state_machine_provisions_retries_and_recovers,

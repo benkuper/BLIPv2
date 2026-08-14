@@ -7,3 +7,6 @@ names; unmeasured rows remain open.
 Raw serial logs sit beside their JSON record. Hardware descriptions distinguish
 the board name supplied by the operator from chip and USB identities measured by
 the tools.
+
+Work-package-specific records are grouped by subsystem. A/B update interruption
+and rollback records are under [`ota/`](ota/).

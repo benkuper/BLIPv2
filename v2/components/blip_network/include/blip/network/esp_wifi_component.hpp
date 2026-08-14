@@ -79,6 +79,7 @@ class EspWifiComponent final : public core::Component {
     [[nodiscard]] core::Status configure_station_locked() noexcept;
     [[nodiscard]] core::Status configure_access_point_locked() noexcept;
     [[nodiscard]] core::Status configure_protocol_locked() noexcept;
+    [[nodiscard]] core::Status configure_antenna_locked() noexcept;
     [[nodiscard]] core::Status configure_ip_locked() noexcept;
     [[nodiscard]] core::Status start_portal_locked() noexcept;
     void stop_portal_locked() noexcept;

@@ -275,6 +275,12 @@ extern "C" void app_main() {
         reject_pending_update();
         return;
     }
+#if defined(BLIP_OTA_HIL_ABORT_BEFORE_CONFIRM)
+    if (!safe_mode && ota_component.pending_confirmation()) {
+        ESP_LOGE(kTag, "BLIP_OTA_HIL_ABORT_BEFORE_CONFIRM");
+        std::abort();
+    }
+#endif
 #if defined(BLIP_DIAGNOSTICS_HIL_FORCE_BOOT_LOOP)
     if (!safe_mode) {
         ESP_LOGE(kTag, "BLIP_DIAGNOSTICS_HIL_FORCED_FAILURE");
