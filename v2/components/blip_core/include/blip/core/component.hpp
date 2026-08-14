@@ -3,6 +3,10 @@
 #include "blip/core/descriptor.hpp"
 #include "blip/core/error.hpp"
 
+#include <cstddef>
+#include <span>
+#include <string_view>
+
 namespace blip::core {
 
 enum class ComponentState : std::uint8_t {
@@ -38,6 +42,21 @@ class Component {
     [[nodiscard]] virtual Status resume() noexcept { return Status::success(); }
     [[nodiscard]] virtual Status stop() noexcept = 0;
     [[nodiscard]] virtual bool callbacks_quiesced() const noexcept { return true; }
+    [[nodiscard]] virtual Status read_parameter(std::string_view id, ScalarValue&) noexcept {
+        return Status::failure(
+            {ErrorDomain::control, ErrorCode::not_found, descriptor().id, "read-parameter", id});
+    }
+    [[nodiscard]] virtual Status write_parameter(std::string_view id, const ScalarValue&) noexcept {
+        return Status::failure(
+            {ErrorDomain::control, ErrorCode::not_found, descriptor().id, "write-parameter", id});
+    }
+    [[nodiscard]] virtual Status invoke_action(std::string_view id, std::span<const ScalarValue>,
+                                               std::span<ScalarValue>,
+                                               std::size_t& output_count) noexcept {
+        output_count = 0;
+        return Status::failure(
+            {ErrorDomain::control, ErrorCode::not_found, descriptor().id, "invoke-action", id});
+    }
 };
 
 } // namespace blip::core

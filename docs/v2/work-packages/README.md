@@ -22,3 +22,4 @@ wire protocols, or public OSC paths.
 | [2.2](2.2-atomic-file-storage.md) | Versioned atomic LittleFS files and an optional two-slot SD service with bounded recovery |
 | [2.3](2.3-settings-migration-v1-import.md) | Ordered schema migrations and a bounded, journaled, physically qualified V1 settings import |
 | [2.4](2.4-diagnostics-safe-mode.md) | Bounded structured diagnostics, retained coredumps, and physically qualified boot-loop recovery |
+| [2.5](2.5-serial-transport.md) | Versioned common envelope, bounded Serial/USB control, host CLI, and normal/recovery hardware qualification |

@@ -16,6 +16,8 @@ enum class ErrorDomain : std::uint8_t {
     event,
     storage,
     diagnostics,
+    control,
+    transport,
 };
 
 enum class ErrorCode : std::uint16_t {

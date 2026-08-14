@@ -333,6 +333,47 @@ Status EspDiagnosticsComponent::start(const StartContext&) noexcept {
     return refresh_metrics();
 }
 
+Status EspDiagnosticsComponent::read_parameter(std::string_view id, ScalarValue& output) noexcept {
+    if (id != "log_level") {
+        return Status::failure(
+            diagnostics_error(ErrorCode::not_found, "read-parameter", "parameter-not-found"));
+    }
+    output = ScalarValue::from_integer(static_cast<std::int64_t>(logger_.default_level()));
+    return Status::success();
+}
+
+Status EspDiagnosticsComponent::write_parameter(std::string_view id,
+                                                const ScalarValue& value) noexcept {
+    if (id != "log_level") {
+        return Status::failure(
+            diagnostics_error(ErrorCode::not_found, "write-parameter", "parameter-not-found"));
+    }
+    if (value.type != ValueType::integer || value.integer < 0 || value.integer > 5) {
+        return Status::failure(
+            diagnostics_error(ErrorCode::validation_failed, "write-parameter", "invalid-level"));
+    }
+    return logger_.set_default_level(static_cast<LogLevel>(value.integer));
+}
+
+Status EspDiagnosticsComponent::invoke_action(std::string_view id,
+                                              std::span<const ScalarValue> arguments,
+                                              std::span<ScalarValue>,
+                                              std::size_t& output_count) noexcept {
+    output_count = 0;
+    if (!arguments.empty()) {
+        return Status::failure(diagnostics_error(ErrorCode::validation_failed, "invoke-action",
+                                                 "arguments-not-allowed"));
+    }
+    if (id == "clear_safe_mode") {
+        return clear_safe_mode();
+    }
+    if (id == "erase_coredump") {
+        return erase_coredump();
+    }
+    return Status::failure(
+        diagnostics_error(ErrorCode::not_found, "invoke-action", "action-not-found"));
+}
+
 Status EspDiagnosticsComponent::confirm_boot() noexcept {
     if (!started_) {
         return Status::failure(

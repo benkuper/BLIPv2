@@ -23,6 +23,11 @@ stack after `app_main` returns; runtime components do not retain it.
 The composition root will remain thin: reusable production behavior belongs in
 the component directories under [`../components/`](../components/).
 
+After boot confirmation, parameters and actions are available through the
+COBS-framed BLIP envelope on UART0 (ESP32) or native USB Serial/JTAG (S3/C6).
+The host client and examples are in
+[`../tools/control/`](../tools/control/README.md).
+
 The committed custom partition table is sized for a 2 MiB device and reserves
 an 896 KiB `storage` LittleFS partition followed by a 64 KiB `coredump`
 partition. The internal storage component formats its partition only when it is

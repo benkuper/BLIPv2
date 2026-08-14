@@ -37,6 +37,12 @@ class EspDiagnosticsComponent final : public Component {
     [[nodiscard]] const ComponentDescriptor& descriptor() const noexcept override;
     [[nodiscard]] Status start(const StartContext&) noexcept override;
     [[nodiscard]] Status stop() noexcept override;
+    [[nodiscard]] Status read_parameter(std::string_view id, ScalarValue& output) noexcept override;
+    [[nodiscard]] Status write_parameter(std::string_view id,
+                                         const ScalarValue& value) noexcept override;
+    [[nodiscard]] Status invoke_action(std::string_view id, std::span<const ScalarValue> arguments,
+                                       std::span<ScalarValue> output,
+                                       std::size_t& output_count) noexcept override;
 
     [[nodiscard]] Status prepare_boot() noexcept;
     [[nodiscard]] Status confirm_boot() noexcept;
