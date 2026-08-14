@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "gate_id": "WP-3.4-TRANSPORT-QUALIFICATION",
+  "state": "pass-with-external-capture-open",
+  "timestamp_utc": "2026-08-14T23:28:10.602780Z",
+  "esp_idf": "6.0.2",
+  "sweep": {
+    "pixels_per_lane": [
+      1,
+      32,
+      256,
+      512,
+      1024
+    ],
+    "lane_requests": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "iterations": 8,
+    "load": "idle"
+  },
+  "runs": [
+    {
+      "target": "esp32",
+      "port": "COM5",
+      "board": "ESP32-D0WDQ6 reference board (model not identified)",
+      "mac": "30:ae:a4:f2:d1:84",
+      "record_count": 115,
+      "completion_marker": true,
+      "restored_overwrite_range": {
+        "bytes": 2097152,
+        "sha256": "4c52b21310a8065c6ffc195f1f72dc77d50ecc02346a053a707263ae0766f2fb",
+        "esptool_verify": "pass"
+      },
+      "maximum_completed_rmt_lanes_at_1024_pixels": 8,
+      "selected_1024_pixel_records": {
+        "rmt": {
+          "schema_version": 1,
+          "target": "esp32",
+          "backend": "rmt",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": true,
+          "encoder_us": 0,
+          "wall_us": 255991,
+          "staging_bytes": 0,
+          "detail": "completed"
+        },
+        "rmt-dma": {
+          "schema_version": 1,
+          "target": "esp32",
+          "backend": "rmt-dma",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": false,
+          "encoder_us": 0,
+          "wall_us": 0,
+          "staging_bytes": 0,
+          "detail": "soc-no-rmt-dma"
+        },
+        "spi-waveform": {
+          "schema_version": 1,
+          "target": "esp32",
+          "backend": "spi-waveform",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": false,
+          "encoder_us": 40585,
+          "wall_us": 64,
+          "staging_bytes": 9216,
+          "detail": "tx-failed"
+        },
+        "spi-waveform-dma": {
+          "schema_version": 1,
+          "target": "esp32",
+          "backend": "spi-waveform-dma",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": true,
+          "encoder_us": 40585,
+          "wall_us": 243506,
+          "staging_bytes": 9216,
+          "detail": "completed"
+        },
+        "spi-clocked": {
+          "schema_version": 1,
+          "target": "esp32",
+          "backend": "spi-clocked",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": true,
+          "encoder_us": 1734,
+          "wall_us": 26833,
+          "staging_bytes": 4164,
+          "detail": "completed"
+        }
+      }
+    },
+    {
+      "target": "esp32s3",
+      "port": "COM9",
+      "board": "M5Dial ESP32-S3",
+      "mac": "b0:81:84:96:83:74",
+      "record_count": 115,
+      "completion_marker": true,
+      "restored_overwrite_range": {
+        "bytes": 2097152,
+        "sha256": "c9bc68965e3434d1edbdef27fbd2609001a4ad2e7245f423866a35a9edb7c005",
+        "esptool_verify": "pass"
+      },
+      "maximum_completed_rmt_lanes_at_1024_pixels": 4,
+      "selected_1024_pixel_records": {
+        "rmt": {
+          "schema_version": 1,
+          "target": "esp32s3",
+          "backend": "rmt",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": true,
+          "encoder_us": 0,
+          "wall_us": 255926,
+          "staging_bytes": 0,
+          "detail": "completed"
+        },
+        "rmt-dma": {
+          "schema_version": 1,
+          "target": "esp32s3",
+          "backend": "rmt-dma",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": true,
+          "encoder_us": 0,
+          "wall_us": 256537,
+          "staging_bytes": 0,
+          "detail": "completed"
+        },
+        "spi-waveform": {
+          "schema_version": 1,
+          "target": "esp32s3",
+          "backend": "spi-waveform",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": false,
+          "encoder_us": 33056,
+          "wall_us": 188,
+          "staging_bytes": 9216,
+          "detail": "tx-failed"
+        },
+        "spi-waveform-dma": {
+          "schema_version": 1,
+          "target": "esp32s3",
+          "backend": "spi-waveform-dma",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": true,
+          "encoder_us": 33064,
+          "wall_us": 243524,
+          "staging_bytes": 9216,
+          "detail": "completed"
+        },
+        "spi-clocked": {
+          "schema_version": 1,
+          "target": "esp32s3",
+          "backend": "spi-clocked",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": true,
+          "encoder_us": 1573,
+          "wall_us": 26864,
+          "staging_bytes": 4164,
+          "detail": "completed"
+        }
+      }
+    },
+    {
+      "target": "esp32c6",
+      "port": "COM8",
+      "board": "Seeed Studio XIAO ESP32C6, onboard antenna",
+      "mac": "98:88:e0:7f:ac:18",
+      "record_count": 115,
+      "completion_marker": true,
+      "restored_overwrite_range": {
+        "bytes": 2097152,
+        "sha256": "6dc2ca539426a3ccf25471a1a259aaae5dcb136261855462a8ecde3ab41273af",
+        "esptool_verify": "pass"
+      },
+      "maximum_completed_rmt_lanes_at_1024_pixels": 2,
+      "selected_1024_pixel_records": {
+        "rmt": {
+          "schema_version": 1,
+          "target": "esp32c6",
+          "backend": "rmt",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": true,
+          "encoder_us": 0,
+          "wall_us": 255841,
+          "staging_bytes": 0,
+          "detail": "completed"
+        },
+        "rmt-dma": {
+          "schema_version": 1,
+          "target": "esp32c6",
+          "backend": "rmt-dma",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": false,
+          "encoder_us": 0,
+          "wall_us": 0,
+          "staging_bytes": 0,
+          "detail": "soc-no-rmt-dma"
+        },
+        "spi-waveform": {
+          "schema_version": 1,
+          "target": "esp32c6",
+          "backend": "spi-waveform",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": false,
+          "encoder_us": 24294,
+          "wall_us": 287,
+          "staging_bytes": 9216,
+          "detail": "tx-failed"
+        },
+        "spi-waveform-dma": {
+          "schema_version": 1,
+          "target": "esp32c6",
+          "backend": "spi-waveform-dma",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": true,
+          "encoder_us": 24293,
+          "wall_us": 243478,
+          "staging_bytes": 9216,
+          "detail": "completed"
+        },
+        "spi-clocked": {
+          "schema_version": 1,
+          "target": "esp32c6",
+          "backend": "spi-clocked",
+          "load": "idle",
+          "lanes": 1,
+          "pixels": 1024,
+          "iterations": 8,
+          "supported": true,
+          "encoder_us": 1672,
+          "wall_us": 26815,
+          "staging_bytes": 4164,
+          "detail": "completed"
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "No external logic-analyzer capture was available.",
+    "Multiline SPI and target-parallel rows remain fixture-required.",
+    "Wi-Fi saturation, flash/cache-disable, and mixed-resource pressure remain Gate C qualification work.",
+    "Completion timing proves driver progress, not waveform integrity or lane skew."
+  ]
+}

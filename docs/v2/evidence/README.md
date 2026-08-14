@@ -10,3 +10,6 @@ the tools.
 
 Work-package-specific records are grouped by subsystem. A/B update interruption
 and rollback records are under [`ota/`](ota/).
+
+Disposable LED transport measurements and restoration checks are under
+[`led-transport/`](led-transport/).
