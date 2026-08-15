@@ -47,6 +47,30 @@
 
         <p id="notice" class="notice" role="status" hidden></p>
         <section id="controls" class="control-grid" aria-label="Device controls"></section>
+
+        <section class="firmware-panel" aria-labelledby="firmware-heading">
+          <div>
+            <p class="eyebrow">Maintenance</p>
+            <h2 id="firmware-heading">Firmware update</h2>
+            <p>Upload a target-matched ESP-IDF application image. The device validates its metadata and SHA-256 before switching OTA slots.</p>
+          </div>
+          <div class="firmware-form">
+            <label>
+              <span>Target</span>
+              <select id="firmware-target">
+                <option value="esp32">ESP32</option>
+                <option value="esp32s3">ESP32-S3</option>
+                <option value="esp32c6">ESP32-C6</option>
+              </select>
+            </label>
+            <label>
+              <span>Application image</span>
+              <input id="firmware-file" type="file" accept=".bin,application/octet-stream" />
+            </label>
+            <button id="firmware-button" class="primary-button" type="button">Upload update</button>
+            <p id="firmware-status" class="firmware-status" role="status"></p>
+          </div>
+        </section>
       </main>
     </div>
 

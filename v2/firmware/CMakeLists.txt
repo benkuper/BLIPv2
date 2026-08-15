@@ -23,3 +23,9 @@ idf_build_set_property(
     "${CMAKE_CURRENT_LIST_DIR}/dependencies.lock.${IDF_TARGET}")
 
 project(blip-v2 VERSION 0.1.0)
+
+# A full factory install must carry a valid empty LittleFS image. The storage
+# component then installs its embedded, integrity-checked browser bundle on the
+# first boot. App-only OTA builds continue to leave this partition untouched.
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/factory_storage")
+littlefs_create_partition_image(storage "${CMAKE_BINARY_DIR}/factory_storage" FLASH_IN_PROJECT)

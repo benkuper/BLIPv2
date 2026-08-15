@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Install BLIP V2</title>
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+    <style>
+      :root { color: #edf5f6; background: #071018; font: 16px/1.6 system-ui, sans-serif; }
+      body { max-width: 720px; margin: auto; padding: 10vh 24px; }
+      h1 { font-size: clamp(2.8rem, 10vw, 6rem); line-height: .95; letter-spacing: -.06em; }
+      p, li { color: #a5b9bd; }
+      esp-web-install-button { --esp-tools-button-color: #5ee5da; --esp-tools-button-text-color: #06201f; }
+      code { color: #5ee5da; }
+    </style>
+  </head>
+  <body>
+    <p>BLIP V2 · factory installer</p>
+    <h1>Flash. Connect. Create.</h1>
+    <p>The installer detects ESP32, ESP32-S3, or ESP32-C6 and writes the complete qualified 4 MiB image, including the initialized browser-control filesystem.</p>
+    <esp-web-install-button manifest="manifest.json"></esp-web-install-button>
+    <ol>
+      <li>After flashing, join the open <code>BLIP-xxxxxx</code> Wi-Fi network.</li>
+      <li>Open <code>http://192.168.4.1</code> and use the generated Wi-Fi provisioning action.</li>
+      <li>Reconnect to your normal network, open the device, and use Firmware update for later A/B releases.</li>
+    </ol>
+  </body>
+</html>

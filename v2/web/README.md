@@ -36,6 +36,11 @@ Verify that the checked-in factory bundle exactly matches these sources with:
 npm run build --prefix v2/web
 ```
 
+The maintenance panel accepts a raw target-matched ESP-IDF application image,
+derives its project/version metadata and SHA-256 in the browser, and uploads it
+to the A/B OTA endpoint. Factory flashing uses the separate complete images and
+manifests under [`../installer/`](../installer/README.md).
+
 The packer can also produce and atomically upload a separately versioned bundle
 to a device on a trusted local network:
 

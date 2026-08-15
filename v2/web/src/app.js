@@ -1,6 +1,7 @@
 import { DeviceClient, deviceUrlFromLocation } from "./client.js";
 import { buildControlModel, describeHost } from "./model.js";
 import { ControlView } from "./view.js";
+import { uploadFirmware } from "./firmware.js";
 
 const controlsRoot = document.querySelector("#controls");
 const emptyTemplate = document.querySelector("#empty-state-template");
@@ -12,6 +13,10 @@ const deviceMeta = document.querySelector("#device-meta");
 const notice = document.querySelector("#notice");
 const search = document.querySelector("#control-search");
 const showConfig = document.querySelector("#show-config");
+const firmwareFile = document.querySelector("#firmware-file");
+const firmwareTarget = document.querySelector("#firmware-target");
+const firmwareButton = document.querySelector("#firmware-button");
+const firmwareStatus = document.querySelector("#firmware-status");
 
 let client = null;
 
@@ -68,5 +73,27 @@ connectButton.addEventListener("click", connect);
 showConfig.addEventListener("change", connect);
 search.addEventListener("input", () => view.setFilter(search.value));
 view.setModel({ components: [], index: new Map() });
+
+firmwareButton.addEventListener("click", async () => {
+  const file = firmwareFile.files?.[0];
+  if (!file) {
+    firmwareStatus.textContent = "Choose a BLIP application image first.";
+    return;
+  }
+  firmwareButton.disabled = true;
+  firmwareStatus.textContent = "Validating and uploading firmware…";
+  try {
+    const image = await uploadFirmware({
+      file,
+      target: firmwareTarget.value,
+      baseUrl: deviceUrlFromLocation(),
+    });
+    firmwareStatus.textContent = `${image.project} ${image.version} accepted. The device is restarting.`;
+  } catch (error) {
+    firmwareStatus.textContent = error instanceof Error ? error.message : String(error);
+  } finally {
+    firmwareButton.disabled = false;
+  }
+});
 
 if (location.protocol === "http:" || location.protocol === "https:") connect();

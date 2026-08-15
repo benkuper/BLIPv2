@@ -1,0 +1,55 @@
+{
+  "format": 1,
+  "date": "2026-08-15",
+  "work_package": "3.5",
+  "status": "partial",
+  "version": "0.1.0",
+  "factory_layout": {
+    "flash_bytes": 4194304,
+    "merged_image_bytes": 4063232,
+    "storage_offset": 3407872,
+    "storage_bytes": 655360,
+    "storage_format": "LittleFS"
+  },
+  "artifacts": {
+    "esp32": {
+      "sha256": "b2eefff416bb92578f53f5669fc1ea65e7e0905116af7fb9cf5ab1122614abca",
+      "bytes": 4063232
+    },
+    "esp32s3": {
+      "sha256": "6411f538444325cf0ee2cdc03c1c07d9f5800ac83072f4553f0e396af68d369b",
+      "bytes": 4063232
+    },
+    "esp32c6": {
+      "sha256": "9b85ac1b5753c0ce7034c2a58991c4ab9c95bfb9c31d4b8f420cd5816168b7ad",
+      "bytes": 4063232
+    }
+  },
+  "automated": {
+    "manifest_validator": "pass",
+    "web_tests": { "passed": 17, "failed": 0 },
+    "host_suites": { "passed": 15, "failed": 0 },
+    "factory_bundle_bytes": 14251,
+    "factory_bundle_assets": 8,
+    "firmware_builds": ["esp32", "esp32s3", "esp32c6"]
+  },
+  "physical_factory_install": {
+    "target": "esp32",
+    "board": "Adafruit HUZZAH32 Feather",
+    "port": "COM5",
+    "method": "merged browser artifact written at offset 0 with esptool v5.3.1",
+    "flash_hash_verification": "pass",
+    "blank_initialized_filesystem_boot": "pass",
+    "serial_led_hil": "pass",
+    "oscquery_browser_websocket_udp_hil": "pass"
+  },
+  "browser_update": {
+    "metadata_and_sha256_unit_tests": "pass",
+    "device_http_ota_and_rollback_hil": "pass (work package 3.3)",
+    "interactive_web_serial_dialog": "not run"
+  },
+  "open_physical_evidence": [
+    "A Web Serial install initiated and completed through the secure-hosted ESP Web Tools dialog requires an interactive browser/serial permission run.",
+    "Post-install Wi-Fi provisioning and browser OTA have not yet been repeated as one uninterrupted human-visible browser scenario."
+  ]
+}

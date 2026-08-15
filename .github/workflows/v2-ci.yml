@@ -41,6 +41,8 @@ jobs:
         run: python v2/tests/host/validate_bootstrap.py
       - name: Validate resource manifests
         run: python v2/tests/host/validate_resource_manifests.py
+      - name: Validate browser installer manifests
+        run: python v2/tests/host/validate_browser_installer.py
       - name: Test schema-driven web shell
         run: |
           npm test --prefix v2/web
