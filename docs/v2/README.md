@@ -24,6 +24,9 @@ pinned commit and source path used to derive it.
 | Work package 3.1 schema-driven web shell | [work-packages/3.1-schema-web-shell.md](work-packages/3.1-schema-web-shell.md) |
 | Work package 3.2 filesystem-managed web assets | [work-packages/3.2-filesystem-web-assets.md](work-packages/3.2-filesystem-web-assets.md) |
 | Work package 3.3 A/B firmware OTA and rollback | [work-packages/3.3-ab-ota-rollback.md](work-packages/3.3-ab-ota-rollback.md) |
+| Work package 3.4 native RMT LED slice | [work-packages/3.4-native-rmt-strip.md](work-packages/3.4-native-rmt-strip.md) |
+| Work package 3.5 browser installer | [work-packages/3.5-browser-installer.md](work-packages/3.5-browser-installer.md) |
+| Work package 3.6 pin reservation UI | [work-packages/3.6-pin-reservation-ui.md](work-packages/3.6-pin-reservation-ui.md) |
 | Append-only gate evidence | [evidence/](evidence/) |
 
 ## Scope boundary

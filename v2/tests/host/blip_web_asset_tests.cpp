@@ -218,7 +218,7 @@ bool factory_bundle_loads_and_streams() {
     BLIP_CHECK(factory_status);
     BLIP_CHECK(store.active());
     BLIP_CHECK(store.info().bundle_version == 1000U);
-    BLIP_CHECK(store.info().asset_count == 8U);
+    BLIP_CHECK(store.info().asset_count == 9U);
 
     const auto* index = store.find("/");
     BLIP_CHECK(index != nullptr && index->path_view() == "/index.html");

@@ -22,6 +22,9 @@ test("client requests host info and the selected registry view", async () => {
   const requested = [];
   const fetchImpl = async (url) => {
     requested.push(url.href);
+    if (url.pathname === "/api/resources") {
+      return response({ schema_version: 1, allocation_revision: 1, board: {}, pins: [] });
+    }
     return response(url.search === "?HOST_INFO" ? { NAME: "Fixture" } : { CONTENTS: {} });
   };
   const client = new DeviceClient({
@@ -31,7 +34,11 @@ test("client requests host info and the selected registry view", async () => {
   });
   const result = await client.load(false);
   assert.equal(result.host.NAME, "Fixture");
-  assert.deepEqual(requested, ["http://192.0.2.8/?HOST_INFO", "http://192.0.2.8/?config=0"]);
+  assert.deepEqual(requested, [
+    "http://192.0.2.8/?HOST_INFO",
+    "http://192.0.2.8/?config=0",
+    "http://192.0.2.8/api/resources",
+  ]);
   assert.throws(() => client.send("/test"), /offline/);
 });
 
@@ -57,6 +64,9 @@ test("non-HTTP device URLs are rejected", () => {
 test("oversized schema responses are rejected before parsing", async () => {
   const fetchImpl = async (url) => {
     if (url.search === "?HOST_INFO") return response({ NAME: "Fixture" });
+    if (url.pathname === "/api/resources") {
+      return response({ schema_version: 1, allocation_revision: 1, board: {}, pins: [] });
+    }
     return new Response("{}", {
       status: 200,
       headers: { "content-length": String(256 * 1024 + 1) },

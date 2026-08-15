@@ -8,6 +8,7 @@ import json
 import socket
 import struct
 import urllib.request
+import urllib.error
 from typing import Any
 
 from websockets.sync.client import connect
@@ -111,6 +112,9 @@ def assert_parameter(tree: dict[str, Any], parameter: str, expected: Any | None 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--origin", default="http://192.168.4.1")
+    parser.add_argument("--expect-board")
+    parser.add_argument("--expect-antenna")
+    parser.add_argument("--expect-pin-count", type=int)
     args = parser.parse_args()
     observations: dict[str, Any] = {"origin": args.origin}
     try:
@@ -129,7 +133,60 @@ def main() -> int:
         tree = json.loads(body)
         assert_parameter(tree, "red")
         assert_parameter(tree, "green")
+        pin_node = find_path(tree, f"{LED_PATH}/pin")
+        selector = pin_node.get("BLIP_RESOURCE_SELECTOR") if pin_node else None
+        if not isinstance(selector, dict) or selector.get("CLASS") != "gpio":
+            raise AssertionError("LED pin is not advertised as a GPIO resource selector")
         observations["schema_led_present"] = True
+
+        with urllib.request.urlopen(args.origin + "/api/resources", timeout=5) as response:
+            resources = json.loads(response.read())
+        if resources.get("schema_version") != 1 or not isinstance(resources.get("allocation_revision"), int):
+            raise AssertionError("resource snapshot version or revision missing")
+        board = resources.get("board", {})
+        pins = resources.get("pins", [])
+        if args.expect_board and board.get("id") != args.expect_board:
+            raise AssertionError(f"board mismatch: {board.get('id')}")
+        if args.expect_antenna and board.get("antenna") != args.expect_antenna:
+            raise AssertionError(f"antenna mismatch: {board.get('antenna')}")
+        if args.expect_pin_count is not None and len(pins) != args.expect_pin_count:
+            raise AssertionError(f"pin count mismatch: {len(pins)}")
+        led_pin = next((pin for pin in pins if any(owner.get("path") == "blip.output.strip0:pin" for owner in pin.get("owners", []))), None)
+        if led_pin is None:
+            raise AssertionError("LED pin lease missing from resource snapshot")
+        if args.expect_antenna == "onboard":
+            reserved = {pin.get("gpio"): pin.get("reason") for pin in pins if pin.get("state") == "reserved"}
+            if reserved.get(3) != "onboard-antenna-rf-switch-power" or reserved.get(14) != "onboard-antenna-selected":
+                raise AssertionError("onboard antenna GPIO reservations missing")
+        observations["resource_snapshot"] = {
+            "board": board.get("id"),
+            "antenna": board.get("antenna"),
+            "pins": len(pins),
+            "revision": resources["allocation_revision"],
+            "led_pin": led_pin.get("id"),
+        }
+        stale_request = urllib.request.Request(
+            args.origin + "/api/resources/reassign",
+            data=json.dumps({
+                "schema_version": 1,
+                "expected_revision": resources["allocation_revision"] + 1,
+                "operation": "swap",
+                "requester": "blip.output.strip0:pin",
+                "previous_owner": "blip.output.strip0:pin",
+                "target_resource": "gpio.1",
+            }).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            urllib.request.urlopen(stale_request, timeout=5)
+        except urllib.error.HTTPError as error:
+            detail = error.read()
+            if error.code != 409 or b"stale-revision" not in detail:
+                raise AssertionError(f"stale reassignment returned HTTP {error.code}: {detail!r}") from error
+        else:
+            raise AssertionError("stale reassignment unexpectedly succeeded")
+        observations["stale_reassignment_rejected"] = True
 
         ws_origin = args.origin.replace("http://", "ws://", 1).replace("https://", "wss://", 1)
         with connect(ws_origin + "/", open_timeout=5, close_timeout=2) as websocket:

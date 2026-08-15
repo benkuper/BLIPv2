@@ -392,6 +392,25 @@ class TreeWriter {
             (!writer_.append(",\"BLIP_UNIT\":") || !writer_.quoted(parameter.unit))) {
             return false;
         }
+        if (parameter.resource_selector.present) {
+            const auto resource_class = parameter.resource_selector.resource_class ==
+                                                core::ResourceClass::gpio
+                                            ? std::string_view{"gpio"}
+                                            : std::string_view{"unsupported"};
+            if (!writer_.append(",\"BLIP_RESOURCE_SELECTOR\":{\"CLASS\":") ||
+                !writer_.quoted(resource_class) ||
+                !writer_.append(",\"REQUIRED_CAPABILITIES\":") ||
+                !writer_.number(parameter.resource_selector.required_capabilities) ||
+                !writer_.append(",\"OPTIONAL\":") ||
+                !writer_.append(parameter.resource_selector.optional ? "true" : "false") ||
+                !writer_.append(",\"SWAP\":") ||
+                !writer_.append(parameter.resource_selector.supports_swap ? "true" : "false") ||
+                !writer_.append(",\"MOVE\":") ||
+                !writer_.append(parameter.resource_selector.supports_move ? "true" : "false") ||
+                !writer_.append("}")) {
+                return false;
+            }
+        }
         return writer_.append("}");
     }
 

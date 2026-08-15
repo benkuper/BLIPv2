@@ -6,16 +6,24 @@
 #include "soc/soc_caps.h"
 
 #include <array>
+#include <cstdio>
 #include <limits>
 
 #ifndef BLIP_LED_DEFAULT_GPIO
-#define BLIP_LED_DEFAULT_GPIO 2
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+#define BLIP_LED_DEFAULT_GPIO 21
+#elif defined(CONFIG_IDF_TARGET_ESP32C6)
+#define BLIP_LED_DEFAULT_GPIO 20
+#else
+#define BLIP_LED_DEFAULT_GPIO 23
+#endif
 #endif
 
 namespace blip::led {
 namespace {
 
 constexpr char kTag[] = "blip_rmt_strip";
+constexpr std::string_view kPinOwner{"blip.output.strip0:pin"};
 constexpr std::array<std::string_view, 1> kProvidedServices{"output.pixel-strip"};
 constexpr std::array<std::string_view, 1> kRequiredServices{"storage.settings"};
 constexpr std::array<std::string_view, 4> kRmtAlternatives{"rmt.tx0", "rmt.tx1", "rmt.tx2",
@@ -49,7 +57,8 @@ constexpr std::array<core::ParameterDescriptor, 14> kParameters{{
      true,
      core::ScalarValue::from_integer(BLIP_LED_DEFAULT_GPIO),
      {true, 0, 63, 1},
-     ""},
+     "",
+     {true, core::ResourceClass::gpio, 0x00000042U, false, true, true}},
     {"protocol",
      "Pixel protocol",
      core::ValueType::integer,
@@ -192,8 +201,9 @@ void saturating_increment(std::atomic<std::uint32_t>& value) noexcept {
 
 const core::ComponentDescriptor EspRmtStripComponent::descriptor_{strip_descriptor()};
 
-EspRmtStripComponent::EspRmtStripComponent(storage::SettingsStore& settings) noexcept
-    : settings_(&settings) {}
+EspRmtStripComponent::EspRmtStripComponent(storage::SettingsStore& settings,
+                                           resources::DeviceBroker& resources) noexcept
+    : settings_(&settings), resources_(&resources) {}
 
 const core::ComponentDescriptor& EspRmtStripComponent::descriptor() const noexcept {
     return descriptor_;
@@ -235,6 +245,26 @@ core::Status EspRmtStripComponent::save_config(const StripConfig& config) noexce
     }
     return settings_->save(descriptor_,
                            std::span<const std::byte>{settings_buffer_.data(), encoded.value()});
+}
+
+core::Result<resources::DeviceBroker::Lease>
+EspRmtStripComponent::reserve_pin(std::uint8_t gpio) noexcept {
+    std::array<char, 12> id{};
+    const int size = std::snprintf(id.data(), id.size(), "gpio.%u", static_cast<unsigned>(gpio));
+    if (size <= 0 || static_cast<std::size_t>(size) >= id.size()) {
+        return core::Result<resources::DeviceBroker::Lease>::failure(
+            output_error(core::ErrorCode::invalid_argument, "reserve-pin", "gpio-id"));
+    }
+    const std::string_view alternative{id.data(), static_cast<std::size_t>(size)};
+    const std::array<std::string_view, 1> alternatives{alternative};
+    core::ResourceRequest request{};
+    request.resource_class = core::ResourceClass::gpio;
+    request.logical_name = "LED strip data";
+    request.ownership = core::OwnershipMode::exclusive;
+    request.alternatives = alternatives;
+    request.required_capabilities = resources::kGpioOutput | resources::kGpioRmt;
+    request.live_reacquire = true;
+    return resources_->acquire(kPinOwner, request);
 }
 
 core::Status EspRmtStripComponent::initialize_output(const StripConfig& config) noexcept {
@@ -334,12 +364,21 @@ core::Status EspRmtStripComponent::start(const core::StartContext&) noexcept {
         completion_ = nullptr;
         return status;
     }
+    auto reserved_pin = reserve_pin(config_.gpio);
+    if (!reserved_pin) {
+        config_mutex_ = nullptr;
+        request_mutex_ = nullptr;
+        completion_ = nullptr;
+        return core::Status::failure(reserved_pin.error());
+    }
+    pin_lease_ = std::move(reserved_pin.value());
     if (config_.enabled) {
         status = initialize_output(config_);
         if (!status) {
             config_mutex_ = nullptr;
             request_mutex_ = nullptr;
             completion_ = nullptr;
+            pin_lease_.release();
             return status;
         }
     }
@@ -351,6 +390,7 @@ core::Status EspRmtStripComponent::start(const core::StartContext&) noexcept {
         started_.store(false);
         task_quiesced_.store(true);
         deinitialize_output();
+        pin_lease_.release();
         config_mutex_ = nullptr;
         request_mutex_ = nullptr;
         completion_ = nullptr;
@@ -376,6 +416,7 @@ core::Status EspRmtStripComponent::stop() noexcept {
     }
     task_ = nullptr;
     deinitialize_output();
+    pin_lease_.release();
     config_mutex_ = nullptr;
     request_mutex_ = nullptr;
     completion_ = nullptr;
@@ -463,7 +504,25 @@ void EspRmtStripComponent::process_pending_config() noexcept {
         candidate.gpio != previous.gpio || candidate.protocol != previous.protocol;
     const bool platform_changed = candidate.enabled != previous.enabled || transport_changed;
     core::Status status = core::Status::success();
-    if (platform_changed) {
+    resources::DeviceBroker::Lease candidate_pin{};
+    if (candidate.gpio != previous.gpio) {
+        std::array<char, 12> candidate_id{};
+        const int id_size = std::snprintf(candidate_id.data(), candidate_id.size(), "gpio.%u",
+                                          static_cast<unsigned>(candidate.gpio));
+        const bool transaction_already_moved_lease =
+            id_size > 0 && static_cast<std::size_t>(id_size) < candidate_id.size() &&
+            pin_lease_.resource_id() ==
+                std::string_view{candidate_id.data(), static_cast<std::size_t>(id_size)};
+        if (!transaction_already_moved_lease) {
+            auto reservation = reserve_pin(candidate.gpio);
+            if (!reservation) {
+                status = core::Status::failure(reservation.error());
+            } else {
+                candidate_pin = std::move(reservation.value());
+            }
+        }
+    }
+    if (status && platform_changed) {
         deinitialize_output();
         if (candidate.enabled) {
             status = initialize_output(candidate);
@@ -481,6 +540,9 @@ void EspRmtStripComponent::process_pending_config() noexcept {
     if (lock_config()) {
         if (status) {
             config_ = candidate;
+            if (candidate_pin.valid()) {
+                pin_lease_ = std::move(candidate_pin);
+            }
         }
         completed_update_id_ = update_id;
         completed_update_status_ = status;

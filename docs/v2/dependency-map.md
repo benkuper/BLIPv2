@@ -49,21 +49,23 @@ flowchart LR
 | `3.1` | Schema-driven web shell | `1.3`, `2.7` | generic controls generated from descriptor schema |
 | `3.2` | Filesystem manager and web asset bundles | `2.2`, `3.1` | independently versioned/verified UI assets |
 | `3.3` | A/B OTA and rollback | `2.4`, `2.6` | signed/profile-checked update and boot confirmation |
-| `3.4` | Native RMT single-strip vertical slice | `1.4`, `1.5`, `2.7` | first output driver and registry-exposed strip |
+| `3.4` | LED transport qualification ADR and native RMT functional vertical slice | `1.4`, `1.5`, `2.7` | measured per-target transport guidance, first output driver and registry-exposed strip; RMT baseline is non-binding for production |
 | `3.5` | Browser installer manifests | `3.2`, `3.3` | factory/install bundle and browser flow |
-| `GB` | Prove install-to-rollback vertical slice | `3.1`–`3.5` | Gate B evidence |
+| `3.6` | Pin reservation inspector and conflict-safe editor | `1.3`, `1.4`, `2.1`, `3.1` | complete pin/claim schema, atomic reassignment, and shared-bus-aware controls |
+| `GB` | Prove install-to-rollback vertical slice | `3.1`–`3.6` | Gate B evidence, including exclusive-pin conflict prevention and legal I2C sharing |
 
 ## Milestones 4–6
 
 | ID | Issue/PR title | Depends on | Contract produced |
 | --- | --- | --- | --- |
-| `4.1` | Pixel surface and output-driver ABI | `GB`, `3.4` | format/timing/buffering/sync capability ABI |
+| `4.1` | Pixel surface, protocol boundary and output-driver ABI | `GB`, `3.4` | format/lane/timing/buffering/DMA/sync/resource capability ABI |
 | `4.2` | Deterministic layered compositor | `4.1`, `1.5` | stream/playback/script/system layer semantics |
 | `4.3` | Linear-light color pipeline | `4.1` | transforms, ordering, calibration, golden vectors |
-| `4.4` | Async submission, pools, deadline metrics | `4.1`, `4.2`, ADR-0004 | allocation-free render/output pipeline |
-| `4.5` | Native clocked-strip drivers | `4.1`, `4.3`, `4.4` | APA102/SK9822/HD108-family backends |
-| `4.6a` | Optional parallel output backend | `4.1`, `4.4` | removable parallel driver |
-| `4.6b` | Optional FastLED compatibility backend | `4.1`, `4.3` | removable compatibility driver |
+| `4.4` | Async submission, preallocated DMA/staging pools, deadline metrics | `4.1`, `4.2`, ADR-0004 | allocation-free, bounded and observable render/output pipeline |
+| `4.5` | Native SPI-DMA clocked-strip drivers | `4.1`, `4.3`, `4.4` | analyzer-qualified APA102/SK9822/HD108-family backends |
+| `4.6a` | Qualified RMT and SPI-encoded one-wire transports plus deterministic selector | `4.1`, `4.4`, `3.4` | measured target/length crossover policy, forced selection and diagnostic reason |
+| `4.6b` | Target-neutral parallel-wave backend with ESP32 I2S/LCD, S3 LCD_CAM and C6 PARLIO adapters | `4.1`, `4.4`, `3.4` | removable parallel transport with qualified lane/timing/resource limits |
+| `4.6c` | Optional FastLED compatibility backend | `4.1`, `4.3` | removable compatibility driver using the common output ABI |
 | `4.7` | Streaming, playback, and legacy import | `4.2`, `4.4`, `2.2`, `0.2` | bounded streaming and versioned playback format/importer |
 | `4.8a` | Art-Net/DMX compatibility | `4.7`, `2.6` | optional Art-Net/DMX component |
 | `4.8b` | Optional E1.31 component | `4.7`, `2.6` | independently removable E1.31 input |

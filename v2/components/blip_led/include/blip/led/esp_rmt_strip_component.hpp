@@ -2,6 +2,7 @@
 
 #include "blip/core/component.hpp"
 #include "blip/led/strip_config.hpp"
+#include "blip/resources/device_broker.hpp"
 #include "blip/storage/settings_store.hpp"
 #include "driver/rmt_encoder.h"
 #include "driver/rmt_tx.h"
@@ -21,7 +22,8 @@ class EspRmtStripComponent final : public core::Component {
     static constexpr std::size_t kTaskStackBytes = 6144U;
     static constexpr std::size_t kTaskStackWords = kTaskStackBytes / sizeof(StackType_t);
 
-    explicit EspRmtStripComponent(storage::SettingsStore& settings) noexcept;
+    EspRmtStripComponent(storage::SettingsStore& settings,
+                         resources::DeviceBroker& resources) noexcept;
 
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
     [[nodiscard]] core::Status start(const core::StartContext&) noexcept override;
@@ -40,6 +42,8 @@ class EspRmtStripComponent final : public core::Component {
     [[nodiscard]] core::Status load_config() noexcept;
     [[nodiscard]] core::Status save_config(const StripConfig& config) noexcept;
     [[nodiscard]] core::Status apply_config_locked(const StripConfig& candidate) noexcept;
+    [[nodiscard]] core::Result<resources::DeviceBroker::Lease>
+    reserve_pin(std::uint8_t gpio) noexcept;
     void process_pending_config() noexcept;
     [[nodiscard]] core::Status initialize_output(const StripConfig& config) noexcept;
     void deinitialize_output() noexcept;
@@ -53,6 +57,8 @@ class EspRmtStripComponent final : public core::Component {
     static const core::ComponentDescriptor descriptor_;
 
     storage::SettingsStore* settings_{};
+    resources::DeviceBroker* resources_{};
+    resources::DeviceBroker::Lease pin_lease_{};
     StripConfig config_{};
     StripConfig pending_config_{};
     std::array<std::byte, kStripSettingsBytes> settings_buffer_{};

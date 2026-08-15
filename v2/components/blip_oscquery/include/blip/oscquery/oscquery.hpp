@@ -14,11 +14,15 @@ enum class HttpGetSurface : std::uint8_t {
     web_asset,
     asset_status,
     update_status,
+    resource_status,
     not_found
 };
 
 [[nodiscard]] constexpr HttpGetSurface route_http_get(std::string_view path, bool has_query,
                                                       bool accepts_html) noexcept {
+    if (path == "/api/resources") {
+        return HttpGetSurface::resource_status;
+    }
     if (has_query) {
         return path == "/" ? HttpGetSurface::oscquery : HttpGetSurface::not_found;
     }

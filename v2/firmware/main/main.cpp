@@ -8,6 +8,7 @@
 #include "blip/oscquery/esp_oscquery_component.hpp"
 #include "blip/ota/esp_ota_component.hpp"
 #include "blip/resources/broker.hpp"
+#include "blip/resources/board_manifest.hpp"
 #include "blip/storage/legacy_settings_import_component.hpp"
 #include "blip/storage/littlefs_storage_component.hpp"
 #include "blip/storage/nvs_settings_component.hpp"
@@ -152,14 +153,17 @@ blip::storage::NvsSettingsComponent settings_component{};
 blip::storage::LittleFsStorageComponent file_storage_component{};
 blip::storage::LegacySettingsImportComponent legacy_import_component{settings_component.settings()};
 blip::network::EspWifiComponent wifi_component{settings_component.settings()};
-blip::led::EspRmtStripComponent led_component{settings_component.settings()};
+constexpr auto board_manifest = blip::resources::selected_board_manifest();
+blip::resources::DeviceBroker resource_broker{};
+blip::led::EspRmtStripComponent led_component{settings_component.settings(), resource_broker};
 blip::ota::EspOtaComponent ota_component{"blip-v2", CONFIG_IDF_TARGET, "minimal"};
 blip::core::Registry<11> registry{};
 blip::core::RegistryControlService<11> control_component{registry};
 blip::transport::EspSerialTransportComponent serial_transport_component{control_component};
 blip::oscquery::EspOscQueryComponent oscquery_component{registry, control_component, wifi_component,
                                                         file_storage_component.web_assets(),
-                                                        ota_component.updates()};
+                                                        ota_component.updates(), resource_broker,
+                                                        board_manifest};
 
 class EspMonotonicClock final : public blip::core::Clock {
   public:
@@ -170,7 +174,15 @@ class EspMonotonicClock final : public blip::core::Clock {
 
 EspMonotonicClock monotonic_clock{};
 blip::core::Scheduler<4> scheduler{monotonic_clock};
-blip::resources::Broker<1, 1> resource_broker{};
+
+[[nodiscard]] bool initialize_resources() noexcept {
+    for (const auto& pin : board_manifest.pins) {
+        if (!resource_broker.add_resource(pin)) {
+            return false;
+        }
+    }
+    return true;
+}
 
 [[nodiscard]] const char* legacy_import_status() noexcept {
     return legacy_import_component.disposition() ==
@@ -256,6 +268,10 @@ void reject_pending_update() noexcept {
 } // namespace
 
 extern "C" void app_main() {
+    if (!initialize_resources()) {
+        ESP_LOGE(kTag, "BLIP_V2_RESOURCE_INVENTORY_FAILED");
+        return;
+    }
     ota_component.prepare_boot();
     if (!diagnostics_component.prepare_boot()) {
         ESP_LOGE(kTag, "BLIP_V2_DIAGNOSTICS_PREPARE_FAILED");

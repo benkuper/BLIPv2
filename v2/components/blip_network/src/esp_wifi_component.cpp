@@ -571,10 +571,20 @@ core::Status EspWifiComponent::start_portal_locked() noexcept {
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr,
     };
+    const httpd_uri_t resource_reassignment_uri{
+        .uri = "/api/resources/reassign",
+        .method = HTTP_POST,
+        .handler = root_handler,
+        .user_ctx = this,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr,
+    };
     if (httpd_register_uri_handler(portal_, &root) != ESP_OK ||
         httpd_register_uri_handler(portal_, &provision_uri) != ESP_OK ||
         httpd_register_uri_handler(portal_, &web_asset_update_uri) != ESP_OK ||
-        httpd_register_uri_handler(portal_, &firmware_update_uri) != ESP_OK) {
+        httpd_register_uri_handler(portal_, &firmware_update_uri) != ESP_OK ||
+        httpd_register_uri_handler(portal_, &resource_reassignment_uri) != ESP_OK) {
         stop_portal_locked();
         return core::Status::failure(
             wifi_error(core::ErrorCode::start_failed, "start-portal", "handler-register-failed"));

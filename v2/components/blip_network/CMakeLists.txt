@@ -10,7 +10,7 @@ idf_component_register(
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/blip_component.cmake)
 blip_configure_component(${COMPONENT_LIB})
 
-if(BLIP_BOARD_SEEED_XIAO_ESP32C6)
+if(BLIP_BOARD_SEEED_XIAO_ESP32C6 OR IDF_TARGET STREQUAL "esp32c6")
     if(NOT IDF_TARGET STREQUAL "esp32c6")
         message(FATAL_ERROR "BLIP_BOARD_SEEED_XIAO_ESP32C6 requires IDF_TARGET=esp32c6")
     endif()

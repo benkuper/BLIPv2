@@ -8,6 +8,12 @@ param(
 
     [string] $DeviceOrigin = "http://192.168.4.1",
 
+    [string] $ExpectBoard = "",
+
+    [string] $ExpectAntenna = "",
+
+    [int] $ExpectPinCount = 0,
+
     [string] $Python = "python"
 )
 
@@ -77,7 +83,11 @@ try {
     Invoke-Netsh -Arguments @("wlan", "connect", "name=$DeviceSsid", "ssid=$DeviceSsid", "interface=$interface")
     Wait-ConnectedSsid -Ssid $DeviceSsid
     Wait-DeviceHttp
-    & $Python $testClient --origin $DeviceOrigin
+    $clientArguments = @($testClient, "--origin", $DeviceOrigin)
+    if ($ExpectBoard) { $clientArguments += @("--expect-board", $ExpectBoard) }
+    if ($ExpectAntenna) { $clientArguments += @("--expect-antenna", $ExpectAntenna) }
+    if ($ExpectPinCount -gt 0) { $clientArguments += @("--expect-pin-count", "$ExpectPinCount") }
+    & $Python @clientArguments
     if ($LASTEXITCODE -ne 0) { throw "LED network HIL client failed" }
 } catch {
     $offlineError = $_

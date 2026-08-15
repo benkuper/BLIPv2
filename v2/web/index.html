@@ -48,6 +48,19 @@
         <p id="notice" class="notice" role="status" hidden></p>
         <section id="controls" class="control-grid" aria-label="Device controls"></section>
 
+        <section class="firmware-panel" aria-labelledby="reservations-heading">
+          <div>
+            <p class="eyebrow">Board resources</p>
+            <h2 id="reservations-heading">Pin reservations</h2>
+            <p>Every board-declared pin is shown, including unavailable system pins and shared buses.</p>
+          </div>
+          <label class="search-field">
+            <span class="sr-only">Search pin reservations</span>
+            <input id="reservation-search" type="search" placeholder="Search pins, owners, buses, or reasons" />
+          </label>
+          <div id="reservations" aria-live="polite"></div>
+        </section>
+
         <section class="firmware-panel" aria-labelledby="firmware-heading">
           <div>
             <p class="eyebrow">Maintenance</p>

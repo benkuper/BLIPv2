@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <array>
+#include <charconv>
 #include <cstdio>
 #include <cstring>
 #include <limits>
@@ -113,7 +114,7 @@ void record_minimum(std::atomic<std::uint32_t>& value, std::uint32_t sample) noe
     }
 }
 
-class HttpChunkSink final : public TextSink {
+class HttpChunkSink final : public TextSink, public resources::SnapshotSink {
   public:
     explicit HttpChunkSink(httpd_req_t* request) noexcept : request_(request) {}
 
@@ -171,6 +172,129 @@ template <std::size_t Capacity>
     return true;
 }
 
+[[nodiscard]] bool json_string(std::string_view source, std::string_view key,
+                               std::string_view& value) noexcept {
+    std::array<char, 48> pattern{};
+    if (key.size() + 2U > pattern.size()) return false;
+    pattern[0] = '\"';
+    std::copy(key.begin(), key.end(), pattern.begin() + 1);
+    pattern[key.size() + 1U] = '\"';
+    const auto found = source.find({pattern.data(), key.size() + 2U});
+    if (found == std::string_view::npos) return false;
+    const auto colon = source.find(':', found + key.size() + 2U);
+    const auto opening = colon == std::string_view::npos ? colon : source.find('\"', colon + 1U);
+    const auto closing = opening == std::string_view::npos ? opening : source.find('\"', opening + 1U);
+    if (opening == std::string_view::npos || closing == std::string_view::npos) return false;
+    value = source.substr(opening + 1U, closing - opening - 1U);
+    return value.find_first_of("\\\"\r\n\0") == std::string_view::npos;
+}
+
+[[nodiscard]] bool json_u32(std::string_view source, std::string_view key,
+                            std::uint32_t& value) noexcept {
+    std::array<char, 48> pattern{};
+    if (key.size() + 2U > pattern.size()) return false;
+    pattern[0] = '\"';
+    std::copy(key.begin(), key.end(), pattern.begin() + 1);
+    pattern[key.size() + 1U] = '\"';
+    const auto found = source.find({pattern.data(), key.size() + 2U});
+    const auto colon = found == std::string_view::npos ? found : source.find(':', found + key.size() + 2U);
+    if (colon == std::string_view::npos) return false;
+    std::size_t cursor = colon + 1U;
+    while (cursor < source.size() && (source[cursor] == ' ' || source[cursor] == '\t')) ++cursor;
+    const auto parsed = std::from_chars(source.data() + cursor, source.data() + source.size(), value);
+    return parsed.ec == std::errc{};
+}
+
+[[nodiscard]] const core::ParameterDescriptor*
+resource_parameter(const core::RegistryView& registry, std::string_view owner,
+                   std::string_view& component, std::string_view& parameter) noexcept {
+    const auto separator = owner.rfind(':');
+    if (separator == std::string_view::npos) return nullptr;
+    component = owner.substr(0U, separator);
+    parameter = owner.substr(separator + 1U);
+    for (std::size_t index = 0; index < registry.component_count(); ++index) {
+        const auto& descriptor = registry.component_descriptor(index);
+        if (descriptor.id != component) continue;
+        const auto found = std::find_if(descriptor.parameters.begin(), descriptor.parameters.end(),
+                                        [parameter](const core::ParameterDescriptor& candidate) {
+                                            return candidate.id == parameter;
+                                        });
+        return found == descriptor.parameters.end() ? nullptr : &*found;
+    }
+    return nullptr;
+}
+
+class ResourceControlHooks final : public resources::TransactionHooks {
+  public:
+    ResourceControlHooks(core::ControlService& controls, std::string_view requester_component,
+                         std::string_view requester_parameter, std::string_view previous_component,
+                         std::string_view previous_parameter, std::int64_t target_gpio,
+                         resources::ReassignmentKind kind) noexcept
+        : controls_(&controls), requester_component_(requester_component),
+          requester_parameter_(requester_parameter), previous_component_(previous_component),
+          previous_parameter_(previous_parameter), target_gpio_(target_gpio), kind_(kind) {}
+
+    [[nodiscard]] core::Status run(resources::TransactionStage stage,
+                                   const resources::ReassignmentRequest&) noexcept override {
+        if (stage == resources::TransactionStage::stop_components) {
+            auto status = read(requester_component_, requester_parameter_, requester_old_);
+            return status ? read(previous_component_, previous_parameter_, previous_old_) : status;
+        }
+        if (stage == resources::TransactionStage::persist_settings) {
+            auto status = write(requester_component_, requester_parameter_, target_gpio_);
+            if (!status) return status;
+            requester_written_ = true;
+            const std::int64_t previous_value =
+                kind_ == resources::ReassignmentKind::swap ? requester_old_ : -1;
+            status = write(previous_component_, previous_parameter_, previous_value);
+            if (status) previous_written_ = true;
+            return status;
+        }
+        return core::Status::success();
+    }
+
+    void rollback(resources::TransactionStage, const resources::ReassignmentRequest&) noexcept override {
+        if (previous_written_) static_cast<void>(write(previous_component_, previous_parameter_, previous_old_));
+        if (requester_written_) static_cast<void>(write(requester_component_, requester_parameter_, requester_old_));
+    }
+
+  private:
+    [[nodiscard]] core::Status read(std::string_view component, std::string_view parameter,
+                                    std::int64_t& value) noexcept {
+        core::ControlResponse response{};
+        const auto status = controls_->execute(
+            {core::ControlOperation::read_parameter, component, parameter, {}}, response);
+        if (!status) return status;
+        if (response.value_count != 1U || response.values[0].type != core::ValueType::integer) {
+            return core::Status::failure({core::ErrorDomain::resource,
+                                          core::ErrorCode::validation_failed, component,
+                                          "resource.reassign", "pin-not-integer"});
+        }
+        value = response.values[0].integer;
+        return core::Status::success();
+    }
+    [[nodiscard]] core::Status write(std::string_view component, std::string_view parameter,
+                                     std::int64_t value) noexcept {
+        const core::ScalarValue scalar = core::ScalarValue::from_integer(value);
+        core::ControlResponse response{};
+        return controls_->execute(
+            {core::ControlOperation::write_parameter, component, parameter,
+             std::span<const core::ScalarValue>{&scalar, 1U}}, response);
+    }
+
+    core::ControlService* controls_{};
+    std::string_view requester_component_{};
+    std::string_view requester_parameter_{};
+    std::string_view previous_component_{};
+    std::string_view previous_parameter_{};
+    std::int64_t target_gpio_{};
+    std::int64_t requester_old_{};
+    std::int64_t previous_old_{};
+    resources::ReassignmentKind kind_{};
+    bool requester_written_{};
+    bool previous_written_{};
+};
+
 } // namespace
 
 const core::ComponentDescriptor EspOscQueryComponent::descriptor_{oscquery_descriptor()};
@@ -179,9 +303,11 @@ EspOscQueryComponent::EspOscQueryComponent(const core::RegistryView& registry,
                                            core::ControlService& controls,
                                            network::EspWifiComponent& wifi,
                                            storage::WebAssetStore& web_assets,
-                                           ota::UpdateService& updates) noexcept
+                                           ota::UpdateService& updates,
+                                           resources::DeviceBroker& resources,
+                                           resources::BoardManifest board) noexcept
     : registry_(&registry), controls_(&controls), wifi_(&wifi), web_assets_(&web_assets),
-      updates_(&updates),
+      updates_(&updates), resources_(&resources), board_(board),
       identity_{
           {device_id_.data(), device_id_.size() - 1U}, "BLIP V2", "BLIP V2", "0.1.0", kOscPort},
       udp_endpoint_(registry, controls, identity_),
@@ -369,6 +495,8 @@ esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
         return handle_asset_status(request);
     case HttpGetSurface::update_status:
         return handle_update_status(request);
+    case HttpGetSurface::resource_status:
+        return handle_resource_status(request);
     case HttpGetSurface::not_found:
         return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "unknown endpoint");
     case HttpGetSurface::oscquery:
@@ -387,6 +515,91 @@ esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
         return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "unknown OSCQuery query");
     }
     return status ? sink.finish() : ESP_FAIL;
+}
+
+esp_err_t EspOscQueryComponent::handle_resource_status(httpd_req_t* request) noexcept {
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    httpd_resp_set_hdr(request, "Access-Control-Allow-Origin", "*");
+    HttpChunkSink sink{request};
+    const auto status = resources::write_resource_snapshot(*resources_, board_, sink);
+    return status ? sink.finish() : ESP_FAIL;
+}
+
+esp_err_t EspOscQueryComponent::handle_resource_reassignment(httpd_req_t* request) noexcept {
+    std::array<char, 512> body{};
+    if (request->content_len == 0U || request->content_len >= body.size()) {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "invalid reassignment body");
+    }
+    std::size_t received_total = 0U;
+    while (received_total < request->content_len) {
+        const int received = httpd_req_recv(request, body.data() + received_total,
+                                            request->content_len - received_total);
+        if (received <= 0) {
+            return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "incomplete reassignment body");
+        }
+        received_total += static_cast<std::size_t>(received);
+    }
+    const std::string_view source{body.data(), received_total};
+    std::string_view operation{};
+    std::string_view requester{};
+    std::string_view previous_owner{};
+    std::string_view target_resource{};
+    std::uint32_t revision{};
+    if (!json_string(source, "operation", operation) ||
+        !json_string(source, "requester", requester) ||
+        !json_string(source, "previous_owner", previous_owner) ||
+        !json_string(source, "target_resource", target_resource) ||
+        !json_u32(source, "expected_revision", revision)) {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "invalid reassignment fields");
+    }
+    const auto kind = operation == "swap" ? resources::ReassignmentKind::swap
+                      : operation == "unassign-and-move"
+                          ? resources::ReassignmentKind::unassign_and_move
+                          : resources::ReassignmentKind::swap;
+    if (operation != "swap" && operation != "unassign-and-move") {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "invalid reassignment operation");
+    }
+    std::string_view requester_component{};
+    std::string_view requester_parameter{};
+    std::string_view previous_component{};
+    std::string_view previous_parameter{};
+    const auto* requester_descriptor = resource_parameter(
+        *registry_, requester, requester_component, requester_parameter);
+    const auto* previous_descriptor = resource_parameter(
+        *registry_, previous_owner, previous_component, previous_parameter);
+    const auto* target = resources_->find_resource(target_resource);
+    if (requester_descriptor == nullptr || previous_descriptor == nullptr || target == nullptr ||
+        !requester_descriptor->resource_selector.present ||
+        !previous_descriptor->resource_selector.present || target->gpio < 0 ||
+        (kind == resources::ReassignmentKind::swap &&
+         !requester_descriptor->resource_selector.supports_swap) ||
+        (kind == resources::ReassignmentKind::unassign_and_move &&
+         (!requester_descriptor->resource_selector.supports_move ||
+          !previous_descriptor->resource_selector.optional))) {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "reassignment not permitted");
+    }
+    const resources::ReassignmentRequest reassignment{
+        revision,
+        kind,
+        requester,
+        previous_owner,
+        target_resource,
+        requester_descriptor->resource_selector.required_capabilities,
+        previous_descriptor->resource_selector.required_capabilities,
+        previous_descriptor->resource_selector.optional,
+    };
+    ResourceControlHooks hooks{*controls_, requester_component, requester_parameter,
+                               previous_component, previous_parameter, target->gpio, kind};
+    const auto status = resources_->reassign(reassignment, hooks);
+    if (!status) {
+        if (status.error().detail == "stale-revision") {
+            httpd_resp_set_status(request, "409 Conflict");
+            return httpd_resp_sendstr(request, "stale-revision");
+        }
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "reassignment rejected");
+    }
+    return handle_resource_status(request);
 }
 
 esp_err_t EspOscQueryComponent::handle_update_status(httpd_req_t* request) noexcept {
@@ -656,6 +869,9 @@ esp_err_t EspOscQueryComponent::handle_http_root(httpd_req_t* request) noexcept 
         result = handle_asset_upload(request);
     } else if (request->method == HTTP_PUT && std::string_view{request->uri} == "/api/firmware") {
         result = handle_firmware_upload(request);
+    } else if (request->method == HTTP_POST &&
+               std::string_view{request->uri} == "/api/resources/reassign") {
+        result = handle_resource_reassignment(request);
     } else {
         result = handle_http_get(request);
     }

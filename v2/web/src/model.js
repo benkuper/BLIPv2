@@ -80,6 +80,20 @@ function normalizeRange(node) {
   return { values, minimum, maximum, step };
 }
 
+function normalizeResourceSelector(node) {
+  const source = node.BLIP_RESOURCE_SELECTOR;
+  if (!isRecord(source)) return null;
+  return {
+    class: text(source.CLASS),
+    requiredCapabilities: Number.isInteger(source.REQUIRED_CAPABILITIES)
+      ? source.REQUIRED_CAPABILITIES
+      : 0,
+    optional: source.OPTIONAL === true,
+    supportsSwap: source.SWAP === true,
+    supportsMove: source.MOVE === true,
+  };
+}
+
 function editorFor(control) {
   if (control.kind === "action") return "action";
   if (control.kind === "event" || !control.writable) return "readonly";
@@ -119,8 +133,9 @@ function normalizeControl(key, node, parentPath) {
     value,
     range: normalizeRange(node),
     unit: text(node.BLIP_UNIT),
+    resourceSelector: normalizeResourceSelector(node),
   };
-  control.editor = editorFor(control);
+  control.editor = control.resourceSelector?.class === "gpio" ? "pin" : editorFor(control);
   return control;
 }
 
@@ -151,8 +166,10 @@ export function buildControlModel(tree) {
       index.set(control.path, control);
     }
     if (controls.length > 0) {
+      const componentId = text(node.BLIP_COMPONENT_ID, path || key || "root");
+      for (const control of controls) control.resourceOwner = `${componentId}:${control.id}`;
       components.push({
-        id: text(node.BLIP_COMPONENT_ID, path || key || "root"),
+        id: componentId,
         path,
         label: text(node.DESCRIPTION, key || "Device"),
         schemaVersion: Number.isInteger(node.BLIP_SCHEMA_VERSION) ? node.BLIP_SCHEMA_VERSION : null,

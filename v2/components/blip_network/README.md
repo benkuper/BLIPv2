@@ -13,7 +13,8 @@ pending and is removed after a station-only connection succeeds.
 
 The persisted `antenna` parameter selects `board-default` (0), `onboard` (1), or
 `external` (2). A board build must declare its RF-switch GPIOs before explicit
-selection is accepted. `BLIP_BOARD_SEEED_XIAO_ESP32C6=ON` drives GPIO3 low to
+selection is accepted. The reference ESP32-C6 build selects the XIAO board automatically;
+`BLIP_BOARD_SEEED_XIAO_ESP32C6=ON` remains available for an explicit profile. It drives GPIO3 low to
 enable that board's switch and uses GPIO14 low/high for onboard/U.FL selection.
 
 Transport protocols that use the resulting IP service remain in their own components;

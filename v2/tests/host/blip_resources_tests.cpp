@@ -13,6 +13,10 @@ using blip::core::ResourceClass;
 using blip::core::ResourceRequest;
 using blip::resources::Broker;
 using blip::resources::ResourceSpec;
+using blip::resources::ReassignmentKind;
+using blip::resources::ReassignmentRequest;
+using blip::resources::TransactionHooks;
+using blip::resources::TransactionStage;
 
 constexpr std::array<std::string_view, 1> gpio0{"gpio.0"};
 constexpr std::array<std::string_view, 1> gpio1{"gpio.1"};
@@ -156,6 +160,83 @@ bool reservation_capacity_and_radio_conflict() {
     return true;
 }
 
+class Hooks final : public TransactionHooks {
+  public:
+    explicit Hooks(int fail_at = -1) noexcept : fail_at_(fail_at) {}
+    [[nodiscard]] blip::core::Status run(TransactionStage, const ReassignmentRequest&) noexcept override {
+        if (calls_++ == fail_at_) {
+            return blip::core::Status::failure({blip::core::ErrorDomain::storage,
+                                                ErrorCode::io_failed, "fixture", "transaction",
+                                                "injected"});
+        }
+        return blip::core::Status::success();
+    }
+    void rollback(TransactionStage, const ReassignmentRequest&) noexcept override { rolled_back_ = true; }
+    int calls_{};
+    bool rolled_back_{};
+  private:
+    int fail_at_{};
+};
+
+bool revisioned_atomic_reassignment() {
+    Broker<2, 2> broker{};
+    BLIP_CHECK(broker.add_resource({ResourceClass::gpio, "gpio.0", 0b11, 1, {}}));
+    BLIP_CHECK(broker.add_resource({ResourceClass::gpio, "gpio.1", 0b11, 1, {}}));
+    auto first = broker.acquire("component.first:pin", request(ResourceClass::gpio, "first", gpio0));
+    auto second = broker.acquire("component.second:pin", request(ResourceClass::gpio, "second", gpio1));
+    BLIP_CHECK(first && second);
+    const auto revision = broker.revision();
+    Hooks hooks{};
+    ReassignmentRequest swap{revision, ReassignmentKind::swap, "component.first:pin",
+                             "component.second:pin", "gpio.1", 0b01, 0b01, false};
+    BLIP_CHECK(broker.reassign(swap, hooks));
+    BLIP_CHECK(first.value().resource_id() == "gpio.1");
+    BLIP_CHECK(second.value().resource_id() == "gpio.0");
+    BLIP_CHECK(broker.revision() != revision);
+    BLIP_CHECK(!broker.reassign(swap, hooks));
+    return true;
+}
+
+bool failures_leave_leases_unchanged() {
+    for (int stage = 0; stage < 3; ++stage) {
+        Broker<2, 2> broker{};
+        BLIP_CHECK(broker.add_resource({ResourceClass::gpio, "gpio.0", 0b11, 1, {}}));
+        BLIP_CHECK(broker.add_resource({ResourceClass::gpio, "gpio.1", 0b11, 1, {}}));
+        auto first = broker.acquire("component.first:pin", request(ResourceClass::gpio, "first", gpio0));
+        auto second = broker.acquire("component.second:pin", request(ResourceClass::gpio, "second", gpio1));
+        BLIP_CHECK(first && second);
+        const auto revision = broker.revision();
+        Hooks hooks{stage};
+        const ReassignmentRequest move{revision, ReassignmentKind::unassign_and_move,
+                                       "component.first:pin", "component.second:pin", "gpio.1",
+                                       0b01, 0U, true};
+        BLIP_CHECK(!broker.reassign(move, hooks));
+        BLIP_CHECK(hooks.rolled_back_);
+        BLIP_CHECK(broker.revision() == revision);
+        BLIP_CHECK(first.value().resource_id() == "gpio.0");
+        BLIP_CHECK(second.value().resource_id() == "gpio.1");
+    }
+    return true;
+}
+
+bool required_owner_cannot_be_unassigned() {
+    Broker<2, 2> broker{};
+    BLIP_CHECK(broker.add_resource({ResourceClass::gpio, "gpio.0", 0b11, 1, {}}));
+    BLIP_CHECK(broker.add_resource({ResourceClass::gpio, "gpio.1", 0b11, 1, {}}));
+    auto first = broker.acquire("component.first:pin", request(ResourceClass::gpio, "first", gpio0));
+    auto second = broker.acquire("component.second:pin", request(ResourceClass::gpio, "second", gpio1));
+    BLIP_CHECK(first && second);
+    Hooks hooks{};
+    const ReassignmentRequest move{broker.revision(), ReassignmentKind::unassign_and_move,
+                                   "component.first:pin", "component.second:pin", "gpio.1",
+                                   0b01, 0U, false};
+    const auto status = broker.reassign(move, hooks);
+    BLIP_CHECK(!status);
+    BLIP_CHECK(status.error().detail == "required-setting");
+    BLIP_CHECK(hooks.calls_ == 0);
+    return true;
+}
+
 } // namespace
 
 int main() {
@@ -166,6 +247,9 @@ int main() {
         {"partial batch rollback", partial_batch_rolls_back},
         {"weak token release and reacquire", weak_token_release_and_reacquire},
         {"reservation capacity and radio conflict", reservation_capacity_and_radio_conflict},
+        {"revisioned atomic reassignment", revisioned_atomic_reassignment},
+        {"transaction failures leave leases unchanged", failures_leave_leases_unchanged},
+        {"required owner cannot be unassigned", required_owner_cannot_be_unassigned},
     };
     return run_tests(tests);
 }

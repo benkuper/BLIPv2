@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "m5stack-m5dial",
+  "target": "esp32s3",
+  "sources": ["https://docs.m5stack.com/en/core/M5Dial?id=pinmap", "https://github.com/m5stack/M5Unified"],
+  "pins": [
+    {"id":"gpio.13","label":"PORT.A SDA / GPIO13","gpio":13,"capabilities":["input","output","pwm","interrupt","open-drain","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.15","label":"PORT.A SCL / GPIO15","gpio":15,"capabilities":["input","output","pwm","interrupt","open-drain","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.2","label":"PORT.B / GPIO2","gpio":2,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.1","label":"PORT.B / GPIO1","gpio":1,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.21","label":"RGB LED / GPIO21","gpio":21,"capabilities":["output","pwm","rmt"],"electrical":"3.3V; onboard RGB LED"},
+    {"id":"gpio.3","label":"Buzzer / GPIO3","gpio":3,"capabilities":["output","pwm"],"electrical":"onboard buzzer","reserved_for":"system.buzzer","reason":"onboard-buzzer","selectable":false},
+    {"id":"gpio.4","label":"LCD RS / GPIO4","gpio":4,"capabilities":["output"],"electrical":"onboard display","reserved_for":"system.display","reason":"onboard-display","selectable":false},
+    {"id":"gpio.5","label":"LCD MOSI / GPIO5","gpio":5,"capabilities":["output"],"electrical":"onboard display","reserved_for":"system.display","reason":"onboard-display","selectable":false},
+    {"id":"gpio.6","label":"LCD SCK / GPIO6","gpio":6,"capabilities":["output"],"electrical":"onboard display","reserved_for":"system.display","reason":"onboard-display","selectable":false},
+    {"id":"gpio.7","label":"LCD CS / GPIO7","gpio":7,"capabilities":["output"],"electrical":"onboard display","reserved_for":"system.display","reason":"onboard-display","selectable":false},
+    {"id":"gpio.8","label":"LCD reset / RFID reset / GPIO8","gpio":8,"capabilities":["output"],"electrical":"onboard display and RFID","reserved_for":"system.display-rfid","reason":"onboard-shared-function","selectable":false},
+    {"id":"gpio.9","label":"LCD backlight / GPIO9","gpio":9,"capabilities":["output","pwm"],"electrical":"onboard display","reserved_for":"system.display","reason":"onboard-display","selectable":false},
+    {"id":"gpio.11","label":"Internal I2C SDA / GPIO11","gpio":11,"capabilities":["input","output","open-drain"],"electrical":"3.3V I2C","reserved_for":"bus.i2c.internal","reason":"internal-i2c-bus","bus":"i2c.internal","selectable":false},
+    {"id":"gpio.12","label":"Internal I2C SCL / GPIO12","gpio":12,"capabilities":["input","output","open-drain"],"electrical":"3.3V I2C","reserved_for":"bus.i2c.internal","reason":"internal-i2c-bus","bus":"i2c.internal","selectable":false},
+    {"id":"gpio.14","label":"Touch interrupt / GPIO14","gpio":14,"capabilities":["input","interrupt"],"electrical":"onboard touch","reserved_for":"system.touch","reason":"onboard-touch","selectable":false},
+    {"id":"gpio.40","label":"Encoder B / GPIO40","gpio":40,"capabilities":["input","interrupt"],"electrical":"onboard encoder","reserved_for":"system.encoder","reason":"onboard-encoder","selectable":false},
+    {"id":"gpio.41","label":"Encoder A / GPIO41","gpio":41,"capabilities":["input","interrupt"],"electrical":"onboard encoder","reserved_for":"system.encoder","reason":"onboard-encoder","selectable":false},
+    {"id":"gpio.46","label":"Power hold / GPIO46","gpio":46,"capabilities":["output"],"electrical":"power latch","reserved_for":"system.power","reason":"power-hold-critical","selectable":false},
+    {"id":"gpio.0","label":"Boot button / GPIO0","gpio":0,"capabilities":["input","interrupt"],"electrical":"boot strap","reserved_for":"system.boot","reason":"boot-strap-pin","selectable":false},
+    {"id":"gpio.19","label":"USB D- / GPIO19","gpio":19,"capabilities":[],"electrical":"USB","reserved_for":"system.usb","reason":"native-usb","selectable":false},
+    {"id":"gpio.20","label":"USB D+ / GPIO20","gpio":20,"capabilities":[],"electrical":"USB","reserved_for":"system.usb","reason":"native-usb","selectable":false}
+  ],
+  "buses": [{"id":"i2c.internal","type":"i2c","sda":"gpio.11","scl":"gpio.12","speed_hz":400000,"members":["system.rtc@0x51","system.rfid@0x28","system.touch@0x38"]}]
+}

@@ -68,6 +68,96 @@ Codex must enforce these in every implementation PR:
 5. Hardware-specific behavior stays behind capability interfaces. Application components must not directly depend on target-specific ESP-IDF drivers.
 6. Every persisted structure and wire protocol is versioned from its first commit.
 
+## LED output transport recommendations
+
+These recommendations are mandatory inputs to LED work. They are provisional
+selection guidance until the qualification measurements below establish the
+actual crossover points. A functional vertical slice using one peripheral must
+not silently make that peripheral the production default.
+
+### Architecture and selection rules
+
+1. Keep pixel/protocol encoding independent from the hardware transport:
+
+   * protocol encoders produce WS2812/SK6812 pulse data, APA102/SK9822 frames,
+     HD108 frames, or other versioned protocol data;
+   * transports submit that data through RMT, serial SPI, or a parallel-wave
+     engine;
+   * DMA is an offload capability of a transport, not a separate transport.
+2. Expose one target-neutral parallel-wave capability. Its target adapters are:
+
+   * ESP32: I2S LCD mode with DMA;
+   * ESP32-S3: LCD_CAM with GDMA, not the ordinary audio I2S mode;
+   * ESP32-C6: PARLIO with GDMA.
+3. The output-driver ABI must advertise protocol/pixel formats, lane count,
+   shared-timing constraints, physical minimum frame period, queue depth,
+   asynchronous completion, DMA support, synchronization/skew guarantees,
+   maximum qualified frame size, staging/internal-memory cost, and every
+   claimed GPIO, bus, peripheral and DMA resource.
+4. `auto` backend selection must be deterministic, expose the selected backend
+   and reason in diagnostics, and allow a profile to force a backend for
+   qualification or troubleshooting. Measured target/length/lane crossover
+   points belong in versioned capability data rather than scattered conditionals.
+5. Preallocate all descriptors, queues and staging buffers before render start.
+   Prefer internal DMA-capable memory for active transfers; use PSRAM only where
+   the target-specific DMA/cache behavior has passed the same stress tests.
+6. Do not claim a performance gain that exceeds the wire protocol's physical
+   limit. For example, an 800 kHz 24-bit one-wire lane takes approximately
+   `pixels * 30 us + reset time`; parallel lanes improve aggregate throughput,
+   not the frame time of one lane.
+7. Production selection prioritizes zero corrupt frames and zero missed valid
+   deadlines under Gate C load before CPU percentage, memory use, peripheral
+   economy or headline throughput.
+
+### Provisional backend recommendations
+
+| Situation | ESP32 | ESP32-S3 | ESP32-C6 |
+| --- | --- | --- | --- |
+| One short one-wire strip | RMT | RMT | RMT |
+| One long one-wire strip under Wi-Fi/radio load | SPI waveform encoding with DMA | RMT with DMA | PARLIO width 1 with GDMA; SPI with DMA fallback |
+| Two to four identical one-wire lanes | Compare RMT with I2S parallel | Compare RMT DMA with LCD_CAM | PARLIO |
+| Many identical one-wire lanes | I2S LCD-mode parallel DMA | LCD_CAM parallel GDMA | PARLIO parallel GDMA |
+| One clocked APA102/SK9822/HD108-family strip | SPI with DMA | SPI with DMA | SPI with DMA |
+| Several clocked strips sharing timing and clock | Compare multiline SPI with the parallel-wave engine | Compare multiline SPI with LCD_CAM | Compare multiline SPI with PARLIO |
+| Lanes requiring independent timing/protocols | Independent RMT/SPI resources within measured limits | Independent RMT/SPI resources within measured limits | Independent RMT/SPI resources within the smaller C6 resource set |
+| More lanes or timing groups than the SoC can guarantee | External RP2040/FPGA/CPLD output engine | External RP2040/FPGA/CPLD output engine | External RP2040/FPGA/CPLD output engine |
+
+RMT remains the economical and flexible baseline for short strips and differing
+lane timings. It is not presumed best for long interrupt-refilled transfers on
+ESP32 or C6. SPI is the native choice for clocked protocols and a candidate for
+robust DMA-backed one-wire waveform generation, but a no-chip-select LED strip
+normally reserves the entire bus. The parallel-wave engine is the aggregate-
+throughput choice when lanes can share protocol timing and frame cadence; it
+also consumes the whole peripheral and potentially many GPIOs.
+
+### Mandatory transport qualification before PR 3.4
+
+Build a disposable HIL benchmark harness and record an ADR before production LED
+transport code. Test RMT, RMT DMA where supported, SPI waveform encoding with
+and without DMA, native clocked SPI, multiline SPI, and the applicable parallel
+adapter on each target. Use an external capture/logic fixture where target
+loopback cannot prove every lane.
+
+The sweep must include:
+
+* 1, 2, 4, 8 and 16 lanes where the target and board expose them;
+* 1, 32, 256, 512 and 1,024 pixels per lane, plus the largest supported profile;
+* WS2812/SK6812-class one-wire timing and representative APA102/SK9822/HD108
+  clocked frames;
+* idle, saturated bidirectional Wi-Fi, settings/metrics queries, flash writes,
+  OTA/cache-disable windows and applicable radio coexistence;
+* internal-memory staging and any proposed PSRAM/DMA path;
+* mixed peripheral pressure from the resource broker's LED-heavy and full
+  profiles.
+
+Record CPU and encoder cycles per pixel, ISR count and worst refill latency,
+internal/DMA/PSRAM usage, staging expansion, submission latency, sustainable
+frame rate, missed deadlines, corrupt waveforms, lane start skew, queue behavior,
+and claimed peripheral/GPIO resources. The ADR must select winners and measured
+crossover points per target/situation, document rejected approaches, and define
+the short qualification run that every backend must pass before the full Gate C
+soak. Deviating from the provisional table requires measurements in that ADR.
+
 ## Implementation roadmap
 
 Each numbered item should normally become one PR. Large component-parity items can become an epic containing one PR per component.
@@ -104,7 +194,7 @@ This does not require faithfully reproducing V1 bugs or undocumented internal co
 | 2.4 | Implement structured logging, runtime log levels, metrics, reset-cause reporting, coredumps and safe mode. | Boot loops enter a diagnosable recovery mode.                                          |
 | 2.5 | Implement the common transport envelope and Serial/USB transport.                                          | Parameters and actions can be controlled through a host test utility.                  |
 | 2.6 | Implement Wi-Fi station/AP management and serial/SoftAP provisioning.                                      | A blank device can be configured without reflashing.                                   |
-| 2.7 | Implement OSC UDP and OSCQuery HTTP/WebSocket discovery.                                                   | The hierarchy is generated exclusively from the registry and passes protocol fixtures. |
+| 2.7 | Implement OSC UDP and OSCQuery HTTP/WebSocket discovery, including mDNS advertisements for `_osc._udp` and `_oscjson._tcp`. | The hierarchy is generated exclusively from the registry, passes protocol fixtures, and is discoverable through DNS-SD/mDNS. |
 
 ### Milestone 3 — First complete vertical slice
 
@@ -113,23 +203,24 @@ This does not require faithfully reproducing V1 bugs or undocumented internal co
 | 3.1 | Build the schema-driven web application shell.                               | Adding a test component requires no hand-written control panel.                  |
 | 3.2 | Add filesystem management and separately updatable web assets.               | UI assets can be replaced without reflashing the application partition.          |
 | 3.3 | Implement A/B OTA, rollback, image/profile validation and boot confirmation. | Failed and interrupted updates recover automatically.                            |
-| 3.4 | Add the first LED backend—single-strip WS2812/SK6812 through native RMT.    | Web and OSC control a real strip on each reference target.                       |
+| 3.4 | After the transport qualification ADR, add the first functional LED backend—single-strip WS2812/SK6812 through native RMT. RMT is a portable vertical-slice baseline, not the production-backend decision. | Web and OSC control a real strip on each reference target; captured output is byte/timing-correct and the qualification ADR is linked. |
 | 3.5 | Add browser installation using esptool-js/Launchpad-compatible manifests.    | A factory device can be flashed, provisioned, opened and updated from a browser. |
+| 3.6 | Add broker-backed pin selectors and a complete pin/reservation inspector. Every pin-valued control lists all board-declared pins with its current owner and compatibility; component-owned conflicts offer explicit atomic swap or unassign-and-move operations, while system/critical reservations remain visible but unavailable. Model I2C pins as a shared bus assignment rather than conflicting per-device claims. | The UI cannot silently double-book an exclusive pin; stale or invalid changes roll back, all reservations remain inspectable, and compatible I2C members share one clearly identified bus without false conflicts. |
 
-**Gate B:** browser install → Wi-Fi setup → OSCQuery discovery → LED control → settings save → OTA rollback works end to end.
+**Gate B:** browser install → Wi-Fi setup → OSCQuery discovery → conflict-safe pin assignment/reservation inspection → LED control → settings save → OTA rollback works end to end.
 
 ### Milestone 4 — Production LED engine
 
 | PR  | Work                                                                                 | Acceptance                                                                                          |
 | --- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| 4.1 | Implement the pixel surface and output-driver ABI.                                   | Drivers advertise pixel format, timing, maximum length, buffering and synchronization capabilities. |
+| 4.1 | Implement the pixel surface, protocol-encoder boundary and output-driver ABI.        | Drivers advertise formats, lane/timing constraints, physical frame period, buffering, DMA, synchronization, qualified limits, memory and claimed resources. |
 | 4.2 | Implement the compositor and`stream`, `playback`, `script`, `system` layers. | Layer priority, opacity and blend behavior have deterministic host tests.                           |
 | 4.3 | Add linear-light color transforms, channel ordering, calibration and correction.     | Known color vectors produce golden outputs.                                                         |
-| 4.4 | Add asynchronous frame submission, buffer pooling and deadline metrics.              | The render task performs zero allocations after startup.                                            |
-| 4.5 | Add native clocked-strip support: APA102/SK9822, HD108 and compatible protocols.     | Protocol analyzer or loopback fixtures verify frame layout and timing.                              |
-| 4.6 | Add optional parallel output and an optional FastLED compatibility backend.          | Native and compatibility backends use the same output ABI.                                          |
+| 4.4 | Add asynchronous frame submission, preallocated DMA/staging pools and deadline metrics. | The render task performs zero allocations after startup; overload and completion behavior are bounded and observable. |
+| 4.5 | Add native SPI-DMA clocked-strip support: APA102/SK9822, HD108 and compatible protocols. | Protocol analyzer or loopback fixtures verify frame layout, clock limits and timing.                 |
+| 4.6 | Implement the qualified production transport set and deterministic selector: RMT/RMT-DMA, SPI-encoded one-wire, target-neutral parallel-wave adapters, and an optional FastLED compatibility backend. This may be an epic with one reviewable PR per transport. | Each selected backend passes its ADR qualification range; `auto` reports its reason, forced selection is testable, resource conflicts fail cleanly, and every backend uses the same output ABI. |
 | 4.7 | Implement streaming and playback, including legacy import.                           | Network streaming does not block LED output; corrupted playback files fail safely.                  |
-| 4.8 | Add Art-Net/DMX compatibility, followed by optional E1.31/DDP components.            | Each is independently removable from minimal builds.                                                |
+| 4.8 | Add Art-Net/DMX compatibility with Art-Net node advertisement/discovery, followed by optional E1.31/DDP components. | An Art-Net controller can discover the node; each compatibility component is independently removable from minimal builds. |
 
 **Gate C:** sustained Wi-Fi traffic cannot corrupt LED timing, exhaust queues or cause monotonic heap loss.
 

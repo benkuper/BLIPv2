@@ -2,6 +2,7 @@ import { decodeOscMessage, encodeOscMessage } from "./osc.js";
 
 const MAX_HOST_INFO_BYTES = 16 * 1024;
 const MAX_TREE_BYTES = 256 * 1024;
+const MAX_RESOURCE_BYTES = 128 * 1024;
 
 function deviceRoot(value) {
   const fallback = globalThis.location?.href ?? "http://localhost/";
@@ -44,14 +45,33 @@ export class DeviceClient {
     hostUrl.search = "HOST_INFO";
     const treeUrl = new URL(this.root);
     treeUrl.search = includeConfig ? "config=1" : "config=0";
-    const [hostResponse, treeResponse] = await Promise.all([
+    const resourceUrl = new URL("/api/resources", this.root);
+    const [hostResponse, treeResponse, resourceResponse] = await Promise.all([
       this.fetchImpl(hostUrl, { cache: "no-store" }),
       this.fetchImpl(treeUrl, { cache: "no-store" }),
+      this.fetchImpl(resourceUrl, { cache: "no-store" }),
     ]);
     return {
       host: await boundedJson(hostResponse, MAX_HOST_INFO_BYTES),
       tree: await boundedJson(treeResponse, MAX_TREE_BYTES),
+      resources: await boundedJson(resourceResponse, MAX_RESOURCE_BYTES),
     };
+  }
+
+  async reassign(request) {
+    const response = await this.fetchImpl(new URL("/api/resources/reassign", this.root), {
+      method: "POST",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+    if (response.status === 409) {
+      const error = new Error("Pin reservations changed; review the refreshed owners");
+      error.code = "stale-revision";
+      throw error;
+    }
+    if (!response.ok) throw new Error(`Device rejected reassignment (HTTP ${response.status})`);
+    return boundedJson(response, MAX_RESOURCE_BYTES);
   }
 
   open({ onMessage, onState, onError } = {}) {

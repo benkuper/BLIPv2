@@ -19,6 +19,7 @@ RESOURCE_CLASSES = {
     "gpio", "rmt", "spi", "i2c", "uart", "timer", "dma", "internal_memory", "psram", "radio"
 }
 OWNERSHIP_MODES = {"exclusive", "shared-read", "bus-member", "multiplexed"}
+PIN_CAPABILITIES = {"input", "output", "adc", "pwm", "interrupt", "open-drain", "rmt"}
 
 
 class ManifestError(ValueError):
@@ -174,6 +175,48 @@ def check_fixture(name: str, should_pass: bool, expected_text: str = "") -> None
     print(f"PASS resource manifest: {name}")
 
 
+def validate_board(path: Path) -> None:
+    document = load_manifest(path)
+    require_keys(document, {"schema_version", "id", "target", "sources", "pins"},
+                 {"schema_version", "id", "target", "sources", "pins", "antenna", "buses"}, path.as_posix())
+    require(document["schema_version"] == 1, f"{path}: unsupported board schema")
+    require(document["target"] in {"esp32", "esp32s3", "esp32c6"}, f"{path}: invalid target")
+    require(isinstance(document["sources"], list) and document["sources"] and
+            all(isinstance(source, str) and source.startswith("https://")
+                for source in document["sources"]), f"{path}: authoritative sources required")
+    require(isinstance(document["pins"], list) and document["pins"], f"{path}: pins required")
+    ids: set[str] = set()
+    gpios: set[int] = set()
+    by_gpio: dict[int, dict[str, Any]] = {}
+    for index, pin in enumerate(document["pins"]):
+        context = f"{path}: pin[{index}]"
+        require(isinstance(pin, dict), f"{context}: must be an object")
+        require_keys(pin, {"id", "label", "gpio", "capabilities", "electrical"},
+                     {"id", "label", "gpio", "capabilities", "electrical", "reserved_for",
+                      "reason", "bus", "selectable"}, context)
+        require(isinstance(pin["id"], str) and ID_PATTERN.fullmatch(pin["id"]),
+                f"{context}: invalid id")
+        require(pin["id"] not in ids, f"{context}: duplicate id")
+        require(isinstance(pin["gpio"], int) and pin["gpio"] >= 0, f"{context}: invalid gpio")
+        require(pin["gpio"] not in gpios, f"{context}: duplicate gpio")
+        require(isinstance(pin["capabilities"], list) and
+                set(pin["capabilities"]).issubset(PIN_CAPABILITIES),
+                f"{context}: invalid capability")
+        if pin.get("selectable") is False:
+            require(bool(pin.get("reserved_for")) and bool(pin.get("reason")),
+                    f"{context}: unavailable pin needs owner and reason")
+        ids.add(pin["id"])
+        gpios.add(pin["gpio"])
+        by_gpio[pin["gpio"]] = pin
+    if document["target"] == "esp32c6":
+        require(document.get("antenna") == "onboard", f"{path}: reference C6 must use onboard antenna")
+        require(by_gpio[3].get("reason") == "onboard-antenna-rf-switch-power",
+                f"{path}: GPIO3 must reserve RF switch power")
+        require(by_gpio[14].get("reason") == "onboard-antenna-selected",
+                f"{path}: GPIO14 must reserve onboard antenna selection")
+    print(f"PASS board manifest: {path.name} ({len(ids)} pins)")
+
+
 def main() -> int:
     if len(sys.argv) > 1:
         for argument in sys.argv[1:]:
@@ -188,7 +231,9 @@ def main() -> int:
     check_fixture("valid.json", True)
     check_fixture("conflict-exclusive.json", False, "feature.button")
     check_fixture("conflict-reserved.json", False, "system.flash")
-    print("Resource manifest validation passed (4 checks)")
+    for board in sorted((ROOT / "v2" / "boards").glob("*.json")):
+        validate_board(board)
+    print("Resource and board manifest validation passed")
     return 0
 
 

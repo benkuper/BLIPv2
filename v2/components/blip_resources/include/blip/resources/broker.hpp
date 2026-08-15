@@ -19,6 +19,45 @@ struct ResourceSpec {
     std::uint32_t capabilities{};
     std::uint32_t capacity{1};
     std::string_view reserved_for{};
+    std::string_view label{};
+    std::int16_t gpio{-1};
+    std::string_view electrical{};
+    std::string_view reason{};
+    std::string_view bus{};
+    bool selectable{true};
+};
+
+struct ClaimView {
+    std::string_view resource_id{};
+    std::string_view owner{};
+    std::string_view role{};
+    core::OwnershipMode mode{core::OwnershipMode::exclusive};
+    std::uint32_t member_key{};
+    bool setting_optional{};
+    bool reboot_required{};
+};
+
+enum class ReassignmentKind : std::uint8_t { swap, unassign_and_move };
+enum class TransactionStage : std::uint8_t { stop_components, persist_settings, restart_components };
+
+struct ReassignmentRequest {
+    std::uint32_t expected_revision{};
+    ReassignmentKind kind{ReassignmentKind::swap};
+    std::string_view requester{};
+    std::string_view previous_owner{};
+    std::string_view target_resource{};
+    std::uint32_t requester_capabilities{};
+    std::uint32_t previous_owner_capabilities{};
+    bool previous_owner_releasable{};
+};
+
+class TransactionHooks {
+  public:
+    virtual ~TransactionHooks() = default;
+    [[nodiscard]] virtual core::Status run(TransactionStage stage,
+                                           const ReassignmentRequest& request) noexcept = 0;
+    virtual void rollback(TransactionStage last_completed,
+                          const ReassignmentRequest& request) noexcept = 0;
 };
 
 template <std::size_t MaxResources, std::size_t MaxLeases> class Broker {
@@ -169,11 +208,15 @@ template <std::size_t MaxResources, std::size_t MaxLeases> class Broker {
         claim.active = true;
         claim.resource_index = selected;
         claim.owner = owner;
+        claim.role = request.logical_name;
         claim.mode = request.ownership;
         claim.amount = request.amount;
         claim.member_key = request.member_key;
         claim.feature_mask = request.feature_mask;
         claim.incompatible_features = request.incompatible_features;
+        claim.setting_optional = request.setting_optional;
+        claim.reboot_required = request.reboot_required;
+        advance_revision();
         return core::Result<Lease>::success(Lease{this, claim_index, claim.generation});
     }
 
@@ -215,17 +258,107 @@ template <std::size_t MaxResources, std::size_t MaxLeases> class Broker {
         return count;
     }
 
+    [[nodiscard]] std::uint32_t revision() const noexcept { return revision_; }
+
+    [[nodiscard]] const ResourceSpec* find_resource(std::string_view id) const noexcept {
+        const auto index = resource_by_id(id);
+        return index == MaxResources ? nullptr : &resources_[index];
+    }
+
+    template <typename Visitor> void visit_resources(Visitor&& visitor) const noexcept {
+        for (const auto& resource : resources_) {
+            visitor(resource);
+        }
+    }
+
+    template <typename Visitor> void visit_claims(Visitor&& visitor) const noexcept {
+        for (const auto& claim : claims_) {
+            if (!claim.active) {
+                continue;
+            }
+            visitor(ClaimView{resources_[claim.resource_index].id, claim.owner, claim.role,
+                              claim.mode, claim.member_key, claim.setting_optional,
+                              claim.reboot_required});
+        }
+    }
+
+    [[nodiscard]] core::Status reassign(const ReassignmentRequest& request,
+                                        TransactionHooks& hooks) noexcept {
+        if (request.expected_revision != revision_) {
+            return failure(core::ErrorCode::invalid_state, request.requester, "broker.reassign",
+                           "stale-revision");
+        }
+        const std::size_t requester_claim = claim_for_owner(request.requester);
+        const std::size_t previous_claim = claim_for_owner(request.previous_owner);
+        const std::size_t target = resource_by_id(request.target_resource);
+        if (requester_claim == MaxLeases || previous_claim == MaxLeases ||
+            target == MaxResources || claims_[previous_claim].resource_index != target ||
+            requester_claim == previous_claim) {
+            return failure(core::ErrorCode::validation_failed, request.requester,
+                           "broker.reassign", "owner-or-target-changed");
+        }
+        const std::size_t requester_source = claims_[requester_claim].resource_index;
+        if (!resources_[target].selectable || !resources_[target].reserved_for.empty() ||
+            (resources_[target].capabilities & request.requester_capabilities) !=
+                request.requester_capabilities) {
+            return failure(core::ErrorCode::resource_unavailable, request.requester,
+                           "broker.reassign", resources_[target].reason);
+        }
+        if (request.kind == ReassignmentKind::swap) {
+            if (!resources_[requester_source].selectable ||
+                (resources_[requester_source].capabilities &
+                 request.previous_owner_capabilities) != request.previous_owner_capabilities) {
+                return failure(core::ErrorCode::resource_unavailable, request.previous_owner,
+                               "broker.reassign", "swap-source-incompatible");
+            }
+        } else if (!request.previous_owner_releasable) {
+            return failure(core::ErrorCode::validation_failed, request.previous_owner,
+                           "broker.reassign", "required-setting");
+        }
+
+        auto status = hooks.run(TransactionStage::stop_components, request);
+        if (!status) {
+            hooks.rollback(TransactionStage::stop_components, request);
+            return status;
+        }
+        const Claim previous_before = claims_[previous_claim];
+        claims_[requester_claim].resource_index = target;
+        if (request.kind == ReassignmentKind::swap) {
+            claims_[previous_claim].resource_index = requester_source;
+        } else {
+            claims_[previous_claim].active = false;
+            claims_[previous_claim].owner = {};
+            claims_[previous_claim].role = {};
+            claims_[previous_claim].amount = 0;
+        }
+        for (const auto stage : {TransactionStage::persist_settings,
+                                 TransactionStage::restart_components}) {
+            status = hooks.run(stage, request);
+            if (!status) {
+                claims_[requester_claim].resource_index = requester_source;
+                claims_[previous_claim] = previous_before;
+                hooks.rollback(stage, request);
+                return status;
+            }
+        }
+        advance_revision();
+        return core::Status::success();
+    }
+
   private:
     struct Claim {
         bool active{};
         std::uint32_t generation{};
         std::size_t resource_index{MaxResources};
         std::string_view owner{};
+        std::string_view role{};
         core::OwnershipMode mode{core::OwnershipMode::exclusive};
         std::uint32_t amount{};
         std::uint32_t member_key{};
         std::uint32_t feature_mask{};
         std::uint32_t incompatible_features{};
+        bool setting_optional{};
+        bool reboot_required{};
     };
 
     struct Compatibility {
@@ -285,6 +418,24 @@ template <std::size_t MaxResources, std::size_t MaxLeases> class Broker {
         return MaxLeases;
     }
 
+    [[nodiscard]] std::size_t claim_for_owner(std::string_view owner) const noexcept {
+        for (std::size_t index = 0; index < MaxLeases; ++index) {
+            if (claims_[index].active && claims_[index].owner == owner) {
+                return index;
+            }
+        }
+        return MaxLeases;
+    }
+
+    [[nodiscard]] std::size_t resource_by_id(std::string_view id) const noexcept {
+        for (std::size_t index = 0; index < resources_.size(); ++index) {
+            if (resources_[index].id == id) {
+                return index;
+            }
+        }
+        return MaxResources;
+    }
+
     [[nodiscard]] bool token_valid(std::size_t claim_index,
                                    std::uint32_t generation) const noexcept {
         return claim_index < MaxLeases && claims_[claim_index].active &&
@@ -295,7 +446,16 @@ template <std::size_t MaxResources, std::size_t MaxLeases> class Broker {
         if (token_valid(claim_index, generation)) {
             claims_[claim_index].active = false;
             claims_[claim_index].owner = {};
+            claims_[claim_index].role = {};
             claims_[claim_index].amount = 0;
+            advance_revision();
+        }
+    }
+
+    void advance_revision() noexcept {
+        ++revision_;
+        if (revision_ == 0U) {
+            ++revision_;
         }
     }
 
@@ -324,6 +484,7 @@ template <std::size_t MaxResources, std::size_t MaxLeases> class Broker {
     core::FixedVector<ResourceSpec, MaxResources> resources_{};
     std::array<Claim, MaxLeases> claims_{};
     bool inventory_closed_{};
+    std::uint32_t revision_{1U};
 };
 
 } // namespace blip::resources

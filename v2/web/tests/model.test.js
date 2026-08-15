@@ -131,6 +131,20 @@ test("a new registry component needs no component-specific UI code", () => {
   assert.equal(model.index.get("/motion/sensitivity").editor, "number");
 });
 
+test("resource metadata specializes a generic parameter into a pin selector", () => {
+  const tree = registryTree();
+  tree.CONTENTS.lights.CONTENTS.pin = leaf("/lights/pin", "Data pin", {
+    TYPE: "i",
+    VALUE: [21],
+    BLIP_KIND: "parameter",
+    BLIP_RESOURCE_SELECTOR: { CLASS: "gpio", REQUIRED_CAPABILITIES: 0x42, OPTIONAL: false, SWAP: true, MOVE: true },
+  });
+  const control = buildControlModel(tree).index.get("/lights/pin");
+  assert.equal(control.editor, "pin");
+  assert.equal(control.resourceOwner, "demo.lights:pin");
+  assert.equal(control.resourceSelector.requiredCapabilities, 0x42);
+});
+
 test("legacy OSCQuery leaves retain useful fallback behavior", () => {
   const tree = registryTree();
   tree.CONTENTS.legacy = {

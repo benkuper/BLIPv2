@@ -53,6 +53,30 @@ struct NumericBounds {
     double step{};
 };
 
+enum class ResourceClass : std::uint8_t {
+    gpio,
+    rmt,
+    spi,
+    i2c,
+    uart,
+    timer,
+    dma,
+    internal_memory,
+    psram,
+    radio,
+};
+
+enum class OwnershipMode : std::uint8_t { exclusive, shared_read, bus_member, multiplexed };
+
+struct ResourceSelectorDescriptor {
+    bool present{};
+    ResourceClass resource_class{ResourceClass::gpio};
+    std::uint32_t required_capabilities{};
+    bool optional{};
+    bool supports_swap{};
+    bool supports_move{};
+};
+
 struct FieldDescriptor {
     std::string_view id{};
     ValueType type{ValueType::integer};
@@ -68,6 +92,7 @@ struct ParameterDescriptor {
     ScalarValue default_value{};
     NumericBounds bounds{};
     std::string_view unit{};
+    ResourceSelectorDescriptor resource_selector{};
 };
 
 struct LegacyEnumValue {
@@ -105,21 +130,6 @@ struct DiagnosticDescriptor {
     std::string_view unit{};
 };
 
-enum class ResourceClass : std::uint8_t {
-    gpio,
-    rmt,
-    spi,
-    i2c,
-    uart,
-    timer,
-    dma,
-    internal_memory,
-    psram,
-    radio,
-};
-
-enum class OwnershipMode : std::uint8_t { exclusive, shared_read, bus_member, multiplexed };
-
 struct ResourceRequest {
     ResourceClass resource_class{ResourceClass::gpio};
     std::string_view logical_name{};
@@ -131,6 +141,8 @@ struct ResourceRequest {
     std::uint32_t feature_mask{};
     std::uint32_t incompatible_features{};
     bool live_reacquire{};
+    bool setting_optional{};
+    bool reboot_required{};
 };
 
 struct SettingsDescriptor {

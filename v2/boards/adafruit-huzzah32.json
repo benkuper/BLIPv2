@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "adafruit-huzzah32",
+  "target": "esp32",
+  "sources": ["https://learn.adafruit.com/adafruit-huzzah32-esp32-feather/pinouts"],
+  "pins": [
+    {"id":"gpio.26","label":"A0 / GPIO26","gpio":26,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.25","label":"A1 / GPIO25","gpio":25,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.34","label":"A2 / GPIO34","gpio":34,"capabilities":["input","adc","interrupt"],"electrical":"3.3V input-only"},
+    {"id":"gpio.39","label":"A3 / GPIO39","gpio":39,"capabilities":["input","adc","interrupt"],"electrical":"3.3V input-only"},
+    {"id":"gpio.36","label":"A4 / GPIO36","gpio":36,"capabilities":["input","adc","interrupt"],"electrical":"3.3V input-only"},
+    {"id":"gpio.4","label":"A5 / GPIO4","gpio":4,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.21","label":"GPIO21","gpio":21,"capabilities":["input","output","pwm","interrupt","open-drain","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.13","label":"GPIO13 / red LED","gpio":13,"capabilities":["input","output","pwm","interrupt","rmt"],"electrical":"3.3V; onboard LED load"},
+    {"id":"gpio.12","label":"GPIO12","gpio":12,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V; boot strap","reserved_for":"system.boot","reason":"boot-strap-pin","selectable":false},
+    {"id":"gpio.27","label":"GPIO27","gpio":27,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.33","label":"GPIO33","gpio":33,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.15","label":"GPIO15","gpio":15,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V; boot strap","reserved_for":"system.boot","reason":"boot-strap-pin","selectable":false},
+    {"id":"gpio.32","label":"GPIO32","gpio":32,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.14","label":"GPIO14","gpio":14,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.35","label":"A13 / battery monitor","gpio":35,"capabilities":["input","adc"],"electrical":"3.3V input-only; divided VBAT","reserved_for":"system.battery","reason":"onboard-battery-divider","selectable":false}
+  ]
+}

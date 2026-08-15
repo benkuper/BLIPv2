@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "seeed-xiao-esp32c6-chip-antenna",
+  "target": "esp32c6",
+  "sources": ["https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/"],
+  "antenna": "onboard",
+  "pins": [
+    {"id":"gpio.0","label":"D0 / GPIO0","gpio":0,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.1","label":"D1 / GPIO1","gpio":1,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.2","label":"D2 / GPIO2","gpio":2,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.21","label":"D3 / GPIO21","gpio":21,"capabilities":["input","output","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.22","label":"D4 / SDA / GPIO22","gpio":22,"capabilities":["input","output","pwm","interrupt","open-drain","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.23","label":"D5 / SCL / GPIO23","gpio":23,"capabilities":["input","output","pwm","interrupt","open-drain","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.16","label":"D6 / TX / GPIO16","gpio":16,"capabilities":["input","output","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.17","label":"D7 / RX / GPIO17","gpio":17,"capabilities":["input","output","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.19","label":"D8 / SCK / GPIO19","gpio":19,"capabilities":["input","output","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.20","label":"D9 / MISO / GPIO20","gpio":20,"capabilities":["input","output","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.18","label":"D10 / MOSI / GPIO18","gpio":18,"capabilities":["input","output","pwm","interrupt","rmt"],"electrical":"3.3V"},
+    {"id":"gpio.15","label":"User LED / GPIO15","gpio":15,"capabilities":["output","pwm","rmt"],"electrical":"3.3V; active-low onboard LED"},
+    {"id":"gpio.3","label":"RF switch power / GPIO3","gpio":3,"capabilities":["output"],"electrical":"onboard RF switch; low enables","reserved_for":"system.radio","reason":"onboard-antenna-rf-switch-power","selectable":false},
+    {"id":"gpio.14","label":"RF antenna select / GPIO14","gpio":14,"capabilities":["output"],"electrical":"low=onboard, high=external","reserved_for":"system.radio","reason":"onboard-antenna-selected","selectable":false},
+    {"id":"gpio.9","label":"Boot button / GPIO9","gpio":9,"capabilities":["input","interrupt"],"electrical":"boot strap","reserved_for":"system.boot","reason":"boot-strap-pin","selectable":false},
+    {"id":"gpio.7","label":"JTAG MTDO / GPIO7","gpio":7,"capabilities":[],"electrical":"debug","reserved_for":"system.debug","reason":"jtag-debug","selectable":false},
+    {"id":"gpio.5","label":"JTAG MTDI / GPIO5","gpio":5,"capabilities":[],"electrical":"debug","reserved_for":"system.debug","reason":"jtag-debug","selectable":false},
+    {"id":"gpio.6","label":"JTAG MTCK / GPIO6","gpio":6,"capabilities":[],"electrical":"debug","reserved_for":"system.debug","reason":"jtag-debug","selectable":false},
+    {"id":"gpio.4","label":"JTAG MTMS / GPIO4","gpio":4,"capabilities":[],"electrical":"debug","reserved_for":"system.debug","reason":"jtag-debug","selectable":false}
+  ]
+}

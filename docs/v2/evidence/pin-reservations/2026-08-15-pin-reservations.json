@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "work_package": "3.6",
+  "date": "2026-08-15",
+  "status": "partial",
+  "implementation": {
+    "board_manifests": {"adafruit-huzzah32": 15, "m5stack-m5dial": 21, "seeed-xiao-esp32c6-chip-antenna": 19},
+    "resource_api": ["GET /api/resources", "POST /api/resources/reassign"],
+    "allocation_schema": 1,
+    "web_bundle_assets": 9,
+    "web_bundle_bytes": 18464
+  },
+  "verification": {
+    "host_suites": {"passed": 15, "failed": 0},
+    "web_tests": {"passed": 21, "failed": 0},
+    "manifest_boards": {"passed": 3, "failed": 0},
+    "firmware_builds": {
+      "esp32": {"passed": true, "app_bytes": 1121824},
+      "esp32s3": {"passed": true, "app_bytes": 1113440},
+      "esp32c6": {"passed": true, "app_bytes": 1257424}
+    },
+    "hardware": {
+      "port": "COM10",
+      "target": "esp32c6",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "antenna_parameter": 1,
+      "resource_revision": 2,
+      "reported_pins": 19,
+      "effective_led_lease": "gpio.20",
+      "effective_led_owner": "blip.output.strip0:pin",
+      "onboard_antenna_reservations": ["gpio.3", "gpio.14"],
+      "browser_shell": true,
+      "oscquery_selector_metadata": true,
+      "stale_reassignment_http_409": true,
+      "websocket_control": true,
+      "udp_control": true,
+      "internet_restored": true
+    },
+    "connected_xiao_antenna_readback": {"COM8": 1, "COM10": 1}
+  },
+  "remaining_gate_b_fixtures": [
+    "interactive secure-origin Web Serial permission/install flow",
+    "physical swap and unassign-and-move using a second configurable pin-owning component",
+    "external LED strip and logic-analyzer qualification rows from work package 3.4",
+    "full Gate B repetition and power-cut counts"
+  ]
+}

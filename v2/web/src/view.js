@@ -1,4 +1,5 @@
 import { coerceControlValue, filterControlModel } from "./model.js";
+import { buildReassignment, filterPins, pinOutcome } from "./resources.js";
 
 function element(document, tag, className, content) {
   const result = document.createElement(tag);
@@ -39,15 +40,17 @@ function readInput(input) {
 }
 
 export class ControlView {
-  constructor({ document, root, emptyTemplate, onSend, onError }) {
+  constructor({ document, root, emptyTemplate, onSend, onReassign, onError }) {
     this.document = document;
     this.root = root;
     this.emptyTemplate = emptyTemplate;
     this.onSend = onSend;
+    this.onReassign = onReassign;
     this.onError = onError;
     this.model = null;
     this.query = "";
     this.rows = new Map();
+    this.resources = null;
   }
 
   setModel(model) {
@@ -57,6 +60,11 @@ export class ControlView {
 
   setFilter(query) {
     this.query = query;
+    this.render();
+  }
+
+  setResources(resources) {
+    this.resources = resources;
     this.render();
   }
 
@@ -98,6 +106,10 @@ export class ControlView {
   }
 
   renderEditor(editor, row, control) {
+    if (control.editor === "pin") {
+      this.renderPinEditor(editor, row, control);
+      return;
+    }
     if (control.editor === "readonly" || control.editor === "unsupported") {
       editor.append(
         element(
@@ -168,6 +180,74 @@ export class ControlView {
     editor.append(form);
   }
 
+  renderPinEditor(editor, row, control) {
+    if (this.resources === null) {
+      editor.append(element(this.document, "output", "value-output", "Pin inventory unavailable"));
+      return;
+    }
+    const select = element(this.document, "select", "pin-select");
+    select.setAttribute("aria-label", control.label);
+    for (const pin of this.resources.pins) {
+      const outcome = pinOutcome(pin, control);
+      const option = element(this.document, "option", "", `${pin.label} — ${outcome.state}: ${outcome.reason}`);
+      option.value = pin.id;
+      option.disabled = outcome.disabled;
+      option.selected = pin.gpio === control.value;
+      option.dataset.state = outcome.state;
+      option.dataset.reason = outcome.reason;
+      select.append(option);
+    }
+    const explanation = element(this.document, "p", "pin-explanation", "Choose a board-declared pin.");
+    const confirmation = element(this.document, "div", "pin-confirmation");
+    confirmation.hidden = true;
+    const submitPin = async () => {
+      const pin = this.resources.pins.find((candidate) => candidate.id === select.value);
+      if (!pin) return;
+      const outcome = pinOutcome(pin, control);
+      explanation.textContent = outcome.reason;
+      confirmation.replaceChildren();
+      confirmation.hidden = true;
+      if (outcome.state !== "conflict") {
+        await this.submit(row, control, [{ type: "integer", value: pin.gpio }]);
+        return;
+      }
+      const previous = outcome.owners[0];
+      confirmation.hidden = false;
+      confirmation.setAttribute("role", "alertdialog");
+      confirmation.setAttribute("aria-label", "Confirm pin reassignment");
+      confirmation.append(element(this.document, "p", "", `${control.resourceOwner} conflicts with ${previous.path}. Nothing will be changed until you choose an atomic operation.`));
+      const run = async (operation) => {
+        row.dataset.pending = "true";
+        try {
+          const request = buildReassignment({ snapshot: this.resources, control, pin, operation });
+          const updated = await this.onReassign(request);
+          this.resources = updated;
+          this.render();
+        } catch (error) {
+          delete row.dataset.pending;
+          this.onError(error);
+        }
+      };
+      if (control.resourceSelector.supportsSwap) {
+        const swap = element(this.document, "button", "apply-button", "Swap assignments");
+        swap.type = "button";
+        swap.addEventListener("click", () => run("swap"));
+        confirmation.append(swap);
+      }
+      if (control.resourceSelector.supportsMove && previous.optional) {
+        const move = element(this.document, "button", "apply-button", "Unassign previous and move");
+        move.type = "button";
+        move.addEventListener("click", () => run("unassign-and-move"));
+        confirmation.append(move);
+      } else {
+        confirmation.append(element(this.document, "p", "pin-explanation", `${previous.path} is required and cannot be unassigned.`));
+      }
+      if (previous.rebootRequired) confirmation.append(element(this.document, "p", "pin-explanation", "Reboot required for the affected component."));
+    };
+    select.addEventListener("change", () => { void submitPin(); });
+    editor.append(select, explanation, confirmation);
+  }
+
   async submit(row, control, values) {
     row.dataset.pending = "true";
     try {
@@ -199,5 +279,44 @@ export class ControlView {
     if (input === null || entry.control.editor === "password") return;
     if (input.type === "checkbox") input.checked = value === true;
     else input.value = String(value);
+  }
+}
+
+export class ReservationView {
+  constructor({ document, root, onNavigate }) {
+    this.document = document;
+    this.root = root;
+    this.onNavigate = onNavigate;
+    this.snapshot = null;
+    this.query = "";
+  }
+
+  setSnapshot(snapshot) { this.snapshot = snapshot; this.render(); }
+  setFilter(query) { this.query = query; this.render(); }
+
+  render() {
+    this.root.replaceChildren();
+    if (!this.snapshot) return;
+    const list = element(this.document, "ul", "reservation-list");
+    for (const pin of filterPins(this.snapshot, this.query)) {
+      const item = element(this.document, "li", "reservation-row");
+      item.dataset.pin = pin.id;
+      item.append(element(this.document, "strong", "", `${pin.label} (${pin.id})`));
+      item.append(element(this.document, "span", "reservation-state", `${pin.state} · ${pin.electrical}`));
+      if (pin.reason) item.append(element(this.document, "span", "pin-explanation", pin.reason));
+      if (pin.bus) item.append(element(this.document, "span", "pin-explanation", `Bus: ${pin.bus}`));
+      for (const owner of pin.owners) {
+        const button = element(this.document, "button", "owner-link", `${owner.path} — ${owner.mode}${owner.role ? ` — ${owner.role}` : ""}`);
+        button.type = "button";
+        button.disabled = !owner.path.includes(":");
+        button.addEventListener("click", () => this.onNavigate(owner.path));
+        item.append(button);
+      }
+      const effective = pin.owners.map((owner) => owner.path).join(", ") || "none";
+      const configured = pin.configuredOwners.join(", ") || "none";
+      item.append(element(this.document, "span", "pin-explanation", `Configured: ${configured}; effective: ${effective}`));
+      list.append(item);
+    }
+    this.root.append(list);
   }
 }
