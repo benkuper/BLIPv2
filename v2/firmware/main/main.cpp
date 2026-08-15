@@ -3,6 +3,7 @@
 #include "blip/core/esp_diagnostics_component.hpp"
 #include "blip/core/registry.hpp"
 #include "blip/core/scheduler.hpp"
+#include "blip/led/esp_rmt_strip_component.hpp"
 #include "blip/network/esp_wifi_component.hpp"
 #include "blip/oscquery/esp_oscquery_component.hpp"
 #include "blip/ota/esp_ota_component.hpp"
@@ -26,9 +27,10 @@ namespace {
 
 constexpr char kTag[] = "blip_bootstrap";
 constexpr std::uint32_t kBootstrapSchemaVersion = 1U;
-constexpr std::array<std::string_view, 8> kBootstrapDependencies{
-    "diagnostics.runtime", "storage.settings", "storage.files.internal", "storage.legacy_import",
-    "transport.serial",    "transport.wifi",   "firmware.ota",           "discovery.oscquery"};
+constexpr std::array<std::string_view, 9> kBootstrapDependencies{
+    "diagnostics.runtime",   "storage.settings",   "storage.files.internal",
+    "storage.legacy_import", "transport.serial",   "transport.wifi",
+    "firmware.ota",          "discovery.oscquery", "output.pixel-strip"};
 constexpr std::array<std::string_view, 2> kRecoveryDependencies{"diagnostics.runtime",
                                                                 "transport.serial"};
 constexpr std::array<blip::core::ParameterDescriptor, 1> kBootstrapParameters{{
@@ -150,9 +152,10 @@ blip::storage::NvsSettingsComponent settings_component{};
 blip::storage::LittleFsStorageComponent file_storage_component{};
 blip::storage::LegacySettingsImportComponent legacy_import_component{settings_component.settings()};
 blip::network::EspWifiComponent wifi_component{settings_component.settings()};
+blip::led::EspRmtStripComponent led_component{settings_component.settings()};
 blip::ota::EspOtaComponent ota_component{"blip-v2", CONFIG_IDF_TARGET, "minimal"};
-blip::core::Registry<10> registry{};
-blip::core::RegistryControlService<10> control_component{registry};
+blip::core::Registry<11> registry{};
+blip::core::RegistryControlService<11> control_component{registry};
 blip::transport::EspSerialTransportComponent serial_transport_component{control_component};
 blip::oscquery::EspOscQueryComponent oscquery_component{registry, control_component, wifi_component,
                                                         file_storage_component.web_assets(),
@@ -223,6 +226,10 @@ void reject_pending_update() noexcept {
         }
         const auto oscquery_status = registry.add(oscquery_component);
         if (!oscquery_status) {
+            return false;
+        }
+        const auto led_status = registry.add(led_component);
+        if (!led_status) {
             return false;
         }
         const auto add_status = registry.add(bootstrap_component);
@@ -325,6 +332,7 @@ extern "C" void app_main() {
     ESP_LOGI(kTag,
              "BLIP_V2_BOOTSTRAP_READY schema=%lu registry=1 scheduler=ready resources=ready "
              "settings=nvs-v1 files=littlefs-v1 web=bundle-v1 web_version=%lu ota=ab-v1 "
+             "led=native-rmt-v1 "
              "web_assets=%lu web_bytes=%lu legacy_import=%s diagnostics=structured-v1 "
              "serial=blip-envelope-v1 osc=udp9000-oscquery-v1 osc_stack_hwm=%lu "
              "wifi_state=%u wifi_ap=%.*s "

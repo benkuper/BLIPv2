@@ -29,3 +29,22 @@ The codec-only check has no external dependency:
 ```powershell
 python v2/tools/control/blip_serial_control.py --self-test
 ```
+
+The LED hardware-in-loop helper configures the strip, checks typed rejection of
+a live transport change, and then verifies persisted settings after an external
+reset. Run its two phases around a board reset:
+
+```powershell
+python v2/tools/control/blip_led_serial_hil.py --port COM8 --phase configure --pin 20 --expect-antenna 1
+# reset the board
+python v2/tools/control/blip_led_serial_hil.py --port COM8 --phase verify --pin 20 --expect-antenna 1
+```
+
+Network HIL must use the atomic wrapper below on a one-Wi-Fi-interface host.
+The wrapper performs OSCQuery discovery, browser WebSocket and UDP writes while
+offline, then restores the named Internet profile in an unconditional `finally`
+block before returning:
+
+```powershell
+& v2/tools/control/blip_ap_control_hil.ps1 -DeviceSsid BLIP-7FAC18 -InternetProfile Archi-Wifi
+```

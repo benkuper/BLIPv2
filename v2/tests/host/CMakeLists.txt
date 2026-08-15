@@ -207,3 +207,21 @@ else()
     target_compile_options(blip_oscquery_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_oscquery_tests COMMAND blip_oscquery_tests)
+
+add_library(blip_led_host STATIC
+    ../../components/blip_led/src/strip_config.cpp
+)
+target_include_directories(blip_led_host PUBLIC ../../components/blip_led/include)
+target_link_libraries(blip_led_host PUBLIC blip_core_host)
+target_compile_features(blip_led_host PUBLIC cxx_std_20)
+
+add_executable(blip_led_tests blip_led_tests.cpp)
+target_link_libraries(blip_led_tests PRIVATE blip_led_host)
+if(MSVC)
+    target_compile_options(blip_led_host PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+    target_compile_options(blip_led_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_led_host PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+    target_compile_options(blip_led_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_led_tests COMMAND blip_led_tests)

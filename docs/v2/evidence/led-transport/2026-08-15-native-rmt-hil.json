@@ -1,0 +1,81 @@
+{
+  "format": 1,
+  "date": "2026-08-15",
+  "work_package": "3.4",
+  "status": "partial",
+  "component": "blip.output.strip0",
+  "backend": "native-rmt",
+  "tests": {
+    "host_suites": { "passed": 15, "failed": 0 },
+    "firmware_builds": ["esp32", "esp32s3", "esp32c6"],
+    "serial_control": "pass",
+    "restart_persistence": "pass",
+    "unsafe_live_transport_change": {
+      "result": "pass",
+      "error_domain": "transport",
+      "error_code": "invalid_state",
+      "detail": "disable-before-pin-or-protocol-change"
+    },
+    "oscquery_discovery": "pass",
+    "browser_websocket_control": "pass",
+    "udp_osc_control": "pass",
+    "internet_restored_after_each_ap_run": true
+  },
+  "boards": [
+    {
+      "target": "esp32",
+      "board": "Adafruit HUZZAH32 Feather",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "gpio": 23,
+      "pixels": 8,
+      "last_frame_us": 555,
+      "worker_stack_headroom_bytes": 2960,
+      "failed_frames": 0,
+      "device_ap": "BLIP-F2D184",
+      "network_hil": "pass"
+    },
+    {
+      "target": "esp32s3",
+      "board": "M5Dial / StampS3",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "gpio": 21,
+      "pixels": 1,
+      "last_frame_us": 271,
+      "worker_stack_headroom_bytes": 2736,
+      "failed_frames": 0,
+      "device_ap": "BLIP-968374",
+      "network_hil": "pass",
+      "note": "GPIO21 is the board-integrated RGB LED pin in the M5Stack hardware table; no visual observation was recorded."
+    },
+    {
+      "target": "esp32c6",
+      "board": "Seeed Studio XIAO ESP32C6, onboard chip antenna",
+      "port": "COM8",
+      "mac": "98:88:e0:7f:ac:18",
+      "gpio": 20,
+      "pixels": 8,
+      "last_frame_us": 598,
+      "worker_stack_headroom_bytes": 3416,
+      "failed_frames": 0,
+      "antenna_parameter": 1,
+      "antenna": "onboard",
+      "device_ap": "BLIP-7FAC18",
+      "network_hil": "pass"
+    }
+  ],
+  "network_observations": {
+    "browser_shell_bytes": 429,
+    "schema_led_present": true,
+    "websocket_red": 11,
+    "udp_green": 22,
+    "shared_registry_readback": true,
+    "websocket_enabled_then_disabled": true
+  },
+  "open_physical_evidence": [
+    "A common external strip was not attached to every reference target.",
+    "No logic-analyzer capture decoded the production component's emitted bytes and pulse/reset timing.",
+    "The M5Dial integrated RGB LED was driven on its documented GPIO but was not visually observed by the test operator."
+  ]
+}

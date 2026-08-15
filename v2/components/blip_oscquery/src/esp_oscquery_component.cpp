@@ -358,7 +358,9 @@ esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
          httpd_req_get_url_query_str(request, query.data(), query.size()) != ESP_OK)) {
         return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "invalid query");
     }
-    const std::string_view path{request->uri};
+    const std::string_view request_uri{request->uri};
+    const std::size_t query_separator = request_uri.find('?');
+    const std::string_view path = request_uri.substr(0U, query_separator);
     const std::string_view query_text{query.data(), query_size};
     switch (route_http_get(path, !query_text.empty(), request_accepts_html(request))) {
     case HttpGetSurface::web_asset:
