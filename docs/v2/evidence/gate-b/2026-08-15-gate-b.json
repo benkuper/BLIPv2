@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "gate_id": "Gate-B",
+  "date": "2026-08-15",
+  "status": "partial",
+  "implementation_commits": [
+    "7415cab",
+    "ae4341f",
+    "6d628a8",
+    "ac3adf0",
+    "1cd73fe"
+  ],
+  "work_packages": {
+    "3.3": "complete",
+    "3.4": "partial: external strip and decoded capture open",
+    "3.5": "partial: interactive Web Serial flow open",
+    "3.6": "partial: second physical pin owner fixture open"
+  },
+  "criteria": {
+    "B-01": {
+      "threshold": "20 consecutive complete end-to-end passes per reference target",
+      "observed_complete_sequences": {"esp32": 0, "esp32s3": 0, "esp32c6": 0},
+      "supporting_subflows": "factory layout flash, provisioning, OSCQuery, browser shell, WebSocket/UDP LED control, settings persistence, OTA, rollback, and resource inspection have passed separately",
+      "status": "not_met"
+    },
+    "B-02": {
+      "threshold": "1000 randomized physical power cuts during settings save",
+      "observed_physical_power_cuts": 0,
+      "supplemental": "host fault-point atomicity suite passes",
+      "status": "not_met"
+    },
+    "B-03": {
+      "threshold": "1000 randomized physical power cuts during filesystem replacement",
+      "observed_physical_power_cuts": 0,
+      "supplemental": "host replacement fault-point atomicity suite passes",
+      "status": "not_met"
+    },
+    "B-04": {
+      "threshold": "25 physical cuts in each OTA erase, write, verify, and boot-confirm phase",
+      "observed": {
+        "target": "esp32c6",
+        "transport_disconnects": ["1 byte", "4096 bytes", "half image"],
+        "pre_confirmation_faults": 1,
+        "automatic_rollback": "pass"
+      },
+      "status": "not_met"
+    },
+    "B-05": {
+      "threshold": "legacy and V2 schema match the live registry; synthetic component requires no hand-authored UI",
+      "observed": "registry-generated host fixtures and generic UI tests pass; live V2 descriptor and control HIL passes on all three targets",
+      "missing": "a recorded legacy-and-V2 snapshot comparison against the same live device",
+      "status": "partial"
+    }
+  },
+  "current_regressions": {
+    "host_suites": {"passed": 15, "failed": 0},
+    "web_tests": {"passed": 21, "failed": 0},
+    "foundation_checks": {"passed": 10, "failed": 0},
+    "bootstrap_checks": {"passed": 5, "failed": 0},
+    "board_manifests": {"passed": 3, "failed": 0},
+    "browser_manifest_validator": "pass",
+    "firmware_builds": ["esp32", "esp32s3", "esp32c6"]
+  },
+  "required_external_fixtures": [
+    "secure-origin interactive Web Serial browser session",
+    "common external RGB or RGBW strip and logic analyzer on every reference target",
+    "second configurable physical pin-owning component",
+    "programmable power-cut fixture for B-02, B-03, and B-04",
+    "ESP32 HUZZAH32 and ESP32-S3 M5Dial reference boards for complete B-01 repetitions"
+  ]
+}

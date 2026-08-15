@@ -1,0 +1,59 @@
+{
+  "format": 1,
+  "date": "2026-08-15",
+  "work_package": "3.5",
+  "status": "partial",
+  "source_commit": "1cd73fe",
+  "version": "0.1.0",
+  "factory_layout": {
+    "flash_bytes": 4194304,
+    "merged_image_bytes": 4063232,
+    "storage_offset": 3407872,
+    "storage_bytes": 655360,
+    "storage_format": "LittleFS"
+  },
+  "artifacts": {
+    "esp32": {
+      "sha256": "2e93babc2cedf89e1585e0b7f9ea75c0099db7c2ddd32c7826e9a5ef06716b97",
+      "application_sha256": "74c676ef5dc6219af00ae557176334d8e3857418d62353e22b3dde6b0aebd753",
+      "bytes": 4063232
+    },
+    "esp32s3": {
+      "sha256": "8c23b6495b13b2d6b7bb85025a941e505f9c8a68a4917cb7ce1fe0c7fae02a31",
+      "application_sha256": "c0aab4e874e5f2fb625ca4a9af89c2f47d506264a264c51f4ee8a74d6072087a",
+      "bytes": 4063232
+    },
+    "esp32c6": {
+      "sha256": "0ee531280cf3fa7d0f1cb09010be19864c80d444ad39d6a0f07eb22659704f86",
+      "application_sha256": "6829e2a34373dc0c470aaaed550622b4d463bc5389bb36d668fd6cd21b34864f",
+      "bytes": 4063232
+    }
+  },
+  "automated": {
+    "manifest_validator": "pass",
+    "factory_source_hashes_match_post_build_outputs": true,
+    "web_tests": {"passed": 21, "failed": 0},
+    "host_suites": {"passed": 15, "failed": 0},
+    "factory_bundle_bytes": 18464,
+    "factory_bundle_assets": 9,
+    "firmware_builds": {
+      "esp32": {"passed": true, "app_bytes": 1121824, "slot_free_percent": 32},
+      "esp32s3": {"passed": true, "app_bytes": 1113440, "slot_free_percent": 32},
+      "esp32c6": {"passed": true, "app_bytes": 1257424, "slot_free_percent": 23}
+    }
+  },
+  "physical_lineage": {
+    "prior_record": "2026-08-15-browser-installer.json",
+    "prior_factory_layout_flash": "pass via esptool on ESP32",
+    "current_artifacts_physically_flashed": false
+  },
+  "interactive_browser_probe": {
+    "secure_local_installer_prepared": true,
+    "available_controllable_browser_sessions": 0,
+    "web_serial_permission_dialog": "not run"
+  },
+  "open_physical_evidence": [
+    "Flash a blank reference target using the current artifact through a user-confirmed Web Serial dialog from a secure hosted origin.",
+    "Repeat post-install Wi-Fi provisioning, device opening, and browser OTA as one uninterrupted human-visible scenario."
+  ]
+}

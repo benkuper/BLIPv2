@@ -13,3 +13,8 @@ and rollback records are under [`ota/`](ota/).
 
 Disposable LED transport measurements and restoration checks are under
 [`led-transport/`](led-transport/).
+
+Gate B rollups are under [`gate-b/`](gate-b/). These records apply the exact
+thresholds from `quality-gates.md`; completed work-package subflows are listed
+as supporting evidence but do not turn an incomplete end-to-end row into a
+pass.

@@ -78,6 +78,11 @@ OTA, deliberately invalid OTA, and rollback.
 | `B-04` | OTA interruption | 25 cuts in each erase/write/verify/boot-confirm phase; every device returns to a bootable confirmed image without a programmer |
 | `B-05` | Discovery/schema | OSCQuery legacy snapshot and V2 descriptor schema both match the live registry; no hand-authored UI control is required for the synthetic component |
 
+The current row-by-row M3 audit is
+[`2026-08-15-gate-b.json`](evidence/gate-b/2026-08-15-gate-b.json). A `partial`
+record is deliberately not a Gate B pass; every threshold above remains
+binding.
+
 ## Gate C — production LED engine
 
 Each driver records its physical minimum frame period from pixel count and bus
