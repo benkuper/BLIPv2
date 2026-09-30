@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "gate_id": "CREATORS-BALL-HD108-SPI-BRINGUP",
+  "state": "partial",
+  "timestamp_utc": "2026-09-30T18:13:00Z",
+  "board": "Creators Ball V2",
+  "port": "COM10",
+  "image_sha256": "de817cbbbdbf807bd487f66e7bb90c19699201d25ae793e03b2fbe39288cb229",
+  "backend": "esp-spi-dma",
+  "wiring": {"pixels": 36, "protocol": "HD108 RGB16", "data_gpio": 3, "clock_gpio": 2, "power_gpio": 21, "spi_host": "SPI2", "clock_hz": 4000000},
+  "frame": {"start_bytes": 16, "pixel_bytes": 288, "trailing_zero_bytes": 8, "total_bytes": 312},
+  "software_checks": {"led_host_tests": "2/2 passed", "board_manifest_validator": "passed", "esp32c6_build": "passed", "git_diff_check": "passed"},
+  "flash": "The application-only flash to ota_0 passed esptool hash verification; saved settings were retained.",
+  "serial_checks": {"enabled": true, "pin": 3, "protocol": 2, "pixels": 36, "backend": "esp-spi-dma", "brightness": 24, "red": 255, "green": 0, "blue": 0, "white": 0, "applied_frames": 1, "failed_frames": 0, "last_completion_us": 5726, "worker_stack_headroom_bytes": 4416},
+  "live_compositor": "The worker composes the solid system layer and a live stream layer before HD108 encoding. See 2026-09-30-creators-ball-ddp.json for the newer stream image and network test.",
+  "debugging": "An initial fixed-count polling loop produced a completion timeout despite a queued SPI transaction. Replacing it with a 100 ms wall-clock deadline and one scheduler tick between polls yielded a completed frame after reboot.",
+  "remaining": ["User visual confirmation of the red 36-pixel chain is pending.", "No external clock/data capture or sustained Wi-Fi Gate C load has been recorded.", "The measured completion time includes task scheduling and is not the physical wire time."]
+}

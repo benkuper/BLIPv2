@@ -7,7 +7,7 @@ indexed in [`docs/v2/`](docs/v2/) and anchored to BLIP V1 commit
 
 The current V2 line includes the reproducible ESP-IDF/C++20 foundation, storage,
 diagnostics and safe mode, Serial/USB control, Wi-Fi provisioning, OSC/OSCQuery,
-and a schema-driven browser control shell. See the
+schema-driven browser control, and the Milestone 4 production LED engine. See the
 [work-package index](docs/v2/work-packages/README.md) and the
 [dependency map](docs/v2/dependency-map.md).
 

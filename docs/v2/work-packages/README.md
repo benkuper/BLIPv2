@@ -20,7 +20,7 @@ wire protocols, or public OSC paths.
 | --- | --- |
 | [2.1](2.1-versioned-nvs-settings.md) | Versioned per-component NVS records with two-slot interrupted-save recovery |
 | [2.2](2.2-atomic-file-storage.md) | Versioned atomic LittleFS files and an optional two-slot SD service with bounded recovery |
-| [2.3](2.3-settings-migration-v1-import.md) | Ordered schema migrations and a bounded, journaled, physically qualified V1 settings import |
+| [2.3](2.3-settings-migration-v1-import.md) | Ordered V2 schema migrations; prior V1 import evidence retained as historical record |
 | [2.4](2.4-diagnostics-safe-mode.md) | Bounded structured diagnostics, retained coredumps, and physically qualified boot-loop recovery |
 | [2.5](2.5-serial-transport.md) | Versioned common envelope, bounded Serial/USB control, host CLI, and normal/recovery hardware qualification |
 | [2.6](2.6-wifi-provisioning.md) | Versioned Wi-Fi station/AP management with serial and SoftAP provisioning |
@@ -36,3 +36,17 @@ wire protocols, or public OSC paths.
 | [3.4](3.4-native-rmt-strip.md) | Native single-strip RMT vertical slice and qualification boundary |
 | [3.5](3.5-browser-installer.md) | Browser-compatible factory artifacts and on-device firmware update flow |
 | [3.6](3.6-pin-reservation-ui.md) | Complete pin/reservation inspection with conflict-safe reassignment and shared-bus handling |
+
+## Milestone 4
+
+| Work package | Result |
+| --- | --- |
+| [4.1](4.1-led-output-abi.md) | Linear pixel surfaces, encoder boundary, and capability-rich output ABI |
+| [4.2](4.2-led-compositor.md) | Deterministic stream/playback/script/system compositor |
+| [4.3](4.3-led-color.md) | Linear-light matrix, calibration, transfer, and channel-order pipeline |
+| [4.4](4.4-led-async.md) | Preallocated async frame pool with bounded overload and deadline metrics |
+| [4.5](4.5-led-clocked-spi.md) | APA102/SK9822/HD108 encoders and asynchronous native SPI-DMA output |
+| [4.6](4.6-led-backends.md) | Fail-closed deterministic backend selection and common transport adapters |
+| [4.7](4.7-led-stream-playback.md) | Bounded stream layer, versioned V2 playback, and clock |
+| [4.8](4.8-led-network-compat.md) | Removable Art-Net, DDP, and optional E1.31 runtimes |
+| [Milestone evidence](milestone-4-evidence.md) | Host goldens, target builds, sustained soak, and open Gate C HIL boundary |

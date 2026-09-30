@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "gate_id": "ARTNET-CREATORS-BALL-DISCOVERY-STREAM",
+  "state": "partial",
+  "recorded_at_utc": "2026-09-30T22:30:00Z",
+  "board": "Creators Ball V2",
+  "target": "esp32c6",
+  "serial_port": "COM10",
+  "firmware": {
+    "build": "m4-creators-ball-v2",
+    "flashed_app_sha256": "01eb30c52e4a57dca0addfe72cce70d3979e8fa9c1a4b4842338a3f8f5bfd1ba",
+    "current_build_artifact_sha256": "b2b805dcdd7b70b193cef0ddabad6110791dd3cebfd748c3167e15c56451dde5",
+    "current_artifact_note": "Rebuilt after the CMake feature-switch fix and a nonfunctional DMX validation reorder; this later artifact was not used for the recorded hardware run.",
+    "flash": "app-only write; esptool hash verification passed",
+    "artnet_enabled": true,
+    "ddp_enabled": true
+  },
+  "network": "PC and Ball remained on Archi-wifi guest; the PC did not join a BLIP access point.",
+  "station_ip_at_test": "192.168.27.186",
+  "tests": [
+    {
+      "kind": "unicast ArtPoll and ArtDmx",
+      "probe": "python v2/tools/control/blip_artnet_probe.py --host 192.168.27.186 --pixels 36 --red 32 --frames 30 --fps 10",
+      "poll_reply_bytes": 239,
+      "advertised_ip_matches_source": true,
+      "dmx_frames_sent": 30,
+      "serial_accepted_packets_after": 31,
+      "serial_rejected_packets_after": 0,
+      "serial_discovery_replies_after": 1,
+      "led_applied_frames_after_timeout": 31,
+      "led_failed_frames_after_timeout": 0
+    },
+    {
+      "kind": "directed broadcast ArtPoll and bounded ArtDmx",
+      "probe": "python v2/tools/control/blip_artnet_probe.py --host 192.168.27.191 --broadcast --expect-ip 192.168.27.186 --pixels 36 --red 8 --frames 1",
+      "poll_reply_bytes": 239,
+      "discovery_result": "Ball replied with its station IP"
+    },
+    {
+      "kind": "oversized universe relative to physical strip",
+      "probe": "python v2/tools/control/blip_artnet_probe.py --host 192.168.27.186 --pixels 170 --red 8 --frames 1",
+      "dmx_payload_bytes": 510,
+      "configured_output_pixels": 36,
+      "result": "accepted and trimmed to the configured strip; no output error observed"
+    }
+  ],
+  "serial_counters_after_tests": {
+    "artnet_accepted_packets": 35,
+    "artnet_rejected_packets": 0,
+    "artnet_discovery_replies": 3,
+    "led_failed_frames": 0,
+    "heap_free_internal_bytes": 231372
+  },
+  "user_visual_observation": "The user reported full red fades and on/off behavior on the Ball LEDs during these network lighting tests. The observation confirms visible output response but does not isolate Art-Net from DDP or establish timing accuracy.",
+  "remaining": [
+    "Art-Net hardware streaming is only verified on Creators Ball V2 so far.",
+    "No external waveform or sustained Gate C timing and heap qualification was captured.",
+    "E1.31 has a portable parser but no registered UDP runtime."
+  ]
+}

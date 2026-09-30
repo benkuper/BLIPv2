@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5-1-HUZZAH32-BATTERY",
+  "state": "partial",
+  "timestamp_utc": "2026-09-30T23:31:21Z",
+  "board": "Adafruit HUZZAH32",
+  "port": "COM5",
+  "chip": "ESP32-D0WDQ6 revision v1.0",
+  "mac": "30:ae:a4:f2:d1:84",
+  "firmware_sha256": "638169f2093b6faf1f454e7d7ff3cb3cd93f47a3608c866e8960f165d4223e7d",
+  "build_profile": "BLIP_BOARD_ADAFRUIT_HUZZAH32=ON; Art-Net, DDP, E1.31 enabled",
+  "flash": "Factory image and corrected app image written; esptool verified written regions.",
+  "serial_control": {
+    "component": "blip.power.battery",
+    "pin_mv": 2119,
+    "battery_mv": 4238,
+    "filtered_mv": 4194,
+    "soc_per_mille": 993,
+    "low": false,
+    "valid": true,
+    "sample_errors": 0,
+    "divider_numerator": 2
+  },
+  "wifi": {"state": "connected", "ip_address": "192.168.27.156"},
+  "checks": {"blip_power_tests": "passed", "idf_build_esp32": "passed"},
+  "limits": [
+    "Voltage and percentage were not checked against an independent meter or a discharge curve.",
+    "No low-battery transition was induced on hardware.",
+    "Other board battery sources are not yet calibrated or wired."
+  ]
+}

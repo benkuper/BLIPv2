@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "gate_id": "E131-OPTIONAL-SIX-BOARD-BUILDS",
+  "state": "builds-passed",
+  "recorded_at_utc": "2026-09-30T23:02:47Z",
+  "method": "ESP-IDF 6.0.2 firmware build with BLIP_ENABLE_ARTNET=ON, BLIP_ENABLE_DDP=ON, BLIP_ENABLE_E131=ON; project_description.json confirms all three components in each build",
+  "builds": [
+    {"board": "Adafruit HUZZAH32", "target": "esp32", "build": "m4-e131-huzzah32", "app_bin_bytes": 1135232, "sha256": "ef29167a521de4acc9018df3b8aa80dab6ac44dc0951fc4d8f7c0a682eaf1a7b", "result": "passed"},
+    {"board": "M5Stack M5Dial", "target": "esp32s3", "build": "m4-e131-m5dial", "app_bin_bytes": 1127536, "sha256": "3d0195e0b66a52d8e06a9c06532b864dc494a001f2b89eee88026fb43762cdd6", "result": "passed"},
+    {"board": "Creators Ball V2", "target": "esp32c6", "build": "m4-e131-ball-c6", "app_bin_bytes": 1286384, "sha256": "f835c3476c0362b91ffabcc071c610e5682a3874fac393b0a32ac29cf75ca0ee", "result": "passed; app flashed and E1.31 hardware checked"},
+    {"board": "Creators Tab replacement", "target": "esp32", "build": "m4-e131-creators-tab", "app_bin_bytes": 1137296, "sha256": "735e4024b09b2454c85be7b47f3e84066760b16edbd067a083c07ce8779c6e26", "result": "passed"},
+    {"board": "Seeed XIAO ESP32-C6", "target": "esp32c6", "build": "m4-e131-xiao-c6", "app_bin_bytes": 1270560, "sha256": "6dc1695a91c251cb8f67a59914f546594e02e2fb72b685a11fe27afc6dec2f4f", "result": "passed"},
+    {"board": "M5Stack M5StickC", "target": "esp32", "build": "m4-e131-m5stickc", "app_bin_bytes": 1136112, "sha256": "1626e8e79d14f2b3e915882f44c65cafa1f77b9e7ceb466fb9f0d5c93f581f10", "result": "passed; serial port absent, so this image was not flashed"}
+  ],
+  "independent_removal": [
+    {"build": "m4-e131-only-c6", "artnet": false, "ddp": false, "e131": true, "included_compat_components": ["blip_e131"], "app_bin_bytes": 1277328, "sha256": "3bb59a6a7d82e5fad45cf7781d54d692338a7ef834098651b49658f7df020a7d", "result": "passed"},
+    {"build": "m4-no-lighting-c6", "artnet": false, "ddp": false, "e131": false, "included_compat_components": [], "app_bin_bytes": 1268864, "sha256": "d6e3ea75ced5f5f781b48acc44d02556c642077f0fee9d31c5f131f26ff64379", "result": "passed"}
+  ],
+  "hardware_scope": "E1.31 runtime hardware verification is currently limited to Creators Ball V2; see 2026-10-01-creators-ball-e131.json."
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5DIAL-V2-ONLY-BOOT",
+  "state": "pass",
+  "board": "M5Stack M5Dial with Stamp S3A",
+  "port": "COM9",
+  "image_sha256": "e4caf44c462ec175b6b6c6e530a5b5ddc590b52bcfedd194f7f57eb238f7b9b5",
+  "change": "Removed the V1 settings importer from firmware composition and its build sources; retained V2 settings and schema migration support.",
+  "flash": "ESP-IDF full image flash completed; bootloader, partition table, OTA selection, app, and storage writes passed esptool hash verification.",
+  "serial_probe": {
+    "component": "blip.output.strip0",
+    "enabled": false,
+    "backend": "native-rmt"
+  },
+  "visual_observation": "The user reported a visible light on the device while enabled=false; its source is not identified. M5Stack documents GPIO38 high as necessary to power the Stamp S3A RGB pixel, and the firmware drives GPIO38 low while this output is disabled."
+}

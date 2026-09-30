@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "gate_id": "XIAO-ESP32C6-BOARD-BRINGUP",
+  "state": "partial",
+  "timestamp_utc": "2026-09-30T16:47:00Z",
+  "board": "Seeed XIAO ESP32-C6 chip antenna",
+  "port": "COM13",
+  "board_definition": "v2/boards/seeed-xiao-esp32c6-chip-antenna.json",
+  "image_sha256": "dd736b0e2a9ac2f93329a66bb17faad47d1c0ba55dc4c1a06abacfda759f6616",
+  "flash": "Complete factory image written and all regions verified by esptool.",
+  "serial_control": {"pin": 20, "antenna": 0},
+  "checks": {"board_manifest_validator": "pass"},
+  "remaining": [
+    "GPIO20 is an external LED output assignment; no addressable strip is attached to this board.",
+    "RF performance and full Gate B/C qualification are not yet demonstrated."
+  ]
+}

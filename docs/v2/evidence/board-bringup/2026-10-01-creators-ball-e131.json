@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "gate_id": "E131-CREATORS-BALL-UNICAST-MULTICAST",
+  "state": "partial",
+  "recorded_at_utc": "2026-09-30T22:59:21Z",
+  "board": "Creators Ball V2",
+  "target": "esp32c6",
+  "serial_port": "COM10",
+  "firmware": {
+    "build": "m4-e131-ball-c6",
+    "flashed_app_sha256": "f835c3476c0362b91ffabcc071c610e5682a3874fac393b0a32ac29cf75ca0ee",
+    "app_bin_bytes": 1286384,
+    "flash": "app-only write; esptool hash verification passed",
+    "artnet_enabled": true,
+    "ddp_enabled": true,
+    "e131_enabled": true
+  },
+  "network": "PC and Ball remained on Archi-wifi guest; the PC did not join a BLIP access point.",
+  "station_ip_at_test": "192.168.27.186",
+  "receiver_at_boot": {
+    "port": 5568,
+    "multicast_joined": true,
+    "join_failures": 0,
+    "worker_stack_headroom_bytes": 3424
+  },
+  "tests": [
+    {
+      "kind": "unicast RGB data",
+      "probe": "python v2/tools/control/blip_e131_send.py --host 192.168.27.186 --pixels 36 --red 32 --frames 30 --fps 10",
+      "sent_frames": 30,
+      "accepted_packets_after": 30,
+      "rejected_packets_after": 0,
+      "led_applied_frames_after": 31,
+      "led_failed_frames_after": 0
+    },
+    {
+      "kind": "universe 1 multicast and stream termination",
+      "probe": "python v2/tools/control/blip_e131_send.py --host 192.168.27.186 --multicast --pixels 36 --red 8 --frames 10 --fps 10 --terminate",
+      "destination": "239.255.0.1",
+      "sent_data_frames": 10,
+      "sent_termination_packets": 1,
+      "result": "multicast remained joined; accepted count rose by 11"
+    },
+    {
+      "kind": "full DMX universe bounded to physical strip",
+      "probe": "python v2/tools/control/blip_e131_send.py --host 192.168.27.186 --pixels 170 --red 4 --frames 1",
+      "dmx_slots": 510,
+      "configured_output_pixels": 36,
+      "result": "accepted with zero output rejections"
+    },
+    {
+      "kind": "other universe",
+      "probe": "python v2/tools/control/blip_e131_send.py --host 192.168.27.186 --universe 2 --pixels 1 --red 8 --frames 1",
+      "result": "ignored_packets rose by one"
+    }
+  ],
+  "serial_counters_after_tests": {
+    "e131_accepted_packets": 42,
+    "e131_rejected_packets": 0,
+    "e131_invalid_packets": 0,
+    "e131_ignored_packets": 1,
+    "e131_output_rejections": 0,
+    "e131_source_capacity": 0,
+    "e131_join_failures": 0,
+    "e131_worker_stack_headroom_bytes": 3344,
+    "led_applied_frames": 42,
+    "led_failed_frames": 0
+  },
+  "remaining": [
+    "No person or external fixture verified LED appearance or waveform timing for the E1.31 run.",
+    "Two-source priority/HTP behavior has host coverage but no physical sender-pair check yet.",
+    "Preview and synchronized E1.31 packets are ignored; synchronized output is not implemented.",
+    "Sustained Gate C Wi-Fi, queue, and heap qualification remains open."
+  ]
+}

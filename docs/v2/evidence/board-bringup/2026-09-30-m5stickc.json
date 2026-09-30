@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5STICKC-BOARD-BRINGUP",
+  "state": "partial",
+  "timestamp_utc": "2026-09-30T17:14:00Z",
+  "board": "M5Stack M5StickC",
+  "port": "COM12",
+  "chip": "ESP32-PICO-D4 revision v1.0",
+  "mac": "94:b9:7e:8b:b7:84",
+  "board_definition": "v2/boards/m5stack-m5stickc.json",
+  "image_sha256": "5a8c41062abe8185d47f9241e9d83f14962dd6633169d0f13ac372d7a9dece93",
+  "partition_table_sha256": "50667a41d5dc9c22ef6896d8b1de7a04bfe68a91f17917ea2d0f85bd5762f417",
+  "original_v1_nvs_backup": {
+    "path": "build/device-backups/com12-m5stickc-nvs-before-migration.bin",
+    "bytes": 20480,
+    "sha256": "f70d5291b1441b25b91ba2690d40933861c42775728c99e66849d20132d8cf99"
+  },
+  "attempts": [
+    "First V2 boot failed because the retained V1 tree had profile-specific component paths absent from the original 22-path fixture.",
+    "After adding those paths, V2 imported settings but Wi-Fi startup failed with nvs-full in the former 20 KiB partition.",
+    "Expanded NVS to 60 KiB before the unchanged app slots; erased the former OTA/PHY region, restored the retained V1 NVS backup, and wrote the new partition table and OTA selection data. All writes verified."
+  ],
+  "boot": "BLIP_V2_BOOTSTRAP_READY board=m5stack-m5stickc legacy_import=confirmed",
+  "serial_control": {"pin": 26, "enabled": false},
+  "checks": {"host_ctest_debug": "16/16 passed", "bootstrap_validator": "pass", "browser_installer_validator": "pass"},
+  "remaining": [
+    "M5StickC display, power manager, buttons, IMU and microphone still need V2 components.",
+    "No external LED is attached to GPIO26; output and Gate B/C qualification are not demonstrated."
+  ]
+}

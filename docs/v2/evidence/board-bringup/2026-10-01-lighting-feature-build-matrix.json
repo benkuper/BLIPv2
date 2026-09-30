@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "gate_id": "NETWORK-LIGHTING-INDEPENDENT-BUILD-SWITCHES",
+  "state": "passed-for-esp32c6",
+  "recorded_at_utc": "2026-09-30T23:05:18Z",
+  "board": "Creators Ball V2",
+  "target": "esp32c6",
+  "method": "ESP-IDF 6.0.2 firmware build plus project_description.json build_components inspection",
+  "cases": [
+    {"build": "m4-no-lighting-c6", "artnet": false, "ddp": false, "e131": false, "included_compat_components": [], "app_bin_bytes": 1268864, "sha256": "d6e3ea75ced5f5f781b48acc44d02556c642077f0fee9d31c5f131f26ff64379", "result": "passed"},
+    {"build": "m4-artnet-only-c6", "artnet": true, "ddp": false, "e131": false, "included_compat_components": ["blip_artnet"], "app_bin_bytes": 1274416, "sha256": "a75b3ba2bf6c9e0cb2498ce8eb987923ca28174796ebd1e190af88340be9af0a", "result": "passed"},
+    {"build": "m4-ddp-only-c6", "artnet": false, "ddp": true, "e131": false, "included_compat_components": ["blip_ddp"], "app_bin_bytes": 1274352, "sha256": "b989c5d7031a07ff32ef1bdc47d7c9044c75d5c40d00abe9d1c069e1c0c418ca", "result": "passed"},
+    {"build": "m4-e131-only-c6", "artnet": false, "ddp": false, "e131": true, "included_compat_components": ["blip_e131"], "app_bin_bytes": 1277328, "sha256": "3bb59a6a7d82e5fad45cf7781d54d692338a7ef834098651b49658f7df020a7d", "result": "passed"},
+    {"build": "m4-creators-ball-v2", "artnet": true, "ddp": true, "e131": false, "included_compat_components": ["blip_artnet", "blip_ddp"], "app_bin_bytes": 1278944, "sha256": "a19d891842c15c09969614ee99fab86419bde98610c41889083ce13f78c566e2", "result": "passed"},
+    {"build": "m4-e131-ball-c6", "artnet": true, "ddp": true, "e131": true, "included_compat_components": ["blip_artnet", "blip_ddp", "blip_e131"], "app_bin_bytes": 1286384, "sha256": "f835c3476c0362b91ffabcc071c610e5682a3874fac393b0a32ac29cf75ca0ee", "result": "passed; this app was flashed for E1.31 hardware testing"}
+  ],
+  "note": "The earlier dual-protocol Ball artifact used for Art-Net hardware evidence has a separate flashed hash in that record. The current three-protocol Ball artifact was flashed for E1.31 testing."
+}

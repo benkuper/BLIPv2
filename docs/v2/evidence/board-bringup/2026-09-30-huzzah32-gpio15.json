@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "gate_id": "HUZZAH32-GPIO15-BOARD-BRINGUP",
+  "state": "partial",
+  "timestamp_utc": "2026-09-30T16:38:00Z",
+  "board": "Adafruit HUZZAH32",
+  "port": "COM5",
+  "chip": "ESP32-D0WDQ6 revision v1.0",
+  "mac": "30:ae:a4:f2:d1:84",
+  "board_definition": "v2/boards/adafruit-huzzah32.json",
+  "wired_strip_data_gpio": 15,
+  "image_sha256": "47e6ef2d9efa352714aa8e34b1be0ac63e9c0a1f64e9a56ff36dc7a1aee3cce6",
+  "flash": "Complete factory image written at 250000 baud; esptool verified all written regions.",
+  "serial_control": {"pin": 15, "enabled": false},
+  "checks": {"board_manifest_validator": "pass", "host_ctest_debug": "16/16 passed"},
+  "remaining": [
+    "The LED strip power and ground wiring have not yet been confirmed.",
+    "No visual LED observation or external waveform capture has been recorded.",
+    "GPIO15 is a boot strap and the strip data input must remain high impedance during reset."
+  ]
+}

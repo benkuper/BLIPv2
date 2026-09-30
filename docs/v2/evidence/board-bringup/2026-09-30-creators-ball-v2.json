@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "gate_id": "CREATORS-BALL-V2-BOARD-BRINGUP",
+  "state": "partial",
+  "timestamp_utc": "2026-09-30T16:02:21Z",
+  "worktree_base_commit": "076c9cbf9bd4e0668a2db07c2a0b0759713c13cd",
+  "worktree_has_uncommitted_changes": true,
+  "board": "Creators Ball V2",
+  "board_definition": "v2/boards/creators-ball-v2.json",
+  "v1_source": "BLIP configs/creators.ini at 1507f440b3ae635686d2bf759ecc742b391f08a7",
+  "port": "COM10",
+  "chip": "ESP32-C6FH8 revision v0.2",
+  "flash_bytes": 8388608,
+  "esp_idf": "6.0.2",
+  "image_sha256": "d9182d0cd463f53dc5ff827a503c5975a14ebfdab3754fdfbf47058b4c7e77d5",
+  "original_flash_backup": {
+    "path": "build/device-backups/com10-creators-ball-v2-before-board-fix.bin",
+    "bytes": 8388608,
+    "sha256": "e20f32098088e09e1e732c837bfa1346af8c8edc872d8fadd06bd937700c4e24"
+  },
+  "attempts": [
+    {
+      "result": "fail",
+      "observation": "Registry start failed for blip.output.strip0:pin because the first board build omitted the LED component's board compile definition."
+    },
+    {
+      "result": "pass",
+      "observation": "Rebuilt with the LED board definition, wrote only the application at 0x20000, and verified the flash digest. Boot reached BLIP_V2_BOOTSTRAP_READY with board=creators-ball-v2, pin=3, and enabled=0."
+    }
+  ],
+  "serial_control": {
+    "pin": 3,
+    "enabled": false,
+    "persisted_antenna": 1,
+    "enable_request": "resource_unavailable: hd108-backend-required",
+    "enabled_after_rejection": false
+  },
+  "follow_up": {
+    "timestamp_utc": "2026-09-30T16:38:00Z",
+    "image_sha256": "6ce726a2e5692eddbe53f1f1c27f12f8e0920371397ed9d2b09f1edbfd050a49",
+    "change": "Raise GPIO22 power hold at the start of app_main before service startup.",
+    "flash": "Application-only write at 0x20000 completed and esptool verified the digest.",
+    "serial_control": {"pin": 3, "enabled": false}
+  },
+  "raw_filtered_boot": "2026-09-30-creators-ball-v2.log",
+  "remaining": [
+    "Native clocked HD108 output is encoded and driver code exists, but it is not yet connected to the firmware component on this board.",
+    "Power latch is configured but battery retention, battery sensing, onboard IMU, IR, and full Gate B/C qualification are not yet demonstrated.",
+    "No external waveform capture or sustained Wi-Fi load was performed."
+  ]
+}

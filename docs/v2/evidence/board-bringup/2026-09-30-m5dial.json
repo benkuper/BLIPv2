@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5DIAL-BOARD-BRINGUP",
+  "state": "partial",
+  "timestamp_utc": "2026-09-30T16:47:00Z",
+  "board": "M5Stack M5Dial with Stamp S3A",
+  "port": "COM9",
+  "board_definition": "v2/boards/m5stack-m5dial.json",
+  "image_sha256": "2795e8d6997d1001a65ffd0b28dd3c97aadcba4d298c661178082e398256f457",
+  "flash": "Complete factory image written and all regions verified by esptool.",
+  "firmware_change": "Raise GPIO46 power hold at the start of app_main; initialize GPIO38 Stamp S3A status LED power off and switch it on only while RMT output is enabled.",
+  "serial_control": {
+    "pin": 21,
+    "test_pixels": 1,
+    "brightness": 16,
+    "red": 128,
+    "green": 0,
+    "blue": 0,
+    "test_enabled": true,
+    "applied_frames": 1,
+    "enabled_after_test": false
+  },
+  "checks": {"board_manifest_validator": "pass"},
+  "followup_status_pixel_check": "With the user reporting a visible light, COM9 still read enabled=false. A saved dim-red (brightness 16, red 128) frame was briefly enabled; applied_frames=1. The output was then disabled again and COM9 confirmed enabled=false. User visual comparison is pending.",
+  "remaining": [
+    "The test addressed a single status LED on the Stamp S3A module. It did not test the M5Dial's circular display or encoder ring. The user later reported a visible light while serial control still reported output enabled=false; the source of that light is not confirmed.",
+    "Battery powered retention, display, encoder, touch, RFID, and Gate B/C qualification are not yet demonstrated."
+  ]
+}

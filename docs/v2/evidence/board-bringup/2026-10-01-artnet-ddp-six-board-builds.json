@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "gate_id": "ARTNET-DDP-SIX-BOARD-BUILDS",
+  "state": "builds-passed",
+  "recorded_at_utc": "2026-09-30T22:40:00Z",
+  "method": "ESP-IDF 6.0.2 build with BLIP_ENABLE_ARTNET=ON and BLIP_ENABLE_DDP=ON; project_description.json confirms both components in each build",
+  "builds": [
+    {"board": "Adafruit HUZZAH32", "target": "esp32", "build": "m4-huzzah32", "app_bin_bytes": 1128144, "sha256": "9abe28f8a37b2f13bdf0cef7df28066845c4b5f2a474ea9058ae5946be8f560e", "result": "passed"},
+    {"board": "M5Stack M5Dial", "target": "esp32s3", "build": "m4-m5dial", "app_bin_bytes": 1120432, "sha256": "264697fc9c0a739587a033896e3805fd47663165a91f1a8fd5b00541b1b776c9", "result": "passed"},
+    {"board": "Creators Ball V2", "target": "esp32c6", "build": "m4-creators-ball-v2", "app_bin_bytes": 1278928, "sha256": "b2b805dcdd7b70b193cef0ddabad6110791dd3cebfd748c3167e15c56451dde5", "result": "passed"},
+    {"board": "Creators Tab replacement", "target": "esp32", "build": "m4-creators-tab", "app_bin_bytes": 1130240, "sha256": "68fbd7570d232bac9d9424f2e5dfdddbdb922c1984929347fd0e6acabd828db4", "result": "passed"},
+    {"board": "Seeed XIAO ESP32-C6", "target": "esp32c6", "build": "m4-current-esp32c6", "app_bin_bytes": 1263088, "sha256": "df2ebb012a6658a16a09e18846e537283a7da3bdebe82973bb25b100d9c50e1c", "result": "passed"},
+    {"board": "M5Stack M5StickC", "target": "esp32", "build": "m4-m5stickc", "app_bin_bytes": 1129024, "sha256": "c202ab0449512b73911ee90a1342e51ab1959417418fe6b45642f484ad02356f", "result": "passed; serial port absent, so this image was not flashed"}
+  ],
+  "hardware_scope": "Creators Ball V2 Art-Net discovery and streaming were tested with the earlier flashed dual-protocol image; see 2026-10-01-creators-ball-artnet.json. The other five Art-Net builds were not flashed or tested as Art-Net hardware in this run."
+}

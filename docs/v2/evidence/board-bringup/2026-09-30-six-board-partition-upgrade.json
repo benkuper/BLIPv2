@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "gate_id": "SIX-BOARD-V2-PARTITION-UPGRADE",
+  "state": "partial",
+  "timestamp_utc": "2026-09-30T17:22:00Z",
+  "partition_layout": {
+    "nvs": {"offset": "0x9000", "bytes": 61440},
+    "otadata": {"offset": "0x18000", "bytes": 8192},
+    "phy_init": {"offset": "0x1a000", "bytes": 4096},
+    "ota_0": "0x20000",
+    "ota_1": "0x1b0000",
+    "storage": "0x340000"
+  },
+  "upgrade_method": "The former OTA/PHY region was erased before writing the new partition table, OTA selection data and application. The M5StickC V1 NVS image was restored into the expanded partition. esptool verified every write.",
+  "devices": [
+    {"board":"Adafruit HUZZAH32","port":"COM5","image_sha256":"16e4137a707849b82933eea468f7182e22ffae15a3e356b90b2860a939edf42a","serial_probe":"blip.output.strip0 pin=15"},
+    {"board":"M5Stack M5Dial","port":"COM9","image_sha256":"e3bc38147264770e2bab3d3c8e175feca0dd331d2335774792f60bd881ea515c","serial_probe":"blip.output.strip0 enabled=false"},
+    {"board":"Creators Ball V2","port":"COM10","image_sha256":"1299c364c3ba0abf539eb68a982370bb3d4e5c8a13268a45a2b0082e5578922f","serial_probe":"blip.output.strip0 enabled=false"},
+    {"board":"M5Stack M5StickC","port":"COM12","image_sha256":"5a8c41062abe8185d47f9241e9d83f14962dd6633169d0f13ac372d7a9dece93","serial_probe":"blip.output.strip0 pin=26; legacy_import=confirmed"},
+    {"board":"Seeed XIAO ESP32-C6","port":"COM13","image_sha256":"a2916835b530625bd4fc1b251149b369b62f16d635af79f305a2f88ea8132c1d","serial_probe":"blip.transport.wifi antenna=0"},
+    {"board":"Creators Tab replacement","port":"COM14","image_sha256":"bef44900cbf884d1b2b51d9256f1f629280a3a09f14f24cc144b93a3c6e1dc34","serial_probe":"blip.output.strip0 pin=25"}
+  ],
+  "checks": {
+    "esp_idf_builds": "six board/target profiles succeeded",
+    "host_ctest_debug": "16/16 passed",
+    "bootstrap_validator": "pass",
+    "browser_installer_validator": "pass",
+    "board_manifest_validator": "pass"
+  },
+  "remaining": [
+    "The six serial probes establish firmware boot and control availability, not Gate B/C completion.",
+    "The HUZZAH32 strip power and ground wiring and visible output remain unconfirmed.",
+    "The Creators Ball HD108 backend is not connected to the firmware output component.",
+    "M5Dial circular display and rotary control, M5StickC peripherals, and later Plan.md milestones remain unimplemented."
+  ]
+}

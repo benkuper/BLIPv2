@@ -11,7 +11,7 @@ This plan is anchored to BLIP [`main` at e567eeb](https://github.com/Golden-Geek
 * Initial targets: ESP32, ESP32-S3, ESP32-C6.
 * No exceptions or RTTI in embedded code.
 * Prefer fixed-capacity buffers and explicit ownership.
-* Preserve useful V1 compatibility, but not V1’s internal architecture.
+* V2 does not need V1 settings, playback, or packet compatibility; retain V2 schema migrations.
 * One independently reviewable subsystem per PR.
 * Do not move or delete V1 until the cutover gate is explicitly approved.
 
@@ -190,7 +190,7 @@ This does not require faithfully reproducing V1 bugs or undocumented internal co
 | --- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | 2.1 | Add versioned per-component settings backed by NVS.                                                        | Interrupted saves retain either the previous or new valid state.                       |
 | 2.2 | Add LittleFS and optional SD storage services with atomic replacement.                                     | Files survive forced resets during update tests.                                       |
-| 2.3 | Add settings migration and V1 settings import.                                                             | Golden V1 fixtures import into the expected V2 component values.                       |
+| 2.3 | Add ordered V2 settings schema migrations. | Versioned V2 records migrate deterministically; V1 import is out of scope. |
 | 2.4 | Implement structured logging, runtime log levels, metrics, reset-cause reporting, coredumps and safe mode. | Boot loops enter a diagnosable recovery mode.                                          |
 | 2.5 | Implement the common transport envelope and Serial/USB transport.                                          | Parameters and actions can be controlled through a host test utility.                  |
 | 2.6 | Implement Wi-Fi station/AP management and serial/SoftAP provisioning.                                      | A blank device can be configured without reflashing.                                   |
@@ -219,7 +219,7 @@ This does not require faithfully reproducing V1 bugs or undocumented internal co
 | 4.4 | Add asynchronous frame submission, preallocated DMA/staging pools and deadline metrics. | The render task performs zero allocations after startup; overload and completion behavior are bounded and observable. |
 | 4.5 | Add native SPI-DMA clocked-strip support: APA102/SK9822, HD108 and compatible protocols. | Protocol analyzer or loopback fixtures verify frame layout, clock limits and timing.                 |
 | 4.6 | Implement the qualified production transport set and deterministic selector: RMT/RMT-DMA, SPI-encoded one-wire, target-neutral parallel-wave adapters, and an optional FastLED compatibility backend. This may be an epic with one reviewable PR per transport. | Each selected backend passes its ADR qualification range; `auto` reports its reason, forced selection is testable, resource conflicts fail cleanly, and every backend uses the same output ABI. |
-| 4.7 | Implement streaming and playback, including legacy import.                           | Network streaming does not block LED output; corrupted playback files fail safely.                  |
+| 4.7 | Implement V2 streaming and playback. | Network streaming does not block LED output; corrupted playback files fail safely. |
 | 4.8 | Add Art-Net/DMX compatibility with Art-Net node advertisement/discovery, followed by optional E1.31/DDP components. | An Art-Net controller can discover the node; each compatibility component is independently removable from minimal builds. |
 
 **Gate C:** sustained Wi-Fi traffic cannot corrupt LED timing, exhaust queues or cause monotonic heap loss.
@@ -233,7 +233,7 @@ This does not require faithfully reproducing V1 bugs or undocumented internal co
 | 5.3 | Add ESP-IDF power-management locks, light/deep sleep coordination and wake sources.                            | Each board profile records measured idle and sleep behavior.                      |
 | 5.4 | Implement`RadioManager` profiles and explicit memory/resource policies.                                      | UI clearly distinguishes live suspension from reboot-required memory reclamation. |
 | 5.5 | Add NimBLE serial/service transport. Add Classic Bluetooth only for original ESP32 profiles.                   | BLE can be excluded entirely and suspended when unused.                           |
-| 5.6 | Implement ESP-NOW V1/V2 negotiation, fragmentation, sequence numbers, acknowledgements and duplicate handling. | Tests cover V1↔V1, V2↔V2 and mixed-fleet behavior.                              |
+| 5.6 | Implement V2 ESP-NOW fragmentation, sequence numbers, acknowledgements and duplicate handling. | Tests cover V2 peers, loss, reordering, and duplicate handling. |
 | 5.7 | Implement fleet clock synchronization, leader election and scheduled cues.                                     | Nodes recover from leader loss without blocking normal computer control.          |
 
 ### Milestone 6 — WASM

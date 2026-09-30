@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "gate_id": "CREATORS-BALL-DDP-STREAM",
+  "state": "partial",
+  "timestamp_utc": "2026-09-30T21:47:45Z",
+  "board": "Creators Ball V2",
+  "port": "COM10",
+  "image_sha256": "e1593317f598fae32a9a0ee49a92eca245a4f4731c6bf9264633b9024d81aa0a",
+  "network": {"ssid": "Archi-wifi guest", "station_ip_at_test": "192.168.27.186", "ddp_udp_port": 4048, "pc_wifi_profile_restored_and_retained": "Archi-wifi guest"},
+  "credentials": "Stored only in the Git-ignored v2/firmware/local-wifi.txt; not included in this evidence file.",
+  "runtime": "A bounded UDP task validates DDP RGB8 datagrams, handles 4-bit sequence wrap, copies updates into the stream layer under a mutex, and wakes the HD108 output worker. The stream clears after one second without packets.",
+  "checks": {"host_led_m4_tests": "passed", "esp32c6_build": "passed", "app_flash_hash_verification": "passed", "six_board_wifi_connected_state": "COM5, COM9, COM10, COM12, COM13, COM14 each returned state=2"},
+  "single_packet": {"sent_bytes": 118, "accepted_packets": 1, "applied_frames_after_timeout": 3, "failed_frames": 0},
+  "five_fps_run": {"sent_frames": 60, "accepted_frames_delta": 60, "rejected_frames_delta": 0, "applied_frames_delta_including_timeout": 61, "failed_frames": 0},
+  "thirty_fps_run": {"duration_seconds": 29.967, "sent_frames": 900, "accepted_packets": 891, "rejected_packets": 0, "invalid_packets": 0, "stale_packets": 0, "output_rejections": 0, "applied_frames": 845, "failed_frames": 0, "ddp_worker_stack_headroom_bytes": 3376, "led_worker_stack_headroom_bytes": 3920, "last_frame_completion_us": 9554},
+  "heap": {"free_internal_before_bytes": 237028, "free_internal_after_bytes": 237028, "minimum_free_internal_after_bytes": 214020, "largest_free_block_after_bytes": 212992},
+  "interpretation": "Nine sent UDP datagrams did not reach the receiver during the 30 fps run. The output worker coalesced intermediate updates while completing 845 frames without a reported transport failure. Identical before/after free-heap readings show no net loss in this run only.",
+  "remaining": ["Visual confirmation of the pixels is pending because the user is away from the hardware.", "No external clock/data timing capture or sustained multi-hour Wi-Fi load has been recorded.", "Only the Creators Ball has a live DDP-to-output path; the other five boards currently have host-tested streaming primitives but no runtime stream ingress."]
+}

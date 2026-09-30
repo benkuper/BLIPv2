@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "gate_id": "DDP-SIX-BOARD-ROLLOUT",
+  "state": "partial",
+  "timestamp_utc": "2026-09-30T22:14:26Z",
+  "network": "PC and boards on Archi-wifi guest; PC never joined a BLIP access point during these tests.",
+  "firmware_builds": [
+    {"board": "Adafruit HUZZAH32", "target": "esp32", "build": "m4-huzzah32", "sha256": "5dd502ceb2ba76ebda6795ad543dbe048a6db39dc55408a2d91503cd53700ec1", "result": "passed"},
+    {"board": "M5Stack M5Dial", "target": "esp32s3", "build": "m4-m5dial", "sha256": "db56731f0fbed2bedd3a8df2f2b254602e25be4b3ea94731c32ab0c0136d3376", "result": "passed"},
+    {"board": "Creators Ball V2", "target": "esp32c6", "build": "m4-creators-ball-v2", "sha256": "a01bfaabaf23d0b93e92df38bee263dd841cb001874cbbebd85ab73983f0a68e", "result": "passed"},
+    {"board": "Creators Tab replacement", "target": "esp32", "build": "m4-creators-tab", "sha256": "109d7f33c72f86ab3e04f5dfcc89c9fb7e1230a6e78d57fcba72bfb296b651f8", "result": "passed"},
+    {"board": "Seeed XIAO ESP32-C6", "target": "esp32c6", "build": "m4-current-esp32c6", "sha256": "9bd6ad9c3a5e730264533c7c45e0d835991f168d7f37c929e4f5cdfa9ada4fe8", "result": "passed"},
+    {"board": "M5Stack M5StickC", "target": "esp32", "build": "m4-m5stickc", "sha256": "1b2448849fbc5255951a4c593506c7e13eaa32cac4b3ea2a1c4c7c57984a6ad0", "result": "passed; COM12 absent, so current image was not flashed"}
+  ],
+  "hardware_hil": [
+    {"board": "Adafruit HUZZAH32", "port": "COM5", "station_ip_at_test": "192.168.27.156", "configured_pixels": 8, "ddp_sent": 30, "ddp_accepted": 28, "ddp_rejected": 0, "applied_frames_after_timeout": 30, "failed_frames": 0, "output_worker_stack_headroom_bytes": 2848, "ddp_worker_stack_headroom_bytes": 3024, "heap_free_internal_bytes": 128464, "boundary_check": "A nine-pixel packet was rejected for the configured eight-pixel strip; output_rejections=1 and applied_frames did not increase."},
+    {"board": "Creators Ball V2", "port": "COM10", "station_ip_at_test": "192.168.27.186", "configured_pixels": 36, "ddp_sent": 30, "ddp_accepted": 30, "ddp_rejected": 0, "applied_frames_after_timeout": 25, "failed_frames": 0},
+    {"board": "M5Stack M5Dial", "port": "COM9", "station_ip_at_test": "192.168.27.137", "configured_pixels": 1, "ddp_sent": 20, "ddp_accepted": 20, "ddp_rejected": 0, "applied_frames_after_timeout": 22, "failed_frames": 0, "output_worker_stack_headroom_bytes": 2624, "final_output_enabled": false},
+    {"board": "Creators Tab replacement", "port": "COM14", "station_ip_at_test": "192.168.27.189", "configured_pixels": 1, "ddp_sent": 10, "ddp_accepted": 10, "ddp_rejected": 0, "applied_frames_after_timeout": 12, "failed_frames": 0, "note": "The first reported station IP was unreachable from the PC. Serial reprovisioning from the ignored local credentials file restored HTTP 200 and DDP reachability. The external strip is disconnected from this board.", "final_output_enabled": false},
+    {"board": "Seeed XIAO ESP32-C6", "port": "COM13", "station_ip_at_test": "192.168.27.136", "configured_pixels": 1, "ddp_sent": 10, "ddp_accepted": 10, "ddp_rejected": 0, "applied_frames_after_timeout": 12, "failed_frames": 0, "note": "No external RGB LED is connected to the tested GPIO20 output.", "final_output_enabled": false}
+  ],
+  "remaining": [
+    "M5StickC COM12 is absent; the current image and DDP output path still need hardware verification.",
+    "LED appearance and waveform timing were not captured by a person or external fixture.",
+    "This short shared-Wi-Fi run does not satisfy the sustained Gate C load and timing qualification."
+  ]
+}

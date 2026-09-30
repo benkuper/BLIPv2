@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "gate_id": "CREATORS-TAB-REPLACEMENT-BOARD-BRINGUP",
+  "state": "partial",
+  "timestamp_utc": "2026-09-30T16:38:00Z",
+  "board": "Creators Tab replacement",
+  "port": "COM14",
+  "chip": "ESP32-PICO-D4 revision v1.0",
+  "mac": "50:02:91:9f:8e:d0",
+  "board_definition": "v2/boards/creators-tab.json",
+  "image_sha256": "40134f91d5be6b24d449eea0f16d0fc414279c06a010fe507a972bb24496d4ff",
+  "flash": [
+    "First full factory write at 250000 baud lost serial data at 90.8 percent of the application region.",
+    "Application retry at 115200 baud completed; esptool verified the digest.",
+    "Filesystem partition written separately and verified; bootloader, partition table and initial OTA data verified in the first write."
+  ],
+  "firmware_change": "Raise GPIO12 power hold at the start of app_main before service startup.",
+  "serial_control": {"pin": 25, "enabled": false},
+  "checks": {"board_manifest_validator": "pass", "host_ctest_debug": "16/16 passed"},
+  "remaining": [
+    "The strip was moved to the HUZZAH32, so no Creators Tab LED output was exercised.",
+    "Battery powered retention, onboard peripherals, and Gate B/C qualification are not yet demonstrated."
+  ]
+}
