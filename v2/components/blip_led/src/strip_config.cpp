@@ -1,4 +1,5 @@
 #include "blip/led/strip_config.hpp"
+#include "blip/led/current_limiter.hpp"
 
 #include <algorithm>
 #include <array>
@@ -65,7 +66,8 @@ void write_u32(std::span<std::byte> output, std::size_t offset, std::uint32_t va
 
 core::Status validate_strip_config(const StripConfig& config) noexcept {
     if (static_cast<std::uint8_t>(config.protocol) > 2U || config.gpio > 63U ||
-        config.pixel_count == 0U || config.pixel_count > kMaximumStripPixels) {
+        config.pixel_count == 0U || config.pixel_count > kMaximumStripPixels ||
+        !valid_power_budget(config.power_budget_ma, config.pixel_count)) {
         return core::Status::failure(
             strip_error(core::ErrorCode::validation_failed, "validate", "invalid-strip-settings"));
     }
@@ -96,17 +98,22 @@ core::Result<std::size_t> encode_strip_config(const StripConfig& config,
     output[19] = static_cast<std::byte>(config.green);
     output[20] = static_cast<std::byte>(config.blue);
     output[21] = static_cast<std::byte>(config.white);
+    write_u16(output, 22U, config.power_budget_ma);
     write_u32(output, kCrcOffset, crc32(output.first(kStripSettingsBytes)));
     return core::Result<std::size_t>::success(kStripSettingsBytes);
 }
 
 core::Result<StripConfig> decode_strip_config(std::span<const std::byte> input) noexcept {
     if (input.size() != kStripSettingsBytes || read_u32(input, 0U) != kMagic ||
-        read_u16(input, 4U) != kStripSettingsFormatVersion ||
+        (read_u16(input, 4U) != 1U &&
+         read_u16(input, 4U) != kStripSettingsFormatVersion) ||
         read_u16(input, 6U) != kStripSettingsBytes || input[12] > std::byte{1} ||
         input[13] > std::byte{2} ||
-        !std::all_of(input.begin() + 22, input.end(),
+        !std::all_of(input.begin() +
+                         (read_u16(input, 4U) == 1U ? 22 : 24), input.end(),
                      [](std::byte value) { return value == std::byte{0}; }) ||
+        (read_u16(input, 4U) == 1U &&
+         (input[22] != std::byte{0} || input[23] != std::byte{0})) ||
         read_u32(input, kCrcOffset) != crc32(input)) {
         return core::Result<StripConfig>::failure(
             strip_error(core::ErrorCode::corrupt_data, "decode", "invalid-strip-record"));
@@ -121,6 +128,9 @@ core::Result<StripConfig> decode_strip_config(std::span<const std::byte> input) 
     config.green = std::to_integer<std::uint8_t>(input[19]);
     config.blue = std::to_integer<std::uint8_t>(input[20]);
     config.white = std::to_integer<std::uint8_t>(input[21]);
+    if (read_u16(input, 4U) == kStripSettingsFormatVersion) {
+        config.power_budget_ma = read_u16(input, 22U);
+    }
     const auto valid = validate_strip_config(config);
     return valid ? core::Result<StripConfig>::success(config)
                  : core::Result<StripConfig>::failure(valid.error());

@@ -64,7 +64,7 @@ constexpr std::array<core::ResourceRequest, 1> kResources{{
      0U, 0x02U, 0U, false},
 }};
 #endif
-constexpr std::array<core::MetadataEntry, 7> kMetadata{{
+constexpr std::array<core::MetadataEntry, 8> kMetadata{{
     {"backend", kClockedBoard ? "esp-spi-dma" : "native-rmt"},
     {"qualification", "ADR-0007"},
     {"lane_count", "1"},
@@ -72,8 +72,9 @@ constexpr std::array<core::MetadataEntry, 7> kMetadata{{
     {"gpio_parameter", "pin"},
     {"maximum_pixels", kClockedBoard ? "36" : "1024"},
     {"transport_dma", kClockedBoard ? "spi-required" : "rmt-disabled-m3-baseline"},
+    {"current_model", "1mA/pixel idle; 20mA/full channel; calculated only"},
 }};
-constexpr std::array<core::ParameterDescriptor, 14> kParameters{{
+constexpr std::array<core::ParameterDescriptor, 17> kParameters{{
     {"enabled",
      "Strip enabled",
      core::ValueType::boolean,
@@ -116,6 +117,14 @@ constexpr std::array<core::ParameterDescriptor, 14> kParameters{{
      core::ScalarValue::from_integer(255),
      {true, 0, 255, 1},
      ""},
+    {"power_budget_ma",
+     "Calculated LED current budget",
+     core::ValueType::integer,
+     core::Access::read_write,
+     true,
+     core::ScalarValue::from_integer(1500),
+     {true, 1, kHardPowerBudgetMa, 1},
+     "mA"},
     {"red",
      "Red",
      core::ValueType::integer,
@@ -172,6 +181,22 @@ constexpr std::array<core::ParameterDescriptor, 14> kParameters{{
      core::ScalarValue::from_integer(0),
      {},
      "us"},
+    {"estimated_current_ma",
+     "Estimated LED current after limiting",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {},
+     "mA"},
+    {"power_scale_q16",
+     "Applied power scale",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(65535),
+     {true, 0, 65535, 1},
+     ""},
     {"worker_stack_headroom",
      "Output worker stack headroom",
      core::ValueType::integer,
@@ -205,15 +230,17 @@ constexpr std::array<core::ActionDescriptor, 1> kActions{{
     {"blackout", "Set all channels to zero", {}},
 }};
 #endif
-constexpr std::array<core::DiagnosticDescriptor, 3> kDiagnostics{{
+constexpr std::array<core::DiagnosticDescriptor, 5> kDiagnostics{{
     {"applied_frames", core::ValueType::integer, "frames"},
     {"failed_frames", core::ValueType::integer, "frames"},
     {"last_frame_us", core::ValueType::integer, "us"},
+    {"estimated_current_ma", core::ValueType::integer, "mA"},
+    {"power_scale_q16", core::ValueType::integer, ""},
 }};
 
 [[nodiscard]] constexpr core::ComponentDescriptor strip_descriptor() noexcept {
     core::ComponentDescriptor descriptor{};
-    descriptor.schema_version = 1U;
+    descriptor.schema_version = 2U;
     descriptor.id = "blip.output.strip0";
     descriptor.display_name = "Pixel strip 0";
     descriptor.description = kClockedBoard ? "Onboard 36-pixel HD108 SPI-DMA output"
@@ -225,7 +252,7 @@ constexpr std::array<core::DiagnosticDescriptor, 3> kDiagnostics{{
     descriptor.actions = kActions;
     descriptor.diagnostics = kDiagnostics;
     descriptor.resources = kResources;
-    descriptor.settings = {1U, 1U};
+    descriptor.settings = {2U, 2U};
     descriptor.disable_policy = core::DisablePolicy::live;
     descriptor.supports_restart = true;
     descriptor.cost = {32768U, kClockedBoard ? 12288U : 24576U,
@@ -585,6 +612,10 @@ core::Status EspRmtStripComponent::transmit(const StripConfig& config,
     if (!encoded) {
         return core::Status::failure(encoded.error());
     }
+    const auto power = limit_encoded(config, buffer.first(encoded.value()));
+    if (!power) {
+        return power;
+    }
     const auto started_at = esp_timer_get_time();
     const auto queued = spi_driver_.submit({buffer.first(encoded.value()),
                                             applied_frames_.load() + failed_frames_.load() + 1U,
@@ -612,6 +643,12 @@ core::Status EspRmtStripComponent::transmit(const StripConfig& config,
         return core::Status::failure(
             output_error(core::ErrorCode::invalid_state, "transmit", "output-not-initialized"));
     }
+    const auto power = limit_encoded(
+        config, std::span<std::byte>{reinterpret_cast<std::byte*>(pixel_buffer_.data()),
+                                     payload_size});
+    if (!power) {
+        return power;
+    }
     rmt_transmit_config_t transmit_config{};
     transmit_config.flags.eot_level = 0U;
     const auto started_at = esp_timer_get_time();
@@ -631,6 +668,23 @@ core::Status EspRmtStripComponent::transmit(const StripConfig& config,
 #endif
 }
 
+core::Status EspRmtStripComponent::limit_encoded(const StripConfig& config,
+                                                  std::span<std::byte> frame) noexcept {
+    const auto protocol = config.protocol == StripProtocol::hd108_rgb
+                              ? PixelProtocol::hd108
+                              : config.protocol == StripProtocol::sk6812_rgbw
+                                    ? PixelProtocol::sk6812
+                                    : PixelProtocol::ws2812;
+    const auto result = current_limiter_.limit(frame, protocol, config.pixel_count,
+                                                config.power_budget_ma);
+    if (!result) {
+        return core::Status::failure(result.error());
+    }
+    estimated_current_ma_.store(result.value().estimated_after_ma);
+    power_scale_q16_.store(result.value().applied_scale_q16);
+    return core::Status::success();
+}
+
 core::Status EspRmtStripComponent::start(const core::StartContext&) noexcept {
     if (started_.load()) {
         return core::Status::success();
@@ -645,6 +699,9 @@ core::Status EspRmtStripComponent::start(const core::StartContext&) noexcept {
             output_error(core::ErrorCode::start_failed, "start", "mutex-create-failed"));
     }
     stream_layer_.clear();
+    current_limiter_.reset();
+    estimated_current_ma_.store(0U);
+    power_scale_q16_.store(65535U);
     auto status = load_config();
     if (!status) {
         config_mutex_ = nullptr;
@@ -864,6 +921,14 @@ core::Status EspRmtStripComponent::read_parameter(std::string_view id,
         output = core::ScalarValue::from_integer(failed_frames_.load());
         return core::Status::success();
     }
+    if (id == "estimated_current_ma") {
+        output = core::ScalarValue::from_integer(estimated_current_ma_.load());
+        return core::Status::success();
+    }
+    if (id == "power_scale_q16") {
+        output = core::ScalarValue::from_integer(power_scale_q16_.load());
+        return core::Status::success();
+    }
     if (id == "last_frame_us") {
         output = core::ScalarValue::from_integer(last_frame_us_.load());
         return core::Status::success();
@@ -891,6 +956,8 @@ core::Status EspRmtStripComponent::read_parameter(std::string_view id,
         output = core::ScalarValue::from_integer(config_.pixel_count);
     } else if (id == "brightness") {
         output = core::ScalarValue::from_integer(config_.brightness);
+    } else if (id == "power_budget_ma") {
+        output = core::ScalarValue::from_integer(config_.power_budget_ma);
     } else if (id == "red") {
         output = core::ScalarValue::from_integer(config_.red);
     } else if (id == "green") {
@@ -933,6 +1000,9 @@ core::Status EspRmtStripComponent::write_parameter(std::string_view id,
     } else if (id == "pixels" && !kClockedBoard && value.type == core::ValueType::integer && value.integer >= 1 &&
                value.integer <= static_cast<std::int64_t>(kMaximumStripPixels)) {
         candidate.pixel_count = static_cast<std::uint16_t>(value.integer);
+    } else if (id == "power_budget_ma" && value.type == core::ValueType::integer &&
+               value.integer >= 1 && value.integer <= kHardPowerBudgetMa) {
+        candidate.power_budget_ma = static_cast<std::uint16_t>(value.integer);
     } else if ((id == "brightness" || id == "red" || id == "green" || id == "blue" ||
                 id == "white") &&
                value.type == core::ValueType::integer && value.integer >= 0 &&

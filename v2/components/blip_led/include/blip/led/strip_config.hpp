@@ -1,6 +1,7 @@
 #pragma once
 
 #include "blip/core/error.hpp"
+#include "blip/led/current_limiter.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -8,7 +9,7 @@
 
 namespace blip::led {
 
-inline constexpr std::uint16_t kStripSettingsFormatVersion = 1U;
+inline constexpr std::uint16_t kStripSettingsFormatVersion = 2U;
 inline constexpr std::size_t kStripSettingsBytes = 32U;
 inline constexpr std::size_t kMaximumStripPixels = 1024U;
 
@@ -24,6 +25,7 @@ struct StripConfig {
     std::uint8_t green{};
     std::uint8_t blue{};
     std::uint8_t white{};
+    std::uint16_t power_budget_ma{kDefaultPowerBudgetMa};
 
     [[nodiscard]] bool operator==(const StripConfig&) const noexcept = default;
 };

@@ -3,6 +3,7 @@ idf_component_register(
         "src/backend_selector.cpp"
         "src/color.cpp"
         "src/compositor.cpp"
+        "src/current_limiter.cpp"
         "src/engine.cpp"
         "src/esp_rmt_strip_component.cpp"
         "src/esp_rmt_output_driver.cpp"

@@ -50,3 +50,10 @@ wire protocols, or public OSC paths.
 | [4.7](4.7-led-stream-playback.md) | Bounded stream layer, versioned V2 playback, and clock |
 | [4.8](4.8-led-network-compat.md) | Removable Art-Net, DDP, and optional E1.31 runtimes |
 | [Milestone evidence](milestone-4-evidence.md) | Host goldens, target builds, sustained soak, and open Gate C HIL boundary |
+
+## Milestone 5
+
+| Work package | Result |
+| --- | --- |
+| [5.1](5.1-battery.md) | HUZZAH32 calibrated ADC and filtered voltage estimate; other board calibration open |
+| [5.2](5.2-led-current-limiting.md) | Encoded-frame calculated current limit and six-board builds; physical current calibration open |

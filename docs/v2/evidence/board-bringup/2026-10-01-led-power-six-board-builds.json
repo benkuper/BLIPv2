@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5-2-LED-POWER-SIX-BOARD-BUILDS",
+  "timestamp_utc": "2026-09-30T23:55:00Z",
+  "configuration": "Art-Net, DDP, E1.31 enabled; HUZZAH32 battery profile enabled only on HUZZAH32",
+  "host_ctest": "18/18 passed",
+  "boards": [
+    {"board": "Creators Ball V2", "build": "m4-e131-ball-c6", "sha256": "e6ed2abe9216a065bb1ada3ed448a172faab856738fb11bf179a253868997910", "bytes": 1288864, "result": "pass"},
+    {"board": "Creators Tab", "build": "m4-e131-creators-tab", "sha256": "adb1030f7a199b4dc560b87cd732b6b7e45a08161169f30a8d0a05ef57aa5aca", "bytes": 1139696, "result": "pass"},
+    {"board": "Adafruit HUZZAH32", "build": "m4-e131-huzzah32", "sha256": "198caad20b243a747f24082dffabe53e0e51243e272a3e49a560b59890a968d8", "bytes": 1149584, "result": "pass"},
+    {"board": "M5Dial", "build": "m4-e131-m5dial", "sha256": "d238a1162797b799fca97da9be019c2f99a47b9905a55d9694cb92eb98187493", "bytes": 1129904, "result": "pass"},
+    {"board": "M5StickC", "build": "m4-e131-m5stickc", "sha256": "ec7d09ca318cfca2295baeafd79e3ae9210b9955000fca706c93731979466c8a", "bytes": 1138512, "result": "pass"},
+    {"board": "Seeed XIAO ESP32-C6", "build": "m4-e131-xiao-c6", "sha256": "47a4801ed08e8b3fe5a7df423a99ee94fde33fb280e5101b9fc88849cc089a8e", "bytes": 1273088, "result": "pass"}
+  ],
+  "limits": "Builds do not prove physical current or LED waveform integrity."
+}

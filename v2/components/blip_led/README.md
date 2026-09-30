@@ -43,6 +43,11 @@ The production engine is split into portable contracts and ESP-IDF ports:
   strict versioned playback and deterministic playback time. The V1 ARGB
   conversion helper remains in the source tree as historical tooling and is
   outside the V2 release scope.
+- `current_limiter.hpp` estimates encoded LED channel current and scales only
+  channel bytes immediately before output. The persisted `power_budget_ma`
+  parameter defaults to 1500 mA and rejects budgets over 5000 mA or below
+  modeled idle current. `estimated_current_ma` and `power_scale_q16` expose the
+  calculated result. Board-specific electrical calibration remains open.
 
 The selector will not use a backend whose capability record is unqualified,
 even when forced. ESP transport records therefore remain fail-closed until the

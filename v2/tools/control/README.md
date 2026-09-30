@@ -85,3 +85,17 @@ New reports include sent packet counts and serial snapshots of accepted/rejected
 packets, applied/failed LED frames, stack headroom, and heap. `elapsed_seconds`
 includes the final serial sample; `traffic_duration_seconds` measures the send
 period. This is a short load check, not waveform timing qualification.
+
+To check the calculated LED current limit and restore the prior strip settings,
+run the serial HIL helper. Use a budget at least as large as the configured
+pixel count because the model includes 1 mA idle per pixel:
+
+```powershell
+python v2/tools/control/blip_led_power_hil.py --port COM10 --budget-ma 50 --red 255 --out docs/v2/evidence/board-bringup/ball-power-limit.json
+python v2/tools/control/blip_led_power_hil.py --port COM5 --budget-ma 15 --red 255 --out docs/v2/evidence/board-bringup/huzzah-power-limit.json
+```
+
+Add `--temporarily-enable` if the strip is disabled. The helper restores the
+prior red channel, enabled state, and budget in a `finally` block and reports
+whether restoration was verified. Its result is a calculated-current check;
+physical supply current still needs a meter.

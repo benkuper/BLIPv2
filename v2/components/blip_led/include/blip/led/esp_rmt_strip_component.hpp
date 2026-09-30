@@ -2,6 +2,7 @@
 
 #include "blip/core/component.hpp"
 #include "blip/led/strip_config.hpp"
+#include "blip/led/current_limiter.hpp"
 #include "blip/led/stream.hpp"
 #if defined(BLIP_BOARD_CREATORS_BALL_V2)
 #include "blip/led/esp_spi_dma_output_driver.hpp"
@@ -57,6 +58,8 @@ class EspRmtStripComponent final : public core::Component {
     void deinitialize_output() noexcept;
     [[nodiscard]] core::Status transmit(const StripConfig& config,
                                          std::size_t payload_size) noexcept;
+    [[nodiscard]] core::Status limit_encoded(const StripConfig& config,
+                                              std::span<std::byte> frame) noexcept;
 #if !defined(BLIP_BOARD_CREATORS_BALL_V2)
     [[nodiscard]] core::Result<std::size_t> render_one_wire(const StripConfig& config) noexcept;
 #endif
@@ -86,6 +89,7 @@ class EspRmtStripComponent final : public core::Component {
     std::array<LinearPixel, kMaximumStripPixels> stream_pixels_{};
 #endif
     StreamLayer stream_layer_{stream_pixels_};
+    CurrentLimiter current_limiter_{};
     StaticSemaphore_t stream_mutex_storage_{};
     SemaphoreHandle_t stream_mutex_{};
     alignas(16) std::array<StackType_t, kTaskStackWords> task_stack_{};
@@ -104,6 +108,8 @@ class EspRmtStripComponent final : public core::Component {
     std::atomic<std::uint32_t> applied_frames_{};
     std::atomic<std::uint32_t> failed_frames_{};
     std::atomic<std::uint32_t> last_frame_us_{};
+    std::atomic<std::uint32_t> estimated_current_ma_{};
+    std::atomic<std::uint32_t> power_scale_q16_{65535U};
     std::uint32_t next_update_id_{};
     std::uint32_t pending_update_id_{};
     std::uint32_t completed_update_id_{};

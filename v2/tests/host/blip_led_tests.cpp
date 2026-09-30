@@ -28,6 +28,7 @@ bool settings_round_trip_and_corruption_fail_closed() {
     config.green = 2U;
     config.blue = 3U;
     config.white = 4U;
+    config.power_budget_ma = 2000U;
     std::array<std::byte, kStripSettingsBytes> encoded{};
     const auto size = encode_strip_config(config, encoded);
     BLIP_CHECK(size && size.value() == kStripSettingsBytes);
@@ -35,6 +36,38 @@ bool settings_round_trip_and_corruption_fail_closed() {
     BLIP_CHECK(decoded && decoded.value() == config);
     encoded[24] = std::byte{1};
     BLIP_CHECK(!decode_strip_config(encoded));
+    return true;
+}
+
+bool v2_settings_v1_migrate_with_a_bounded_budget() {
+    StripConfig config{};
+    config.pixel_count = 36U;
+    config.red = 12U;
+    config.power_budget_ma = 2300U;
+    std::array<std::byte, kStripSettingsBytes> encoded{};
+    BLIP_CHECK(encode_strip_config(config, encoded));
+    encoded[4] = std::byte{1};
+    encoded[5] = std::byte{0};
+    encoded[22] = std::byte{0};
+    encoded[23] = std::byte{0};
+    std::uint32_t crc = 0xffffffffU;
+    for (std::size_t index = 0U; index < encoded.size(); ++index) {
+        const auto byte = index >= 8U && index < 12U ? 0U
+                          : std::to_integer<std::uint8_t>(encoded[index]);
+        crc ^= byte;
+        for (int bit = 0; bit < 8; ++bit) {
+            const auto mask = 0U - (crc & 1U);
+            crc = (crc >> 1U) ^ (0xedb88320U & mask);
+        }
+    }
+    crc = ~crc;
+    for (std::size_t index = 0U; index < 4U; ++index) {
+        encoded[8U + index] = static_cast<std::byte>(crc >> (8U * index));
+    }
+    const auto decoded = decode_strip_config(encoded);
+    BLIP_CHECK(decoded);
+    BLIP_CHECK(decoded.value().power_budget_ma == kDefaultPowerBudgetMa);
+    BLIP_CHECK(decoded.value().red == 12U);
     return true;
 }
 
@@ -51,6 +84,11 @@ bool invalid_settings_are_rejected() {
     config.protocol = StripProtocol::hd108_rgb;
     std::array<std::uint8_t, 3> unclocked{};
     BLIP_CHECK(!fill_solid_frame(config, unclocked));
+    config.power_budget_ma = 0U;
+    BLIP_CHECK(!validate_strip_config(config));
+    config.power_budget_ma = 5001U;
+    BLIP_CHECK(!validate_strip_config(config));
+    config.power_budget_ma = kDefaultPowerBudgetMa;
     std::array<std::byte, kStripSettingsBytes - 1U> short_output{};
     config.protocol = StripProtocol::ws2812_rgb;
     BLIP_CHECK(!encode_strip_config(config, short_output));
@@ -110,6 +148,7 @@ bool protocol_timings_are_exact() {
 
 int main() {
     const std::array tests{settings_round_trip_and_corruption_fail_closed,
+                           v2_settings_v1_migrate_with_a_bounded_budget,
                            invalid_settings_are_rejected, ws2812_frame_is_grb_and_brightness_scaled,
                            sk6812_frame_is_grbw_at_maximum_length, protocol_timings_are_exact};
     for (const auto test : tests) {

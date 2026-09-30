@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5-2-LED-POWER-HIL",
+  "timestamp_utc": "2026-09-30T23:51:01.209023+00:00",
+  "port": "COM10",
+  "original": {
+    "power_budget_ma": 1500,
+    "red": 0,
+    "pixels": 36,
+    "brightness": 24,
+    "failed_frames": 0,
+    "applied_frames": 1
+  },
+  "limited_observation": {
+    "power_budget_ma": 50,
+    "red": 255,
+    "estimated_current_ma": 50,
+    "power_scale_q16": 13539,
+    "failed_frames": 0,
+    "applied_frames": 3
+  },
+  "restored": {
+    "power_budget_ma": 1500,
+    "red": 0
+  },
+  "restoration_errors": [],
+  "passed": true,
+  "limit": "Calculated channel-current model; no physical current measurement."
+}
