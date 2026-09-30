@@ -14,10 +14,13 @@ param(
 
     [int] $ExpectPinCount = 0,
 
-    [string] $Python = "python"
+    [string] $Python = "python",
+
+    [int] $RecoveryDelaySeconds = 600
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "../wifi/blip_wifi_guard.ps1")
 $interface = "Wi-Fi"
 $profileFile = Join-Path ([System.IO.Path]::GetTempPath()) "$DeviceSsid.xml"
 $testClient = Join-Path $PSScriptRoot "blip_led_network_hil.py"
@@ -76,9 +79,12 @@ $profileXml = @"
 "@
 
 $offlineError = $null
+$guard = $null
 try {
     [System.IO.File]::WriteAllText($profileFile, $profileXml)
     Invoke-Netsh -Arguments @("wlan", "add", "profile", "filename=$profileFile", "interface=$interface", "user=current")
+    $guard = Start-BlipWifiGuard -InternetProfile $InternetProfile -DeviceSsid $DeviceSsid `
+        -Interface $interface -RecoveryDelaySeconds $RecoveryDelaySeconds
     Invoke-Netsh -Arguments @("wlan", "disconnect", "interface=$interface")
     Invoke-Netsh -Arguments @("wlan", "connect", "name=$DeviceSsid", "ssid=$DeviceSsid", "interface=$interface")
     Wait-ConnectedSsid -Ssid $DeviceSsid
@@ -92,14 +98,13 @@ try {
 } catch {
     $offlineError = $_
 } finally {
-    # There is only one Wi-Fi interface. Do all AP work above without returning
-    # control, then unconditionally restore Internet before Codex can continue.
-    & netsh wlan disconnect "interface=$interface" | Out-Host
-    & netsh wlan connect "name=$InternetProfile" "interface=$interface" | Out-Host
-    try {
-        Wait-ConnectedSsid -Ssid $InternetProfile -TimeoutSeconds 45
-    } catch {
-        if ($null -eq $offlineError) { $offlineError = $_ }
+    if ($null -ne $guard) {
+        try {
+            Restore-BlipWifi -Guard $guard -InternetProfile $InternetProfile -Interface $interface
+        } catch {
+            if ($null -eq $offlineError) { $offlineError = $_ }
+            else { Write-Warning $_ }
+        }
     }
     & netsh wlan delete profile "name=$DeviceSsid" "interface=$interface" | Out-Host
     Remove-Item -LiteralPath $profileFile -Force -ErrorAction SilentlyContinue

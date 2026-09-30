@@ -10,7 +10,7 @@
 
 namespace blip::storage {
 
-inline constexpr std::uint32_t kLegacySettingsImporterVersion = 1;
+inline constexpr std::uint32_t kLegacySettingsImporterVersion = 2;
 inline constexpr std::size_t kMaxLegacySettingsBytes = 6144;
 inline constexpr std::size_t kMaxLegacySettingCount = 192;
 inline constexpr std::size_t kMaxLegacyComponentCount = 64;

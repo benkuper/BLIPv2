@@ -208,12 +208,65 @@ def validate_board(path: Path) -> None:
         ids.add(pin["id"])
         gpios.add(pin["gpio"])
         by_gpio[pin["gpio"]] = pin
-    if document["target"] == "esp32c6":
+    if document["id"] == "seeed-xiao-esp32c6-chip-antenna":
         require(document.get("antenna") == "onboard", f"{path}: reference C6 must use onboard antenna")
         require(by_gpio[3].get("reason") == "onboard-antenna-rf-switch-power",
                 f"{path}: GPIO3 must reserve RF switch power")
         require(by_gpio[14].get("reason") == "onboard-antenna-selected",
                 f"{path}: GPIO14 must reserve onboard antenna selection")
+    if document["id"] == "adafruit-huzzah32":
+        pin = by_gpio.get(15, {})
+        require(pin.get("reserved_for") == "blip.output.strip0:pin"
+                and pin.get("reason") == "ws2812b-data-boot-strap"
+                and pin.get("selectable") is False,
+                f"{path}: GPIO15 must remain reserved for the wired strip")
+    if document["id"] == "m5stack-m5dial":
+        pin = by_gpio.get(38, {})
+        require(pin.get("reserved_for") == "system.led-power"
+                and pin.get("reason") == "led-enable"
+                and pin.get("selectable") is False,
+                f"{path}: GPIO38 must remain reserved for RGB LED power")
+    if document["id"] == "creators-ball-v2":
+        require(document["target"] == "esp32c6", f"{path}: Creators Ball V2 target changed")
+        for gpio, owner, reason in (
+            (2, "blip.output.strip0:clock", "hd108-clock"),
+            (3, "blip.output.strip0:pin", "hd108-data"),
+            (14, "system.battery", "battery-charge-input"),
+            (21, "system.led-power", "led-enable"),
+            (22, "system.power", "power-hold-critical"),
+        ):
+            pin = by_gpio.get(gpio, {})
+            require(pin.get("reserved_for") == owner and pin.get("reason") == reason
+                    and pin.get("selectable") is False,
+                    f"{path}: GPIO{gpio} must remain reserved for {owner}")
+    if document["id"] == "creators-tab":
+        require(document["target"] == "esp32", f"{path}: Creators Tab target changed")
+        for gpio, owner, reason in (
+            (12, "system.power", "power-hold-critical"),
+            (23, "bus.i2c.imu", "onboard-imu-bus"),
+            (25, "blip.output.strip0:pin", "ws2812b-data"),
+            (27, "system.led-power", "led-enable"),
+            (39, "system.battery", "battery-charge-input"),
+        ):
+            pin = by_gpio.get(gpio, {})
+            require(pin.get("reserved_for") == owner and pin.get("reason") == reason
+                    and pin.get("selectable") is False,
+                    f"{path}: GPIO{gpio} must remain reserved for {owner}")
+    if document["id"] == "m5stack-m5stickc":
+        require(document["target"] == "esp32", f"{path}: M5StickC target changed")
+        for gpio, owner, reason in (
+            (0, "system.microphone", "onboard-microphone-clock"),
+            (21, "bus.i2c.internal", "internal-i2c-bus"),
+            (23, "system.display", "tft-data-command"),
+            (37, "system.button", "button-a"),
+            (39, "system.button", "button-b"),
+        ):
+            pin = by_gpio.get(gpio, {})
+            require(pin.get("reserved_for") == owner and pin.get("reason") == reason
+                    and pin.get("selectable") is False,
+                    f"{path}: GPIO{gpio} must remain reserved for {owner}")
+        require(by_gpio.get(26, {}).get("selectable", True) is True,
+                f"{path}: external HAT GPIO26 must remain available")
     print(f"PASS board manifest: {path.name} ({len(ids)} pins)")
 
 

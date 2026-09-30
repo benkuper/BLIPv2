@@ -15,7 +15,7 @@
     {"id":"gpio.12","label":"GPIO12","gpio":12,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V; boot strap","reserved_for":"system.boot","reason":"boot-strap-pin","selectable":false},
     {"id":"gpio.27","label":"GPIO27","gpio":27,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
     {"id":"gpio.33","label":"GPIO33","gpio":33,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
-    {"id":"gpio.15","label":"GPIO15","gpio":15,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V; boot strap","reserved_for":"system.boot","reason":"boot-strap-pin","selectable":false},
+    {"id":"gpio.15","label":"GPIO15 / strip data","gpio":15,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V; boot strap; LED data input must remain high impedance during reset","reserved_for":"blip.output.strip0:pin","reason":"ws2812b-data-boot-strap","selectable":false},
     {"id":"gpio.32","label":"GPIO32","gpio":32,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
     {"id":"gpio.14","label":"GPIO14","gpio":14,"capabilities":["input","output","adc","pwm","interrupt","rmt"],"electrical":"3.3V"},
     {"id":"gpio.35","label":"A13 / battery monitor","gpio":35,"capabilities":["input","adc"],"electrical":"3.3V input-only; divided VBAT","reserved_for":"system.battery","reason":"onboard-battery-divider","selectable":false}

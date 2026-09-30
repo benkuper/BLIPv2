@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "creators-ball-v2",
+  "target": "esp32c6",
+  "sources": ["https://github.com/Golden-Geek/BLIP/blob/1507f440b3ae635686d2bf759ecc742b391f08a7/configs/creators.ini"],
+  "pins": [
+    {"id":"gpio.0","label":"IMU SDA / GPIO0","gpio":0,"capabilities":["input","output","open-drain"],"electrical":"3.3V I2C","reserved_for":"bus.i2c.imu","reason":"onboard-imu-bus","bus":"i2c.imu","selectable":false},
+    {"id":"gpio.1","label":"IMU SCL / GPIO1","gpio":1,"capabilities":["input","output","open-drain"],"electrical":"3.3V I2C","reserved_for":"bus.i2c.imu","reason":"onboard-imu-bus","bus":"i2c.imu","selectable":false},
+    {"id":"gpio.2","label":"HD108 clock / GPIO2","gpio":2,"capabilities":["output"],"electrical":"onboard LED clock","reserved_for":"blip.output.strip0:clock","reason":"hd108-clock","selectable":false},
+    {"id":"gpio.3","label":"HD108 data / GPIO3","gpio":3,"capabilities":["output"],"electrical":"onboard LED data","reserved_for":"blip.output.strip0:pin","reason":"hd108-data","selectable":false},
+    {"id":"gpio.4","label":"Flash MOSI / GPIO4","gpio":4,"capabilities":["output"],"electrical":"onboard storage","reserved_for":"system.storage","reason":"storage-spi","selectable":false},
+    {"id":"gpio.5","label":"Flash MISO / GPIO5","gpio":5,"capabilities":["input"],"electrical":"onboard storage","reserved_for":"system.storage","reason":"storage-spi","selectable":false},
+    {"id":"gpio.6","label":"Battery sense / GPIO6","gpio":6,"capabilities":["input","adc"],"electrical":"battery divider","reserved_for":"system.battery","reason":"battery-monitor","selectable":false},
+    {"id":"gpio.7","label":"IMU interrupt / GPIO7","gpio":7,"capabilities":["input","interrupt"],"electrical":"onboard IMU","reserved_for":"system.imu","reason":"imu-interrupt","selectable":false},
+    {"id":"gpio.8","label":"Flash SCK / GPIO8","gpio":8,"capabilities":["output"],"electrical":"onboard storage","reserved_for":"system.storage","reason":"storage-spi","selectable":false},
+    {"id":"gpio.9","label":"Charge feedback LED / GPIO9","gpio":9,"capabilities":["output","pwm"],"electrical":"onboard LED; boot strap","reserved_for":"system.battery","reason":"charge-feedback","selectable":false},
+    {"id":"gpio.14","label":"Charge sense / GPIO14","gpio":14,"capabilities":["input"],"electrical":"charger input","reserved_for":"system.battery","reason":"battery-charge-input","selectable":false},
+    {"id":"gpio.15","label":"Flash CS / GPIO15","gpio":15,"capabilities":["output"],"electrical":"onboard storage","reserved_for":"system.storage","reason":"storage-spi","selectable":false},
+    {"id":"gpio.16","label":"HD108 backup data / GPIO16","gpio":16,"capabilities":["output"],"electrical":"onboard backup data","reserved_for":"system.led-backup","reason":"hd108-backup-data","selectable":false},
+    {"id":"gpio.17","label":"HD108 backup clock / GPIO17","gpio":17,"capabilities":["output"],"electrical":"onboard backup clock","reserved_for":"system.led-backup","reason":"hd108-backup-clock","selectable":false},
+    {"id":"gpio.18","label":"IR input 1 / GPIO18","gpio":18,"capabilities":["input","interrupt"],"electrical":"onboard IR input","reserved_for":"system.ir","reason":"ir-input","selectable":false},
+    {"id":"gpio.19","label":"Power/wake button / GPIO19","gpio":19,"capabilities":["input","interrupt"],"electrical":"onboard button","reserved_for":"system.power","reason":"wake-button","selectable":false},
+    {"id":"gpio.20","label":"IR input 2 / GPIO20","gpio":20,"capabilities":["input","interrupt"],"electrical":"onboard IR input","reserved_for":"system.ir","reason":"ir-input","selectable":false},
+    {"id":"gpio.21","label":"HD108 enable / GPIO21","gpio":21,"capabilities":["output"],"electrical":"onboard LED power","reserved_for":"system.led-power","reason":"led-enable","selectable":false},
+    {"id":"gpio.22","label":"Power hold / GPIO22","gpio":22,"capabilities":["output"],"electrical":"power latch","reserved_for":"system.power","reason":"power-hold-critical","selectable":false},
+    {"id":"gpio.23","label":"IMU reset / GPIO23","gpio":23,"capabilities":["output"],"electrical":"onboard IMU","reserved_for":"system.imu","reason":"imu-reset","selectable":false}
+  ],
+  "buses": [{"id":"i2c.imu","type":"i2c","sda":"gpio.0","scl":"gpio.1","speed_hz":400000,"members":["system.imu"]}]
+}

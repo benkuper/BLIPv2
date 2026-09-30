@@ -20,7 +20,7 @@ namespace {
 
 constexpr char kTag[] = "blip_diagnostics";
 constexpr std::array<std::string_view, 1> kProvidedServices{"diagnostics.runtime"};
-constexpr std::array<ParameterDescriptor, 1> kParameters{{
+constexpr std::array<ParameterDescriptor, 4> kParameters{{
     {"log_level",
      "Default log level",
      ValueType::integer,
@@ -29,6 +29,12 @@ constexpr std::array<ParameterDescriptor, 1> kParameters{{
      ScalarValue::from_integer(static_cast<std::int64_t>(LogLevel::info)),
      {true, 0, 5, 1},
      ""},
+    {"heap_free_internal", "Free internal heap", ValueType::integer, Access::read_only,
+     false, ScalarValue::from_integer(0), {}, "bytes"},
+    {"heap_minimum_internal", "Minimum free internal heap", ValueType::integer,
+     Access::read_only, false, ScalarValue::from_integer(0), {}, "bytes"},
+    {"heap_largest_internal", "Largest free internal block", ValueType::integer,
+     Access::read_only, false, ScalarValue::from_integer(0), {}, "bytes"},
 }};
 constexpr std::array<ActionDescriptor, 2> kActions{{
     {"clear_safe_mode", "Clear safe mode on next reboot", {}},
@@ -334,11 +340,21 @@ Status EspDiagnosticsComponent::start(const StartContext&) noexcept {
 }
 
 Status EspDiagnosticsComponent::read_parameter(std::string_view id, ScalarValue& output) noexcept {
-    if (id != "log_level") {
+    if (id == "log_level") {
+        output = ScalarValue::from_integer(static_cast<std::int64_t>(logger_.default_level()));
+    } else if (id == "heap_free_internal") {
+        output = ScalarValue::from_integer(
+            heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+    } else if (id == "heap_minimum_internal") {
+        output = ScalarValue::from_integer(
+            heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+    } else if (id == "heap_largest_internal") {
+        output = ScalarValue::from_integer(
+            heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+    } else {
         return Status::failure(
             diagnostics_error(ErrorCode::not_found, "read-parameter", "parameter-not-found"));
     }
-    output = ScalarValue::from_integer(static_cast<std::int64_t>(logger_.default_level()));
     return Status::success();
 }
 

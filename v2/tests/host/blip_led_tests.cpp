@@ -46,8 +46,11 @@ bool invalid_settings_are_rejected() {
     config.gpio = 64U;
     BLIP_CHECK(!validate_strip_config(config));
     config.gpio = 2U;
-    config.protocol = static_cast<StripProtocol>(2U);
+    config.protocol = static_cast<StripProtocol>(3U);
     BLIP_CHECK(!validate_strip_config(config));
+    config.protocol = StripProtocol::hd108_rgb;
+    std::array<std::uint8_t, 3> unclocked{};
+    BLIP_CHECK(!fill_solid_frame(config, unclocked));
     std::array<std::byte, kStripSettingsBytes - 1U> short_output{};
     config.protocol = StripProtocol::ws2812_rgb;
     BLIP_CHECK(!encode_strip_config(config, short_output));

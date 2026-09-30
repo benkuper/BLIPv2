@@ -64,7 +64,7 @@ void write_u32(std::span<std::byte> output, std::size_t offset, std::uint32_t va
 } // namespace
 
 core::Status validate_strip_config(const StripConfig& config) noexcept {
-    if (static_cast<std::uint8_t>(config.protocol) > 1U || config.gpio > 63U ||
+    if (static_cast<std::uint8_t>(config.protocol) > 2U || config.gpio > 63U ||
         config.pixel_count == 0U || config.pixel_count > kMaximumStripPixels) {
         return core::Status::failure(
             strip_error(core::ErrorCode::validation_failed, "validate", "invalid-strip-settings"));
@@ -104,7 +104,7 @@ core::Result<StripConfig> decode_strip_config(std::span<const std::byte> input) 
     if (input.size() != kStripSettingsBytes || read_u32(input, 0U) != kMagic ||
         read_u16(input, 4U) != kStripSettingsFormatVersion ||
         read_u16(input, 6U) != kStripSettingsBytes || input[12] > std::byte{1} ||
-        input[13] > std::byte{1} ||
+        input[13] > std::byte{2} ||
         !std::all_of(input.begin() + 22, input.end(),
                      [](std::byte value) { return value == std::byte{0}; }) ||
         read_u32(input, kCrcOffset) != crc32(input)) {
@@ -131,6 +131,11 @@ core::Result<std::size_t> fill_solid_frame(const StripConfig& config,
     const auto valid = validate_strip_config(config);
     if (!valid) {
         return core::Result<std::size_t>::failure(valid.error());
+    }
+    if (config.protocol == StripProtocol::hd108_rgb) {
+        return core::Result<std::size_t>::failure(
+            strip_error(core::ErrorCode::validation_failed, "fill-frame",
+                        "clocked-encoder-required"));
     }
     const std::size_t channels = channel_count(config.protocol);
     const std::size_t required = config.pixel_count * channels;

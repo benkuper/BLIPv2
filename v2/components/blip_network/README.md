@@ -2,7 +2,7 @@
 
 Owns the ESP-IDF Wi-Fi station/AP lifecycle and the bounded provisioning surface. The
 component persists one versioned configuration through `storage.settings`, normalizes
-imported V1 `/wifi` settings, exposes credentials as write-only control data, and starts
+V2 Wi-Fi settings, exposes credentials as write-only control data, and starts
 an open `BLIP-XXXXXX` SoftAP with a fixed-size HTTP form whenever credentials are absent
 or a station connection times out.
 
@@ -16,6 +16,9 @@ The persisted `antenna` parameter selects `board-default` (0), `onboard` (1), or
 selection is accepted. The reference ESP32-C6 build selects the XIAO board automatically;
 `BLIP_BOARD_SEEED_XIAO_ESP32C6=ON` remains available for an explicit profile. It drives GPIO3 low to
 enable that board's switch and uses GPIO14 low/high for onboard/U.FL selection.
+The `BLIP_BOARD_CREATORS_BALL_V2=ON` build has no RF-switch GPIOs; those pins
+retain their Creators Ball LED and battery functions. A persisted `onboard`
+antenna setting is accepted without driving any GPIO; `external` is rejected.
 
 Transport protocols that use the resulting IP service remain in their own components;
 this component provides `transport.wifi` and `network.http`, owns the shared 2.4 GHz

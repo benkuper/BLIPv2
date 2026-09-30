@@ -1,10 +1,73 @@
+idf_build_get_property(blip_artnet_enabled BLIP_ENABLE_ARTNET)
+idf_build_get_property(blip_ddp_enabled BLIP_ENABLE_DDP)
+idf_build_get_property(blip_e131_enabled BLIP_ENABLE_E131)
+idf_build_get_property(blip_huzzah32_enabled BLIP_BOARD_ADAFRUIT_HUZZAH32)
+
+set(blip_main_sources "main.cpp")
+set(blip_main_requires blip_core blip_led blip_network blip_oscquery blip_ota
+    blip_resources blip_storage blip_transport esp_driver_gpio esp_system esp_timer log)
+if(blip_artnet_enabled)
+    list(APPEND blip_main_sources "network_lighting_artnet.cpp")
+    list(APPEND blip_main_requires blip_artnet)
+endif()
+if(blip_ddp_enabled)
+    list(APPEND blip_main_sources "network_lighting_ddp.cpp")
+    list(APPEND blip_main_requires blip_ddp)
+endif()
+if(blip_e131_enabled)
+    list(APPEND blip_main_sources "network_lighting_e131.cpp")
+    list(APPEND blip_main_requires blip_e131)
+endif()
+if(blip_huzzah32_enabled)
+    if(NOT IDF_TARGET STREQUAL "esp32")
+        message(FATAL_ERROR "BLIP_BOARD_ADAFRUIT_HUZZAH32 requires IDF_TARGET=esp32")
+    endif()
+    list(APPEND blip_main_requires blip_power)
+endif()
+
 idf_component_register(
-    SRCS "main.cpp"
-    PRIV_REQUIRES blip_core blip_led blip_network blip_oscquery blip_ota blip_resources blip_storage blip_transport esp_system esp_timer log
+    SRCS ${blip_main_sources}
+    PRIV_REQUIRES ${blip_main_requires}
     INCLUDE_DIRS "")
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/blip_component.cmake)
 blip_configure_component(${COMPONENT_LIB})
+
+if(blip_artnet_enabled)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_ENABLE_ARTNET=1)
+endif()
+if(blip_ddp_enabled)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_ENABLE_DDP=1)
+endif()
+if(blip_e131_enabled)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_ENABLE_E131=1)
+endif()
+
+if(BLIP_BOARD_CREATORS_BALL_V2)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_BOARD_CREATORS_BALL_V2=1)
+endif()
+if(BLIP_BOARD_CREATORS_TAB)
+    if(NOT IDF_TARGET STREQUAL "esp32")
+        message(FATAL_ERROR "BLIP_BOARD_CREATORS_TAB requires IDF_TARGET=esp32")
+    endif()
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_BOARD_CREATORS_TAB=1)
+endif()
+if(BLIP_BOARD_M5STICKC)
+    if(NOT IDF_TARGET STREQUAL "esp32")
+        message(FATAL_ERROR "BLIP_BOARD_M5STICKC requires IDF_TARGET=esp32")
+    endif()
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_BOARD_M5STICKC=1)
+endif()
+if(BLIP_BOARD_ADAFRUIT_HUZZAH32)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_BOARD_ADAFRUIT_HUZZAH32=1)
+endif()
+if((BLIP_BOARD_CREATORS_TAB AND BLIP_BOARD_CREATORS_BALL_V2) OR
+   (BLIP_BOARD_M5STICKC AND BLIP_BOARD_CREATORS_TAB) OR
+   (BLIP_BOARD_M5STICKC AND BLIP_BOARD_CREATORS_BALL_V2) OR
+   (BLIP_BOARD_ADAFRUIT_HUZZAH32 AND
+    (BLIP_BOARD_CREATORS_TAB OR BLIP_BOARD_CREATORS_BALL_V2 OR BLIP_BOARD_M5STICKC)))
+    message(FATAL_ERROR "Select only one board")
+endif()
 
 if(BLIP_DIAGNOSTICS_HIL_FORCE_BOOT_LOOP)
     target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_DIAGNOSTICS_HIL_FORCE_BOOT_LOOP=1)

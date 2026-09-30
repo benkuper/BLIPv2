@@ -196,7 +196,16 @@ core::Result<LegacyImportResult> LegacyImportCoordinator::run() noexcept {
 
     LegacyImportResult result{LegacyImportDisposition::imported_pending, 0, 0,
                               validated.value().setting_count};
-    for (const auto& mapping : legacy_component_mappings()) {
+    const auto mappings = legacy_component_mappings();
+    for (std::size_t mapping_index = 0; mapping_index < mappings.size(); ++mapping_index) {
+        const auto& mapping = mappings[mapping_index];
+        bool target_seen{};
+        for (std::size_t prior = 0; prior < mapping_index; ++prior) {
+            target_seen |= mappings[prior].component_id == mapping.component_id;
+        }
+        if (target_seen) {
+            continue; // Multiple V1 paths can feed one V2 component.
+        }
         ImportedSettingsBuilder builder{payload_buffer_};
         BuildContext context{mapping.component_id, &builder};
         const auto imported = importer.import(source, *workspace_, build_setting, &context);

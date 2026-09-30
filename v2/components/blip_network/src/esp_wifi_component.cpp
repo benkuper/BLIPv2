@@ -20,8 +20,7 @@ namespace {
 
 constexpr char kTag[] = "blip_wifi";
 constexpr std::array<std::string_view, 2> kProvidedServices{"transport.wifi", "network.http"};
-constexpr std::array<std::string_view, 2> kRequiredServices{"storage.settings",
-                                                            "storage.legacy_import"};
+constexpr std::array<std::string_view, 1> kRequiredServices{"storage.settings"};
 constexpr std::array<std::string_view, 1> kRadioAlternatives{"radio0"};
 constexpr std::array<core::ResourceRequest, 1> kResources{{
     {core::ResourceClass::radio, "wifi", core::OwnershipMode::multiplexed, kRadioAlternatives, 0, 1,
@@ -61,7 +60,7 @@ constexpr std::array<core::MetadataEntry, 6> kMetadata{{
     {"secret_policy", "password-write-only"},
     {"antenna_modes", "0=board-default,1=onboard,2=external"},
 }};
-constexpr std::array<core::ParameterDescriptor, 14> kParameters{{
+constexpr std::array<core::ParameterDescriptor, 15> kParameters{{
     {"enabled",
      "Wi-Fi enabled",
      core::ValueType::boolean,
@@ -165,6 +164,14 @@ constexpr std::array<core::ParameterDescriptor, 14> kParameters{{
      false,
      core::ScalarValue::from_integer(0),
      {true, 0, 5, 1},
+     ""},
+    {"ip_address",
+     "Active IPv4 address",
+     core::ValueType::string,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_string(""),
+     {},
      ""},
     {"worker_stack_headroom",
      "Wi-Fi worker stack headroom",
@@ -514,7 +521,11 @@ core::Status EspWifiComponent::configure_antenna_locked() noexcept {
     ESP_LOGI(kTag, "antenna=%s", external ? "external" : "onboard");
     return core::Status::success();
 #else
-    return config_.antenna == WifiAntenna::board_default
+    // Fixed onboard antennas have no switch to drive. Accept an already
+    // persisted "onboard" choice when moving from a generic C6 image to the
+    // correct board build; "external" still requires an RF switch.
+    return config_.antenna == WifiAntenna::board_default ||
+                   config_.antenna == WifiAntenna::onboard
                ? core::Status::success()
                : core::Status::failure(wifi_error(core::ErrorCode::resource_unavailable,
                                                   "configure-antenna", "no-board-rf-switch"));
@@ -902,6 +913,19 @@ core::Status EspWifiComponent::read_parameter(std::string_view id,
         output = core::ScalarValue::from_number(signal);
     } else if (id == "state") {
         output = core::ScalarValue::from_integer(static_cast<std::int64_t>(state_machine_.state()));
+    } else if (id == "ip_address") {
+        esp_netif_t* netif = state_machine_.state() == WifiConnectionState::connected
+                                 ? station_netif_ : access_point_netif_;
+        esp_netif_ip_info_t ip_info{};
+        readback_text_size_ = 0U;
+        if (netif != nullptr && esp_netif_get_ip_info(netif, &ip_info) == ESP_OK) {
+            const int size = std::snprintf(readback_text_.data(), readback_text_.size(), IPSTR,
+                                           IP2STR(&ip_info.ip));
+            if (size > 0 && static_cast<std::size_t>(size) < readback_text_.size()) {
+                readback_text_size_ = static_cast<std::size_t>(size);
+            }
+        }
+        output = core::ScalarValue::from_string({readback_text_.data(), readback_text_size_});
     } else if (id == "worker_stack_headroom") {
         output = core::ScalarValue::from_integer(worker_stack_headroom_bytes());
     } else {

@@ -18,22 +18,20 @@ flash writes can exceed 30 seconds on a device AP; override it with `--timeout`.
 
 ## Device access-point HIL rule
 
-This development computer has one Wi-Fi interface. Connecting it to a device
-fallback AP removes its Internet route, so Codex cannot make another model/tool
-round trip until normal Wi-Fi is restored. Never split an AP qualification
-across interactive tool calls or depend on Codex to decide the next step while
-the machine is connected to the device. Prewrite the complete offline sequence,
-run it as one local process, and put restoration of the original Wi-Fi profile
-in an unconditional cleanup (`finally`) path. The process must return only after
-the development machine has reconnected to its original network.
+Prefer shared Wi-Fi for OTA HIL. This computer has one Wi-Fi interface, so a
+device fallback AP removes its Internet route. If an AP test is necessary, run
+the complete offline sequence in one local process with an independent timed
+recovery process armed before changing networks. Reconnection in `finally` alone
+cannot recover from a killed or hung test process.
 
-`blip_ota_ap_hil.ps1` enforces that rule for the fallback AP. It freezes Windows
-network use into one prewritten operation and restores the named Internet
-profile before returning, including on failure. Example:
+`blip_ota_ap_hil.ps1` arms that recovery process, then restores and verifies
+Internet access on the normal path. The independent process reconnects the
+Internet profile if the test process dies or exceeds its 600-second default
+deadline. Example:
 
 ```powershell
 pwsh -File v2/tools/ota/blip_ota_ap_hil.ps1 -Operation status `
-  -DeviceSsid BLIP-123456 -InternetProfile MyWifi
+  -DeviceSsid BLIP-123456 -InternetProfile 'Archi-wifi guest'
 ```
 
 `blip_ota_serial_capture.py` can run beside the AP operation to preserve boot

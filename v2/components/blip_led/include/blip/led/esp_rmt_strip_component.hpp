@@ -2,6 +2,10 @@
 
 #include "blip/core/component.hpp"
 #include "blip/led/strip_config.hpp"
+#include "blip/led/stream.hpp"
+#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+#include "blip/led/esp_spi_dma_output_driver.hpp"
+#endif
 #include "blip/resources/device_broker.hpp"
 #include "blip/storage/settings_store.hpp"
 #include "driver/rmt_encoder.h"
@@ -37,6 +41,10 @@ class EspRmtStripComponent final : public core::Component {
                                              std::span<const core::ScalarValue> arguments,
                                              std::span<core::ScalarValue> outputs,
                                              std::size_t& output_count) noexcept override;
+    [[nodiscard]] core::Status ingest_stream(std::uint8_t sequence, std::uint16_t start_pixel,
+                                             std::span<const std::byte> channels,
+                                             std::uint8_t channels_per_pixel, bool sixteen_bit,
+                                             std::uint64_t received_at_us) noexcept;
 
   private:
     [[nodiscard]] core::Status load_config() noexcept;
@@ -48,7 +56,10 @@ class EspRmtStripComponent final : public core::Component {
     [[nodiscard]] core::Status initialize_output(const StripConfig& config) noexcept;
     void deinitialize_output() noexcept;
     [[nodiscard]] core::Status transmit(const StripConfig& config,
-                                        std::size_t payload_size) noexcept;
+                                         std::size_t payload_size) noexcept;
+#if !defined(BLIP_BOARD_CREATORS_BALL_V2)
+    [[nodiscard]] core::Result<std::size_t> render_one_wire(const StripConfig& config) noexcept;
+#endif
     [[nodiscard]] bool lock_config() noexcept;
     void unlock_config() noexcept;
     void run() noexcept;
@@ -62,7 +73,21 @@ class EspRmtStripComponent final : public core::Component {
     StripConfig config_{};
     StripConfig pending_config_{};
     std::array<std::byte, kStripSettingsBytes> settings_buffer_{};
+#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+    static constexpr std::size_t kBoardPixelCount = 36U;
+    static constexpr std::size_t kBoardFrameBytes = 16U + kBoardPixelCount * 8U + 8U;
+    alignas(4) std::array<std::uint8_t, kBoardFrameBytes> pixel_buffer_{};
+    std::array<LinearPixel, kBoardPixelCount> stream_pixels_{};
+    EspSpiDmaOutputDriver spi_driver_{SPI2_HOST, 3, 2, kBoardFrameBytes};
+    resources::DeviceBroker::Lease clock_lease_{};
+    resources::DeviceBroker::Lease spi_lease_{};
+#else
     std::array<std::uint8_t, kMaximumStripPixels * 4U> pixel_buffer_{};
+    std::array<LinearPixel, kMaximumStripPixels> stream_pixels_{};
+#endif
+    StreamLayer stream_layer_{stream_pixels_};
+    StaticSemaphore_t stream_mutex_storage_{};
+    SemaphoreHandle_t stream_mutex_{};
     alignas(16) std::array<StackType_t, kTaskStackWords> task_stack_{};
     StaticTask_t task_storage_{};
     TaskHandle_t task_{};
@@ -86,7 +111,7 @@ class EspRmtStripComponent final : public core::Component {
     bool reconfigure_pending_{};
 };
 
-static_assert(sizeof(EspRmtStripComponent) <= 12288U,
+static_assert(sizeof(EspRmtStripComponent) <= 24576U,
               "RMT strip component exceeds its declared static RAM budget");
 
 } // namespace blip::led

@@ -4,15 +4,19 @@
 #include "blip/core/registry.hpp"
 #include "blip/core/scheduler.hpp"
 #include "blip/led/esp_rmt_strip_component.hpp"
+#if defined(BLIP_BOARD_ADAFRUIT_HUZZAH32)
+#include "blip/power/esp_battery_component.hpp"
+#endif
 #include "blip/network/esp_wifi_component.hpp"
 #include "blip/oscquery/esp_oscquery_component.hpp"
 #include "blip/ota/esp_ota_component.hpp"
 #include "blip/resources/broker.hpp"
 #include "blip/resources/board_manifest.hpp"
-#include "blip/storage/legacy_settings_import_component.hpp"
 #include "blip/storage/littlefs_storage_component.hpp"
 #include "blip/storage/nvs_settings_component.hpp"
 #include "blip/transport/esp_serial_transport_component.hpp"
+#include "network_lighting_features.hpp"
+#include "driver/gpio.h"
 #include "esp_idf_version.h"
 #include "esp_log.h"
 #include "esp_system.h"
@@ -27,11 +31,43 @@
 namespace {
 
 constexpr char kTag[] = "blip_bootstrap";
+
+[[nodiscard]] bool initialize_board_power() noexcept {
+#if defined(BLIP_BOARD_CREATORS_TAB)
+    constexpr gpio_num_t kPowerHold = GPIO_NUM_12;
+    constexpr gpio_num_t kLedPower = GPIO_NUM_27;
+#elif defined(BLIP_BOARD_CREATORS_BALL_V2)
+    constexpr gpio_num_t kPowerHold = GPIO_NUM_22;
+    constexpr gpio_num_t kLedPower = GPIO_NUM_21;
+#elif defined(CONFIG_IDF_TARGET_ESP32S3)
+    constexpr gpio_num_t kPowerHold = GPIO_NUM_46;
+    constexpr gpio_num_t kLedPower = GPIO_NUM_38;
+#else
+    return true;
+#endif
+#if defined(BLIP_BOARD_CREATORS_TAB) || defined(BLIP_BOARD_CREATORS_BALL_V2) || \
+    defined(CONFIG_IDF_TARGET_ESP32S3)
+    // Raise the board power latch before storage, network, or registry startup.
+    return gpio_set_level(kPowerHold, 1) == ESP_OK &&
+           gpio_set_direction(kPowerHold, GPIO_MODE_OUTPUT) == ESP_OK &&
+           gpio_set_level(kLedPower, 0) == ESP_OK &&
+           gpio_set_direction(kLedPower, GPIO_MODE_OUTPUT) == ESP_OK;
+#endif
+}
+#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+constexpr char kLedBootStatus[] = "hd108-spi-dma";
+#elif defined(BLIP_BOARD_CREATORS_TAB)
+constexpr char kLedBootStatus[] = "ws2812b-board-power-pending";
+#elif defined(BLIP_BOARD_M5STICKC)
+constexpr char kLedBootStatus[] = "external-rmt-gpio26";
+#else
+constexpr char kLedBootStatus[] = "native-rmt-v1";
+#endif
 constexpr std::uint32_t kBootstrapSchemaVersion = 1U;
-constexpr std::array<std::string_view, 9> kBootstrapDependencies{
+constexpr std::array<std::string_view, 8> kBootstrapDependencies{
     "diagnostics.runtime",   "storage.settings",   "storage.files.internal",
-    "storage.legacy_import", "transport.serial",   "transport.wifi",
-    "firmware.ota",          "discovery.oscquery", "output.pixel-strip"};
+    "transport.serial",      "transport.wifi",     "firmware.ota",
+    "discovery.oscquery",    "output.pixel-strip"};
 constexpr std::array<std::string_view, 2> kRecoveryDependencies{"diagnostics.runtime",
                                                                 "transport.serial"};
 constexpr std::array<blip::core::ParameterDescriptor, 1> kBootstrapParameters{{
@@ -151,14 +187,16 @@ BootstrapComponent recovery_component{true};
 blip::core::EspDiagnosticsComponent diagnostics_component{};
 blip::storage::NvsSettingsComponent settings_component{};
 blip::storage::LittleFsStorageComponent file_storage_component{};
-blip::storage::LegacySettingsImportComponent legacy_import_component{settings_component.settings()};
 blip::network::EspWifiComponent wifi_component{settings_component.settings()};
 constexpr auto board_manifest = blip::resources::selected_board_manifest();
 blip::resources::DeviceBroker resource_broker{};
 blip::led::EspRmtStripComponent led_component{settings_component.settings(), resource_broker};
+#if defined(BLIP_BOARD_ADAFRUIT_HUZZAH32)
+blip::power::EspBatteryComponent battery_component{};
+#endif
 blip::ota::EspOtaComponent ota_component{"blip-v2", CONFIG_IDF_TARGET, "minimal"};
-blip::core::Registry<11> registry{};
-blip::core::RegistryControlService<11> control_component{registry};
+blip::core::Registry<14> registry{};
+blip::core::RegistryControlService<14> control_component{registry};
 blip::transport::EspSerialTransportComponent serial_transport_component{control_component};
 blip::oscquery::EspOscQueryComponent oscquery_component{registry, control_component, wifi_component,
                                                         file_storage_component.web_assets(),
@@ -181,14 +219,14 @@ blip::core::Scheduler<4> scheduler{monotonic_clock};
             return false;
         }
     }
+#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+    if (!resource_broker.add_resource(
+            {blip::core::ResourceClass::spi, "spi2", 0U, 1U,
+             "blip.output.strip0:spi", "SPI2 host", -1, "", "hd108-output", "", false})) {
+        return false;
+    }
+#endif
     return true;
-}
-
-[[nodiscard]] const char* legacy_import_status() noexcept {
-    return legacy_import_component.disposition() ==
-                   blip::storage::LegacyImportDisposition::no_source
-               ? "none"
-               : "confirmed";
 }
 
 void reject_pending_update() noexcept {
@@ -224,10 +262,6 @@ void reject_pending_update() noexcept {
         if (!file_storage_status) {
             return false;
         }
-        const auto import_status = registry.add(legacy_import_component);
-        if (!import_status) {
-            return false;
-        }
         const auto wifi_status = registry.add(wifi_component);
         if (!wifi_status) {
             return false;
@@ -244,6 +278,44 @@ void reject_pending_update() noexcept {
         if (!led_status) {
             return false;
         }
+#if defined(BLIP_BOARD_ADAFRUIT_HUZZAH32)
+        const auto battery_status = registry.add(battery_component);
+        if (!battery_status) {
+            return false;
+        }
+#endif
+#if defined(BLIP_ENABLE_DDP)
+        const auto ddp_status = registry.add(blip::firmware::ddp_feature(led_component));
+        if (!ddp_status) {
+            const auto& error = ddp_status.error();
+            ESP_LOGE(kTag, "DDP registry add failed code=%u detail=%.*s",
+                     static_cast<unsigned>(error.code), static_cast<int>(error.detail.size()),
+                     error.detail.data());
+            return false;
+        }
+#endif
+#if defined(BLIP_ENABLE_ARTNET)
+        const auto artnet_status = registry.add(
+            blip::firmware::artnet_feature(wifi_component, led_component));
+        if (!artnet_status) {
+            const auto& error = artnet_status.error();
+            ESP_LOGE(kTag, "Art-Net registry add failed code=%u detail=%.*s",
+                     static_cast<unsigned>(error.code), static_cast<int>(error.detail.size()),
+                     error.detail.data());
+            return false;
+        }
+#endif
+#if defined(BLIP_ENABLE_E131)
+        const auto e131_status = registry.add(
+            blip::firmware::e131_feature(wifi_component, led_component));
+        if (!e131_status) {
+            const auto& error = e131_status.error();
+            ESP_LOGE(kTag, "E1.31 registry add failed code=%u detail=%.*s",
+                     static_cast<unsigned>(error.code), static_cast<int>(error.detail.size()),
+                     error.detail.data());
+            return false;
+        }
+#endif
         const auto add_status = registry.add(bootstrap_component);
         if (!add_status) {
             return false;
@@ -251,6 +323,11 @@ void reject_pending_update() noexcept {
     }
     const auto validation_status = registry.validate();
     if (!validation_status) {
+        const auto& error = validation_status.error();
+        ESP_LOGE(kTag, "registry validation failed component=%.*s code=%u detail=%.*s",
+                 static_cast<int>(error.component.size()), error.component.data(),
+                 static_cast<unsigned>(error.code), static_cast<int>(error.detail.size()),
+                 error.detail.data());
         return false;
     }
     const auto started = registry.start_all();
@@ -268,6 +345,10 @@ void reject_pending_update() noexcept {
 } // namespace
 
 extern "C" void app_main() {
+    if (!initialize_board_power()) {
+        ESP_LOGE(kTag, "BLIP_V2_BOARD_POWER_INIT_FAILED");
+        return;
+    }
     if (!initialize_resources()) {
         ESP_LOGE(kTag, "BLIP_V2_RESOURCE_INVENTORY_FAILED");
         return;
@@ -310,12 +391,6 @@ extern "C" void app_main() {
         std::abort();
     }
 #endif
-    if (!safe_mode && !legacy_import_component.confirm_boot()) {
-        ESP_LOGE(kTag, "BLIP_V2_IMPORT_CONFIRM_FAILED");
-        static_cast<void>(registry.stop_all());
-        reject_pending_update();
-        return;
-    }
     if (!diagnostics_component.confirm_boot()) {
         ESP_LOGE(kTag, "BLIP_V2_BOOT_CONFIRM_FAILED");
         static_cast<void>(registry.stop_all());
@@ -348,17 +423,17 @@ extern "C" void app_main() {
     ESP_LOGI(kTag,
              "BLIP_V2_BOOTSTRAP_READY schema=%lu registry=1 scheduler=ready resources=ready "
              "settings=nvs-v1 files=littlefs-v1 web=bundle-v1 web_version=%lu ota=ab-v1 "
-             "led=native-rmt-v1 "
-             "web_assets=%lu web_bytes=%lu legacy_import=%s diagnostics=structured-v1 "
+             "led=%s "
+             "web_assets=%lu web_bytes=%lu diagnostics=structured-v1 "
              "serial=blip-envelope-v1 osc=udp9000-oscquery-v1 osc_stack_hwm=%lu "
              "wifi_state=%u wifi_ap=%.*s "
              "safe_mode=0 reset=%s coredump=%s coredump_id=%08lx heap_free=%lu "
-             "heap_largest=%lu stack_hwm=%lu target=%s idf=%s",
+             "heap_largest=%lu stack_hwm=%lu target=%s board=%.*s idf=%s",
              static_cast<unsigned long>(kBootstrapSchemaVersion),
              static_cast<unsigned long>(file_storage_component.web_assets().info().bundle_version),
+             kLedBootStatus,
              static_cast<unsigned long>(file_storage_component.web_assets().info().asset_count),
              static_cast<unsigned long>(file_storage_component.web_assets().info().total_size),
-             legacy_import_status(),
              static_cast<unsigned long>(oscquery_component.task_stack_headroom_bytes()),
              static_cast<unsigned>(wifi_component.connection_state()),
              static_cast<int>(wifi_component.access_point_ssid().size()),
@@ -369,5 +444,6 @@ extern "C" void app_main() {
              static_cast<unsigned long>(diagnostics.free_internal_heap),
              static_cast<unsigned long>(diagnostics.largest_free_internal_block),
              static_cast<unsigned long>(diagnostics.main_stack_high_water_bytes), CONFIG_IDF_TARGET,
+             static_cast<int>(board_manifest.id.size()), board_manifest.id.data(),
              esp_get_idf_version());
 }

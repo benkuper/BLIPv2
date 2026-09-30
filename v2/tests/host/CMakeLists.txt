@@ -209,7 +209,15 @@ endif()
 add_test(NAME blip_oscquery_tests COMMAND blip_oscquery_tests)
 
 add_library(blip_led_host STATIC
+    ../../components/blip_led/src/backend_selector.cpp
+    ../../components/blip_led/src/color.cpp
+    ../../components/blip_led/src/compositor.cpp
+    ../../components/blip_led/src/engine.cpp
+    ../../components/blip_led/src/parallel_encoder.cpp
+    ../../components/blip_led/src/playback.cpp
+    ../../components/blip_led/src/protocol_encoder.cpp
     ../../components/blip_led/src/strip_config.cpp
+    ../../components/blip_led/src/stream.cpp
 )
 target_include_directories(blip_led_host PUBLIC ../../components/blip_led/include)
 target_link_libraries(blip_led_host PUBLIC blip_core_host)
@@ -225,3 +233,46 @@ else()
     target_compile_options(blip_led_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_led_tests COMMAND blip_led_tests)
+
+add_library(blip_led_compat_host STATIC
+    ../../components/blip_artnet/src/artnet.cpp
+    ../../components/blip_e131/src/e131.cpp
+    ../../components/blip_ddp/src/ddp.cpp
+)
+target_include_directories(blip_led_compat_host PUBLIC
+    ../../components/blip_artnet/include
+    ../../components/blip_e131/include
+    ../../components/blip_ddp/include
+)
+target_link_libraries(blip_led_compat_host PUBLIC blip_core_host blip_led_host)
+target_compile_features(blip_led_compat_host PUBLIC cxx_std_20)
+if(MSVC)
+    target_compile_options(blip_led_compat_host PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_led_compat_host PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+
+add_executable(blip_led_m4_tests blip_led_m4_tests.cpp)
+target_link_libraries(blip_led_m4_tests PRIVATE blip_led_compat_host)
+if(MSVC)
+    target_compile_options(blip_led_m4_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_led_m4_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_led_m4_tests COMMAND blip_led_m4_tests)
+
+add_library(blip_power_host STATIC
+    ../../components/blip_power/src/battery_model.cpp
+)
+target_include_directories(blip_power_host PUBLIC ../../components/blip_power/include)
+target_compile_features(blip_power_host PUBLIC cxx_std_20)
+add_executable(blip_power_tests blip_power_tests.cpp)
+target_link_libraries(blip_power_tests PRIVATE blip_power_host)
+if(MSVC)
+    target_compile_options(blip_power_host PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+    target_compile_options(blip_power_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_power_host PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+    target_compile_options(blip_power_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_power_tests COMMAND blip_power_tests)

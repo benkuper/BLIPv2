@@ -6,6 +6,7 @@ v2/firmware/build-*/
 v2/firmware/managed_components/
 v2/firmware/sdkconfig
 v2/firmware/sdkconfig.old
+v2/firmware/local-wifi.txt
 
 # Python cache and local environments
 __pycache__/

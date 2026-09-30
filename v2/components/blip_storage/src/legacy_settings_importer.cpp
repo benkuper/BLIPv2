@@ -9,7 +9,7 @@
 namespace blip::storage {
 namespace {
 
-constexpr std::array<LegacyComponentMapping, 22> kMappings{{
+constexpr std::array<LegacyComponentMapping, 31> kMappings{{
     {"comm", "blip.transport"},
     {"comm.serial", "blip.transport.serial"},
     {"comm.osc", "blip.osc"},
@@ -32,6 +32,18 @@ constexpr std::array<LegacyComponentMapping, 22> kMappings{{
     {"buttons.button1", "blip.input.button.1"},
     {"ir", "blip.input.ir"},
     {"motion", "blip.sensor.motion"},
+    // Older board profiles place the server at the root; M5StickC also has
+    // display, stream input, GPIO and distance components absent from the
+    // original golden fixture. Keep their settings until V2 providers exist.
+    {"server", "blip.oscquery"},
+    {"display", "blip.display"},
+    {"streamReceiver", "blip.transport.stream-receiver"},
+    {"gpio", "blip.io.gpio"},
+    {"gpio.gpio1", "blip.io.gpio.1"},
+    {"gpio.gpio2", "blip.io.gpio.2"},
+    {"gpio.gpio3", "blip.io.gpio.3"},
+    {"distances", "blip.sensor.distances"},
+    {"distances.distance1", "blip.sensor.distance.1"},
 }};
 
 constexpr std::size_t kMaxDepth = 8;

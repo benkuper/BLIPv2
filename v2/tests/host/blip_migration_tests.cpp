@@ -11,6 +11,8 @@
 #include <cstring>
 #include <span>
 #include <string_view>
+#include <tuple>
+#include <utility>
 
 #ifndef BLIP_V1_SETTINGS_FIXTURE
 #error "BLIP_V1_SETTINGS_FIXTURE must name the golden MessagePack fixture"
@@ -150,6 +152,82 @@ bool golden_messagepack_is_strictly_imported() {
     const auto rejected =
         importer.import(std::span<const std::byte>{corrupt.bytes.data(), corrupt.size}, workspace);
     BLIP_CHECK(!rejected);
+    return true;
+}
+
+struct BoardProfileChecks {
+    std::size_t visited{};
+    bool server{};
+    bool display{};
+    bool stream_receiver{};
+    bool gpio{};
+    bool distance{};
+};
+
+[[nodiscard]] Status check_board_profile(void* context,
+                                         const ImportedSetting& setting) noexcept {
+    auto& checks = *static_cast<BoardProfileChecks*>(context);
+    ++checks.visited;
+    checks.server |= setting.component_id == "blip.oscquery";
+    checks.display |= setting.component_id == "blip.display";
+    checks.stream_receiver |= setting.component_id == "blip.transport.stream-receiver";
+    checks.gpio |= setting.component_id == "blip.io.gpio.1";
+    checks.distance |= setting.component_id == "blip.sensor.distance.1";
+    return Status::success();
+}
+
+bool alternate_board_profile_imports() {
+    // A small, value-free stand-in for the different V1 component tree found
+    // on M5StickC. The original golden fixture does not contain these paths.
+    std::array<std::byte, 256> bytes{};
+    std::size_t used{};
+    bool overflow{};
+    const auto put = [&](std::uint8_t value) {
+        if (used < bytes.size()) {
+            bytes[used++] = static_cast<std::byte>(value);
+        } else {
+            overflow = true;
+        }
+    };
+    const auto string = [&](std::string_view value) {
+        put(static_cast<std::uint8_t>(0xa0U | value.size()));
+        for (const char character : value) {
+            put(static_cast<std::uint8_t>(character));
+        }
+    };
+    put(0x81U);
+    string("components");
+    put(0x85U);
+    for (const auto [component, field] :
+         {std::pair{"server", "port"}, std::pair{"display", "brightness"},
+          std::pair{"streamReceiver", "mode"}}) {
+        string(component);
+        put(0x81U);
+        string(field);
+        put(0x01U);
+    }
+    for (const auto [parent, child, field] :
+         {std::tuple{"gpio", "gpio1", "value"},
+          std::tuple{"distances", "distance1", "threshold"}}) {
+        string(parent);
+        put(0x81U);
+        string("components");
+        put(0x81U);
+        string(child);
+        put(0x81U);
+        string(field);
+        put(0x01U);
+    }
+    BLIP_CHECK(!overflow);
+    LegacyImportWorkspace workspace{};
+    LegacySettingsImporter importer{};
+    BoardProfileChecks checks{};
+    const auto imported = importer.import(std::span<const std::byte>{bytes.data(), used},
+                                          workspace, check_board_profile, &checks);
+    BLIP_CHECK(imported && imported.value().component_count == 7U &&
+               imported.value().setting_count == 5U && checks.visited == 5U &&
+               checks.server && checks.display && checks.stream_receiver && checks.gpio &&
+               checks.distance);
     return true;
 }
 
@@ -395,6 +473,7 @@ int main() {
     const TestCase tests[]{
         {"ordered migration registry", migration_registry_is_ordered_and_idempotent},
         {"golden V1 settings import", golden_messagepack_is_strictly_imported},
+        {"alternate V1 board profile import", alternate_board_profile_imports},
         {"idempotent import coordinator", coordinator_is_idempotent_and_preserves_source},
         {"import interruption recovery", coordinator_recovers_every_write_boundary},
     };

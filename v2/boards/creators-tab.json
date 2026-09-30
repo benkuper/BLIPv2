@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "creators-tab",
+  "target": "esp32",
+  "sources": ["https://github.com/Golden-Geek/BLIP/blob/1507f440b3ae635686d2bf759ecc742b391f08a7/configs/creators.ini"],
+  "pins": [
+    {"id":"gpio.0","label":"Boot / GPIO0","gpio":0,"capabilities":["input"],"electrical":"boot strap","reserved_for":"system.boot","reason":"boot-strap-pin","selectable":false},
+    {"id":"gpio.1","label":"UART0 TX / GPIO1","gpio":1,"capabilities":["output"],"electrical":"USB serial bridge","reserved_for":"system.serial","reason":"serial-console","selectable":false},
+    {"id":"gpio.3","label":"UART0 RX / GPIO3","gpio":3,"capabilities":["input"],"electrical":"USB serial bridge","reserved_for":"system.serial","reason":"serial-console","selectable":false},
+    {"id":"gpio.12","label":"Power hold / GPIO12","gpio":12,"capabilities":["output"],"electrical":"power latch; boot strap","reserved_for":"system.power","reason":"power-hold-critical","selectable":false},
+    {"id":"gpio.13","label":"SD MOSI / GPIO13","gpio":13,"capabilities":["output"],"electrical":"onboard SD","reserved_for":"system.storage","reason":"sd-spi","selectable":false},
+    {"id":"gpio.14","label":"SD SCK / GPIO14","gpio":14,"capabilities":["output"],"electrical":"onboard SD","reserved_for":"system.storage","reason":"sd-spi","selectable":false},
+    {"id":"gpio.15","label":"SD CS / GPIO15","gpio":15,"capabilities":["output"],"electrical":"onboard SD; boot strap","reserved_for":"system.storage","reason":"sd-spi","selectable":false},
+    {"id":"gpio.19","label":"SD MISO / GPIO19","gpio":19,"capabilities":["input"],"electrical":"onboard SD","reserved_for":"system.storage","reason":"sd-spi","selectable":false},
+    {"id":"gpio.22","label":"IMU SCL / GPIO22","gpio":22,"capabilities":["input","output","open-drain"],"electrical":"3.3V I2C","reserved_for":"bus.i2c.imu","reason":"onboard-imu-bus","bus":"i2c.imu","selectable":false},
+    {"id":"gpio.23","label":"IMU SDA / GPIO23","gpio":23,"capabilities":["input","output","open-drain"],"electrical":"3.3V I2C","reserved_for":"bus.i2c.imu","reason":"onboard-imu-bus","bus":"i2c.imu","selectable":false},
+    {"id":"gpio.25","label":"WS2812B data / GPIO25","gpio":25,"capabilities":["output","rmt"],"electrical":"onboard LED connector","reserved_for":"blip.output.strip0:pin","reason":"ws2812b-data","selectable":false},
+    {"id":"gpio.27","label":"LED strip enable / GPIO27","gpio":27,"capabilities":["output"],"electrical":"strip power enable","reserved_for":"system.led-power","reason":"led-enable","selectable":false},
+    {"id":"gpio.32","label":"Button / GPIO32","gpio":32,"capabilities":["input","interrupt"],"electrical":"onboard button","reserved_for":"system.button","reason":"button-input","selectable":false},
+    {"id":"gpio.33","label":"SD enable / GPIO33","gpio":33,"capabilities":["output"],"electrical":"onboard SD power","reserved_for":"system.storage","reason":"sd-enable","selectable":false},
+    {"id":"gpio.34","label":"IMU interrupt / GPIO34","gpio":34,"capabilities":["input","interrupt"],"electrical":"input only","reserved_for":"system.imu","reason":"imu-interrupt","selectable":false},
+    {"id":"gpio.35","label":"Battery sense / GPIO35","gpio":35,"capabilities":["input","adc"],"electrical":"input only; battery divider","reserved_for":"system.battery","reason":"battery-monitor","selectable":false},
+    {"id":"gpio.36","label":"Power/wake button / GPIO36","gpio":36,"capabilities":["input","interrupt"],"electrical":"input only","reserved_for":"system.power","reason":"wake-button","selectable":false},
+    {"id":"gpio.39","label":"Charge sense / GPIO39","gpio":39,"capabilities":["input","adc"],"electrical":"input only; charger input","reserved_for":"system.battery","reason":"battery-charge-input","selectable":false}
+  ],
+  "buses": [{"id":"i2c.imu","type":"i2c","sda":"gpio.23","scl":"gpio.22","speed_hz":400000,"members":["system.imu"]}]
+}

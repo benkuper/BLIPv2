@@ -49,7 +49,7 @@ def main() -> int:
             flash_files = {
                 "0x0" if target != "esp32" else "0x1000": "bootloader.bin",
                 "0x8000": "partition-table.bin",
-                "0xe000": "ota-data.bin",
+                "0x18000": "ota-data.bin",
                 "0x20000": "blip-v2.bin",
                 "0x340000": "storage.bin",
             }

@@ -16,8 +16,17 @@ Replace `esp32` with `esp32s3` or `esp32c6` for the other profiles. Generated
 configuration stays in the selected build directory. The dependency resolver
 uses a separate committed lock for each target.
 
-The startup task has an 8 KiB bounded stack so the depth-limited V1 settings
-parser can run before registry confirmation. ESP-IDF releases this transient
+Art-Net discovery/DMX and DDP pixel input are enabled by default. Pass
+`-DBLIP_ENABLE_ARTNET=OFF` or `-DBLIP_ENABLE_DDP=OFF` to `idf.py` to exclude
+either protocol component and its registry entry from a smaller build. Use a
+separate build directory for each option combination.
+The E1.31 receiver is optional and disabled by default; pass
+`-DBLIP_ENABLE_E131=ON` to include it.
+For the Adafruit HUZZAH32 battery ADC on GPIO35, pass
+`-DBLIP_BOARD_ADAFRUIT_HUZZAH32=ON` in a dedicated ESP32 build directory.
+The battery registry entry is included only in that board build.
+
+The startup task has an 8 KiB bounded stack. ESP-IDF releases this transient
 stack after `app_main` returns; runtime components do not retain it.
 
 The composition root will remain thin: reusable production behavior belongs in
@@ -32,7 +41,7 @@ The committed custom partition table targets 4 MiB devices and reserves two
 1.5625 MiB OTA application slots, 640 KiB `storage` LittleFS, a redundant 8 KiB OTA
 selection ledger, and 128 KiB `coredump`. The internal storage component formats
 its partition only when it is completely erased; unrecognized nonblank media
-fails closed so legacy data is not silently destroyed. Coredumps are validated
+fails closed so unknown data is not silently destroyed. Coredumps are validated
 at boot, retained without overwrite, and erased only by an explicit diagnostics
 action.
 

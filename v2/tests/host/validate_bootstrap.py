@@ -112,6 +112,10 @@ def validate_build_contract() -> None:
         partitions.append((fields[0], fields[1], fields[2], int(fields[3], 0), int(fields[4], 0)))
     by_name = {partition[0]: partition for partition in partitions}
     require("factory" not in by_name, "A/B layout must not retain a factory app")
+    require(by_name["nvs"][3:] == (0x9000, 0xF000),
+            "NVS capacity must fit current V2 component settings")
+    require(by_name["otadata"][3] == 0x18000 and by_name["phy_init"][3] == 0x1A000,
+            "OTA/PHY offsets must leave the expanded NVS region intact")
     require(by_name["otadata"][4] == 0x2000, "OTA ledger must contain two sectors")
     require(by_name["ota_0"][4] == by_name["ota_1"][4] == 0x190000,
             "OTA slots must be equal 1.5625 MiB partitions")
