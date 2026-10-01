@@ -89,6 +89,21 @@ else()
     target_compile_options(blip_espnow_frames_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_espnow_frames_tests COMMAND blip_espnow_frames_tests)
+
+add_library(blip_fleet_host STATIC ../../components/blip_fleet/src/fleet.cpp)
+target_include_directories(blip_fleet_host PUBLIC ../../components/blip_fleet/include)
+target_link_libraries(blip_fleet_host PUBLIC blip_core_host)
+target_compile_features(blip_fleet_host PUBLIC cxx_std_20)
+add_executable(blip_fleet_tests blip_fleet_tests.cpp)
+target_link_libraries(blip_fleet_tests PRIVATE blip_fleet_host)
+if(MSVC)
+    target_compile_options(blip_fleet_host PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+    target_compile_options(blip_fleet_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_fleet_host PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+    target_compile_options(blip_fleet_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_fleet_tests COMMAND blip_fleet_tests)
 add_test(
     NAME blip_serial_control_self_test
     COMMAND ${Python3_EXECUTABLE}
