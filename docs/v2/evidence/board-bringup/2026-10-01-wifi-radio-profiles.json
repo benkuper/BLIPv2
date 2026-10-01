@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5-4-WIFI-RADIO-PROFILES",
+  "state": "partial",
+  "timestamp_utc": "2026-10-01T01:13:31Z",
+  "policy": {
+    "enabled": "live RF suspension, driver remains initialized",
+    "boot_profile_0": "Wi-Fi driver loaded at boot",
+    "boot_profile_1": "Wi-Fi driver and Wi-Fi netifs omitted at boot; lwIP remains for socket users",
+    "restore": "set boot_profile to 0 over serial and reboot"
+  },
+  "builds": [
+    {"board": "Adafruit HUZZAH32", "profile": "m4-e131-huzzah32", "bytes": 1171584, "sha256": "dd08a23f20be065f0adc6ac57a16252b170b4db6bd838c4ea5d903c4ec474f6f", "result": "pass"},
+    {"board": "Creators Ball V2", "profile": "m4-e131-ball-c6", "bytes": 1298368, "sha256": "f7108600d7ab5bd19e3fbb9ef54a9d73fa5afc9eea61ce8c6aba4236c755ff13", "result": "pass"},
+    {"board": "Creators Tab", "profile": "m4-e131-creators-tab", "bytes": 1148208, "sha256": "7055578e78f0f9b3af5599616c7ac641cc81a5d8315bbdd2a94fdb3cba5a3b63", "result": "pass"},
+    {"board": "M5Dial", "profile": "m4-e131-m5dial", "bytes": 1139680, "sha256": "9f23a136164833c09329f7a5356a46d7ea9bb5f753182b7be0eefa56f8c44b14", "result": "pass"},
+    {"board": "M5StickC", "profile": "m4-e131-m5stickc", "bytes": 1147008, "sha256": "b8044f181b171761cc94f2d49e0bd4e2f91e49ffaaf291a0d95f369fca52d0fb", "result": "pass"},
+    {"board": "Seeed XIAO ESP32-C6", "profile": "m4-e131-xiao-c6", "bytes": 1282896, "sha256": "d18175535ba5f59aed5ae634c0d680e20841253a53e1114782f8eccbdf9d757a", "result": "pass"}
+  ],
+  "hardware": {
+    "huzzah32": {
+      "port": "COM5",
+      "live_suspend_driver_initialized": true,
+      "live_suspend_free_internal_heap_bytes": 113816,
+      "loaded_free_internal_heap_bytes": 111216,
+      "reclaimed_free_internal_heap_bytes": 167020,
+      "reclaimed_minus_loaded_bytes": 55804,
+      "reclaimed_state": 4,
+      "full_registry_probe": true,
+      "serial_restore_driver_initialized": true,
+      "shared_lan_oscquery_description": true,
+      "served_web_ui_description_code": true
+    },
+    "creators_ball_v2": {
+      "port": "COM10",
+      "loaded_free_internal_heap_bytes": 222696,
+      "reclaimed_free_internal_heap_bytes": 286104,
+      "reclaimed_minus_loaded_bytes": 63408,
+      "full_registry_probe": true,
+      "serial_restore_driver_initialized": true
+    },
+    "m5dial": {
+      "port": "COM9",
+      "loaded_free_internal_heap_bytes": 177316,
+      "reclaimed_free_internal_heap_bytes": 235252,
+      "reclaimed_minus_loaded_bytes": 57936,
+      "full_registry_probe": true,
+      "serial_restore_driver_initialized": true,
+      "pixel_output_enabled": false
+    }
+  },
+  "host_tests": {
+    "network_settings": "8 passed",
+    "oscquery": "6 passed",
+    "web": "21 passed",
+    "bundle_repacked": true
+  },
+  "host_wifi": "Archi-wifi guest; no BLIP AP connection",
+  "limits": [
+    "Free-heap differences include other state-dependent allocations and are not a direct allocation trace.",
+    "Static Wi-Fi component buffers and the lwIP TCP/IP stack remain in the reclaimed profile.",
+    "Creators Tab, M5StickC, and XIAO ESP32-C6 passed builds but were not flashed for this cycle.",
+    "BLE and ESP-NOW radio profiles remain open."
+  ]
+}

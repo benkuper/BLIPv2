@@ -229,7 +229,8 @@ bool valid_ipv4(std::string_view value) noexcept {
 core::Status validate_wifi_config(const WifiConfig& config, bool require_credentials) noexcept {
     if (!bounded_sizes(config) || static_cast<std::uint8_t>(config.mode) > 2U ||
         static_cast<std::uint8_t>(config.protocol) > 3U || config.tx_power_index > 3U ||
-        static_cast<std::uint8_t>(config.antenna) > 2U || config.channel > 14U ||
+        static_cast<std::uint8_t>(config.antenna) > 2U ||
+        static_cast<std::uint8_t>(config.boot_profile) > 1U || config.channel > 14U ||
         !valid_utf8(config.ssid.view()) || !no_nul(config.ssid.view()) ||
         !valid_password(config.password.view())) {
         return core::Status::failure(
@@ -277,6 +278,7 @@ core::Result<std::size_t> encode_wifi_config(const WifiConfig& config,
     output[20] = static_cast<std::byte>(config.manual_ip.size);
     output[21] = static_cast<std::byte>(config.manual_gateway.size);
     output[22] = static_cast<std::byte>(config.antenna);
+    output[23] = static_cast<std::byte>(config.boot_profile);
     std::size_t offset = kWifiSettingsHeaderBytes;
     const auto append = [&output, &offset](std::string_view value) {
         if (!value.empty()) {
@@ -297,11 +299,13 @@ decode_wifi_config(std::span<const std::byte> input,
                    storage::ImportedSettingsDecodeWorkspace& workspace) noexcept {
     if (input.size() >= kWifiSettingsHeaderBytes && read_u32(input, 0) == kWifiMagic) {
         const std::uint16_t format_version = read_u16(input, 4);
-        if ((format_version != 1U && format_version != kWifiSettingsFormatVersion) ||
+        if ((format_version < 1U || format_version > kWifiSettingsFormatVersion) ||
             read_u16(input, 6) != kWifiSettingsHeaderBytes || input[12] > std::byte{1} ||
-            input[14] > std::byte{1} || input[23] != std::byte{0} ||
+            input[14] > std::byte{1} ||
+            (format_version < 3U && input[23] != std::byte{0}) ||
+            (format_version == 3U && input[23] > std::byte{1}) ||
             (format_version == 1U && input[22] != std::byte{0}) ||
-            (format_version == kWifiSettingsFormatVersion && input[22] > std::byte{2}) ||
+            (format_version >= 2U && input[22] > std::byte{2}) ||
             read_u32(input, kCrcOffset) != crc32(input)) {
             return core::Result<DecodedWifiConfig>::failure(
                 config_error(core::ErrorCode::corrupt_data, "decode", "invalid-header-or-crc"));
@@ -326,6 +330,9 @@ decode_wifi_config(std::span<const std::byte> input,
         config.antenna = format_version == 1U
                              ? WifiAntenna::board_default
                              : static_cast<WifiAntenna>(std::to_integer<std::uint8_t>(input[22]));
+        config.boot_profile = format_version < 3U
+                                  ? RadioBootProfile::wifi_loaded
+                                  : static_cast<RadioBootProfile>(std::to_integer<std::uint8_t>(input[23]));
         std::size_t offset = kWifiSettingsHeaderBytes;
         const auto text = [&input, &offset](std::size_t size) {
             const std::string_view result{reinterpret_cast<const char*>(input.data() + offset),

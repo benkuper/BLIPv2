@@ -172,6 +172,7 @@ export function buildControlModel(tree) {
         id: componentId,
         path,
         label: text(node.DESCRIPTION, key || "Device"),
+        description: text(node.BLIP_DESCRIPTION),
         schemaVersion: Number.isInteger(node.BLIP_SCHEMA_VERSION) ? node.BLIP_SCHEMA_VERSION : null,
         disablePolicy: text(node.BLIP_DISABLE_POLICY),
         controls,

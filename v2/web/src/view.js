@@ -84,6 +84,9 @@ export class ControlView {
     const header = element(this.document, "header", "component-header");
     header.append(element(this.document, "h2", "", component.label));
     header.append(element(this.document, "p", "component-path", component.path));
+    if (component.description) {
+      header.append(element(this.document, "p", "component-description", component.description));
+    }
     card.append(header);
     const list = element(this.document, "ul", "control-list");
     for (const control of component.controls) list.append(this.controlRow(control));

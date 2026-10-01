@@ -57,3 +57,5 @@ wire protocols, or public OSC paths.
 | --- | --- |
 | [5.1](5.1-battery.md) | HUZZAH32 calibrated ADC and filtered voltage estimate; other board calibration open |
 | [5.2](5.2-led-current-limiting.md) | Encoded-frame calculated current limit and six-board builds; physical current calibration open |
+| [5.3](5.3-pm-dfs.md) | DFS with pixel-frame CPU locks; physical power measurements open |
+| [5.4](5.4-wifi-radio-profiles.md) | Live Wi-Fi suspension and reboot-applied driver memory reclamation; BLE and ESP-NOW profiles open |

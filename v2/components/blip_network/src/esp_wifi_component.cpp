@@ -60,13 +60,45 @@ constexpr std::array<core::MetadataEntry, 6> kMetadata{{
     {"secret_policy", "password-write-only"},
     {"antenna_modes", "0=board-default,1=onboard,2=external"},
 }};
-constexpr std::array<core::ParameterDescriptor, 15> kParameters{{
+constexpr std::array<core::ParameterDescriptor, 19> kParameters{{
     {"enabled",
-     "Wi-Fi enabled",
+     "Wi-Fi RF enabled (live suspension retains driver memory)",
      core::ValueType::boolean,
      core::Access::read_write,
      true,
      core::ScalarValue::from_bool(true),
+     {},
+     ""},
+    {"boot_profile",
+     "Next boot Wi-Fi profile (0=loaded, 1=reclaim driver memory)",
+     core::ValueType::integer,
+     core::Access::read_write,
+     true,
+     core::ScalarValue::from_integer(0),
+     {true, 0, 1, 1},
+     ""},
+    {"active_boot_profile",
+     "Active Wi-Fi profile (0=loaded, 1=driver memory reclaimed)",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {true, 0, 1, 1},
+     ""},
+    {"profile_reboot_required",
+     "Reboot required to apply Wi-Fi profile",
+     core::ValueType::boolean,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_bool(false),
+     {},
+     ""},
+    {"driver_initialized",
+     "Wi-Fi driver memory allocated",
+     core::ValueType::boolean,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_bool(false),
      {},
      ""},
     {"mode",
@@ -219,7 +251,8 @@ constexpr char kProvisionAccepted[] =
     descriptor.id = "blip.transport.wifi";
     descriptor.display_name = "Wi-Fi network manager";
     descriptor.description =
-        "Versioned station/AP management with bounded serial and SoftAP provisioning";
+        "The Wi-Fi RF switch suspends transmission live but retains driver memory. "
+        "The boot profile reclaims driver memory only after reboot; restore it over serial.";
     descriptor.metadata = kMetadata;
     descriptor.provided_services = kProvidedServices;
     descriptor.required_services = kRequiredServices;
@@ -395,13 +428,7 @@ core::Status EspWifiComponent::commit_config(const WifiConfig& config, bool defe
 }
 
 core::Status EspWifiComponent::initialize_platform() noexcept {
-    esp_err_t result = esp_netif_init();
-    if (result == ESP_OK) {
-        netif_owned_ = true;
-    } else if (result != ESP_ERR_INVALID_STATE) {
-        return platform_status(result, "start", "netif-init-failed");
-    }
-    result = esp_event_loop_create_default();
+    esp_err_t result = esp_event_loop_create_default();
     if (result == ESP_OK) {
         event_loop_owned_ = true;
     } else if (result != ESP_ERR_INVALID_STATE) {
@@ -631,11 +658,15 @@ core::Status EspWifiComponent::reconfigure_radio_locked() noexcept {
         radio_started_ = false;
     }
     connect_in_progress_ = false;
-    const WifiTransition transition =
-        state_machine_.apply(config_, static_cast<std::uint64_t>(esp_timer_get_time()) / 1000U);
+    WifiConfig effective = config_;
+    if (active_boot_profile_ == RadioBootProfile::reclaim_wifi) {
+        effective.enabled = false;
+    }
+    const WifiTransition transition = state_machine_.apply(
+        effective, static_cast<std::uint64_t>(esp_timer_get_time()) / 1000U);
     update_public_state_locked();
     rssi_ = -127;
-    if (!config_.enabled) {
+    if (!effective.enabled) {
         return core::Status::success();
     }
     auto status = configure_antenna_locked();
@@ -749,11 +780,23 @@ core::Status EspWifiComponent::start(const core::StartContext&) noexcept {
             wifi_error(core::ErrorCode::validation_failed, "start", "wifi-6-unsupported"));
     }
 #endif
-    status = initialize_platform();
-    if (!status) {
-        cleanup_platform();
+    active_boot_profile_ = config_.boot_profile;
+    // Other network transports still create lwIP sockets when Wi-Fi is excluded.
+    // Keep the TCP/IP mailbox while omitting Wi-Fi netifs and driver allocations.
+    const esp_err_t netif_result = esp_netif_init();
+    if (netif_result == ESP_OK) {
+        netif_owned_ = true;
+    } else if (netif_result != ESP_ERR_INVALID_STATE) {
         mutex_ = nullptr;
-        return status;
+        return platform_status(netif_result, "start", "netif-init-failed");
+    }
+    if (active_boot_profile_ == RadioBootProfile::wifi_loaded) {
+        status = initialize_platform();
+        if (!status) {
+            cleanup_platform();
+            mutex_ = nullptr;
+            return status;
+        }
     }
     std::array<std::uint8_t, 6> mac{};
     if (esp_read_mac(mac.data(), ESP_MAC_WIFI_STA) != ESP_OK) {
@@ -802,9 +845,10 @@ core::Status EspWifiComponent::start(const core::StartContext&) noexcept {
         return core::Status::failure(
             wifi_error(core::ErrorCode::start_failed, "start", "worker-create-failed"));
     }
-    ESP_LOGI(kTag, "network manager ready state=%u ap=%.*s",
-             static_cast<unsigned>(public_state_.load()), static_cast<int>(ap_ssid_size_),
-             ap_ssid_.data());
+    ESP_LOGI(kTag, "network manager ready state=%u profile=%u driver=%u ap=%.*s",
+             static_cast<unsigned>(public_state_.load()),
+             static_cast<unsigned>(active_boot_profile_), wifi_initialized_ ? 1U : 0U,
+             static_cast<int>(ap_ssid_size_), ap_ssid_.data());
     return core::Status::success();
 }
 
@@ -896,6 +940,14 @@ core::Status EspWifiComponent::read_parameter(std::string_view id,
     }
     if (id == "enabled") {
         output = core::ScalarValue::from_bool(config_.enabled);
+    } else if (id == "boot_profile") {
+        output = core::ScalarValue::from_integer(static_cast<std::int64_t>(config_.boot_profile));
+    } else if (id == "active_boot_profile") {
+        output = core::ScalarValue::from_integer(static_cast<std::int64_t>(active_boot_profile_));
+    } else if (id == "profile_reboot_required") {
+        output = core::ScalarValue::from_bool(config_.boot_profile != active_boot_profile_);
+    } else if (id == "driver_initialized") {
+        output = core::ScalarValue::from_bool(wifi_initialized_);
     } else if (id == "mode") {
         output = core::ScalarValue::from_integer(static_cast<std::int64_t>(config_.mode));
     } else if (id == "channel_scan") {
@@ -965,6 +1017,9 @@ core::Status EspWifiComponent::write_parameter(std::string_view id,
     bool assigned = true;
     if (id == "enabled" && value.type == core::ValueType::boolean) {
         candidate.enabled = value.boolean;
+    } else if (id == "boot_profile" && value.type == core::ValueType::integer &&
+               value.integer >= 0 && value.integer <= 1) {
+        candidate.boot_profile = static_cast<RadioBootProfile>(value.integer);
     } else if (id == "mode" && value.type == core::ValueType::integer) {
         candidate.mode = static_cast<WifiMode>(value.integer);
     } else if (id == "ssid" && value.type == core::ValueType::string) {
@@ -1093,7 +1148,10 @@ void EspWifiComponent::run() noexcept {
                     previous = config_;
                     deferred_apply_pending_ = false;
                     config_ = candidate;
-                    applied = reconfigure_radio_locked();
+                    WifiConfig same_live_settings = previous;
+                    same_live_settings.boot_profile = candidate.boot_profile;
+                    applied = same_live_settings == candidate ? core::Status::success()
+                                                               : reconfigure_radio_locked();
                     if (!applied) {
                         config_ = previous;
                         static_cast<void>(reconfigure_radio_locked());

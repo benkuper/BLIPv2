@@ -106,6 +106,7 @@ class EspWifiComponent final : public core::Component {
 
     storage::SettingsStore* settings_{};
     WifiConfig config_{};
+    RadioBootProfile active_boot_profile_{RadioBootProfile::wifi_loaded};
     WifiConfig pending_config_{};
     WifiConfig deferred_previous_config_{};
     WifiStateMachine state_machine_{};

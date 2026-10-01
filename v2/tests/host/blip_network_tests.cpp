@@ -56,6 +56,7 @@ bool native_config_round_trip_and_corruption() {
     config.protocol = WifiProtocol::ax;
     config.channel = 11;
     config.antenna = WifiAntenna::external;
+    config.boot_profile = RadioBootProfile::reclaim_wifi;
 
     std::array<std::byte, kMaxWifiSettingsBytes> encoded{};
     const auto encoded_size = encode_wifi_config(config, encoded);
@@ -89,6 +90,9 @@ bool config_validation_rejects_unsafe_credentials_and_addresses() {
     BLIP_CHECK(validate_wifi_config(config, true));
     config.antenna = static_cast<WifiAntenna>(3);
     BLIP_CHECK(!validate_wifi_config(config, true));
+    config.antenna = WifiAntenna::board_default;
+    config.boot_profile = static_cast<RadioBootProfile>(2);
+    BLIP_CHECK(!validate_wifi_config(config, true));
     BLIP_CHECK(valid_ipv4("0.0.0.0"));
     BLIP_CHECK(valid_ipv4("255.255.255.255"));
     BLIP_CHECK(!valid_ipv4("1.2.3"));
@@ -113,6 +117,28 @@ bool version_one_native_settings_migrate_to_board_default_antenna() {
     const auto decoded = decode_wifi_config({encoded.data(), size.value()}, workspace);
     BLIP_CHECK(decoded);
     BLIP_CHECK(decoded.value().config.antenna == WifiAntenna::board_default);
+    BLIP_CHECK(decoded.value().config.boot_profile == RadioBootProfile::wifi_loaded);
+    return true;
+}
+
+bool version_two_native_settings_default_to_loaded_driver() {
+    WifiConfig config{};
+    config.antenna = WifiAntenna::external;
+    std::array<std::byte, kMaxWifiSettingsBytes> encoded{};
+    const auto size = encode_wifi_config(config, encoded);
+    BLIP_CHECK(size);
+    encoded[4] = std::byte{2};
+    encoded[5] = std::byte{0};
+    write_u32(encoded, 8, settings_crc32({encoded.data(), size.value()}));
+
+    ImportedSettingsDecodeWorkspace workspace{};
+    const auto decoded = decode_wifi_config({encoded.data(), size.value()}, workspace);
+    BLIP_CHECK(decoded);
+    BLIP_CHECK(decoded.value().config.antenna == WifiAntenna::external);
+    BLIP_CHECK(decoded.value().config.boot_profile == RadioBootProfile::wifi_loaded);
+    encoded[23] = std::byte{1};
+    write_u32(encoded, 8, settings_crc32({encoded.data(), size.value()}));
+    BLIP_CHECK(!decode_wifi_config({encoded.data(), size.value()}, workspace));
     return true;
 }
 
@@ -232,6 +258,7 @@ int main() {
         native_config_round_trip_and_corruption,
         config_validation_rejects_unsafe_credentials_and_addresses,
         version_one_native_settings_migrate_to_board_default_antenna,
+        version_two_native_settings_default_to_loaded_driver,
         legacy_wifi_payload_migrates_without_exposing_secret,
         provisioning_form_is_bounded_and_strict,
         state_machine_provisions_retries_and_recovers,

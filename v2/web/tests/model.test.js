@@ -19,6 +19,7 @@ function component(path, id, description, contents) {
     ACCESS: 0,
     BLIP_KIND: "component",
     BLIP_COMPONENT_ID: id,
+    BLIP_DESCRIPTION: "Live controls are applied immediately; boot profiles require a reboot.",
     BLIP_SCHEMA_VERSION: 2,
     BLIP_DISABLE_POLICY: "live",
     CONTENTS: contents,
@@ -99,6 +100,7 @@ test("registry nodes become generic component controls", () => {
   const model = buildControlModel(registryTree());
   assert.equal(model.components.length, 2);
   assert.equal(model.components[0].id, "demo.lights");
+  assert.match(model.components[0].description, /boot profiles require a reboot/);
   assert.deepEqual(
     model.components[0].controls.map(({ id, editor }) => [id, editor]),
     [

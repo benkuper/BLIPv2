@@ -12,13 +12,14 @@
 
 namespace blip::network {
 
-inline constexpr std::uint16_t kWifiSettingsFormatVersion = 2;
+inline constexpr std::uint16_t kWifiSettingsFormatVersion = 3;
 inline constexpr std::size_t kWifiSettingsHeaderBytes = 24;
 inline constexpr std::size_t kMaxWifiSettingsBytes = 192;
 
 enum class WifiMode : std::uint8_t { station = 0, access_point = 1, station_and_ap = 2 };
 enum class WifiProtocol : std::uint8_t { b = 0, bg = 1, bgn = 2, ax = 3 };
 enum class WifiAntenna : std::uint8_t { board_default = 0, onboard = 1, external = 2 };
+enum class RadioBootProfile : std::uint8_t { wifi_loaded = 0, reclaim_wifi = 1 };
 enum class WifiSettingsSource : std::uint8_t { native, legacy_import };
 
 template <std::size_t Maximum> struct BoundedText {
@@ -61,6 +62,7 @@ struct WifiConfig {
     WifiProtocol protocol{WifiProtocol::bgn};
     std::uint8_t channel{};
     WifiAntenna antenna{WifiAntenna::board_default};
+    RadioBootProfile boot_profile{RadioBootProfile::wifi_loaded};
 
     [[nodiscard]] bool operator==(const WifiConfig&) const noexcept = default;
 };

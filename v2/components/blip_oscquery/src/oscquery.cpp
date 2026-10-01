@@ -599,7 +599,10 @@ class TreeWriter {
                 if (!writer_.quoted("namespace")) {
                     return false;
                 }
-            } else if (!writer_.quoted("component") || !writer_.append(",\"BLIP_COMPONENT_ID\":") ||
+            } else if (!writer_.quoted("component") ||
+                       !writer_.append(",\"BLIP_DESCRIPTION\":") ||
+                       !writer_.quoted(child_descriptor->description) ||
+                       !writer_.append(",\"BLIP_COMPONENT_ID\":") ||
                        !writer_.quoted(child_descriptor->id) ||
                        !writer_.append(",\"BLIP_SCHEMA_VERSION\":") ||
                        !writer_.number(child_descriptor->schema_version) ||
