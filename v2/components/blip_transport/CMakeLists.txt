@@ -5,13 +5,20 @@ set(blip_transport_sources
     "src/legacy_serial_v1.cpp"
     "src/serial_protocol.cpp")
 if(blip_ble_enabled)
-    list(APPEND blip_transport_sources "src/ble_fragments.cpp")
+    list(APPEND blip_transport_sources
+        "src/ble_fragments.cpp"
+        "src/esp_ble_transport_component.cpp")
+endif()
+
+set(blip_transport_requires blip_core esp_driver_uart esp_driver_usb_serial_jtag freertos)
+if(blip_ble_enabled)
+    list(APPEND blip_transport_requires blip_storage bt log)
 endif()
 
 idf_component_register(
     SRCS ${blip_transport_sources}
     INCLUDE_DIRS "include"
-    REQUIRES blip_core esp_driver_uart esp_driver_usb_serial_jtag freertos)
+    REQUIRES ${blip_transport_requires})
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/blip_component.cmake)
 blip_configure_component(${COMPONENT_LIB})

@@ -17,6 +17,9 @@
 #include "blip/storage/littlefs_storage_component.hpp"
 #include "blip/storage/nvs_settings_component.hpp"
 #include "blip/transport/esp_serial_transport_component.hpp"
+#if defined(BLIP_ENABLE_BLE)
+#include "blip/transport/esp_ble_transport_component.hpp"
+#endif
 #include "network_lighting_features.hpp"
 #include "driver/gpio.h"
 #include "esp_idf_version.h"
@@ -200,9 +203,13 @@ blip::power::EspBatteryComponent battery_component{};
 blip::power::EspSleepComponent sleep_component{wifi_component, led_component};
 #endif
 blip::ota::EspOtaComponent ota_component{"blip-v2", CONFIG_IDF_TARGET, "minimal"};
-blip::core::Registry<16> registry{};
-blip::core::RegistryControlService<16> control_component{registry};
+blip::core::Registry<20> registry{};
+blip::core::RegistryControlService<20> control_component{registry};
 blip::transport::EspSerialTransportComponent serial_transport_component{control_component};
+#if defined(BLIP_ENABLE_BLE)
+blip::transport::EspBleTransportComponent ble_transport_component{
+    control_component, settings_component.settings()};
+#endif
 blip::oscquery::EspOscQueryComponent oscquery_component{registry, control_component, wifi_component,
                                                         file_storage_component.web_assets(),
                                                         ota_component.updates(), resource_broker,
@@ -275,6 +282,12 @@ void reject_pending_update() noexcept {
         if (!wifi_status) {
             return false;
         }
+#if defined(BLIP_ENABLE_BLE)
+        const auto ble_status = registry.add(ble_transport_component);
+        if (!ble_status) {
+            return false;
+        }
+#endif
         const auto ota_status = registry.add(ota_component);
         if (!ota_status) {
             return false;
@@ -416,6 +429,11 @@ extern "C" void app_main() {
         return;
     }
     serial_transport_component.enable_control();
+#if defined(BLIP_ENABLE_BLE)
+    if (!safe_mode) {
+        ble_transport_component.enable_control();
+    }
+#endif
     const auto& diagnostics = diagnostics_component.snapshot();
     if (safe_mode) {
         ESP_LOGW(kTag,

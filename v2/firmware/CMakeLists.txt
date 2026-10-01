@@ -2,10 +2,16 @@ cmake_minimum_required(VERSION 3.22)
 
 # Keep generated configuration isolated inside each selected build directory.
 set(SDKCONFIG "${CMAKE_BINARY_DIR}/sdkconfig")
-option(BLIP_ENABLE_ARTNET "Include Art-Net discovery and DMX input" ON)
-option(BLIP_ENABLE_DDP "Include DDP pixel input" ON)
-option(BLIP_ENABLE_E131 "Include E1.31/sACN DMX input" OFF)
 option(BLIP_ENABLE_BLE "Include the NimBLE control transport" OFF)
+set(blip_network_lighting_default ON)
+if(BLIP_ENABLE_BLE)
+    # Leave room in the 4 MB OTA layout for the opt-in NimBLE image.
+    set(blip_network_lighting_default OFF)
+    set(SDKCONFIG_DEFAULTS "sdkconfig.defaults;sdkconfig.ble.defaults")
+endif()
+option(BLIP_ENABLE_ARTNET "Include Art-Net discovery and DMX input" ${blip_network_lighting_default})
+option(BLIP_ENABLE_DDP "Include DDP pixel input" ${blip_network_lighting_default})
+option(BLIP_ENABLE_E131 "Include E1.31/sACN DMX input" OFF)
 option(BLIP_BOARD_ADAFRUIT_HUZZAH32 "Use the HUZZAH32 board battery profile" OFF)
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/../components/blip_core"
