@@ -1,0 +1,2 @@
+# XIAO ESP32-C6 BLE profile retains OTA headroom on its 4 MB flash.
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions-ble-4mb.csv"

@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-01",
+  "work_package": "5.5",
+  "toolchain": "ESP-IDF 6.0.2",
+  "profile": "BLIP_ENABLE_BLE=ON; Art-Net, DDP and E1.31 excluded",
+  "boards": [
+    {
+      "board": "Adafruit HUZZAH32",
+      "target": "esp32",
+      "port": "COM5",
+      "app_image_hex": "0x14d220",
+      "app_partition_hex": "0x190000",
+      "ble_probe_write_verified_by_serial": true,
+      "ble_disable_and_serial_reenable": true,
+      "persisted_enable_after_reset": true,
+      "heap_free_internal_ble_active_bytes": 41032,
+      "heap_minimum_internal_bytes": 24624,
+      "wifi_http_root_status": 200
+    },
+    {
+      "board": "Creators Tab",
+      "target": "esp32",
+      "port": "COM14",
+      "app_image_hex": "0x1476a0",
+      "app_partition_hex": "0x190000",
+      "ble_probe_write_verified_by_serial": true,
+      "ble_disable_and_serial_reenable": true,
+      "heap_free_internal_ble_active_bytes": 45200,
+      "wifi_tx_profile_2": "Repeated brownout detector resets during Wi-Fi association with BLE active",
+      "wifi_tx_profile_0": "A short 30-second observation had no reset, but a longer run brownout-reset repeatedly (boot sequence 2 to 6; reset cause 9=brownout)",
+      "ble_transport_with_wifi_suspended": "Probe write/readback and live disable passed without a brownout",
+      "left_with_ble_disabled": true,
+      "wifi_tx_profile_restored": 2,
+      "ble_disabled_boot_sequence_stable": 4,
+      "qualification_limit": "Simultaneous Wi-Fi and BLE is not reliable on the present power connection"
+    },
+    {
+      "board": "M5StickC",
+      "target": "esp32",
+      "port": "COM12",
+      "app_image_hex": "0x147200",
+      "app_partition_hex": "0x190000",
+      "flash_baud": 115200,
+      "ble_probe_write_verified_by_serial": true,
+      "ble_disable_and_serial_reenable": true,
+      "heap_free_internal_ble_active_bytes": 44228
+    },
+    {
+      "board": "M5Dial",
+      "target": "esp32s3",
+      "port": "COM9",
+      "app_image_hex": "0x144d70",
+      "app_partition_hex": "0x190000",
+      "ble_probe_write_verified_by_serial": true,
+      "ble_disable_and_serial_reenable": true,
+      "heap_free_internal_ble_active_bytes": 101104,
+      "regression": "An initial 4 KiB BLE worker stack overflowed on BLE settings write; 8 KiB dynamic worker passed"
+    },
+    {
+      "board": "Seeed XIAO ESP32-C6 chip antenna",
+      "target": "esp32c6",
+      "port": "COM13",
+      "app_image_hex": "0x18df60",
+      "app_partition_hex": "0x1a0000",
+      "partition_profile": "partitions-ble-4mb.csv",
+      "ble_probe_write_verified_by_serial": true,
+      "ble_disable_and_serial_reenable": true,
+      "browser_http_root_status_after_partition_change": 200,
+      "ble_get_after_partition_change": true,
+      "ble_disable_and_reenable_after_partition_change": true
+    },
+    {
+      "board": "Creators Ball V2",
+      "target": "esp32c6",
+      "port": "COM10",
+      "detected_flash_mb": 8,
+      "app_image_hex": "0x191ff0",
+      "app_partition_hex": "0x300000",
+      "partition_profile": "partitions-8mb.csv",
+      "ble_probe_write_verified_by_serial": true,
+      "ble_disable_and_serial_reenable": true,
+      "heap_free_internal_ble_active_bytes": 167692
+    }
+  ],
+  "open_gates": [
+    "Creators Tab reliable Wi-Fi and BLE coexistence on a suitable power source",
+    "Mixed BLE, Wi-Fi and LED traffic soak on six boards",
+    "Optional Classic Bluetooth profile on original ESP32",
+    "Browser installation and OTA flow for BLE-specific partition layouts"
+  ]
+}
