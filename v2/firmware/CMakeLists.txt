@@ -5,8 +5,10 @@ set(SDKCONFIG "${CMAKE_BINARY_DIR}/sdkconfig")
 option(BLIP_ENABLE_BLE "Include the NimBLE control transport" OFF)
 set(blip_network_lighting_default ON)
 if(BLIP_ENABLE_BLE)
-    # Leave room in the 4 MB OTA layout for the opt-in NimBLE image.
-    set(blip_network_lighting_default OFF)
+    # Keep network lighting on the 8 MB Ball; 4 MB BLE profiles need app space.
+    if(NOT BLIP_BOARD_CREATORS_BALL_V2)
+        set(blip_network_lighting_default OFF)
+    endif()
     set(SDKCONFIG_DEFAULTS "sdkconfig.defaults;sdkconfig.ble.defaults")
     if(BLIP_BOARD_CREATORS_BALL_V2)
         list(APPEND SDKCONFIG_DEFAULTS "sdkconfig.ball-8mb.defaults")

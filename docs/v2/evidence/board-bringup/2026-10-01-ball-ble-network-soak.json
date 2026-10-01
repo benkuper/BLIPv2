@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "started_at_utc": "2026-10-01T07:34:07.317086+00:00",
+  "host": "192.168.27.186",
+  "serial_port": "COM10",
+  "pixels": 36,
+  "fps_per_protocol": 20.0,
+  "requested_duration_seconds": 180,
+  "traffic_duration_seconds": 187.689,
+  "elapsed_seconds": 195.375,
+  "sent_packets": {
+    "artnet": 3686,
+    "ddp": 3686,
+    "e131": 3686
+  },
+  "sender_errors": [],
+  "samples": [
+    {
+      "elapsed_seconds": 0.0,
+      "values": {
+        "blip.diagnostics.heap_free_internal": 148752,
+        "blip.diagnostics.heap_minimum_internal": 144828,
+        "blip.diagnostics.heap_largest_internal": 131072,
+        "blip.output.strip0.applied_frames": 1,
+        "blip.output.strip0.failed_frames": 0,
+        "blip.output.strip0.last_frame_us": 7604,
+        "blip.output.strip0.worker_stack_headroom": 4016,
+        "blip.input.artnet.accepted_packets": 0,
+        "blip.input.artnet.rejected_packets": 0,
+        "blip.input.ddp.accepted_packets": 0,
+        "blip.input.ddp.rejected_packets": 0,
+        "blip.input.ddp.worker_stack_headroom": 3408,
+        "blip.input.e131.accepted_packets": 0,
+        "blip.input.e131.rejected_packets": 0,
+        "blip.input.e131.worker_stack_headroom": 3392
+      }
+    },
+    {
+      "elapsed_seconds": 37.676,
+      "values": {
+        "blip.diagnostics.heap_free_internal": 148824,
+        "blip.diagnostics.heap_minimum_internal": 134836,
+        "blip.diagnostics.heap_largest_internal": 131072,
+        "blip.output.strip0.applied_frames": 977,
+        "blip.output.strip0.failed_frames": 0,
+        "blip.output.strip0.last_frame_us": 9247,
+        "blip.output.strip0.worker_stack_headroom": 3888,
+        "blip.input.artnet.accepted_packets": 669,
+        "blip.input.artnet.rejected_packets": 0,
+        "blip.input.ddp.accepted_packets": 690,
+        "blip.input.ddp.rejected_packets": 0,
+        "blip.input.ddp.worker_stack_headroom": 3376,
+        "blip.input.e131.accepted_packets": 720,
+        "blip.input.e131.rejected_packets": 0,
+        "blip.input.e131.worker_stack_headroom": 3280
+      }
+    },
+    {
+      "elapsed_seconds": 75.365,
+      "values": {
+        "blip.diagnostics.heap_free_internal": 148776,
+        "blip.diagnostics.heap_minimum_internal": 134836,
+        "blip.diagnostics.heap_largest_internal": 131072,
+        "blip.output.strip0.applied_frames": 2143,
+        "blip.output.strip0.failed_frames": 0,
+        "blip.output.strip0.last_frame_us": 9213,
+        "blip.output.strip0.worker_stack_headroom": 3888,
+        "blip.input.artnet.accepted_packets": 1410,
+        "blip.input.artnet.rejected_packets": 0,
+        "blip.input.ddp.accepted_packets": 1429,
+        "blip.input.ddp.rejected_packets": 0,
+        "blip.input.ddp.worker_stack_headroom": 3312,
+        "blip.input.e131.accepted_packets": 1460,
+        "blip.input.e131.rejected_packets": 0,
+        "blip.input.e131.worker_stack_headroom": 3280
+      }
+    },
+    {
+      "elapsed_seconds": 113.615,
+      "values": {
+        "blip.diagnostics.heap_free_internal": 148776,
+        "blip.diagnostics.heap_minimum_internal": 131428,
+        "blip.diagnostics.heap_largest_internal": 129024,
+        "blip.output.strip0.applied_frames": 3294,
+        "blip.output.strip0.failed_frames": 0,
+        "blip.output.strip0.last_frame_us": 9468,
+        "blip.output.strip0.worker_stack_headroom": 3888,
+        "blip.input.artnet.accepted_packets": 2158,
+        "blip.input.artnet.rejected_packets": 0,
+        "blip.input.ddp.accepted_packets": 2177,
+        "blip.input.ddp.rejected_packets": 0,
+        "blip.input.ddp.worker_stack_headroom": 3312,
+        "blip.input.e131.accepted_packets": 2211,
+        "blip.input.e131.rejected_packets": 0,
+        "blip.input.e131.worker_stack_headroom": 3280
+      }
+    },
+    {
+      "elapsed_seconds": 151.307,
+      "values": {
+        "blip.diagnostics.heap_free_internal": 148840,
+        "blip.diagnostics.heap_minimum_internal": 131428,
+        "blip.diagnostics.heap_largest_internal": 131072,
+        "blip.output.strip0.applied_frames": 4473,
+        "blip.output.strip0.failed_frames": 0,
+        "blip.output.strip0.last_frame_us": 9316,
+        "blip.output.strip0.worker_stack_headroom": 3888,
+        "blip.input.artnet.accepted_packets": 2901,
+        "blip.input.artnet.rejected_packets": 0,
+        "blip.input.ddp.accepted_packets": 2920,
+        "blip.input.ddp.rejected_packets": 0,
+        "blip.input.ddp.worker_stack_headroom": 3312,
+        "blip.input.e131.accepted_packets": 2952,
+        "blip.input.e131.rejected_packets": 0,
+        "blip.input.e131.worker_stack_headroom": 3280
+      }
+    },
+    {
+      "elapsed_seconds": 187.689,
+      "values": {
+        "blip.diagnostics.heap_free_internal": 148600,
+        "blip.diagnostics.heap_minimum_internal": 131428,
+        "blip.diagnostics.heap_largest_internal": 131072,
+        "blip.output.strip0.applied_frames": 5590,
+        "blip.output.strip0.failed_frames": 0,
+        "blip.output.strip0.last_frame_us": 8944,
+        "blip.output.strip0.worker_stack_headroom": 3888,
+        "blip.input.artnet.accepted_packets": 3615,
+        "blip.input.artnet.rejected_packets": 0,
+        "blip.input.ddp.accepted_packets": 3636,
+        "blip.input.ddp.rejected_packets": 0,
+        "blip.input.ddp.worker_stack_headroom": 3312,
+        "blip.input.e131.accepted_packets": 3666,
+        "blip.input.e131.rejected_packets": 0,
+        "blip.input.e131.worker_stack_headroom": 3280
+      }
+    },
+    {
+      "elapsed_seconds": 195.375,
+      "values": {
+        "blip.diagnostics.heap_free_internal": 148788,
+        "blip.diagnostics.heap_minimum_internal": 131428,
+        "blip.diagnostics.heap_largest_internal": 131072,
+        "blip.output.strip0.applied_frames": 5765,
+        "blip.output.strip0.failed_frames": 0,
+        "blip.output.strip0.last_frame_us": 9366,
+        "blip.output.strip0.worker_stack_headroom": 3888,
+        "blip.input.artnet.accepted_packets": 3686,
+        "blip.input.artnet.rejected_packets": 0,
+        "blip.input.ddp.accepted_packets": 3686,
+        "blip.input.ddp.rejected_packets": 0,
+        "blip.input.ddp.worker_stack_headroom": 3312,
+        "blip.input.e131.accepted_packets": 3686,
+        "blip.input.e131.rejected_packets": 0,
+        "blip.input.e131.worker_stack_headroom": 3280
+      }
+    }
+  ],
+  "limits": "Serial and transport counters do not establish waveform integrity or a Gate C pass."
+}

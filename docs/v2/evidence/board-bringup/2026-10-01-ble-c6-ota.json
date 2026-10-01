@@ -20,6 +20,7 @@
       "app_image_bytes": 1646576,
       "ble_active_attempt": "Client timed out after 300 seconds; board remained reachable with OTA state confirmed and no reported upload progress",
       "ble_suspended_retry": "HTTP 202 accepted in about 10 seconds",
+      "second_ble_active_attempt": "HTTP 202 accepted; rebooted with OTA state confirmed and BLE active",
       "post_reboot_ota_state": "confirmed",
       "post_reboot_ble_reenabled": true,
       "post_reboot_http_root_status": 200
@@ -28,6 +29,6 @@
   "limits": [
     "The application image version was unchanged; this checks alternate-slot writing and confirmed reboot, not version migration",
     "The browser Web Serial installer and browser OTA UI were not exercised",
-    "Ball sustained Wi-Fi transfer while BLE is active needs diagnosis"
+    "The cause of Ball's first BLE-active OTA timeout is unknown; a later BLE-active retry passed"
   ]
 }

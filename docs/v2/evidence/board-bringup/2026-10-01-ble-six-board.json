@@ -87,6 +87,6 @@
     "Mixed BLE, Wi-Fi and LED traffic soak on six boards",
     "Optional Classic Bluetooth profile on original ESP32",
     "Browser Web Serial installation for BLE-specific partition layouts",
-    "Creators Ball sustained Wi-Fi transfer while BLE is active"
+    "Creators Ball BLE-active OTA timeout repeatability"
   ]
 }
