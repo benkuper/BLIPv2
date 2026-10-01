@@ -20,6 +20,9 @@
 #if defined(BLIP_ENABLE_BLE)
 #include "blip/transport/esp_ble_transport_component.hpp"
 #endif
+#if defined(BLIP_ENABLE_CLASSIC_BT)
+#include "blip/transport/esp_classic_transport_component.hpp"
+#endif
 #include "network_lighting_features.hpp"
 #include "driver/gpio.h"
 #include "esp_idf_version.h"
@@ -197,11 +200,23 @@ blip::storage::LittleFsStorageComponent file_storage_component{};
 blip::network::EspWifiComponent wifi_component{settings_component.settings()};
 constexpr auto board_manifest = blip::resources::selected_board_manifest();
 blip::resources::DeviceBroker resource_broker{};
-blip::led::EspRmtStripComponent led_component{settings_component.settings(), resource_broker,
-                                                power_manager_component};
+#if defined(CONFIG_IDF_TARGET_ESP32) && defined(BLIP_ENABLE_CLASSIC_BT)
+// Bluedroid reserves more fixed DRAM than NimBLE. Construct these large
+// components on the heap before starting any services.
+blip::led::EspRmtStripComponent* led_component{};
+#else
+blip::led::EspRmtStripComponent led_storage{settings_component.settings(), resource_broker,
+                                              power_manager_component};
+blip::led::EspRmtStripComponent* led_component{&led_storage};
+#endif
 #if defined(BLIP_BOARD_ADAFRUIT_HUZZAH32)
 blip::power::EspBatteryComponent battery_component{};
-blip::power::EspSleepComponent sleep_component{wifi_component, led_component};
+#if defined(BLIP_ENABLE_CLASSIC_BT)
+blip::power::EspSleepComponent* sleep_component{};
+#else
+blip::power::EspSleepComponent sleep_storage{wifi_component, *led_component};
+blip::power::EspSleepComponent* sleep_component{&sleep_storage};
+#endif
 #endif
 blip::ota::EspOtaComponent ota_component{"blip-v2", CONFIG_IDF_TARGET, "minimal"};
 blip::core::Registry<20> registry{};
@@ -211,7 +226,12 @@ blip::transport::EspSerialTransportComponent serial_transport_component{control_
 blip::transport::EspBleTransportComponent ble_transport_component{
     control_component, settings_component.settings()};
 #endif
-#if defined(CONFIG_IDF_TARGET_ESP32) && defined(BLIP_ENABLE_BLE)
+#if defined(BLIP_ENABLE_CLASSIC_BT)
+blip::transport::EspClassicTransportComponent classic_transport_component{
+    control_component, settings_component.settings()};
+#endif
+#if defined(CONFIG_IDF_TARGET_ESP32) && \
+    (defined(BLIP_ENABLE_BLE) || defined(BLIP_ENABLE_CLASSIC_BT))
 // The original ESP32 reserves a fixed DRAM region for its BT controller. Keep
 // OSCQuery available by placing its large fixed packet buffers in the heap.
 blip::oscquery::EspOscQueryComponent* oscquery_component{};
@@ -295,6 +315,12 @@ void reject_pending_update() noexcept {
             return false;
         }
 #endif
+#if defined(BLIP_ENABLE_CLASSIC_BT)
+        const auto classic_status = registry.add(classic_transport_component);
+        if (!classic_status) {
+            return false;
+        }
+#endif
         const auto ota_status = registry.add(ota_component);
         if (!ota_status) {
             return false;
@@ -303,7 +329,7 @@ void reject_pending_update() noexcept {
         if (!oscquery_status) {
             return false;
         }
-        const auto led_status = registry.add(led_component);
+        const auto led_status = registry.add(*led_component);
         if (!led_status) {
             return false;
         }
@@ -312,13 +338,13 @@ void reject_pending_update() noexcept {
         if (!battery_status) {
             return false;
         }
-        const auto sleep_status = registry.add(sleep_component);
+        const auto sleep_status = registry.add(*sleep_component);
         if (!sleep_status) {
             return false;
         }
 #endif
 #if defined(BLIP_ENABLE_DDP)
-        const auto ddp_status = registry.add(blip::firmware::ddp_feature(led_component));
+        const auto ddp_status = registry.add(blip::firmware::ddp_feature(*led_component));
         if (!ddp_status) {
             const auto& error = ddp_status.error();
             ESP_LOGE(kTag, "DDP registry add failed code=%u detail=%.*s",
@@ -329,7 +355,7 @@ void reject_pending_update() noexcept {
 #endif
 #if defined(BLIP_ENABLE_ARTNET)
         const auto artnet_status = registry.add(
-            blip::firmware::artnet_feature(wifi_component, led_component));
+            blip::firmware::artnet_feature(wifi_component, *led_component));
         if (!artnet_status) {
             const auto& error = artnet_status.error();
             ESP_LOGE(kTag, "Art-Net registry add failed code=%u detail=%.*s",
@@ -340,7 +366,7 @@ void reject_pending_update() noexcept {
 #endif
 #if defined(BLIP_ENABLE_E131)
         const auto e131_status = registry.add(
-            blip::firmware::e131_feature(wifi_component, led_component));
+            blip::firmware::e131_feature(wifi_component, *led_component));
         if (!e131_status) {
             const auto& error = e131_status.error();
             ESP_LOGE(kTag, "E1.31 registry add failed code=%u detail=%.*s",
@@ -397,7 +423,28 @@ extern "C" void app_main() {
         reject_pending_update();
         return;
     }
-#if defined(CONFIG_IDF_TARGET_ESP32) && defined(BLIP_ENABLE_BLE)
+#if defined(CONFIG_IDF_TARGET_ESP32) && defined(BLIP_ENABLE_CLASSIC_BT)
+    if (!safe_mode) {
+        led_component = new (std::nothrow) blip::led::EspRmtStripComponent{
+            settings_component.settings(), resource_broker, power_manager_component};
+        if (led_component == nullptr) {
+            ESP_LOGE(kTag, "BLIP_V2_LED_ALLOCATION_FAILED");
+            reject_pending_update();
+            return;
+        }
+#if defined(BLIP_BOARD_ADAFRUIT_HUZZAH32)
+        sleep_component = new (std::nothrow) blip::power::EspSleepComponent{
+            wifi_component, *led_component};
+        if (sleep_component == nullptr) {
+            ESP_LOGE(kTag, "BLIP_V2_SLEEP_ALLOCATION_FAILED");
+            reject_pending_update();
+            return;
+        }
+#endif
+    }
+#endif
+#if defined(CONFIG_IDF_TARGET_ESP32) && \
+    (defined(BLIP_ENABLE_BLE) || defined(BLIP_ENABLE_CLASSIC_BT))
     if (!safe_mode) {
         oscquery_component = new (std::nothrow) blip::oscquery::EspOscQueryComponent{
             registry, control_component, wifi_component, file_storage_component.web_assets(),
@@ -451,6 +498,11 @@ extern "C" void app_main() {
 #if defined(BLIP_ENABLE_BLE)
     if (!safe_mode) {
         ble_transport_component.enable_control();
+    }
+#endif
+#if defined(BLIP_ENABLE_CLASSIC_BT)
+    if (!safe_mode) {
+        classic_transport_component.enable_control();
     }
 #endif
     const auto& diagnostics = diagnostics_component.snapshot();

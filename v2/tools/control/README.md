@@ -31,6 +31,21 @@ The codec-only check has no external dependency:
 python v2/tools/control/blip_serial_control.py --self-test
 ```
 
+On an original ESP32 built with `BLIP_ENABLE_CLASSIC_BT=ON`, Classic SPP is
+excluded from the other targets and disabled at runtime until enabled over
+serial. Read its Bluetooth address, enable it, then use the same COBS control
+envelope over an RFCOMM socket (channel 1):
+
+```powershell
+python v2/tools/control/blip_serial_control.py --port COM5 set blip.transport.classic enabled true
+python v2/tools/control/blip_serial_control.py --port COM5 get blip.transport.classic address
+python v2/tools/control/blip_classic_control.py --address AA:BB:CC:DD:EE:FF get blip.bootstrap probe_value
+```
+
+The Classic and NimBLE firmware profiles are mutually exclusive. Classic uses
+authenticated Secure Simple Pairing with no device input/output, so pairing
+does not provide a displayed code for human comparison.
+
 The LED hardware-in-loop helper configures the strip, checks typed rejection of
 a live transport change, and then verifies persisted settings after an external
 reset. Run its two phases around a board reset:

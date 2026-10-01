@@ -1,4 +1,5 @@
 idf_build_get_property(blip_ble_enabled BLIP_ENABLE_BLE)
+idf_build_get_property(blip_classic_enabled BLIP_ENABLE_CLASSIC_BT)
 set(blip_transport_sources
     "src/envelope.cpp"
     "src/esp_serial_transport_component.cpp"
@@ -9,9 +10,15 @@ if(blip_ble_enabled)
         "src/ble_fragments.cpp"
         "src/esp_ble_transport_component.cpp")
 endif()
+if(blip_classic_enabled)
+    list(APPEND blip_transport_sources "src/esp_classic_transport_component.cpp")
+endif()
 
 set(blip_transport_requires blip_core esp_driver_uart esp_driver_usb_serial_jtag freertos)
 if(blip_ble_enabled)
+    list(APPEND blip_transport_requires blip_storage bt log)
+endif()
+if(blip_classic_enabled)
     list(APPEND blip_transport_requires blip_storage bt log)
 endif()
 
