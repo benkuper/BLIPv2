@@ -4,6 +4,7 @@
 #include "blip/core/registry.hpp"
 #include "blip/core/scheduler.hpp"
 #include "blip/led/esp_rmt_strip_component.hpp"
+#include "blip/pm/esp_power_manager_component.hpp"
 #if defined(BLIP_BOARD_ADAFRUIT_HUZZAH32)
 #include "blip/power/esp_battery_component.hpp"
 #include "blip/power/esp_sleep_component.hpp"
@@ -186,19 +187,21 @@ class BootstrapComponent final : public blip::core::Component {
 BootstrapComponent bootstrap_component{false};
 BootstrapComponent recovery_component{true};
 blip::core::EspDiagnosticsComponent diagnostics_component{};
+blip::pm::EspPowerManagerComponent power_manager_component{};
 blip::storage::NvsSettingsComponent settings_component{};
 blip::storage::LittleFsStorageComponent file_storage_component{};
 blip::network::EspWifiComponent wifi_component{settings_component.settings()};
 constexpr auto board_manifest = blip::resources::selected_board_manifest();
 blip::resources::DeviceBroker resource_broker{};
-blip::led::EspRmtStripComponent led_component{settings_component.settings(), resource_broker};
+blip::led::EspRmtStripComponent led_component{settings_component.settings(), resource_broker,
+                                                power_manager_component};
 #if defined(BLIP_BOARD_ADAFRUIT_HUZZAH32)
 blip::power::EspBatteryComponent battery_component{};
 blip::power::EspSleepComponent sleep_component{wifi_component, led_component};
 #endif
 blip::ota::EspOtaComponent ota_component{"blip-v2", CONFIG_IDF_TARGET, "minimal"};
-blip::core::Registry<15> registry{};
-blip::core::RegistryControlService<15> control_component{registry};
+blip::core::Registry<16> registry{};
+blip::core::RegistryControlService<16> control_component{registry};
 blip::transport::EspSerialTransportComponent serial_transport_component{control_component};
 blip::oscquery::EspOscQueryComponent oscquery_component{registry, control_component, wifi_component,
                                                         file_storage_component.web_assets(),
@@ -256,6 +259,10 @@ void reject_pending_update() noexcept {
             return false;
         }
     } else {
+        const auto power_status = registry.add(power_manager_component);
+        if (!power_status) {
+            return false;
+        }
         const auto storage_status = registry.add(settings_component);
         if (!storage_status) {
             return false;

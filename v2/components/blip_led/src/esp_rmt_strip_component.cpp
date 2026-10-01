@@ -55,7 +55,7 @@ constexpr std::string_view kClockOwner{"blip.output.strip0:clock"};
 constexpr std::string_view kSpiOwner{"blip.output.strip0:spi"};
 #endif
 constexpr std::array<std::string_view, 1> kProvidedServices{"output.pixel-strip"};
-constexpr std::array<std::string_view, 1> kRequiredServices{"storage.settings"};
+constexpr std::array<std::string_view, 2> kRequiredServices{"storage.settings", "power.cpu"};
 #if !defined(BLIP_BOARD_CREATORS_BALL_V2)
 constexpr std::array<std::string_view, 4> kRmtAlternatives{"rmt.tx0", "rmt.tx1", "rmt.tx2",
                                                            "rmt.tx3"};
@@ -277,8 +277,9 @@ void saturating_increment(std::atomic<std::uint32_t>& value) noexcept {
 const core::ComponentDescriptor EspRmtStripComponent::descriptor_{strip_descriptor()};
 
 EspRmtStripComponent::EspRmtStripComponent(storage::SettingsStore& settings,
-                                           resources::DeviceBroker& resources) noexcept
-    : settings_(&settings), resources_(&resources) {}
+                                           resources::DeviceBroker& resources,
+                                           pm::EspPowerManagerComponent& power_manager) noexcept
+    : settings_(&settings), resources_(&resources), power_manager_(&power_manager) {}
 
 const core::ComponentDescriptor& EspRmtStripComponent::descriptor() const noexcept {
     return descriptor_;
@@ -1142,6 +1143,11 @@ void EspRmtStripComponent::run() noexcept {
         snapshot = config_;
         unlock_config();
         if (!snapshot.enabled) {
+            continue;
+        }
+        pm::FrameCpuLock frame_lock{*power_manager_};
+        if (!frame_lock.acquired()) {
+            saturating_increment(failed_frames_);
             continue;
         }
 #if defined(BLIP_BOARD_CREATORS_BALL_V2)

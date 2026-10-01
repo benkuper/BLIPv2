@@ -4,6 +4,7 @@
 #include "blip/led/strip_config.hpp"
 #include "blip/led/current_limiter.hpp"
 #include "blip/led/stream.hpp"
+#include "blip/pm/esp_power_manager_component.hpp"
 #if defined(BLIP_BOARD_CREATORS_BALL_V2)
 #include "blip/led/esp_spi_dma_output_driver.hpp"
 #endif
@@ -28,7 +29,8 @@ class EspRmtStripComponent final : public core::Component {
     static constexpr std::size_t kTaskStackWords = kTaskStackBytes / sizeof(StackType_t);
 
     EspRmtStripComponent(storage::SettingsStore& settings,
-                         resources::DeviceBroker& resources) noexcept;
+                         resources::DeviceBroker& resources,
+                         pm::EspPowerManagerComponent& power_manager) noexcept;
 
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
     [[nodiscard]] core::Status start(const core::StartContext&) noexcept override;
@@ -72,6 +74,7 @@ class EspRmtStripComponent final : public core::Component {
 
     storage::SettingsStore* settings_{};
     resources::DeviceBroker* resources_{};
+    pm::EspPowerManagerComponent* power_manager_{};
     resources::DeviceBroker::Lease pin_lease_{};
     StripConfig config_{};
     StripConfig pending_config_{};

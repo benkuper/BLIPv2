@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5-3-PM-DFS-PIXEL-LOCK",
+  "state": "partial",
+  "timestamp_utc": "2026-10-01T00:55:02Z",
+  "configuration": "CONFIG_PM_ENABLE=y; 80 MHz idle, 160 MHz maximum; automatic light sleep off",
+  "builds": [
+    {"board": "Creators Ball V2", "profile": "m4-e131-ball-c6", "bytes": 1297008, "sha256": "942a950e6e81f2b818546f1f833477a574550154d7007c930a174780e6dc3a54", "result": "pass"},
+    {"board": "Creators Tab", "profile": "m4-e131-creators-tab", "bytes": 1146752, "sha256": "985e6b86d0dec704cf1bd9b55706cafb88775a82a205d6e1527771c2d7aeb89b", "result": "pass"},
+    {"board": "Adafruit HUZZAH32", "profile": "m4-e131-huzzah32", "bytes": 1170128, "sha256": "b01c63fa75a10af68504b56c0592fd9ddc0dee1a23720170afaed1e79b94686a", "result": "pass"},
+    {"board": "M5Dial", "profile": "m4-e131-m5dial", "bytes": 1138224, "sha256": "b44e648f0cbe838dc6da3f7a0eb3b3e0a06fa18db582db10cd9ee5fbdde3b44a", "result": "pass"},
+    {"board": "M5StickC", "profile": "m4-e131-m5stickc", "bytes": 1145552, "sha256": "90b11c0ba8791a0d764688cdf1375ec1f6b82a728d6fb830b58c25fab2ebb4ac", "result": "pass"},
+    {"board": "Seeed XIAO ESP32-C6", "profile": "m4-e131-xiao-c6", "bytes": 1281536, "sha256": "166c376cc57b2916783b2e3f6646b428f70561933c6de501179cd8b32a78cff5", "result": "pass"}
+  ],
+  "hardware": {
+    "huzzah32": {
+      "port": "COM5",
+      "flash_hash_verified": true,
+      "led_backend": "RMT",
+      "pm_policy": [80, 160, false],
+      "acquired_frames": [1, 3],
+      "applied_frames": [1, 3],
+      "failed_frames": [0, 0],
+      "active_frame_locks_after": 0,
+      "release_errors": 0,
+      "red_restored": 0,
+      "wifi_state": [2, 2],
+      "light_sleep_regression_us": 999972,
+      "deep_sleep_boot_sequence": [1, 2],
+      "deep_sleep_timer_wake_mask": 16,
+      "passed": true
+    },
+    "creators_ball_v2": {
+      "port": "COM10",
+      "flash_hash_verified": true,
+      "led_backend": "SPI-DMA HD108",
+      "pm_policy": [80, 160, false],
+      "acquired_frames": [1, 3],
+      "applied_frames": [1, 3],
+      "failed_frames": [0, 0],
+      "active_frame_locks_after": 0,
+      "release_errors": 0,
+      "red_restored": 0,
+      "wifi_state": [2, 2],
+      "network_soak": {
+        "traffic_seconds": 37.678,
+        "sent_packets_each": 741,
+        "accepted_artnet": 741,
+        "accepted_ddp": 741,
+        "accepted_e131": 741,
+        "rejected_packets": 0,
+        "applied_frames": [3, 736],
+        "failed_frames": [0, 0],
+        "frame_locks_after": 736,
+        "active_frame_locks_after": 0,
+        "release_errors": 0,
+        "free_internal_heap_bytes": [222688, 222716]
+      },
+      "passed": true
+    },
+    "m5dial": {
+      "port": "COM9",
+      "flash_hash_verified": true,
+      "pm_policy": [80, 160, false],
+      "wifi_state": 2,
+      "pixel_output_enabled": false,
+      "pixel_frame_locks": 0,
+      "passed": true
+    }
+  },
+  "host_network": "Archi-wifi guest 2; IPv4 Internet; espressif.com TCP/443 reachable",
+  "limits": [
+    "The configured CPU frequencies were read back; instantaneous clock and electrical current were not measured.",
+    "Creators Tab, M5StickC, and XIAO ESP32-C6 passed builds but were not flashed for this gate.",
+    "Automatic light sleep and coordinated non-LED workload locks remain open."
+  ]
+}

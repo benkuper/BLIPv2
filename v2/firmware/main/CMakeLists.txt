@@ -5,7 +5,7 @@ idf_build_get_property(blip_huzzah32_enabled BLIP_BOARD_ADAFRUIT_HUZZAH32)
 
 set(blip_main_sources "main.cpp")
 set(blip_main_requires blip_core blip_led blip_network blip_oscquery blip_ota
-    blip_resources blip_storage blip_transport esp_driver_gpio esp_system esp_timer log)
+    blip_pm blip_resources blip_storage blip_transport esp_driver_gpio esp_system esp_timer log)
 if(blip_artnet_enabled)
     list(APPEND blip_main_sources "network_lighting_artnet.cpp")
     list(APPEND blip_main_requires blip_artnet)

@@ -20,7 +20,7 @@ namespace {
 
 constexpr char kTag[] = "blip_wifi";
 constexpr std::array<std::string_view, 2> kProvidedServices{"transport.wifi", "network.http"};
-constexpr std::array<std::string_view, 1> kRequiredServices{"storage.settings"};
+constexpr std::array<std::string_view, 2> kRequiredServices{"storage.settings", "power.cpu"};
 constexpr std::array<std::string_view, 1> kRadioAlternatives{"radio0"};
 constexpr std::array<core::ResourceRequest, 1> kResources{{
     {core::ResourceClass::radio, "wifi", core::OwnershipMode::multiplexed, kRadioAlternatives, 0, 1,
