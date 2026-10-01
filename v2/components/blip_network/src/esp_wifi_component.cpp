@@ -834,7 +834,7 @@ core::Status EspWifiComponent::start(const core::StartContext&) noexcept {
         return status;
     }
     worker_quiesced_.store(false);
-    worker_task_ = xTaskCreateStatic(task_entry, "blip_wifi", worker_stack_.size(), this, 4,
+    worker_task_ = xTaskCreateStatic(task_entry, "blip_wifi", sizeof(worker_stack_), this, 4,
                                      worker_stack_.data(), &worker_task_storage_);
     if (worker_task_ == nullptr) {
         worker_quiesced_.store(true);

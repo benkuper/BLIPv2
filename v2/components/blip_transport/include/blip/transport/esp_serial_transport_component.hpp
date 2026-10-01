@@ -15,7 +15,7 @@ namespace blip::transport {
 
 class EspSerialTransportComponent final : public core::Component {
   public:
-    static constexpr std::size_t kTaskStackBytes = 4096;
+    static constexpr std::size_t kTaskStackBytes = 8192;
     static constexpr std::size_t kTaskStackWords = kTaskStackBytes / sizeof(StackType_t);
 
     explicit EspSerialTransportComponent(core::ControlService& controls) noexcept;
@@ -66,7 +66,7 @@ class EspSerialTransportComponent final : public core::Component {
     std::atomic<std::uint32_t> overflow_frames_{};
 };
 
-static_assert(sizeof(EspSerialTransportComponent) <= 8192,
+static_assert(sizeof(EspSerialTransportComponent) <= 12288,
               "serial transport exceeds its declared static RAM budget");
 
 } // namespace blip::transport

@@ -73,7 +73,7 @@ core::Status EspSleepComponent::start(const core::StartContext&) noexcept {
     boot_wake_cause_ = booted_from_deep_sleep_ ? esp_sleep_get_wakeup_causes() : 0U;
     quiesced_.store(false);
     running_.store(true);
-    task_handle_ = xTaskCreateStatic(task_entry, "blip_sleep", task_stack_.size(), this, 4,
+    task_handle_ = xTaskCreateStatic(task_entry, "blip_sleep", sizeof(task_stack_), this, 4,
                                      task_stack_.data(), &task_storage_);
     if (task_handle_ == nullptr) {
         running_.store(false);

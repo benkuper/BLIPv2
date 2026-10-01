@@ -35,7 +35,7 @@ constexpr std::array<core::DiagnosticDescriptor, 4> kDiagnostics{{
     descriptor.diagnostics = kDiagnostics;
     descriptor.settings = {1, 1};
     descriptor.disable_policy = core::DisablePolicy::reboot_required;
-    descriptor.cost = {32768, 8192, EspSerialTransportComponent::kTaskStackBytes};
+    descriptor.cost = {32768, 12288, EspSerialTransportComponent::kTaskStackBytes};
     return descriptor;
 }
 
@@ -127,7 +127,7 @@ core::Status EspSerialTransportComponent::start(const core::StartContext&) noexc
     control_enabled_.store(false);
     quiesced_.store(false);
     running_.store(true);
-    task_handle_ = xTaskCreateStatic(task_entry, "blip_serial", task_stack_.size(), this, 5,
+    task_handle_ = xTaskCreateStatic(task_entry, "blip_serial", sizeof(task_stack_), this, 5,
                                      task_stack_.data(), &task_storage_);
     if (task_handle_ == nullptr) {
         running_.store(false);

@@ -116,7 +116,7 @@ core::Status EspE131Component::start(const core::StartContext&) noexcept {
     active_sources_.store(0U);
     started_.store(true);
     task_quiesced_.store(false);
-    task_ = xTaskCreateStatic(task_entry, "blip_e131", task_stack_.size(), this, 4,
+    task_ = xTaskCreateStatic(task_entry, "blip_e131", sizeof(task_stack_), this, 4,
                               task_stack_.data(), &task_storage_);
     if (task_ == nullptr) {
         started_.store(false);

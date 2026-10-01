@@ -113,7 +113,7 @@ core::Status EspArtNetComponent::start(const core::StartContext&) noexcept {
     }
     started_.store(true);
     task_quiesced_.store(false);
-    task_ = xTaskCreateStatic(task_entry, "blip_artnet", task_stack_.size(), this, 4,
+    task_ = xTaskCreateStatic(task_entry, "blip_artnet", sizeof(task_stack_), this, 4,
                               task_stack_.data(), &task_storage_);
     if (task_ == nullptr) {
         started_.store(false);
