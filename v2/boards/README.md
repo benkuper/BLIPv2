@@ -43,6 +43,18 @@ controls GPIO27 strip power, but its current WS2812 encoder uses GRB order and
 has not been qualified for that strip. The external strip was moved to the
 HUZZAH32, so the Tab output currently has no visual LED test.
 
+`creators-club.json` records the ESP32 Creators Club wiring from V1
+`creatorsclub`. Build it with `-DBLIP_BOARD_CREATORS_CLUB=ON`. GPIO12 holds
+power, GPIO27 enables the strip, and SPI2 drives SK9822 data/clock on
+GPIO25/GPIO26. The fixed 32 logical pixels each expand to three physical LEDs
+in reverse logical order, matching V1's `LED_LEDS_PER_PIXEL=3` and
+`LED_DEFAULT_INVERT_DIRECTION=true`. The V1 default power budget is 1200 mA
+and its 0.4 brightness factor maps to V2 brightness 102/255. The Club's SD,
+IMU, button, battery, and IR pins are reserved in the manifest; those devices
+do not yet have V2 components. V1 lists GPIO3 as charge sense, overlapping
+the ESP32 UART0 RX used by the USB serial bridge, so no charge sense driver
+claims that pin.
+
 `m5stack-m5stickc.json` uses the M5Stack StickC pin map and the dormant V1
 M5StickC profile. Build it with `-DBLIP_BOARD_M5STICKC=ON`. The current pixel
 component defaults to the free external HAT GPIO26 instead of GPIO23, which is

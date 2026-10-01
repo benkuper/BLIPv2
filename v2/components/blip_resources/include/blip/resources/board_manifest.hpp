@@ -199,6 +199,46 @@ constexpr std::array kCreatorsTabPins{
         "input only; charger input", "system.battery", "battery-charge-input", {}, false),
 };
 
+// V1 creatorsclub wiring. The 32 logical SK9822 pixels each address three LEDs.
+constexpr std::array kCreatorsClubPins{
+    pin("gpio.0", "Boot / GPIO0", 0, kGpioInput, "boot strap", "system.boot",
+        "boot-strap-pin", {}, false),
+    pin("gpio.1", "UART0 TX / GPIO1", 1, kGpioOutput, "USB serial bridge",
+        "system.serial", "serial-console", {}, false),
+    pin("gpio.3", "Charge sense / UART0 RX / GPIO3", 3, kGpioInput,
+        "charger input; USB serial bridge", "system.battery", "battery-charge-input", {}, false),
+    pin("gpio.12", "Power hold / GPIO12", 12, kGpioOutput, "power latch; boot strap",
+        "system.power", "power-hold-critical", {}, false),
+    pin("gpio.13", "SD MOSI / GPIO13", 13, kGpioOutput, "onboard SD",
+        "system.storage", "sd-spi", {}, false),
+    pin("gpio.14", "SD SCK / GPIO14", 14, kGpioOutput, "onboard SD",
+        "system.storage", "sd-spi", {}, false),
+    pin("gpio.15", "SD CS / GPIO15", 15, kGpioOutput, "onboard SD; boot strap",
+        "system.storage", "sd-spi", {}, false),
+    pin("gpio.16", "SD enable / GPIO16", 16, kGpioOutput, "onboard SD power",
+        "system.storage", "sd-enable", {}, false),
+    pin("gpio.17", "IR input / GPIO17", 17, kGpioInput | kGpioInterrupt,
+        "onboard IR", "system.ir", "ir-input", {}, false),
+    pin("gpio.19", "SD MISO / GPIO19", 19, kGpioInput, "onboard SD",
+        "system.storage", "sd-spi", {}, false),
+    pin("gpio.22", "IMU SCL / GPIO22", 22, kI2c, "3.3V I2C",
+        "bus.i2c.imu", "onboard-imu-bus", "i2c.imu", false),
+    pin("gpio.23", "IMU SDA / GPIO23", 23, kI2c, "3.3V I2C",
+        "bus.i2c.imu", "onboard-imu-bus", "i2c.imu", false),
+    pin("gpio.25", "SK9822 data / GPIO25", 25, kGpioOutput,
+        "onboard LED data", "blip.output.strip0:pin", "sk9822-data", {}, false),
+    pin("gpio.26", "SK9822 clock / GPIO26", 26, kGpioOutput,
+        "onboard LED clock", "blip.output.strip0:clock", "sk9822-clock", {}, false),
+    pin("gpio.27", "LED strip enable / GPIO27", 27, kGpioOutput,
+        "strip power enable", "system.led-power", "led-enable", {}, false),
+    pin("gpio.32", "Button / GPIO32", 32, kGpioInput | kGpioInterrupt,
+        "onboard button", "system.button", "button-input", {}, false),
+    pin("gpio.33", "IMU interrupt / GPIO33", 33, kGpioInput | kGpioInterrupt,
+        "onboard IMU", "system.imu", "imu-interrupt", {}, false),
+    pin("gpio.35", "Battery sense / GPIO35", 35, kGpioInput | kGpioAdc,
+        "input only; battery divider", "system.battery", "battery-monitor", {}, false),
+};
+
 constexpr std::array kM5StickCPins{
     pin("gpio.0", "Microphone clock / HAT GPIO0", 0, kGpioOutput,
         "microphone clock; boot strap", "system.microphone", "onboard-microphone-clock", {}, false),
@@ -259,6 +299,15 @@ constexpr std::array kM5StickCPins{
 #endif
         "Creators Tab requires ESP32");
     return {"creators-tab", "esp32", detail::kCreatorsTabPins, 25, "pcb"};
+#elif defined(BLIP_BOARD_CREATORS_CLUB)
+    static_assert(
+#if defined(CONFIG_IDF_TARGET_ESP32)
+        true,
+#else
+        false,
+#endif
+        "Creators Club requires ESP32");
+    return {"creators-club", "esp32", detail::kCreatorsClubPins, 25, "pcb"};
 #elif defined(BLIP_BOARD_M5STICKC)
     static_assert(
 #if defined(CONFIG_IDF_TARGET_ESP32)

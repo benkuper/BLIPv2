@@ -120,6 +120,22 @@ bool color_and_protocol_goldens() {
     return true;
 }
 
+bool grouped_clocked_pixels_follow_club_wiring() {
+    const std::array<LinearPixel, 3> logical{{{100, 0, 0, 0, 65535},
+                                               {0, 200, 0, 0, 65535},
+                                               {0, 0, 300, 0, 65535}}};
+    std::array<LinearPixel, 9> physical{};
+    CHECK(expand_grouped_pixels(logical, physical, 3U, true));
+    for (std::size_t group = 0U; group < logical.size(); ++group) {
+        for (std::size_t led = 0U; led < 3U; ++led) {
+            CHECK(physical[group * 3U + led] == logical[logical.size() - 1U - group]);
+        }
+    }
+    CHECK(!expand_grouped_pixels(logical, physical, 0U, true));
+    CHECK(!expand_grouped_pixels(logical, std::span{physical}.first(8), 3U, true));
+    return true;
+}
+
 class FakeDriver final : public OutputDriver {
   public:
     const DriverCapabilities& capabilities() const noexcept override { return cap; }
@@ -468,6 +484,7 @@ int main() {
     const std::array tests{abi_reports_limits_and_periods,
                            compositor_is_linear_and_priority_ordered,
                            color_and_protocol_goldens,
+                           grouped_clocked_pixels_follow_club_wiring,
                            frame_pool_is_bounded_and_observable,
                            selector_is_deterministic_and_fail_closed,
                            streaming_and_playback_are_bounded,

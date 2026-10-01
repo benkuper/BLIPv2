@@ -67,6 +67,12 @@ if(BLIP_BOARD_CREATORS_TAB)
     endif()
     target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_BOARD_CREATORS_TAB=1)
 endif()
+if(BLIP_BOARD_CREATORS_CLUB)
+    if(NOT IDF_TARGET STREQUAL "esp32")
+        message(FATAL_ERROR "BLIP_BOARD_CREATORS_CLUB requires IDF_TARGET=esp32")
+    endif()
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_BOARD_CREATORS_CLUB=1)
+endif()
 if(BLIP_BOARD_M5STICKC)
     if(NOT IDF_TARGET STREQUAL "esp32")
         message(FATAL_ERROR "BLIP_BOARD_M5STICKC requires IDF_TARGET=esp32")
@@ -76,11 +82,14 @@ endif()
 if(BLIP_BOARD_ADAFRUIT_HUZZAH32)
     target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_BOARD_ADAFRUIT_HUZZAH32=1)
 endif()
-if((BLIP_BOARD_CREATORS_TAB AND BLIP_BOARD_CREATORS_BALL_V2) OR
-   (BLIP_BOARD_M5STICKC AND BLIP_BOARD_CREATORS_TAB) OR
-   (BLIP_BOARD_M5STICKC AND BLIP_BOARD_CREATORS_BALL_V2) OR
-   (BLIP_BOARD_ADAFRUIT_HUZZAH32 AND
-    (BLIP_BOARD_CREATORS_TAB OR BLIP_BOARD_CREATORS_BALL_V2 OR BLIP_BOARD_M5STICKC)))
+set(blip_selected_boards 0)
+foreach(blip_board IN ITEMS BLIP_BOARD_CREATORS_TAB BLIP_BOARD_CREATORS_CLUB
+        BLIP_BOARD_CREATORS_BALL_V2 BLIP_BOARD_M5STICKC BLIP_BOARD_ADAFRUIT_HUZZAH32)
+    if(${blip_board})
+        math(EXPR blip_selected_boards "${blip_selected_boards} + 1")
+    endif()
+endforeach()
+if(blip_selected_boards GREATER 1)
     message(FATAL_ERROR "Select only one board")
 endif()
 

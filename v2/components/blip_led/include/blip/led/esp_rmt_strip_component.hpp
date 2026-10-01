@@ -5,7 +5,7 @@
 #include "blip/led/current_limiter.hpp"
 #include "blip/led/stream.hpp"
 #include "blip/pm/esp_power_manager_component.hpp"
-#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
 #include "blip/led/esp_spi_dma_output_driver.hpp"
 #endif
 #include "blip/resources/device_broker.hpp"
@@ -62,7 +62,7 @@ class EspRmtStripComponent final : public core::Component {
                                          std::size_t payload_size) noexcept;
     [[nodiscard]] core::Status limit_encoded(const StripConfig& config,
                                               std::span<std::byte> frame) noexcept;
-#if !defined(BLIP_BOARD_CREATORS_BALL_V2)
+#if !defined(BLIP_BOARD_CREATORS_BALL_V2) && !defined(BLIP_BOARD_CREATORS_CLUB)
     [[nodiscard]] core::Result<std::size_t> render_one_wire(const StripConfig& config) noexcept;
 #endif
     [[nodiscard]] bool lock_config() noexcept;
@@ -79,12 +79,18 @@ class EspRmtStripComponent final : public core::Component {
     StripConfig config_{};
     StripConfig pending_config_{};
     std::array<std::byte, kStripSettingsBytes> settings_buffer_{};
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
 #if defined(BLIP_BOARD_CREATORS_BALL_V2)
     static constexpr std::size_t kBoardPixelCount = 36U;
     static constexpr std::size_t kBoardFrameBytes = 16U + kBoardPixelCount * 8U + 8U;
+    EspSpiDmaOutputDriver spi_driver_{SPI2_HOST, 3, 2, kBoardFrameBytes};
+#else
+    static constexpr std::size_t kBoardPixelCount = 32U;
+    static constexpr std::size_t kBoardFrameBytes = 4U + kBoardPixelCount * 3U * 4U + 6U;
+    EspSpiDmaOutputDriver spi_driver_{SPI2_HOST, 25, 26, kBoardFrameBytes};
+#endif
     alignas(4) std::array<std::uint8_t, kBoardFrameBytes> pixel_buffer_{};
     std::array<LinearPixel, kBoardPixelCount> stream_pixels_{};
-    EspSpiDmaOutputDriver spi_driver_{SPI2_HOST, 3, 2, kBoardFrameBytes};
     resources::DeviceBroker::Lease clock_lease_{};
     resources::DeviceBroker::Lease spi_lease_{};
 #else

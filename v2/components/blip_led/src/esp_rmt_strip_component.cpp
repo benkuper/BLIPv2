@@ -31,7 +31,26 @@ constexpr char kTag[] = "blip_rmt_strip";
 constexpr bool kClockedBoard = true;
 constexpr std::uint8_t kDefaultProtocol = 2U;
 constexpr std::uint16_t kDefaultPixels = 36U;
+constexpr std::uint16_t kPhysicalPixels = 36U;
+constexpr gpio_num_t kLedPowerGpio = GPIO_NUM_21;
+constexpr PixelProtocol kWireProtocol = PixelProtocol::hd108;
+constexpr PixelFormat kWireFormat = PixelFormat::rgb16;
+constexpr char kProtocolValues[] = "2=hd108-rgb16";
+constexpr char kMaximumPixels[] = "36";
 constexpr std::array<std::string_view, 1> kClockAlternatives{"gpio.2"};
+#elif defined(BLIP_BOARD_CREATORS_CLUB)
+constexpr bool kClockedBoard = true;
+constexpr std::uint8_t kDefaultProtocol = 3U;
+constexpr std::uint16_t kDefaultPixels = 32U;
+constexpr std::uint16_t kPhysicalPixels = 96U;
+constexpr gpio_num_t kLedPowerGpio = GPIO_NUM_27;
+constexpr PixelProtocol kWireProtocol = PixelProtocol::sk9822;
+constexpr PixelFormat kWireFormat = PixelFormat::rgb8;
+constexpr char kProtocolValues[] = "3=sk9822-rgb8";
+constexpr char kMaximumPixels[] = "32";
+constexpr std::array<std::string_view, 1> kClockAlternatives{"gpio.26"};
+#endif
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
 constexpr std::array<std::string_view, 1> kSpiAlternatives{"spi2"};
 constexpr std::array<core::ResourceRequest, 2> kResources{{
     {core::ResourceClass::gpio, "clock", core::OwnershipMode::exclusive,
@@ -43,20 +62,22 @@ constexpr std::array<core::ResourceRequest, 2> kResources{{
 constexpr bool kClockedBoard = false;
 constexpr std::uint8_t kDefaultProtocol = 0U;
 constexpr std::uint16_t kDefaultPixels = 1U;
-#endif
+constexpr char kProtocolValues[] = "0=ws2812-grb,1=sk6812-grbw";
+constexpr char kMaximumPixels[] = "1024";
 #if defined(BLIP_BOARD_CREATORS_TAB)
 constexpr gpio_num_t kLedPowerGpio = GPIO_NUM_27;
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
 constexpr gpio_num_t kLedPowerGpio = GPIO_NUM_38;
 #endif
+#endif
 constexpr std::string_view kPinOwner{"blip.output.strip0:pin"};
-#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
 constexpr std::string_view kClockOwner{"blip.output.strip0:clock"};
 constexpr std::string_view kSpiOwner{"blip.output.strip0:spi"};
 #endif
 constexpr std::array<std::string_view, 1> kProvidedServices{"output.pixel-strip"};
 constexpr std::array<std::string_view, 2> kRequiredServices{"storage.settings", "power.cpu"};
-#if !defined(BLIP_BOARD_CREATORS_BALL_V2)
+#if !defined(BLIP_BOARD_CREATORS_BALL_V2) && !defined(BLIP_BOARD_CREATORS_CLUB)
 constexpr std::array<std::string_view, 4> kRmtAlternatives{"rmt.tx0", "rmt.tx1", "rmt.tx2",
                                                            "rmt.tx3"};
 constexpr std::array<core::ResourceRequest, 1> kResources{{
@@ -68,9 +89,9 @@ constexpr std::array<core::MetadataEntry, 8> kMetadata{{
     {"backend", kClockedBoard ? "esp-spi-dma" : "native-rmt"},
     {"qualification", "ADR-0007"},
     {"lane_count", "1"},
-    {"protocol_values", kClockedBoard ? "2=hd108-rgb16" : "0=ws2812-grb,1=sk6812-grbw"},
+    {"protocol_values", kProtocolValues},
     {"gpio_parameter", "pin"},
-    {"maximum_pixels", kClockedBoard ? "36" : "1024"},
+    {"maximum_pixels", kMaximumPixels},
     {"transport_dma", kClockedBoard ? "spi-required" : "rmt-disabled-m3-baseline"},
     {"current_model", "1mA/pixel idle; 20mA/full channel; calculated only"},
 }};
@@ -99,7 +120,7 @@ constexpr std::array<core::ParameterDescriptor, 17> kParameters{{
      kClockedBoard ? core::Access::read_only : core::Access::read_write,
      true,
      core::ScalarValue::from_integer(kDefaultProtocol),
-     {true, kClockedBoard ? 2 : 0, kClockedBoard ? 2 : 1, 1},
+     {true, kClockedBoard ? kDefaultProtocol : 0, kClockedBoard ? kDefaultProtocol : 1, 1},
      ""},
     {"pixels",
      "Pixel count",
@@ -107,7 +128,7 @@ constexpr std::array<core::ParameterDescriptor, 17> kParameters{{
      kClockedBoard ? core::Access::read_only : core::Access::read_write,
      true,
      core::ScalarValue::from_integer(kDefaultPixels),
-     {true, kClockedBoard ? 36 : 1, kClockedBoard ? 36 : kMaximumStripPixels, 1},
+     {true, kClockedBoard ? kDefaultPixels : 1, kClockedBoard ? kDefaultPixels : kMaximumStripPixels, 1},
      "pixels"},
     {"brightness",
      "Global brightness",
@@ -214,7 +235,7 @@ constexpr std::array<core::ParameterDescriptor, 17> kParameters{{
      {},
      ""},
 }};
-#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
 constexpr std::array<core::FieldDescriptor, 4> kStreamPixelArguments{{
     {"index", core::ValueType::integer, true},
     {"red", core::ValueType::integer, true},
@@ -243,8 +264,13 @@ constexpr std::array<core::DiagnosticDescriptor, 5> kDiagnostics{{
     descriptor.schema_version = 2U;
     descriptor.id = "blip.output.strip0";
     descriptor.display_name = "Pixel strip 0";
-    descriptor.description = kClockedBoard ? "Onboard 36-pixel HD108 SPI-DMA output"
-                                            : "Single-lane WS2812/SK6812 native RMT output";
+#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+    descriptor.description = "Onboard 36-pixel HD108 SPI-DMA output";
+#elif defined(BLIP_BOARD_CREATORS_CLUB)
+    descriptor.description = "Onboard 32-pixel SK9822 SPI-DMA output (3 LEDs per pixel)";
+#else
+    descriptor.description = "Single-lane WS2812/SK6812 native RMT output";
+#endif
     descriptor.metadata = kMetadata;
     descriptor.provided_services = kProvidedServices;
     descriptor.required_services = kRequiredServices;
@@ -301,9 +327,13 @@ core::Status EspRmtStripComponent::load_config() noexcept {
         if (loaded.error().code == core::ErrorCode::not_found) {
             config_ = {};
             config_.gpio = BLIP_LED_DEFAULT_GPIO;
-#if defined(BLIP_BOARD_CREATORS_BALL_V2)
-            config_.protocol = StripProtocol::hd108_rgb;
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
+            config_.protocol = static_cast<StripProtocol>(kDefaultProtocol);
             config_.pixel_count = kDefaultPixels;
+#if defined(BLIP_BOARD_CREATORS_CLUB)
+            config_.power_budget_ma = 1200U;
+            config_.brightness = 102U;
+#endif
 #endif
             return validate_strip_config(config_);
         }
@@ -326,6 +356,18 @@ core::Status EspRmtStripComponent::load_config() noexcept {
         config_.pixel_count = kDefaultPixels;
         config_.enabled = false;
         ESP_LOGW(kTag, "migrated strip settings to onboard HD108 SPI output");
+        return save_config(config_);
+    }
+#elif defined(BLIP_BOARD_CREATORS_CLUB)
+    if (config_.gpio != BLIP_LED_DEFAULT_GPIO ||
+        config_.protocol != StripProtocol::sk9822_rgb ||
+        config_.pixel_count != kDefaultPixels) {
+        config_.gpio = BLIP_LED_DEFAULT_GPIO;
+        config_.protocol = StripProtocol::sk9822_rgb;
+        config_.pixel_count = kDefaultPixels;
+        config_.power_budget_ma = 1200U;
+        config_.enabled = false;
+        ESP_LOGW(kTag, "migrated strip settings to onboard SK9822 SPI output");
         return save_config(config_);
     }
 #elif defined(BLIP_BOARD_CREATORS_TAB)
@@ -354,7 +396,8 @@ core::Status EspRmtStripComponent::load_config() noexcept {
         return save_config(config_);
     }
 #endif
-    if (!kClockedBoard && config_.protocol == StripProtocol::hd108_rgb) {
+    if (!kClockedBoard && (config_.protocol == StripProtocol::hd108_rgb ||
+                           config_.protocol == StripProtocol::sk9822_rgb)) {
         return core::Status::failure(output_error(core::ErrorCode::validation_failed,
                                                   "load", "clocked-backend-required"));
     }
@@ -392,14 +435,15 @@ EspRmtStripComponent::reserve_pin(std::uint8_t gpio) noexcept {
 }
 
 core::Status EspRmtStripComponent::initialize_output(const StripConfig& config) noexcept {
-#if defined(BLIP_BOARD_CREATORS_BALL_V2)
-    if (config.gpio != 3U || config.protocol != StripProtocol::hd108_rgb ||
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
+    if (config.gpio != BLIP_LED_DEFAULT_GPIO ||
+        config.protocol != static_cast<StripProtocol>(kDefaultProtocol) ||
         config.pixel_count != kDefaultPixels) {
         return core::Status::failure(output_error(core::ErrorCode::validation_failed,
                                                   "initialize", "fixed-board-layout"));
     }
-    const OutputConfig output{PixelProtocol::hd108, PixelFormat::rgb16, 1U,
-                              kDefaultPixels, 4'000'000U};
+    const OutputConfig output{kWireProtocol, kWireFormat, 1U,
+                              kPhysicalPixels, 4'000'000U};
     auto clock = resources_->acquire(kClockOwner, kResources[0]);
     if (!clock) {
         return core::Status::failure(clock.error());
@@ -412,7 +456,7 @@ core::Status EspRmtStripComponent::initialize_output(const StripConfig& config) 
     if (!started) {
         return started;
     }
-    if (gpio_set_level(GPIO_NUM_21, 1) != ESP_OK) {
+    if (gpio_set_level(kLedPowerGpio, 1) != ESP_OK) {
         static_cast<void>(spi_driver_.stop());
         return core::Status::failure(output_error(core::ErrorCode::start_failed,
                                                   "initialize", "led-power-enable"));
@@ -471,8 +515,8 @@ core::Status EspRmtStripComponent::initialize_output(const StripConfig& config) 
 }
 
 void EspRmtStripComponent::deinitialize_output() noexcept {
-#if defined(BLIP_BOARD_CREATORS_BALL_V2)
-    static_cast<void>(gpio_set_level(GPIO_NUM_21, 0));
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
+    static_cast<void>(gpio_set_level(kLedPowerGpio, 0));
     static_cast<void>(spi_driver_.stop());
     clock_lease_.release();
     spi_lease_.release();
@@ -493,7 +537,7 @@ void EspRmtStripComponent::deinitialize_output() noexcept {
 #endif
 }
 
-#if !defined(BLIP_BOARD_CREATORS_BALL_V2)
+#if !defined(BLIP_BOARD_CREATORS_BALL_V2) && !defined(BLIP_BOARD_CREATORS_CLUB)
 core::Result<std::size_t>
 EspRmtStripComponent::render_one_wire(const StripConfig& config) noexcept {
     if (stream_mutex_ == nullptr || xSemaphoreTake(stream_mutex_, portMAX_DELAY) != pdTRUE) {
@@ -563,7 +607,7 @@ EspRmtStripComponent::render_one_wire(const StripConfig& config) noexcept {
 
 core::Status EspRmtStripComponent::transmit(const StripConfig& config,
                                             std::size_t payload_size) noexcept {
-#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
     static_cast<void>(payload_size);
     std::array<LinearPixel, kDefaultPixels> system_pixels{};
     std::array<LinearPixel, kDefaultPixels> pixels{};
@@ -608,8 +652,18 @@ core::Status EspRmtStripComponent::transmit(const StripConfig& config,
     options.color.brightness = static_cast<std::uint16_t>(config.brightness * 257U);
     auto buffer = std::span<std::byte>{reinterpret_cast<std::byte*>(pixel_buffer_.data()),
                                        pixel_buffer_.size()};
-    const auto encoded = encode_frame({pixels, 1U, kDefaultPixels}, PixelProtocol::hd108,
+#if defined(BLIP_BOARD_CREATORS_CLUB)
+    std::array<LinearPixel, kPhysicalPixels> physical_pixels{};
+    const auto expanded = expand_grouped_pixels(pixels, physical_pixels, 3U, true);
+    if (!expanded) {
+        return expanded;
+    }
+    const auto encoded = encode_frame({physical_pixels, 1U, kPhysicalPixels}, kWireProtocol,
                                       options, buffer);
+#else
+    const auto encoded = encode_frame({pixels, 1U, kPhysicalPixels}, kWireProtocol,
+                                      options, buffer);
+#endif
     if (!encoded) {
         return core::Status::failure(encoded.error());
     }
@@ -673,10 +727,17 @@ core::Status EspRmtStripComponent::limit_encoded(const StripConfig& config,
                                                   std::span<std::byte> frame) noexcept {
     const auto protocol = config.protocol == StripProtocol::hd108_rgb
                               ? PixelProtocol::hd108
+                              : config.protocol == StripProtocol::sk9822_rgb
+                                    ? PixelProtocol::sk9822
                               : config.protocol == StripProtocol::sk6812_rgbw
                                     ? PixelProtocol::sk6812
                                     : PixelProtocol::ws2812;
-    const auto result = current_limiter_.limit(frame, protocol, config.pixel_count,
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
+    constexpr std::size_t kPowerPixels = kPhysicalPixels;
+#else
+    const std::size_t kPowerPixels = config.pixel_count;
+#endif
+    const auto result = current_limiter_.limit(frame, protocol, kPowerPixels,
                                                 config.power_budget_ma);
     if (!result) {
         return core::Status::failure(result.error());
@@ -778,14 +839,16 @@ core::Status EspRmtStripComponent::apply_config_locked(const StripConfig& candid
     if (!valid) {
         return valid;
     }
-#if defined(BLIP_BOARD_CREATORS_BALL_V2)
-    if (candidate.gpio != 3U || candidate.protocol != StripProtocol::hd108_rgb ||
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
+    if (candidate.gpio != BLIP_LED_DEFAULT_GPIO ||
+        candidate.protocol != static_cast<StripProtocol>(kDefaultProtocol) ||
         candidate.pixel_count != kDefaultPixels) {
         return core::Status::failure(output_error(core::ErrorCode::validation_failed,
                                                   "configure", "fixed-board-layout"));
     }
 #else
-    if (candidate.protocol == StripProtocol::hd108_rgb) {
+    if (candidate.protocol == StripProtocol::hd108_rgb ||
+        candidate.protocol == StripProtocol::sk9822_rgb) {
         return core::Status::failure(output_error(core::ErrorCode::validation_failed,
                                                   "configure", "clocked-backend-required"));
     }
@@ -1064,7 +1127,7 @@ core::Status EspRmtStripComponent::invoke_action(std::string_view id,
                                                  std::span<core::ScalarValue>,
                                                  std::size_t& output_count) noexcept {
     output_count = 0U;
-#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
     if (id == "stream_pixel") {
         if (arguments.size() != 4U || !started_.load() || stream_mutex_ == nullptr) {
             return core::Status::failure(output_error(core::ErrorCode::invalid_argument,
@@ -1072,7 +1135,7 @@ core::Status EspRmtStripComponent::invoke_action(std::string_view id,
         }
         for (std::size_t index = 0U; index < arguments.size(); ++index) {
             if (arguments[index].type != core::ValueType::integer || arguments[index].integer < 0 ||
-                arguments[index].integer > (index == 0U ? 35 : 255)) {
+                arguments[index].integer > (index == 0U ? kDefaultPixels - 1 : 255)) {
                 return core::Status::failure(output_error(core::ErrorCode::validation_failed,
                                                           "stream-pixel", "invalid-value"));
             }
@@ -1150,7 +1213,7 @@ void EspRmtStripComponent::run() noexcept {
             saturating_increment(failed_frames_);
             continue;
         }
-#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
         const auto status = transmit(snapshot, 0U);
 #else
         const auto payload = render_one_wire(snapshot);

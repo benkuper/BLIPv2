@@ -252,6 +252,19 @@ def validate_board(path: Path) -> None:
             require(pin.get("reserved_for") == owner and pin.get("reason") == reason
                     and pin.get("selectable") is False,
                     f"{path}: GPIO{gpio} must remain reserved for {owner}")
+    if document["id"] == "creators-club":
+        require(document["target"] == "esp32", f"{path}: Creators Club target changed")
+        for gpio, owner, reason in (
+            (12, "system.power", "power-hold-critical"),
+            (25, "blip.output.strip0:pin", "sk9822-data"),
+            (26, "blip.output.strip0:clock", "sk9822-clock"),
+            (27, "system.led-power", "led-enable"),
+            (33, "system.imu", "imu-interrupt"),
+        ):
+            pin = by_gpio.get(gpio, {})
+            require(pin.get("reserved_for") == owner and pin.get("reason") == reason
+                    and pin.get("selectable") is False,
+                    f"{path}: GPIO{gpio} must remain reserved for {owner}")
     if document["id"] == "m5stack-m5stickc":
         require(document["target"] == "esp32", f"{path}: M5StickC target changed")
         for gpio, owner, reason in (

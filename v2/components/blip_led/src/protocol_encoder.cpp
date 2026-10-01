@@ -119,4 +119,23 @@ core::Result<std::size_t> encode_spi_one_wire(std::span<const std::byte> input,
     return core::Result<std::size_t>::success(input.size() * 3U);
 }
 
+core::Status expand_grouped_pixels(std::span<const LinearPixel> logical,
+                                   std::span<LinearPixel> physical,
+                                   std::size_t leds_per_pixel,
+                                   bool invert_direction) noexcept {
+    if (logical.empty() || leds_per_pixel == 0U ||
+        logical.size() > kMaximumPixels / leds_per_pixel ||
+        physical.size() != logical.size() * leds_per_pixel) {
+        return core::Status::failure({core::ErrorDomain::transport,
+                                      core::ErrorCode::validation_failed,
+                                      "blip.led.encoder", "expand-grouped", "invalid-layout"});
+    }
+    for (std::size_t index = 0U; index < logical.size(); ++index) {
+        const auto& pixel = logical[invert_direction ? logical.size() - 1U - index : index];
+        std::fill_n(physical.begin() + static_cast<std::ptrdiff_t>(index * leds_per_pixel),
+                    leds_per_pixel, pixel);
+    }
+    return core::Status::success();
+}
+
 } // namespace blip::led

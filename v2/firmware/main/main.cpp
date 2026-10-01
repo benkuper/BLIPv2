@@ -45,7 +45,7 @@ namespace {
 constexpr char kTag[] = "blip_bootstrap";
 
 [[nodiscard]] bool initialize_board_power() noexcept {
-#if defined(BLIP_BOARD_CREATORS_TAB)
+#if defined(BLIP_BOARD_CREATORS_TAB) || defined(BLIP_BOARD_CREATORS_CLUB)
     constexpr gpio_num_t kPowerHold = GPIO_NUM_12;
     constexpr gpio_num_t kLedPower = GPIO_NUM_27;
 #elif defined(BLIP_BOARD_CREATORS_BALL_V2)
@@ -57,7 +57,8 @@ constexpr char kTag[] = "blip_bootstrap";
 #else
     return true;
 #endif
-#if defined(BLIP_BOARD_CREATORS_TAB) || defined(BLIP_BOARD_CREATORS_BALL_V2) || \
+#if defined(BLIP_BOARD_CREATORS_TAB) || defined(BLIP_BOARD_CREATORS_CLUB) || \
+    defined(BLIP_BOARD_CREATORS_BALL_V2) || \
     defined(CONFIG_IDF_TARGET_ESP32S3)
     // Raise the board power latch before storage, network, or registry startup.
     return gpio_set_level(kPowerHold, 1) == ESP_OK &&
@@ -68,6 +69,8 @@ constexpr char kTag[] = "blip_bootstrap";
 }
 #if defined(BLIP_BOARD_CREATORS_BALL_V2)
 constexpr char kLedBootStatus[] = "hd108-spi-dma";
+#elif defined(BLIP_BOARD_CREATORS_CLUB)
+constexpr char kLedBootStatus[] = "sk9822-spi-dma";
 #elif defined(BLIP_BOARD_CREATORS_TAB)
 constexpr char kLedBootStatus[] = "ws2812b-board-power-pending";
 #elif defined(BLIP_BOARD_M5STICKC)
@@ -265,10 +268,10 @@ blip::core::Scheduler<4> scheduler{monotonic_clock};
             return false;
         }
     }
-#if defined(BLIP_BOARD_CREATORS_BALL_V2)
+#if defined(BLIP_BOARD_CREATORS_BALL_V2) || defined(BLIP_BOARD_CREATORS_CLUB)
     if (!resource_broker.add_resource(
             {blip::core::ResourceClass::spi, "spi2", 0U, 1U,
-             "blip.output.strip0:spi", "SPI2 host", -1, "", "hd108-output", "", false})) {
+             "blip.output.strip0:spi", "SPI2 host", -1, "", "clocked-led-output", "", false})) {
         return false;
     }
 #endif

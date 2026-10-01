@@ -13,7 +13,8 @@ inline constexpr std::uint16_t kStripSettingsFormatVersion = 2U;
 inline constexpr std::size_t kStripSettingsBytes = 32U;
 inline constexpr std::size_t kMaximumStripPixels = 1024U;
 
-enum class StripProtocol : std::uint8_t { ws2812_rgb = 0, sk6812_rgbw = 1, hd108_rgb = 2 };
+enum class StripProtocol : std::uint8_t { ws2812_rgb = 0, sk6812_rgbw = 1, hd108_rgb = 2,
+                                          sk9822_rgb = 3 };
 
 struct StripConfig {
     bool enabled{};

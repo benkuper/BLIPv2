@@ -25,6 +25,8 @@ The E1.31 receiver is optional and disabled by default; pass
 For the Adafruit HUZZAH32 battery ADC on GPIO35, pass
 `-DBLIP_BOARD_ADAFRUIT_HUZZAH32=ON` in a dedicated ESP32 build directory.
 The battery registry entry is included only in that board build.
+For the Creators Club, pass `-DBLIP_BOARD_CREATORS_CLUB=ON` in a dedicated
+ESP32 build directory. Its fixed SK9822 output uses SPI2 on GPIO25/GPIO26.
 
 The startup task has an 8 KiB bounded stack. ESP-IDF releases this transient
 stack after `app_main` returns; runtime components do not retain it.

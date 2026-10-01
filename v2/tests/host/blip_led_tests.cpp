@@ -79,10 +79,13 @@ bool invalid_settings_are_rejected() {
     config.gpio = 64U;
     BLIP_CHECK(!validate_strip_config(config));
     config.gpio = 2U;
-    config.protocol = static_cast<StripProtocol>(3U);
+    config.protocol = static_cast<StripProtocol>(4U);
     BLIP_CHECK(!validate_strip_config(config));
-    config.protocol = StripProtocol::hd108_rgb;
+    config.protocol = StripProtocol::sk9822_rgb;
+    BLIP_CHECK(validate_strip_config(config));
     std::array<std::uint8_t, 3> unclocked{};
+    BLIP_CHECK(!fill_solid_frame(config, unclocked));
+    config.protocol = StripProtocol::hd108_rgb;
     BLIP_CHECK(!fill_solid_frame(config, unclocked));
     config.power_budget_ma = 0U;
     BLIP_CHECK(!validate_strip_config(config));

@@ -34,7 +34,7 @@ while non-critical updates are globally suspended.
 | --- | --- | --- | --- |
 | `creatorsball` | ESP32-C6 DevKitM-1 | network, LED, Art-Net, FX, button, battery, script, ESP-NOW, IR, BNO055, OTA | WS2816, 37 pixels, external SPI storage |
 | `creatorsballv2` | ESP32-C6 DevKitC-1, 8 MiB | same, BNO08x | default environment; HD108, 36 pixels |
-| `creatorsclub` | ESP32 DevKit | same, BNO055 | SK9822, 32 logical pixels, SD storage |
+| `creatorsclub` | ESP32 DevKit | same, BNO055 | SK9822, 32 logical pixels (three physical LEDs each), SD storage; V2 `creators-club` profile |
 | `poebridge` | Olimex ESP32-POE-ISO | Ethernet, Art-Net, button, ESP-NOW bridge, OTA | LittleFS fallback |
 | `disneybridgeA0` | ESP32-C6 DevKitM-1 | Art-Net, button, GPIO, OTA, RF24/Flowtoys, DIP, wired DMX | bridge-specific pins |
 
