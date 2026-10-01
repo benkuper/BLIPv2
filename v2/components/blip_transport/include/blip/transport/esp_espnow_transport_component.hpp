@@ -61,7 +61,7 @@ class EspEspNowTransportComponent final : public core::Component {
     void complete_request(bool success, const core::ScalarValue& value = {}) noexcept;
 
     static void worker_entry(void* context) noexcept;
-    static void receive_callback(const esp_now_recv_info_t* info,
+    static void receive_callback(void* context, const esp_now_recv_info_t* info,
                                  const std::uint8_t* data, int length) noexcept;
 
     static const core::ComponentDescriptor descriptor_;

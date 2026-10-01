@@ -3,6 +3,9 @@
 #include "blip/core/esp_diagnostics_component.hpp"
 #include "blip/core/registry.hpp"
 #include "blip/core/scheduler.hpp"
+#if defined(BLIP_ENABLE_FLEET)
+#include "blip/fleet/esp_fleet_component.hpp"
+#endif
 #include "blip/led/esp_rmt_strip_component.hpp"
 #include "blip/pm/esp_power_manager_component.hpp"
 #if defined(BLIP_BOARD_ADAFRUIT_HUZZAH32)
@@ -35,6 +38,7 @@
 #include "sdkconfig.h"
 
 #include <array>
+#include <atomic>
 #include <cstdint>
 #include <cstdlib>
 #include <new>
@@ -146,7 +150,7 @@ class BootstrapComponent final : public blip::core::Component {
             return control_error(blip::core::ErrorCode::not_found, "read-parameter",
                                  "parameter-not-found");
         }
-        output = blip::core::ScalarValue::from_integer(probe_value_);
+        output = blip::core::ScalarValue::from_integer(probe_value_.load());
         return blip::core::Status::success();
     }
 
@@ -194,7 +198,7 @@ class BootstrapComponent final : public blip::core::Component {
         bootstrap_descriptor(true)};
     bool recovery_{};
     bool started_{};
-    std::int64_t probe_value_{};
+    std::atomic<std::int64_t> probe_value_{};
 };
 
 BootstrapComponent bootstrap_component{false};
@@ -227,6 +231,10 @@ blip::power::EspSleepComponent* sleep_component{&sleep_storage};
 blip::ota::EspOtaComponent ota_component{"blip-v2", CONFIG_IDF_TARGET, "minimal"};
 blip::core::Registry<20> registry{};
 blip::core::RegistryControlService<20> control_component{registry};
+#if defined(BLIP_ENABLE_FLEET)
+blip::fleet::EspFleetComponent fleet_component{
+    control_component, settings_component.settings(), wifi_component};
+#endif
 blip::transport::EspSerialTransportComponent serial_transport_component{control_component};
 #if defined(BLIP_ENABLE_BLE)
 blip::transport::EspBleTransportComponent ble_transport_component{
@@ -319,6 +327,11 @@ void reject_pending_update() noexcept {
         if (!wifi_status) {
             return false;
         }
+#if defined(BLIP_ENABLE_FLEET)
+        if (!registry.add(fleet_component)) {
+            return false;
+        }
+#endif
 #if defined(BLIP_ENABLE_BLE)
         const auto ble_status = registry.add(ble_transport_component);
         if (!ble_status) {
@@ -511,6 +524,11 @@ extern "C" void app_main() {
         return;
     }
     serial_transport_component.enable_control();
+#if defined(BLIP_ENABLE_FLEET)
+    if (!safe_mode) {
+        fleet_component.enable_control();
+    }
+#endif
 #if defined(BLIP_ENABLE_BLE)
     if (!safe_mode) {
         ble_transport_component.enable_control();

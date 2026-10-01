@@ -60,7 +60,13 @@ constexpr std::array<core::MetadataEntry, 6> kMetadata{{
     {"secret_policy", "password-write-only"},
     {"antenna_modes", "0=board-default,1=onboard,2=external"},
 }};
-constexpr std::array<core::ParameterDescriptor, 19> kParameters{{
+constexpr std::array<core::ParameterDescriptor, 22> kParameters{{
+    {"autonomous_channel", "Routerless radio channel (0=normal networking)", core::ValueType::integer,
+     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "channel"},
+    {"low_latency_clients", "Clients suspending Wi-Fi modem sleep", core::ValueType::integer,
+     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "clients"},
+    {"latency_policy_failures", "Wi-Fi latency policy failures", core::ValueType::integer,
+     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "failures"},
     {"enabled",
      "Wi-Fi RF enabled (live suspension retains driver memory)",
      core::ValueType::boolean,
@@ -505,7 +511,8 @@ core::Status EspWifiComponent::configure_access_point_locked() noexcept {
     wifi_config_t access_point{};
     std::memcpy(access_point.ap.ssid, ap_ssid_.data(), ap_ssid_size_);
     access_point.ap.ssid_len = static_cast<std::uint8_t>(ap_ssid_size_);
-    access_point.ap.channel = config_.channel == 0U ? 1U : config_.channel;
+    access_point.ap.channel = autonomous_channel_.load() != 0U ? autonomous_channel_.load()
+        : config_.channel == 0U ? 1U : config_.channel;
     access_point.ap.authmode = WIFI_AUTH_OPEN;
     access_point.ap.max_connection = 4;
     access_point.ap.pmf_cfg.required = false;
@@ -516,7 +523,8 @@ core::Status EspWifiComponent::configure_access_point_locked() noexcept {
 
 core::Status EspWifiComponent::configure_protocol_locked() noexcept {
     const std::uint8_t bitmap = protocol_bitmap(config_.protocol);
-    if (state_machine_.station_active() && esp_wifi_set_protocol(WIFI_IF_STA, bitmap) != ESP_OK) {
+    if ((state_machine_.station_active() || autonomous_channel_.load() != 0U) &&
+        esp_wifi_set_protocol(WIFI_IF_STA, bitmap) != ESP_OK) {
         return core::Status::failure(wifi_error(core::ErrorCode::io_failed, "configure-protocol",
                                                 "station-protocol-failed"));
     }
@@ -659,6 +667,11 @@ core::Status EspWifiComponent::reconfigure_radio_locked() noexcept {
     }
     connect_in_progress_ = false;
     WifiConfig effective = config_;
+    if (autonomous_channel_.load() != 0U) {
+        effective.mode = WifiMode::access_point;
+        effective.ssid.clear();
+        effective.password.clear();
+    }
     if (active_boot_profile_ == RadioBootProfile::reclaim_wifi) {
         effective.enabled = false;
     }
@@ -673,7 +686,7 @@ core::Status EspWifiComponent::reconfigure_radio_locked() noexcept {
     if (!status) {
         return status;
     }
-    const wifi_mode_t mode = state_machine_.station_active()
+    const wifi_mode_t mode = autonomous_channel_.load() != 0U ? WIFI_MODE_APSTA : state_machine_.station_active()
                                  ? (state_machine_.ap_active() ? WIFI_MODE_APSTA : WIFI_MODE_STA)
                                  : WIFI_MODE_AP;
     status = platform_status(esp_wifi_set_mode(mode), "configure", "set-mode-failed");
@@ -697,6 +710,14 @@ core::Status EspWifiComponent::reconfigure_radio_locked() noexcept {
         return status;
     }
     radio_started_ = true;
+    if (autonomous_channel_.load() != 0U) {
+        status = platform_status(esp_wifi_set_channel(autonomous_channel_.load(), WIFI_SECOND_CHAN_NONE),
+            "configure", "autonomous-channel-failed");
+        if (!status) return status;
+    }
+    status = platform_status(esp_wifi_set_ps(low_latency_clients_.load() > 0U
+        ? WIFI_PS_NONE : previous_power_save_), "configure", "wifi-power-save-failed");
+    if (!status) return status;
     status = configure_protocol_locked();
     if (!status) {
         return status;
@@ -932,13 +953,72 @@ bool EspWifiComponent::callbacks_quiesced() const noexcept {
     return quiesced_.load() && worker_quiesced_.load() && active_callbacks_.load() == 0U;
 }
 
+core::Status EspWifiComponent::acquire_autonomous_radio(std::uint8_t channel) noexcept {
+    if (channel < 1U || channel > 11U || !started_.load() || !lock())
+        return core::Status::failure(wifi_error(core::ErrorCode::invalid_argument, "autonomous-radio", "channel-or-state"));
+    if (!config_.enabled || active_boot_profile_ != RadioBootProfile::wifi_loaded || autonomous_channel_.load() != 0U) {
+        unlock();
+        return core::Status::failure(wifi_error(core::ErrorCode::resource_conflict, "autonomous-radio", "radio-unavailable"));
+    }
+    autonomous_channel_.store(channel);
+    const auto status = reconfigure_radio_locked();
+    if (!status) {
+        autonomous_channel_.store(0U);
+        static_cast<void>(reconfigure_radio_locked());
+    }
+    unlock();
+    return status;
+}
+
+core::Status EspWifiComponent::release_autonomous_radio() noexcept {
+    if (!lock()) return core::Status::failure(wifi_error(core::ErrorCode::invalid_state, "autonomous-radio", "not-started"));
+    const auto channel = autonomous_channel_.exchange(0U);
+    const auto status = channel == 0U ? core::Status::success() : reconfigure_radio_locked();
+    unlock();
+    return status;
+}
+
+core::Status EspWifiComponent::acquire_low_latency() noexcept {
+    if (!started_.load() || !lock())
+        return core::Status::failure(wifi_error(core::ErrorCode::invalid_state, "latency", "not-started"));
+    core::Status status = core::Status::success();
+    if (!radio_started_ || low_latency_clients_.load() == UINT32_MAX) {
+        status = core::Status::failure(wifi_error(core::ErrorCode::invalid_state, "latency", "radio-unavailable"));
+    } else if (low_latency_clients_.load() == 0U) {
+        status = platform_status(esp_wifi_get_ps(&previous_power_save_), "latency", "get-power-save");
+        if (status) status = platform_status(esp_wifi_set_ps(WIFI_PS_NONE), "latency", "set-power-save");
+    }
+    if (status) low_latency_clients_.fetch_add(1U);
+    else latency_policy_failures_.fetch_add(1U);
+    unlock();
+    return status;
+}
+
+void EspWifiComponent::release_low_latency() noexcept {
+    if (!lock()) { latency_policy_failures_.fetch_add(1U); return; }
+    const auto clients = low_latency_clients_.load();
+    if (clients == 0U) latency_policy_failures_.fetch_add(1U);
+    else {
+        low_latency_clients_.store(clients - 1U);
+        if (clients == 1U && wifi_initialized_ && esp_wifi_set_ps(previous_power_save_) != ESP_OK)
+            latency_policy_failures_.fetch_add(1U);
+    }
+    unlock();
+}
+
 core::Status EspWifiComponent::read_parameter(std::string_view id,
                                               core::ScalarValue& output) noexcept {
     if (!started_.load() || !lock()) {
         return core::Status::failure(
             wifi_error(core::ErrorCode::invalid_state, "read-parameter", "not-started"));
     }
-    if (id == "enabled") {
+    if (id == "autonomous_channel") {
+        output = core::ScalarValue::from_integer(autonomous_channel_.load());
+    } else if (id == "low_latency_clients") {
+        output = core::ScalarValue::from_integer(low_latency_clients_.load());
+    } else if (id == "latency_policy_failures") {
+        output = core::ScalarValue::from_integer(latency_policy_failures_.load());
+    } else if (id == "enabled") {
         output = core::ScalarValue::from_bool(config_.enabled);
     } else if (id == "boot_profile") {
         output = core::ScalarValue::from_integer(static_cast<std::int64_t>(config_.boot_profile));

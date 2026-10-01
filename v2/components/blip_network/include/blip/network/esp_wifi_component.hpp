@@ -9,6 +9,7 @@
 #include "esp_http_server.h"
 #include "esp_netif.h"
 #include "esp_timer.h"
+#include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
@@ -65,6 +66,14 @@ class EspWifiComponent final : public core::Component {
     [[nodiscard]] bool set_http_root_delegate(HttpRootDelegate& delegate) noexcept;
     void clear_http_root_delegate(const HttpRootDelegate& delegate) noexcept;
     [[nodiscard]] bool local_ipv4(std::span<char> output, std::size_t& size) const noexcept;
+    // Shared timing clients temporarily suspend modem sleep, without changing
+    // persisted Wi-Fi configuration or the radio memory profile.
+    [[nodiscard]] core::Status acquire_low_latency() noexcept;
+    void release_low_latency() noexcept;
+    // Temporarily run STA for ESP-NOW on a fixed channel without association
+    // or scanning. Keep the setup AP and restore saved networking on release.
+    [[nodiscard]] core::Status acquire_autonomous_radio(std::uint8_t channel) noexcept;
+    [[nodiscard]] core::Status release_autonomous_radio() noexcept;
 
   private:
     [[nodiscard]] core::Status load_config() noexcept;
@@ -135,6 +144,10 @@ class EspWifiComponent final : public core::Component {
     bool event_loop_owned_{};
     bool wifi_initialized_{};
     bool radio_started_{};
+    wifi_ps_type_t previous_power_save_{WIFI_PS_MIN_MODEM};
+    std::atomic<std::uint32_t> low_latency_clients_{};
+    std::atomic<std::uint32_t> latency_policy_failures_{};
+    std::atomic<std::uint8_t> autonomous_channel_{};
     bool reconfigure_pending_{};
     bool pending_defer_radio_{};
     bool deferred_apply_pending_{};

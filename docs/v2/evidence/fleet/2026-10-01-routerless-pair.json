@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5-7-FLEET-PAIR-HIL",
+  "timestamp_utc": "2026-10-01T15:08:31.488520+00:00",
+  "ports": [
+    "COM10",
+    "COM5"
+  ],
+  "checks": [
+    "two nodes elect the lowest station node and lock their clocks",
+    "four integer cues and one action execute once on each node alongside direct control",
+    "leader withdrawal cancels old cues; direct control and replacement leader cues still work",
+    "returning original leader is elected and clocks relock; cancelled cue stays cancelled"
+  ],
+  "passed": true,
+  "limits": "Software dispatch timing on two routerless ESP-NOW nodes; no physical LED timing measurement, peer authentication, or large-fleet radio qualification.",
+  "originals": {
+    "COM10": {
+      "enabled": false,
+      "fleet_id": 1,
+      "channel": 1,
+      "probe_value": 0,
+      "low_latency_clients": 0,
+      "autonomous_channel": 0
+    },
+    "COM5": {
+      "enabled": false,
+      "fleet_id": 1,
+      "channel": 1,
+      "probe_value": 0,
+      "low_latency_clients": 0,
+      "autonomous_channel": 0
+    }
+  },
+  "leader_port": "COM10",
+  "initial_convergence": [
+    {
+      "leader_id": 9425086991836,
+      "synchronized": true,
+      "active": true
+    },
+    {
+      "leader_id": 9425086991836,
+      "synchronized": true,
+      "active": true
+    }
+  ],
+  "before": {
+    "COM10": {
+      "node_id": 9425086991836,
+      "leader_id": 9425086991836,
+      "is_leader": true,
+      "synchronized": true,
+      "active": true,
+      "pending": 0,
+      "clock_samples": 0,
+      "offset_us": 0,
+      "uncertainty_us": 0,
+      "sample_age_us": 0,
+      "executed": 0,
+      "execution_failed": 0,
+      "execution_dropped": 0,
+      "late": 0,
+      "cancelled": 0,
+      "duplicates": 0,
+      "send_failed": 0,
+      "invalid_packets": 0,
+      "maximum_lateness_us": 0,
+      "last_execution_us": 0,
+      "network_stack_headroom": 4740,
+      "executor_stack_headroom": 4620
+    },
+    "COM5": {
+      "node_id": 53526649819524,
+      "leader_id": 9425086991836,
+      "is_leader": false,
+      "synchronized": true,
+      "active": true,
+      "pending": 0,
+      "clock_samples": 71,
+      "offset_us": 13864033,
+      "uncertainty_us": 5000,
+      "sample_age_us": 240614,
+      "executed": 0,
+      "execution_failed": 0,
+      "execution_dropped": 0,
+      "late": 0,
+      "cancelled": 0,
+      "duplicates": 0,
+      "send_failed": 0,
+      "invalid_packets": 0,
+      "maximum_lateness_us": 0,
+      "last_execution_us": 0,
+      "network_stack_headroom": 4892,
+      "executor_stack_headroom": 4432
+    }
+  },
+  "latency_leases": {
+    "COM10": 1,
+    "COM5": 1
+  },
+  "routerless_radio": {
+    "COM10": {
+      "autonomous_channel": 1,
+      "state": 5
+    },
+    "COM5": {
+      "autonomous_channel": 1,
+      "state": 5
+    }
+  },
+  "writes": [
+    {
+      "value": 31,
+      "sequence": 1,
+      "observed": {
+        "COM10": 31,
+        "COM5": 31
+      }
+    },
+    {
+      "value": 32,
+      "sequence": 2,
+      "observed": {
+        "COM10": 32,
+        "COM5": 32
+      }
+    },
+    {
+      "value": 33,
+      "sequence": 3,
+      "observed": {
+        "COM10": 33,
+        "COM5": 33
+      }
+    },
+    {
+      "value": 34,
+      "sequence": 4,
+      "observed": {
+        "COM10": 34,
+        "COM5": 34
+      }
+    }
+  ],
+  "leader_recovery_seconds": 3.7709520000207704,
+  "rejoin_convergence": [
+    {
+      "leader_id": 9425086991836,
+      "synchronized": true,
+      "active": true
+    },
+    {
+      "leader_id": 9425086991836,
+      "synchronized": true,
+      "active": true
+    }
+  ],
+  "after": {
+    "COM10": {
+      "node_id": 9425086991836,
+      "leader_id": 9425086991836,
+      "is_leader": true,
+      "synchronized": true,
+      "active": true,
+      "pending": 0,
+      "clock_samples": 0,
+      "offset_us": 0,
+      "uncertainty_us": 0,
+      "sample_age_us": 0,
+      "executed": 5,
+      "execution_failed": 0,
+      "execution_dropped": 0,
+      "late": 0,
+      "cancelled": 0,
+      "duplicates": 0,
+      "send_failed": 0,
+      "invalid_packets": 0,
+      "maximum_lateness_us": 9208,
+      "last_execution_us": 110751816,
+      "network_stack_headroom": 4628,
+      "executor_stack_headroom": 3248
+    },
+    "COM5": {
+      "node_id": 53526649819524,
+      "leader_id": 9425086991836,
+      "is_leader": false,
+      "synchronized": true,
+      "active": true,
+      "pending": 0,
+      "clock_samples": 280,
+      "offset_us": 13863603,
+      "uncertainty_us": 5000,
+      "sample_age_us": 150227,
+      "executed": 6,
+      "execution_failed": 0,
+      "execution_dropped": 0,
+      "late": 0,
+      "cancelled": 1,
+      "duplicates": 81,
+      "send_failed": 0,
+      "invalid_packets": 0,
+      "maximum_lateness_us": 9865,
+      "last_execution_us": 105898292,
+      "network_stack_headroom": 4412,
+      "executor_stack_headroom": 3136
+    }
+  },
+  "restored": {
+    "COM10": {
+      "enabled": false,
+      "fleet_id": 1,
+      "channel": 1,
+      "probe_value": 0,
+      "low_latency_clients": 0,
+      "autonomous_channel": 0
+    },
+    "COM5": {
+      "enabled": false,
+      "fleet_id": 1,
+      "channel": 1,
+      "probe_value": 0,
+      "low_latency_clients": 0,
+      "autonomous_channel": 0
+    }
+  },
+  "restoration_errors": []
+}

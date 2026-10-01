@@ -1,4 +1,5 @@
 #include "blip/transport/esp_espnow_transport_component.hpp"
+#include "blip/transport/espnow_radio.hpp"
 
 #include "esp_log.h"
 #include "esp_random.h"
@@ -383,15 +384,14 @@ core::Status EspEspNowTransportComponent::invoke_action(
 }
 
 bool EspEspNowTransportComponent::activate() noexcept {
-    if (esp_now_init() != ESP_OK) return false;
+    if (!EspNowRadio::shared().subscribe(this, receive_callback, false)) return false;
     esp_now_peer_info_t peer{};
     active_peer_ = peer_packed_.load();
     unpack_mac(active_peer_, peer.peer_addr);
     peer.channel = 0;
     peer.ifidx = WIFI_IF_STA;
-    if (esp_now_add_peer(&peer) != ESP_OK ||
-        esp_now_register_recv_cb(receive_callback) != ESP_OK) {
-        static_cast<void>(esp_now_deinit());
+    if (esp_now_add_peer(&peer) != ESP_OK) {
+        EspNowRadio::shared().unsubscribe(this);
         return false;
     }
     active_.store(true);
@@ -401,8 +401,10 @@ bool EspEspNowTransportComponent::activate() noexcept {
 
 void EspEspNowTransportComponent::deactivate() noexcept {
     if (!active_.exchange(false)) return;
-    static_cast<void>(esp_now_unregister_recv_cb());
-    static_cast<void>(esp_now_deinit());
+    std::uint8_t peer[6]{};
+    unpack_mac(active_peer_, peer);
+    static_cast<void>(esp_now_del_peer(peer));
+    EspNowRadio::shared().unsubscribe(this);
     receive_.reset();
     transmit_.reset();
     response_waiting_ = false;
@@ -571,8 +573,8 @@ void EspEspNowTransportComponent::worker_entry(void* context) noexcept {
 }
 
 void EspEspNowTransportComponent::receive_callback(
-    const esp_now_recv_info_t* info, const std::uint8_t* data, int length) noexcept {
-    auto* self = instance_;
+    void* context, const esp_now_recv_info_t* info, const std::uint8_t* data, int length) noexcept {
+    auto* self = static_cast<EspEspNowTransportComponent*>(context);
     if (self == nullptr || !self->active_.load() || info == nullptr ||
         info->src_addr == nullptr || data == nullptr || length <= 0 ||
         length > static_cast<int>(kEspNowPacketBytes)) return;

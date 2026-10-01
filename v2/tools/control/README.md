@@ -114,3 +114,15 @@ Add `--temporarily-enable` if the strip is disabled. The helper restores the
 prior red channel, enabled state, and budget in a `finally` block and reports
 whether restoration was verified. Its result is a calculated-current check;
 physical supply current still needs a meter.
+
+For a routerless ESP-NOW fleet pair, build both boards with
+`BLIP_ENABLE_FLEET=ON` and leave the computer on its usual network:
+
+```powershell
+python v2/tools/control/blip_fleet_hil.py --ports COM10 COM5 --out fleet-pair.json
+```
+
+The test temporarily puts the devices on a fixed ESP-NOW channel, exercises
+clock/election, scheduled commands, normal serial control and leader recovery,
+then restores and verifies fleet settings, probe values and radio leases.
+It does not change PC Wi-Fi or require the devices to join a router.

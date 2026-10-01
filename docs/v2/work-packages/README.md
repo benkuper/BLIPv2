@@ -61,3 +61,4 @@ wire protocols, or public OSC paths.
 | [5.4](5.4-wifi-radio-profiles.md) | Live Wi-Fi suspension and reboot-applied driver memory reclamation; BLE and ESP-NOW profiles open |
 | [5.5 Bluetooth transports](5.5-ble-transport-foundation.md) | NimBLE GATT on six boards and Classic SPP on two original ESP32 boards; remaining coexistence and power qualification open |
 | [5.6 ESP-NOW V2](5.6-espnow-v2.md) | Bounded V2 peer control, ACK/retry and duplicate suppression; seven-board build and Ball-to-peer HIL passed |
+| [5.7 Routerless fleet](5.7-routerless-fleet.md) | ESP-NOW broadcast election/clock/cues; 4,096-listener host case and routerless Ball/HUZZAH32 recovery gate passed; remaining board builds and radio scale qualification open |

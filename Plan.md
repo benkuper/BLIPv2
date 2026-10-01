@@ -12,6 +12,7 @@ This plan is anchored to BLIP [`main` at e567eeb](https://github.com/Golden-Geek
 * No exceptions or RTTI in embedded code.
 * Prefer fixed-capacity buffers and explicit ownership.
 * V2 does not need V1 settings, playback, or packet compatibility; retain V2 schema migrations.
+* Fleet must work without a router, IP setup, or computer. Prefer ESP-NOW broadcast with silent followers and bounded per-device memory; avoid a participant roster or acknowledgements from every device. Qualify practical capacity against radio range, interference and airtime.
 * One independently reviewable subsystem per PR.
 * Do not move or delete V1 until the cutover gate is explicitly approved.
 
