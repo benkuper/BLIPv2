@@ -69,7 +69,7 @@ std::uint16_t tx_value_handle{};
     result.settings = {1, 1};
     result.disable_policy = core::DisablePolicy::live;
     result.supports_restart = true;
-    result.cost = {65536, 8192, EspBleTransportComponent::kWorkerStackBytes};
+    result.cost = {65536, 4096, EspBleTransportComponent::kWorkerStackBytes};
     return result;
 }
 
@@ -125,9 +125,8 @@ core::Status EspBleTransportComponent::start(const core::StartContext&) noexcept
     control_ready_.store(false);
     quiesced_.store(false);
     started_.store(true);
-    worker_task_ = xTaskCreateStatic(worker_entry, "blip_ble", sizeof(worker_stack_), this,
-                                     4, worker_stack_.data(), &worker_task_storage_);
-    if (worker_task_ == nullptr) {
+    if (xTaskCreate(worker_entry, "blip_ble", kWorkerStackBytes, this, 4,
+                    &worker_task_) != pdPASS) {
         started_.store(false);
         quiesced_.store(true);
         instance_ = nullptr;

@@ -31,6 +31,7 @@
 #include <array>
 #include <cstdint>
 #include <cstdlib>
+#include <new>
 #include <string_view>
 
 namespace {
@@ -210,10 +211,16 @@ blip::transport::EspSerialTransportComponent serial_transport_component{control_
 blip::transport::EspBleTransportComponent ble_transport_component{
     control_component, settings_component.settings()};
 #endif
-blip::oscquery::EspOscQueryComponent oscquery_component{registry, control_component, wifi_component,
-                                                        file_storage_component.web_assets(),
-                                                        ota_component.updates(), resource_broker,
-                                                        board_manifest};
+#if defined(CONFIG_IDF_TARGET_ESP32) && defined(BLIP_ENABLE_BLE)
+// The original ESP32 reserves a fixed DRAM region for its BT controller. Keep
+// OSCQuery available by placing its large fixed packet buffers in the heap.
+blip::oscquery::EspOscQueryComponent* oscquery_component{};
+#else
+blip::oscquery::EspOscQueryComponent oscquery_storage{
+    registry, control_component, wifi_component, file_storage_component.web_assets(),
+    ota_component.updates(), resource_broker, board_manifest};
+blip::oscquery::EspOscQueryComponent* oscquery_component{&oscquery_storage};
+#endif
 
 class EspMonotonicClock final : public blip::core::Clock {
   public:
@@ -292,7 +299,7 @@ void reject_pending_update() noexcept {
         if (!ota_status) {
             return false;
         }
-        const auto oscquery_status = registry.add(oscquery_component);
+        const auto oscquery_status = registry.add(*oscquery_component);
         if (!oscquery_status) {
             return false;
         }
@@ -390,6 +397,18 @@ extern "C" void app_main() {
         reject_pending_update();
         return;
     }
+#if defined(CONFIG_IDF_TARGET_ESP32) && defined(BLIP_ENABLE_BLE)
+    if (!safe_mode) {
+        oscquery_component = new (std::nothrow) blip::oscquery::EspOscQueryComponent{
+            registry, control_component, wifi_component, file_storage_component.web_assets(),
+            ota_component.updates(), resource_broker, board_manifest};
+        if (oscquery_component == nullptr) {
+            ESP_LOGE(kTag, "BLIP_V2_OSCQUERY_ALLOCATION_FAILED");
+            reject_pending_update();
+            return;
+        }
+    }
+#endif
 #if defined(BLIP_DIAGNOSTICS_HIL_CLEAR_SAFE_MODE)
     if (safe_mode) {
         if (!diagnostics_component.clear_safe_mode()) {
@@ -465,7 +484,7 @@ extern "C" void app_main() {
              kLedBootStatus,
              static_cast<unsigned long>(file_storage_component.web_assets().info().asset_count),
              static_cast<unsigned long>(file_storage_component.web_assets().info().total_size),
-             static_cast<unsigned long>(oscquery_component.task_stack_headroom_bytes()),
+             static_cast<unsigned long>(oscquery_component->task_stack_headroom_bytes()),
              static_cast<unsigned>(wifi_component.connection_state()),
              static_cast<int>(wifi_component.access_point_ssid().size()),
              wifi_component.access_point_ssid().data(),

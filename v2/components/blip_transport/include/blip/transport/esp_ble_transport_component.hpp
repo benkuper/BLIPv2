@@ -20,8 +20,7 @@ namespace blip::transport {
 
 class EspBleTransportComponent final : public core::Component {
   public:
-    static constexpr std::size_t kWorkerStackBytes = 4096;
-    static constexpr std::size_t kWorkerStackWords = kWorkerStackBytes / sizeof(StackType_t);
+    static constexpr std::size_t kWorkerStackBytes = 8192;
 
     EspBleTransportComponent(core::ControlService& controls,
                              storage::SettingsStore& settings) noexcept;
@@ -68,8 +67,6 @@ class EspBleTransportComponent final : public core::Component {
     BleRequestAssembler request_assembler_{};
     BleResponseFragments response_fragments_{};
     ControlEnvelopeEndpoint endpoint_;
-    alignas(16) std::array<StackType_t, kWorkerStackWords> worker_stack_{};
-    StaticTask_t worker_task_storage_{};
     TaskHandle_t worker_task_{};
     std::size_t request_size_{};
     std::uint32_t request_epoch_{};
@@ -100,5 +97,5 @@ class EspBleTransportComponent final : public core::Component {
 
 } // namespace blip::transport
 
-static_assert(sizeof(blip::transport::EspBleTransportComponent) <= 8192,
+static_assert(sizeof(blip::transport::EspBleTransportComponent) <= 4096,
               "BLE transport exceeds its declared static RAM budget");
