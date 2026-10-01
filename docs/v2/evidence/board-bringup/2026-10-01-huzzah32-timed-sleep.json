@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5-3-HUZZAH32-TIMED-LIGHT-SLEEP",
+  "state": "partial",
+  "timestamp_utc": "2026-10-01T00:11:02Z",
+  "board": "Adafruit HUZZAH32",
+  "port": "COM5",
+  "firmware_sha256": "f6483678dd68eabaa6b3b68aba6fb4ca838e9a9d0913bb7d4e8840f4ae8bf00d",
+  "flash": "OTA selector and app image written; esptool verified both regions",
+  "active_precondition": "light_sleep(2000) returned invalid_state/wifi-or-led-active while both were enabled",
+  "light_sleep": {
+    "requested_ms": 2000,
+    "completed_before": 1,
+    "completed_after": 2,
+    "last_sleep_us": 2000307,
+    "wake_cause_mask": 16,
+    "timer_wake_bit": 16,
+    "last_error": 0,
+    "state": 3,
+    "passed": true
+  },
+  "settings": {
+    "original_wifi_enabled": true,
+    "original_strip_enabled": true,
+    "restored_wifi_enabled": true,
+    "restored_strip_enabled": true,
+    "restoration_errors": []
+  },
+  "builds": [
+    {"board": "Creators Ball V2", "profile": "m4-e131-ball-c6", "bytes": 1288880, "sha256": "3d23fd3aa51ee29da8b06e87c6e9460872ffccd1307ba909ebff72a384fc6bc2", "result": "pass"},
+    {"board": "Creators Tab", "profile": "m4-e131-creators-tab", "bytes": 1139728, "sha256": "60c8c62d52f83982adc456f01d6ee18998b601faab4af7753fc53facdff102c7", "result": "pass"},
+    {"board": "Adafruit HUZZAH32", "profile": "m4-e131-huzzah32", "bytes": 1162608, "sha256": "f6483678dd68eabaa6b3b68aba6fb4ca838e9a9d0913bb7d4e8840f4ae8bf00d", "result": "pass"},
+    {"board": "M5Dial", "profile": "m4-e131-m5dial", "bytes": 1129936, "sha256": "a56568330cfeac4383ede8ec9c56d98bd2989cfa5eb9cae55f1486f41297045e", "result": "pass"},
+    {"board": "M5StickC", "profile": "m4-e131-m5stickc", "bytes": 1138544, "sha256": "bda9c14b9e5cd7563ccc76bf7f6a79583c5a87106269d90d0b23619d2074147b", "result": "pass"},
+    {"board": "Seeed XIAO ESP32-C6", "profile": "m4-e131-xiao-c6", "bytes": 1273104, "sha256": "77551362d6a6cc1c16a4abcd00feddd79735320f8a3e48a2e4ca2be0685dc362", "result": "pass"}
+  ],
+  "host_network": "Archi-wifi guest 2; IPv4 Internet; espressif.com TCP/443 reachable",
+  "limits": [
+    "No physical current measurements or automatic idle sleep yet.",
+    "Power-latch and wake behavior remain unqualified on the other boards.",
+    "The first HIL harness poll during sleep timed out; firmware then reported a completed 1999946 us timer wake and restored settings. The harness now waits through the timer interval before polling."
+  ]
+}

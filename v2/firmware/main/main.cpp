@@ -6,6 +6,7 @@
 #include "blip/led/esp_rmt_strip_component.hpp"
 #if defined(BLIP_BOARD_ADAFRUIT_HUZZAH32)
 #include "blip/power/esp_battery_component.hpp"
+#include "blip/power/esp_sleep_component.hpp"
 #endif
 #include "blip/network/esp_wifi_component.hpp"
 #include "blip/oscquery/esp_oscquery_component.hpp"
@@ -193,10 +194,11 @@ blip::resources::DeviceBroker resource_broker{};
 blip::led::EspRmtStripComponent led_component{settings_component.settings(), resource_broker};
 #if defined(BLIP_BOARD_ADAFRUIT_HUZZAH32)
 blip::power::EspBatteryComponent battery_component{};
+blip::power::EspSleepComponent sleep_component{wifi_component, led_component};
 #endif
 blip::ota::EspOtaComponent ota_component{"blip-v2", CONFIG_IDF_TARGET, "minimal"};
-blip::core::Registry<14> registry{};
-blip::core::RegistryControlService<14> control_component{registry};
+blip::core::Registry<15> registry{};
+blip::core::RegistryControlService<15> control_component{registry};
 blip::transport::EspSerialTransportComponent serial_transport_component{control_component};
 blip::oscquery::EspOscQueryComponent oscquery_component{registry, control_component, wifi_component,
                                                         file_storage_component.web_assets(),
@@ -281,6 +283,10 @@ void reject_pending_update() noexcept {
 #if defined(BLIP_BOARD_ADAFRUIT_HUZZAH32)
         const auto battery_status = registry.add(battery_component);
         if (!battery_status) {
+            return false;
+        }
+        const auto sleep_status = registry.add(sleep_component);
+        if (!sleep_status) {
             return false;
         }
 #endif
