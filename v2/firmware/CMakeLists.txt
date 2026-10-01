@@ -5,6 +5,7 @@ set(SDKCONFIG "${CMAKE_BINARY_DIR}/sdkconfig")
 option(BLIP_ENABLE_ARTNET "Include Art-Net discovery and DMX input" ON)
 option(BLIP_ENABLE_DDP "Include DDP pixel input" ON)
 option(BLIP_ENABLE_E131 "Include E1.31/sACN DMX input" OFF)
+option(BLIP_ENABLE_BLE "Include the NimBLE control transport" OFF)
 option(BLIP_BOARD_ADAFRUIT_HUZZAH32 "Use the HUZZAH32 board battery profile" OFF)
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/../components/blip_core"
@@ -40,6 +41,7 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 idf_build_set_property(BLIP_ENABLE_ARTNET ${BLIP_ENABLE_ARTNET})
 idf_build_set_property(BLIP_ENABLE_DDP ${BLIP_ENABLE_DDP})
 idf_build_set_property(BLIP_ENABLE_E131 ${BLIP_ENABLE_E131})
+idf_build_set_property(BLIP_ENABLE_BLE ${BLIP_ENABLE_BLE})
 idf_build_set_property(BLIP_BOARD_ADAFRUIT_HUZZAH32 ${BLIP_BOARD_ADAFRUIT_HUZZAH32})
 
 # Keep the bootstrap image limited to main and its transitive requirements.

@@ -22,13 +22,28 @@ struct SerialEndpointMetrics {
     std::uint32_t error_responses{};
 };
 
+class ControlEnvelopeEndpoint {
+  public:
+    ControlEnvelopeEndpoint(core::ControlService& controls,
+                            std::span<std::byte> payload_buffer) noexcept
+        : controls_(&controls), payload_buffer_(payload_buffer) {}
+
+    [[nodiscard]] core::Result<std::size_t>
+    handle_request(std::span<const std::byte> request,
+                   std::span<std::byte> response) noexcept;
+
+  private:
+    core::ControlService* controls_{};
+    std::span<std::byte> payload_buffer_{};
+};
+
 class SerialControlEndpoint {
   public:
     SerialControlEndpoint(core::ControlService& controls, std::span<std::byte> decode_buffer,
                           std::span<std::byte> envelope_buffer,
                           std::span<std::byte> payload_buffer) noexcept
-        : controls_(&controls), decode_buffer_(decode_buffer), envelope_buffer_(envelope_buffer),
-          payload_buffer_(payload_buffer) {}
+        : endpoint_(controls, payload_buffer), decode_buffer_(decode_buffer),
+          envelope_buffer_(envelope_buffer) {}
 
     [[nodiscard]] core::Result<std::size_t>
     handle_frame(std::span<const std::byte> encoded_frame,
@@ -36,10 +51,9 @@ class SerialControlEndpoint {
     [[nodiscard]] const SerialEndpointMetrics& metrics() const noexcept { return metrics_; }
 
   private:
-    core::ControlService* controls_{};
+    ControlEnvelopeEndpoint endpoint_;
     std::span<std::byte> decode_buffer_{};
     std::span<std::byte> envelope_buffer_{};
-    std::span<std::byte> payload_buffer_{};
     SerialEndpointMetrics metrics_{};
 };
 

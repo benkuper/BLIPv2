@@ -307,6 +307,15 @@ bool framed_endpoint_controls_registry() {
     BLIP_CHECK(response && response.value().error_code == ErrorCode::none);
     BLIP_CHECK(endpoint.metrics().accepted == 1U);
 
+    ControlEnvelopeEndpoint ble_endpoint{controls, payload_buffer};
+    const auto ble_response_size = ble_endpoint.handle_request(
+        {request_envelope.data(), envelope_size.value()}, response_envelope);
+    BLIP_CHECK(ble_response_size);
+    const auto ble_envelope =
+        decode_envelope({response_envelope.data(), ble_response_size.value()});
+    BLIP_CHECK(ble_envelope && ble_envelope.value().kind == EnvelopeKind::response);
+    BLIP_CHECK(ble_envelope.value().request_id == 77U);
+
     request_frame[3] ^= std::byte{0x80};
     BLIP_CHECK(
         !endpoint.handle_frame({request_frame.data(), frame_size.value() - 1U}, response_frame));

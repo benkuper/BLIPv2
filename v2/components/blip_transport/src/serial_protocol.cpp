@@ -100,29 +100,21 @@ core::Result<std::size_t> cobs_decode_frame(std::span<const std::byte> input,
 }
 
 core::Result<std::size_t>
-SerialControlEndpoint::handle_frame(std::span<const std::byte> encoded_frame,
-                                    std::span<std::byte> output_frame) noexcept {
-    const auto decoded_size = cobs_decode_frame(encoded_frame, decode_buffer_);
-    if (!decoded_size) {
-        saturating_increment(metrics_.rejected);
-        return core::Result<std::size_t>::failure(decoded_size.error());
-    }
-    const auto envelope =
-        decode_envelope(decode_buffer_.first(static_cast<std::size_t>(decoded_size.value())));
+ControlEnvelopeEndpoint::handle_request(std::span<const std::byte> request_envelope,
+                                        std::span<std::byte> response_envelope) noexcept {
+    const auto envelope = decode_envelope(request_envelope);
     if (!envelope || envelope.value().kind != EnvelopeKind::request ||
         envelope.value().payload_type != PayloadType::control) {
-        saturating_increment(metrics_.rejected);
         return core::Result<std::size_t>::failure(
-            envelope ? serial_error(core::ErrorCode::invalid_argument, "handle-frame",
+            envelope ? serial_error(core::ErrorCode::invalid_argument, "handle-request",
                                     "request-control-required")
                      : envelope.error());
     }
     const auto message = decode_control_message(envelope.value().payload);
     if (!message || message.value().error_code != core::ErrorCode::none ||
         !message.value().detail.empty()) {
-        saturating_increment(metrics_.rejected);
         return core::Result<std::size_t>::failure(
-            message ? serial_error(core::ErrorCode::invalid_argument, "handle-frame",
+            message ? serial_error(core::ErrorCode::invalid_argument, "handle-request",
                                    "request-status-must-be-empty")
                     : message.error());
     }
@@ -146,14 +138,24 @@ SerialControlEndpoint::handle_frame(std::span<const std::byte> encoded_frame,
     };
     const auto payload_size = encode_control_message(response_message, payload_buffer_);
     if (!payload_size) {
-        saturating_increment(metrics_.rejected);
         return core::Result<std::size_t>::failure(payload_size.error());
     }
     const auto response_kind = status ? EnvelopeKind::response : EnvelopeKind::error;
-    const auto envelope_size =
-        encode_envelope({response_kind, PayloadType::control, envelope.value().request_id, 0,
-                         payload_buffer_.first(payload_size.value())},
-                        envelope_buffer_);
+    return encode_envelope({response_kind, PayloadType::control, envelope.value().request_id, 0,
+                            payload_buffer_.first(payload_size.value())},
+                           response_envelope);
+}
+
+core::Result<std::size_t>
+SerialControlEndpoint::handle_frame(std::span<const std::byte> encoded_frame,
+                                    std::span<std::byte> output_frame) noexcept {
+    const auto decoded_size = cobs_decode_frame(encoded_frame, decode_buffer_);
+    if (!decoded_size) {
+        saturating_increment(metrics_.rejected);
+        return core::Result<std::size_t>::failure(decoded_size.error());
+    }
+    const auto envelope_size = endpoint_.handle_request(
+        decode_buffer_.first(decoded_size.value()), envelope_buffer_);
     if (!envelope_size) {
         saturating_increment(metrics_.rejected);
         return core::Result<std::size_t>::failure(envelope_size.error());
@@ -165,7 +167,8 @@ SerialControlEndpoint::handle_frame(std::span<const std::byte> encoded_frame,
         return frame_size;
     }
     saturating_increment(metrics_.accepted);
-    if (!status) {
+    const auto response = decode_envelope(envelope_buffer_.first(envelope_size.value()));
+    if (response && response.value().kind == EnvelopeKind::error) {
         saturating_increment(metrics_.error_responses);
     }
     return frame_size;
