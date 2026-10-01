@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-01",
+  "source_commit": "7a0f27050c33f70cf17090398632b6d984b4733e",
+  "boards": [
+    {
+      "profile": "ball",
+      "target": "esp32c6",
+      "app_bytes": 1707232,
+      "partition_bytes": 3145728,
+      "sha256": "0c55307b4e0df6871390b5adffaf8a51ffeba80939798e531dae447b0682d8d2",
+      "fleet_enabled": true,
+      "espnow_enabled": true,
+      "ble_enabled": true,
+      "flash_verified": true
+    },
+    {
+      "profile": "huzzah32",
+      "target": "esp32",
+      "app_bytes": 1210896,
+      "partition_bytes": 1638400,
+      "sha256": "c07a2b14ca8e5f715a6f1da11494f7248d7d563556b046d32ff3998794e3e3c2",
+      "fleet_enabled": true,
+      "espnow_enabled": true,
+      "ble_enabled": false,
+      "flash_verified": true
+    },
+    {
+      "profile": "xiao",
+      "target": "esp32c6",
+      "app_bytes": 1315600,
+      "partition_bytes": 1638400,
+      "sha256": "bc9768935c7193692e422469de6784e010be9f33fca6227b9642c9136cf6e50b",
+      "fleet_enabled": true,
+      "espnow_enabled": true,
+      "ble_enabled": false,
+      "flash_verified": true
+    },
+    {
+      "profile": "m5dial",
+      "target": "esp32s3",
+      "app_bytes": 1178960,
+      "partition_bytes": 1638400,
+      "sha256": "e583fd4dbcda58a363cdca5caa27ba1b2f658df534100a0840bd91cf84e36956",
+      "fleet_enabled": true,
+      "espnow_enabled": true,
+      "ble_enabled": false,
+      "flash_verified": true
+    },
+    {
+      "profile": "m5stickc",
+      "target": "esp32",
+      "app_bytes": 1186368,
+      "partition_bytes": 1638400,
+      "sha256": "8d35acec9ff13638054b67230225d214f1627012062cc91f1e3d4ebf326597a8",
+      "fleet_enabled": true,
+      "espnow_enabled": true,
+      "ble_enabled": false,
+      "flash_verified": true
+    },
+    {
+      "profile": "creators-tab",
+      "target": "esp32",
+      "app_bytes": 1187568,
+      "partition_bytes": 1638400,
+      "sha256": "845f2b2c1e36671a48c77a64030499838bc58c1a5f7a7b86682d85c38898f896",
+      "fleet_enabled": true,
+      "espnow_enabled": true,
+      "ble_enabled": false,
+      "flash_verified": true
+    },
+    {
+      "profile": "club",
+      "target": "esp32",
+      "app_bytes": 1202192,
+      "partition_bytes": 1638400,
+      "sha256": "6fc50151ebed2c910fe0ced1b6916013849cd9b6022eec8d8fa7341380287f99",
+      "fleet_enabled": true,
+      "espnow_enabled": true,
+      "ble_enabled": false,
+      "flash_verified": true
+    }
+  ],
+  "passed": true
+}

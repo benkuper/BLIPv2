@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-10-01T15:15:08.890917+00:00",
+  "ports": [
+    "COM10",
+    "COM5"
+  ],
+  "passed": true,
+  "before_remote_read": 0,
+  "during": {
+    "COM10": {
+      "fleet_active": true,
+      "peer_active": false,
+      "autonomous_channel": 1
+    },
+    "COM5": {
+      "fleet_active": true,
+      "peer_active": false,
+      "autonomous_channel": 1
+    }
+  },
+  "after_remote_read": 0,
+  "restoration_errors": []
+}

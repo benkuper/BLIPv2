@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-10-01T15:38:14.751613+00:00",
+  "ports": [
+    "COM10",
+    "COM5",
+    "COM9",
+    "COM12",
+    "COM13",
+    "COM14",
+    "COM15"
+  ],
+  "passed": true,
+  "limits": "Single-hop routerless radio group; software control checks, no physical output timing or delivery guarantee.",
+  "nodes": {
+    "COM10": 9425086991836,
+    "COM5": 53526649819524,
+    "COM9": 194070321726324,
+    "COM12": 163524412946308,
+    "COM13": 17943754352232,
+    "COM14": 87971963309776,
+    "COM15": 53526649873288
+  },
+  "leader_port": "COM10",
+  "replacement_port": "COM13",
+  "before_executed": {
+    "COM10": 5,
+    "COM5": 6,
+    "COM9": 0,
+    "COM12": 0,
+    "COM13": 0,
+    "COM14": 0,
+    "COM15": 0
+  },
+  "initial_consensus": {
+    "COM10": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM5": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM9": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM12": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM13": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM14": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM15": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    }
+  },
+  "routerless": {
+    "COM10": {
+      "state": 6,
+      "autonomous_channel": 1,
+      "low_latency_clients": 1,
+      "setup_ap_active": false
+    },
+    "COM5": {
+      "state": 6,
+      "autonomous_channel": 1,
+      "low_latency_clients": 1,
+      "setup_ap_active": false
+    },
+    "COM9": {
+      "state": 6,
+      "autonomous_channel": 1,
+      "low_latency_clients": 1,
+      "setup_ap_active": false
+    },
+    "COM12": {
+      "state": 6,
+      "autonomous_channel": 1,
+      "low_latency_clients": 1,
+      "setup_ap_active": false
+    },
+    "COM13": {
+      "state": 6,
+      "autonomous_channel": 1,
+      "low_latency_clients": 1,
+      "setup_ap_active": false
+    },
+    "COM14": {
+      "state": 6,
+      "autonomous_channel": 1,
+      "low_latency_clients": 1,
+      "setup_ap_active": false
+    },
+    "COM15": {
+      "state": 6,
+      "autonomous_channel": 1,
+      "low_latency_clients": 1,
+      "setup_ap_active": false
+    }
+  },
+  "first_cue": {
+    "COM10": 61,
+    "COM5": 61,
+    "COM9": 61,
+    "COM12": 61,
+    "COM13": 61,
+    "COM14": 61,
+    "COM15": 61
+  },
+  "queued": {
+    "COM10": 1,
+    "COM5": 1,
+    "COM9": 1,
+    "COM12": 1,
+    "COM13": 1,
+    "COM14": 1,
+    "COM15": 1
+  },
+  "replacement_consensus": {
+    "COM5": {
+      "active": true,
+      "leader_id": 17943754352232,
+      "synchronized": true
+    },
+    "COM9": {
+      "active": true,
+      "leader_id": 17943754352232,
+      "synchronized": true
+    },
+    "COM12": {
+      "active": true,
+      "leader_id": 17943754352232,
+      "synchronized": true
+    },
+    "COM13": {
+      "active": true,
+      "leader_id": 17943754352232,
+      "synchronized": true
+    },
+    "COM14": {
+      "active": true,
+      "leader_id": 17943754352232,
+      "synchronized": true
+    },
+    "COM15": {
+      "active": true,
+      "leader_id": 17943754352232,
+      "synchronized": true
+    }
+  },
+  "observed_recovery_seconds": 19.84133609998389,
+  "replacement_cue": {
+    "COM5": 62,
+    "COM9": 62,
+    "COM12": 62,
+    "COM13": 62,
+    "COM14": 62,
+    "COM15": 62
+  },
+  "rejoin_consensus": {
+    "COM10": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM5": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM9": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM12": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM13": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM14": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    },
+    "COM15": {
+      "active": true,
+      "leader_id": 9425086991836,
+      "synchronized": true
+    }
+  },
+  "after": {
+    "COM10": {
+      "executed": 6,
+      "execution_failed": 0,
+      "execution_dropped": 0,
+      "late": 0,
+      "duplicates": 0,
+      "maximum_lateness_us": 6569,
+      "network_stack_headroom": 4628,
+      "executor_stack_headroom": 3248
+    },
+    "COM5": {
+      "executed": 8,
+      "execution_failed": 0,
+      "execution_dropped": 0,
+      "late": 0,
+      "duplicates": 97,
+      "maximum_lateness_us": 7063,
+      "network_stack_headroom": 4404,
+      "executor_stack_headroom": 3144
+    },
+    "COM9": {
+      "executed": 2,
+      "execution_failed": 0,
+      "execution_dropped": 0,
+      "late": 0,
+      "duplicates": 97,
+      "maximum_lateness_us": 9124,
+      "network_stack_headroom": 4740,
+      "executor_stack_headroom": 2920
+    },
+    "COM12": {
+      "executed": 2,
+      "execution_failed": 0,
+      "execution_dropped": 0,
+      "late": 0,
+      "duplicates": 97,
+      "maximum_lateness_us": 9278,
+      "network_stack_headroom": 4980,
+      "executor_stack_headroom": 3144
+    },
+    "COM13": {
+      "executed": 2,
+      "execution_failed": 0,
+      "execution_dropped": 0,
+      "late": 0,
+      "duplicates": 73,
+      "maximum_lateness_us": 4419,
+      "network_stack_headroom": 4748,
+      "executor_stack_headroom": 3240
+    },
+    "COM14": {
+      "executed": 2,
+      "execution_failed": 0,
+      "execution_dropped": 0,
+      "late": 0,
+      "duplicates": 97,
+      "maximum_lateness_us": 8212,
+      "network_stack_headroom": 4980,
+      "executor_stack_headroom": 3144
+    },
+    "COM15": {
+      "executed": 2,
+      "execution_failed": 0,
+      "execution_dropped": 0,
+      "late": 0,
+      "duplicates": 97,
+      "maximum_lateness_us": 6181,
+      "network_stack_headroom": 4412,
+      "executor_stack_headroom": 3144
+    }
+  },
+  "restored": {
+    "COM10": {
+      "enabled": false,
+      "fleet_id": 1,
+      "channel": 1,
+      "probe_value": 0
+    },
+    "COM5": {
+      "enabled": false,
+      "fleet_id": 1,
+      "channel": 1,
+      "probe_value": 0
+    },
+    "COM9": {
+      "enabled": false,
+      "fleet_id": 1,
+      "channel": 1,
+      "probe_value": 0
+    },
+    "COM12": {
+      "enabled": false,
+      "fleet_id": 1,
+      "channel": 1,
+      "probe_value": 0
+    },
+    "COM13": {
+      "enabled": false,
+      "fleet_id": 1,
+      "channel": 1,
+      "probe_value": 0
+    },
+    "COM14": {
+      "enabled": false,
+      "fleet_id": 1,
+      "channel": 1,
+      "probe_value": 0
+    },
+    "COM15": {
+      "enabled": false,
+      "fleet_id": 1,
+      "channel": 1,
+      "probe_value": 0
+    }
+  },
+  "restoration_errors": []
+}

@@ -126,3 +126,16 @@ The test temporarily puts the devices on a fixed ESP-NOW channel, exercises
 clock/election, scheduled commands, normal serial control and leader recovery,
 then restores and verifies fleet settings, probe values and radio leases.
 It does not change PC Wi-Fi or require the devices to join a router.
+
+For a larger serial-connected group, run the group gate. It checks the elected
+leader, every node's clock and cue execution, leader withdrawal/rejoin and state
+restoration. Autonomous mode must report no setup AP advertising:
+
+```powershell
+python v2/tools/control/blip_fleet_group_hil.py --ports COM10 COM5 COM9 COM12 COM13 COM14 COM15 --out fleet-group.json
+python v2/tools/control/blip_fleet_peer_resume_hil.py --ports COM10 COM5 --out peer-resume.json
+```
+
+The second helper checks unicast peer control before and after a temporary fleet
+lease, and restores both peer and fleet settings. Use it with fleet initially
+disabled.
