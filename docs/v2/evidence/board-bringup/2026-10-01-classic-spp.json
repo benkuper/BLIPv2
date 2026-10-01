@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-01",
+  "work_package": "5.5",
+  "toolchain": "ESP-IDF 6.0.2",
+  "profile": "BLIP_ENABLE_CLASSIC_BT=ON; NimBLE, Art-Net, DDP and E1.31 excluded",
+  "security": "SPP requests authentication using Secure Simple Pairing with no device input/output; no displayed-code comparison",
+  "boards": [
+    {
+      "board": "Adafruit HUZZAH32",
+      "target": "esp32",
+      "port": "COM5",
+      "app_image_bytes": 1516496,
+      "app_partition_hex": "0x190000",
+      "spp_get": true,
+      "spp_probe_write_verified_by_serial": true,
+      "spp_disable_and_serial_reenable": true,
+      "persisted_enable_after_reset": true,
+      "malformed_frame_rejected_and_recovered": true,
+      "connection_churn": "20 consecutive SPP connections and control reads passed; free internal heap 14092 to 14096 bytes",
+      "heap_free_internal_classic_active_bytes": 13568,
+      "wifi_http_root_status": 200
+    },
+    {
+      "board": "M5StickC",
+      "target": "esp32",
+      "port": "COM12",
+      "app_image_bytes": 1491632,
+      "app_partition_hex": "0x190000",
+      "spp_get": true,
+      "spp_probe_write_verified_by_serial": true,
+      "spp_disable_and_serial_reenable": true,
+      "heap_free_internal_classic_active_bytes": 19056
+    },
+    {
+      "board": "Creators Tab",
+      "target": "esp32",
+      "port": "COM14",
+      "app_image_bytes": 1492880,
+      "app_partition_hex": "0x190000",
+      "build_passed": true,
+      "hardware_radio_test": "not run because the current board has brownout-reset with Wi-Fi and BLE together"
+    }
+  ],
+  "open_gates": [
+    "Longer sustained SPP traffic and connection churn on original ESP32",
+    "Creators Tab Classic radio qualification on a stable power source",
+    "Classic authentication policy with user-verifiable pairing for sensitive deployments"
+  ]
+}
