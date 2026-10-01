@@ -13,6 +13,7 @@ enum class WifiConnectionState : std::uint8_t {
     connection_error,
     disabled,
     hotspot,
+    autonomous,
 };
 
 struct WifiTransition {
@@ -31,6 +32,7 @@ class WifiStateMachine {
     static constexpr std::uint64_t kMaximumRetryMs = 5000;
 
     [[nodiscard]] WifiTransition apply(const WifiConfig& config, std::uint64_t now_ms) noexcept;
+    [[nodiscard]] WifiTransition enter_autonomous() noexcept;
     [[nodiscard]] WifiTransition station_connected(std::uint64_t now_ms) noexcept;
     [[nodiscard]] WifiTransition station_disconnected(std::uint64_t now_ms) noexcept;
     [[nodiscard]] WifiTransition tick(std::uint64_t now_ms) noexcept;

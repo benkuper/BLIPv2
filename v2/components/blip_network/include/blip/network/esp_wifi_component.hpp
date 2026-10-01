@@ -71,7 +71,7 @@ class EspWifiComponent final : public core::Component {
     [[nodiscard]] core::Status acquire_low_latency() noexcept;
     void release_low_latency() noexcept;
     // Temporarily run STA for ESP-NOW on a fixed channel without association
-    // or scanning. Keep the setup AP and restore saved networking on release.
+    // or scanning/AP advertising. Restore saved networking on release.
     [[nodiscard]] core::Status acquire_autonomous_radio(std::uint8_t channel) noexcept;
     [[nodiscard]] core::Status release_autonomous_radio() noexcept;
 

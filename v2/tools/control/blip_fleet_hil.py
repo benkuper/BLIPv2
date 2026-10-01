@@ -86,9 +86,10 @@ def main() -> int:
         report["before"] = {port: snapshot(port) for port in args.ports}
         report["latency_leases"] = {port: get(port, "low_latency_clients", "blip.transport.wifi") for port in args.ports}
         report["routerless_radio"] = {port: {name: get(port, name, "blip.transport.wifi")
-                                             for name in ("autonomous_channel", "state")}
+                                             for name in ("autonomous_channel", "state", "setup_ap_active")}
                                        for port in args.ports}
-        if any(value["autonomous_channel"] != 1 or value["state"] == 2 for value in report["routerless_radio"].values()):
+        if any(value["autonomous_channel"] != 1 or value["state"] != 6 or value["setup_ap_active"]
+               for value in report["routerless_radio"].values()):
             raise RuntimeError("fleet did not enter routerless mode")
         if any(report["latency_leases"][port] != originals[port]["low_latency_clients"] + 1 for port in args.ports):
             raise RuntimeError("fleet did not acquire its Wi-Fi latency lease")

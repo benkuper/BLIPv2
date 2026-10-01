@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "gate_id": "M5-7-FLEET-PAIR-HIL",
-  "timestamp_utc": "2026-10-01T15:08:31.488520+00:00",
+  "timestamp_utc": "2026-10-01T15:30:43.540254+00:00",
   "ports": [
     "COM10",
     "COM5"
@@ -78,9 +78,9 @@
       "active": true,
       "pending": 0,
       "clock_samples": 71,
-      "offset_us": 13864033,
+      "offset_us": 15120847,
       "uncertainty_us": 5000,
-      "sample_age_us": 240614,
+      "sample_age_us": 157283,
       "executed": 0,
       "execution_failed": 0,
       "execution_dropped": 0,
@@ -91,8 +91,8 @@
       "invalid_packets": 0,
       "maximum_lateness_us": 0,
       "last_execution_us": 0,
-      "network_stack_headroom": 4892,
-      "executor_stack_headroom": 4432
+      "network_stack_headroom": 4948,
+      "executor_stack_headroom": 4440
     }
   },
   "latency_leases": {
@@ -102,11 +102,13 @@
   "routerless_radio": {
     "COM10": {
       "autonomous_channel": 1,
-      "state": 5
+      "state": 6,
+      "setup_ap_active": false
     },
     "COM5": {
       "autonomous_channel": 1,
-      "state": 5
+      "state": 6,
+      "setup_ap_active": false
     }
   },
   "writes": [
@@ -143,7 +145,7 @@
       }
     }
   ],
-  "leader_recovery_seconds": 3.7709520000207704,
+  "leader_recovery_seconds": 2.6980576000059955,
   "rejoin_convergence": [
     {
       "leader_id": 9425086991836,
@@ -176,9 +178,9 @@
       "duplicates": 0,
       "send_failed": 0,
       "invalid_packets": 0,
-      "maximum_lateness_us": 9208,
-      "last_execution_us": 110751816,
-      "network_stack_headroom": 4628,
+      "maximum_lateness_us": 6569,
+      "last_execution_us": 86511846,
+      "network_stack_headroom": 4740,
       "executor_stack_headroom": 3248
     },
     "COM5": {
@@ -188,10 +190,10 @@
       "synchronized": true,
       "active": true,
       "pending": 0,
-      "clock_samples": 280,
-      "offset_us": 13863603,
+      "clock_samples": 284,
+      "offset_us": 15120439,
       "uncertainty_us": 5000,
-      "sample_age_us": 150227,
+      "sample_age_us": 6879,
       "executed": 6,
       "execution_failed": 0,
       "execution_dropped": 0,
@@ -200,10 +202,10 @@
       "duplicates": 81,
       "send_failed": 0,
       "invalid_packets": 0,
-      "maximum_lateness_us": 9865,
-      "last_execution_us": 105898292,
-      "network_stack_headroom": 4412,
-      "executor_stack_headroom": 3136
+      "maximum_lateness_us": 3742,
+      "last_execution_us": 79328087,
+      "network_stack_headroom": 4404,
+      "executor_stack_headroom": 3144
     }
   },
   "restored": {

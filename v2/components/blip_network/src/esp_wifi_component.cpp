@@ -60,7 +60,9 @@ constexpr std::array<core::MetadataEntry, 6> kMetadata{{
     {"secret_policy", "password-write-only"},
     {"antenna_modes", "0=board-default,1=onboard,2=external"},
 }};
-constexpr std::array<core::ParameterDescriptor, 22> kParameters{{
+constexpr std::array<core::ParameterDescriptor, 23> kParameters{{
+    {"setup_ap_active", "Setup access point is advertising", core::ValueType::boolean,
+     core::Access::read_only, false, core::ScalarValue::from_bool(false), {}, ""},
     {"autonomous_channel", "Routerless radio channel (0=normal networking)", core::ValueType::integer,
      core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "channel"},
     {"low_latency_clients", "Clients suspending Wi-Fi modem sleep", core::ValueType::integer,
@@ -667,16 +669,12 @@ core::Status EspWifiComponent::reconfigure_radio_locked() noexcept {
     }
     connect_in_progress_ = false;
     WifiConfig effective = config_;
-    if (autonomous_channel_.load() != 0U) {
-        effective.mode = WifiMode::access_point;
-        effective.ssid.clear();
-        effective.password.clear();
-    }
     if (active_boot_profile_ == RadioBootProfile::reclaim_wifi) {
         effective.enabled = false;
     }
-    const WifiTransition transition = state_machine_.apply(
-        effective, static_cast<std::uint64_t>(esp_timer_get_time()) / 1000U);
+    const WifiTransition transition = effective.enabled && autonomous_channel_.load() != 0U
+        ? state_machine_.enter_autonomous()
+        : state_machine_.apply(effective, static_cast<std::uint64_t>(esp_timer_get_time()) / 1000U);
     update_public_state_locked();
     rssi_ = -127;
     if (!effective.enabled) {
@@ -686,7 +684,7 @@ core::Status EspWifiComponent::reconfigure_radio_locked() noexcept {
     if (!status) {
         return status;
     }
-    const wifi_mode_t mode = autonomous_channel_.load() != 0U ? WIFI_MODE_APSTA : state_machine_.station_active()
+    const wifi_mode_t mode = autonomous_channel_.load() != 0U ? WIFI_MODE_STA : state_machine_.station_active()
                                  ? (state_machine_.ap_active() ? WIFI_MODE_APSTA : WIFI_MODE_STA)
                                  : WIFI_MODE_AP;
     status = platform_status(esp_wifi_set_mode(mode), "configure", "set-mode-failed");
@@ -1012,7 +1010,12 @@ core::Status EspWifiComponent::read_parameter(std::string_view id,
         return core::Status::failure(
             wifi_error(core::ErrorCode::invalid_state, "read-parameter", "not-started"));
     }
-    if (id == "autonomous_channel") {
+    if (id == "setup_ap_active") {
+        wifi_mode_t mode = WIFI_MODE_NULL;
+        const bool queried = wifi_initialized_ && esp_wifi_get_mode(&mode) == ESP_OK;
+        output = core::ScalarValue::from_bool(queried && radio_started_ &&
+            (mode == WIFI_MODE_AP || mode == WIFI_MODE_APSTA));
+    } else if (id == "autonomous_channel") {
         output = core::ScalarValue::from_integer(autonomous_channel_.load());
     } else if (id == "low_latency_clients") {
         output = core::ScalarValue::from_integer(low_latency_clients_.load());
@@ -1046,8 +1049,8 @@ core::Status EspWifiComponent::read_parameter(std::string_view id,
     } else if (id == "state") {
         output = core::ScalarValue::from_integer(static_cast<std::int64_t>(state_machine_.state()));
     } else if (id == "ip_address") {
-        esp_netif_t* netif = state_machine_.state() == WifiConnectionState::connected
-                                 ? station_netif_ : access_point_netif_;
+        esp_netif_t* netif = state_machine_.state() == WifiConnectionState::autonomous ? nullptr
+            : state_machine_.state() == WifiConnectionState::connected ? station_netif_ : access_point_netif_;
         esp_netif_ip_info_t ip_info{};
         readback_text_size_ = 0U;
         if (netif != nullptr && esp_netif_get_ip_info(netif, &ip_info) == ESP_OK) {
@@ -1360,7 +1363,7 @@ void EspWifiComponent::clear_http_root_delegate(const HttpRootDelegate& delegate
 
 bool EspWifiComponent::local_ipv4(std::span<char> output, std::size_t& size) const noexcept {
     size = 0;
-    if (!started_.load() || output.size() < 16U) {
+    if (!started_.load() || output.size() < 16U || public_state_.load() == WifiConnectionState::autonomous) {
         return false;
     }
     esp_netif_t* netif = public_state_.load() == WifiConnectionState::connected

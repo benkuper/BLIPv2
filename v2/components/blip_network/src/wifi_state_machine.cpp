@@ -64,6 +64,16 @@ WifiTransition WifiStateMachine::station_connected(std::uint64_t) noexcept {
     return transition;
 }
 
+WifiTransition WifiStateMachine::enter_autonomous() noexcept {
+    WifiTransition transition{};
+    transition.stop_ap = ap_active_;
+    station_active_ = false;
+    ap_active_ = false;
+    retry_count_ = 0;
+    set_state(WifiConnectionState::autonomous, transition);
+    return transition;
+}
+
 WifiTransition WifiStateMachine::station_disconnected(std::uint64_t now_ms) noexcept {
     WifiTransition transition{};
     if (!station_active_) {

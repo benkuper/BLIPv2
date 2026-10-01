@@ -53,12 +53,14 @@ must match on every prop. Channel settings currently permit 1?11. Fleet settings
 schema 2 migrates the earlier V2 prototype record by choosing channel 1.
 
 Active mode takes an autonomous radio lease from the Wi-Fi owner. The device
-stops association/scanning, runs ESP-NOW station radio on the fixed channel, and
-keeps its setup AP. Saved network credentials and settings are retained. Disabling
+stops association/scanning and setup AP advertising, then runs ESP-NOW station
+radio on the fixed channel. Saved network credentials and settings are retained. Disabling
 fleet releases the lease and restores saved networking. A latency lease suspends
 modem sleep while fleet is active, restoring the previous policy on release.
 The Wi-Fi controls expose `autonomous_channel`, `low_latency_clients` and
-`latency_policy_failures`. Wi-Fi RF must be enabled and its driver loaded; a boot
+`latency_policy_failures`. State 6 means autonomous radio; `setup_ap_active` reports
+the actual driver interface mode and is false in this mode. Serial and BLE can
+still control the prop. Wi-Fi RF must be enabled and its driver loaded; a boot
 profile that reclaims that driver cannot run ESP-NOW. The PC's Wi-Fi is never
 changed by the HIL helper.
 

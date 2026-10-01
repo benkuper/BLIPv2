@@ -251,6 +251,25 @@ bool station_and_ap_disconnect_retries_without_dropping_hotspot() {
     return true;
 }
 
+bool autonomous_radio_has_no_association_retry_or_access_point() {
+    WifiStateMachine machine{};
+    WifiConfig config{};
+    config.mode = WifiMode::station_and_ap;
+    BLIP_CHECK(config.ssid.assign("saved-network"));
+    BLIP_CHECK(config.password.assign("saved-password"));
+    static_cast<void>(machine.apply(config, 0));
+    BLIP_CHECK(machine.station_active() && machine.ap_active());
+    const auto autonomous = machine.enter_autonomous();
+    BLIP_CHECK(autonomous.stop_ap && machine.state() == WifiConnectionState::autonomous);
+    BLIP_CHECK(!machine.station_active() && !machine.ap_active());
+    BLIP_CHECK(!machine.tick(60000).connect_station);
+    BLIP_CHECK(!machine.station_disconnected(60000).connect_station);
+    BLIP_CHECK(machine.state() == WifiConnectionState::autonomous);
+    const auto restored = machine.apply(config, 61000);
+    BLIP_CHECK(restored.start_station && restored.connect_station && restored.start_ap);
+    return true;
+}
+
 } // namespace
 
 int main() {
@@ -263,6 +282,7 @@ int main() {
         provisioning_form_is_bounded_and_strict,
         state_machine_provisions_retries_and_recovers,
         station_and_ap_disconnect_retries_without_dropping_hotspot,
+        autonomous_radio_has_no_association_retry_or_access_point,
     };
     for (const auto test : tests) {
         if (!test()) {
