@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-01",
+  "work_packages": ["3.5", "5.5"],
+  "toolchain": "ESP-IDF 6.0.2, esptool 5.3.1",
+  "status": "factory packages generated; browser installation not yet physically tested",
+  "packages": [
+    {
+      "board": "creators-ball-v2",
+      "flash_bytes": 8388608,
+      "storage_offset_hex": "0x620000",
+      "merged_image_bytes": 8257536,
+      "merged_image_sha256": "7a2b7fc3f3275e57fc077409963a507006417b06986bda033c62431dc38a1aeb"
+    },
+    {
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "flash_bytes": 4194304,
+      "storage_offset_hex": "0x360000",
+      "merged_image_bytes": 4063232,
+      "merged_image_sha256": "2e2d134ee988a2535f313cf298fb9b8e647214947ac0f58f59f00aaa38dcb44a"
+    }
+  ],
+  "checks": {
+    "generic_installer_contract": "pass",
+    "board_specific_manifest_contract": "pass",
+    "reject_ball_build_as_xiao": "pass",
+    "real_merges": "pass",
+    "manifest_json_and_launchpad_toml_parse": "pass",
+    "source_board_images_physically_flashed": true,
+    "merged_images_physically_flashed": false,
+    "browser_web_serial_flow": "not run",
+    "ble_partition_ota_flow": "not run"
+  }
+}

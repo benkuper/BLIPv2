@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
 import sys
 import tempfile
 from pathlib import Path
@@ -113,6 +114,65 @@ def main() -> int:
         )
         hashes = json.loads((output / "hashes.json").read_text(encoding="utf-8"))
         require(set(hashes["targets"]) == set(module.TARGETS), "provenance target matrix mismatch")
+
+        ball_build = base / "ball"
+        shutil.copytree(base / "esp32c6", ball_build)
+        ball_flasher = json.loads((ball_build / "flasher_args.json").read_text(encoding="utf-8"))
+        ball_flasher["flash_settings"]["flash_size"] = "8MB"
+        ball_flasher["flash_files"]["0x620000"] = ball_flasher["flash_files"].pop("0x340000")
+        (ball_build / "flasher_args.json").write_text(json.dumps(ball_flasher), encoding="utf-8")
+        (ball_build / "CMakeCache.txt").write_text(
+            "BLIP_ENABLE_BLE:BOOL=ON\nBLIP_BOARD_CREATORS_BALL_V2:UNINITIALIZED=ON\n",
+            encoding="utf-8",
+        )
+        (ball_build / "sdkconfig").write_text(
+            'CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions-8mb.csv"\n',
+            encoding="utf-8",
+        )
+        ball_output = base / "ball-output"
+        sys.argv = [str(BUILDER_PATH), "--board-id", "creators-ball-v2",
+                    "--board-build", str(ball_build), "--output", str(ball_output)]
+        try:
+            require(module.main() == 0, "Ball BLE installer builder failed")
+        finally:
+            sys.argv = previous
+        ball_manifest = json.loads((ball_output / "manifest.json").read_text(encoding="utf-8"))
+        ball_hashes = json.loads((ball_output / "hashes.json").read_text(encoding="utf-8"))
+        require(len(ball_manifest["builds"]) == 1, "Ball manifest must contain one board build")
+        require(ball_manifest["builds"][0]["chipFamily"] == "ESP32-C6", "Ball target drifted")
+        require(ball_hashes["targets"]["esp32c6"]["storage_offset"] == 0x620000,
+                "Ball storage offset drifted")
+        require(ball_hashes["targets"]["esp32c6"]["flash_bytes"] == 8 * 1024 * 1024,
+                "Ball flash size drifted")
+
+        xiao_build = base / "xiao"
+        shutil.copytree(base / "esp32c6", xiao_build)
+        xiao_flasher = json.loads((xiao_build / "flasher_args.json").read_text(encoding="utf-8"))
+        xiao_flasher["flash_files"]["0x360000"] = xiao_flasher["flash_files"].pop("0x340000")
+        (xiao_build / "flasher_args.json").write_text(json.dumps(xiao_flasher), encoding="utf-8")
+        (xiao_build / "CMakeCache.txt").write_text("BLIP_ENABLE_BLE:BOOL=ON\n",
+                                                  encoding="utf-8")
+        (xiao_build / "sdkconfig").write_text(
+            'CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions-ble-4mb.csv"\n',
+            encoding="utf-8",
+        )
+        xiao_output = base / "xiao-output"
+        sys.argv = [str(BUILDER_PATH), "--board-id", "seeed-xiao-esp32c6-chip-antenna",
+                    "--board-build", str(xiao_build), "--output", str(xiao_output)]
+        try:
+            require(module.main() == 0, "XIAO BLE installer builder failed")
+        finally:
+            sys.argv = previous
+        xiao_hashes = json.loads((xiao_output / "hashes.json").read_text(encoding="utf-8"))
+        require(xiao_hashes["targets"]["esp32c6"]["storage_offset"] == 0x360000,
+                "XIAO storage offset drifted")
+        try:
+            module.load_build(ball_build, "esp32c6", "4MB", 0x360000,
+                              "seeed-xiao-esp32c6-chip-antenna")
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("Ball build was accepted as XIAO BLE")
 
     print("PASS browser installer manifests")
     return 0
