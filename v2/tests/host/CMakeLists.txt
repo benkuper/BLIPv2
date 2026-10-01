@@ -55,6 +55,7 @@ add_test(NAME blip_ota_tests COMMAND blip_ota_tests)
 add_library(blip_transport_host STATIC
     ../../components/blip_transport/src/ble_fragments.cpp
     ../../components/blip_transport/src/envelope.cpp
+    ../../components/blip_transport/src/espnow_frames.cpp
     ../../components/blip_transport/src/legacy_serial_v1.cpp
     ../../components/blip_transport/src/serial_protocol.cpp
 )
@@ -80,6 +81,14 @@ else()
     target_compile_options(blip_ble_fragments_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_ble_fragments_tests COMMAND blip_ble_fragments_tests)
+add_executable(blip_espnow_frames_tests blip_espnow_frames_tests.cpp)
+target_link_libraries(blip_espnow_frames_tests PRIVATE blip_transport_host)
+if(MSVC)
+    target_compile_options(blip_espnow_frames_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_espnow_frames_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_espnow_frames_tests COMMAND blip_espnow_frames_tests)
 add_test(
     NAME blip_serial_control_self_test
     COMMAND ${Python3_EXECUTABLE}
