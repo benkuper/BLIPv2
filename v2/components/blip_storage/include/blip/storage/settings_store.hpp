@@ -7,6 +7,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <mutex>
 #include <span>
 #include <string_view>
 
@@ -104,6 +105,9 @@ class SettingsStore {
 
     BlobStore* backend_{};
     std::span<std::byte> scratch_{};
+    // All components share this transaction buffer. Control transports and the
+    // fleet executor may load/save concurrently; protect the whole generation.
+    std::mutex transaction_mutex_{};
 };
 
 } // namespace blip::storage

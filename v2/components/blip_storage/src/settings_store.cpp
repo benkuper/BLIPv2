@@ -372,6 +372,7 @@ bool SettingsStore::overlaps(std::span<const std::byte> first,
 
 core::Result<LoadedSettings> SettingsStore::load(const core::ComponentDescriptor& descriptor,
                                                  std::span<std::byte> output) noexcept {
+    const std::lock_guard transaction_lock{transaction_mutex_};
     const auto descriptor_status = validate_descriptor(descriptor, "load");
     if (!descriptor_status) {
         return core::Result<LoadedSettings>::failure(descriptor_status.error());
@@ -424,6 +425,7 @@ core::Result<LoadedSettings> SettingsStore::load(const core::ComponentDescriptor
 
 core::Status SettingsStore::save(const core::ComponentDescriptor& descriptor,
                                  std::span<const std::byte> payload) noexcept {
+    const std::lock_guard transaction_lock{transaction_mutex_};
     const auto descriptor_status = validate_descriptor(descriptor, "save");
     if (!descriptor_status) {
         return descriptor_status;

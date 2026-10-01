@@ -2,11 +2,14 @@
 #include "test_harness.hpp"
 
 #include <array>
+#include <atomic>
+#include <barrier>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <span>
 #include <string_view>
+#include <thread>
 
 namespace {
 
@@ -374,6 +377,36 @@ bool components_are_isolated() {
     return true;
 }
 
+bool concurrent_component_transactions_remain_isolated() {
+    constexpr auto alpha = descriptor("test.concurrent-alpha", 1);
+    constexpr auto beta = descriptor("test.concurrent-beta", 1);
+    FakeBlobStore backend{};
+    std::array<std::byte, kBlobCapacity> scratch{};
+    SettingsStore store{backend, scratch};
+    std::barrier ready{2};
+    std::atomic<bool> passed{true};
+    auto worker = [&](const ComponentDescriptor& component, std::byte marker) {
+        ready.arrive_and_wait();
+        for (std::uint8_t generation = 1; generation <= 100; ++generation) {
+            const std::array value{marker, static_cast<std::byte>(generation)};
+            if (!store.save(component, value)) { passed.store(false); return; }
+            std::this_thread::yield();
+            std::array<std::byte, 2> output{};
+            const auto loaded = store.load(component, output);
+            if (!loaded || loaded.value().generation != generation || output != value) {
+                passed.store(false);
+                return;
+            }
+        }
+    };
+    std::thread first{worker, std::cref(alpha), std::byte{0xaa}};
+    std::thread second{worker, std::cref(beta), std::byte{0xbb}};
+    first.join();
+    second.join();
+    BLIP_CHECK(passed.load());
+    return true;
+}
+
 bool bounded_failures_are_explicit() {
     constexpr auto component = descriptor("test.bounds", 1);
     constexpr std::array<std::uint8_t, 16> value{};
@@ -405,6 +438,7 @@ int main() {
         {"torn commit fallback", torn_commit_uses_highest_valid_generation},
         {"corrupt record diagnosis", corrupt_only_record_is_diagnosed},
         {"per-component isolation", components_are_isolated},
+        {"concurrent component transactions", concurrent_component_transactions_remain_isolated},
         {"bounded storage failures", bounded_failures_are_explicit},
     };
     return run_tests(tests);

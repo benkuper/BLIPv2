@@ -139,7 +139,8 @@ add_library(blip_storage_host STATIC
     ../../components/blip_storage/src/web_asset_store.cpp
 )
 target_include_directories(blip_storage_host PUBLIC ../../components/blip_storage/include)
-target_link_libraries(blip_storage_host PUBLIC blip_core_host)
+find_package(Threads REQUIRED)
+target_link_libraries(blip_storage_host PUBLIC blip_core_host Threads::Threads)
 target_compile_features(blip_storage_host PUBLIC cxx_std_20)
 
 add_executable(blip_storage_tests blip_storage_tests.cpp)
