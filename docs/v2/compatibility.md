@@ -29,9 +29,9 @@ the default disposition for later implementation. A change from **preserve** or
 | Playback metadata | JSON `.meta` with `fps`, `group`, `id`, `groupColor`, optional `scripts` | **Import** with strict bounds and defaults | `.meta` fixture |
 | Playback pixels | raw `.colors`; active profile uses 8-bit bytes in A,R,G,B order, frame size `pixel_count * 4` | **Import**; V2 native format declares version, format, dimensions, and checksum | `.colors` fixture and golden decoded frames |
 | Art-Net/DMX mapping | universes and one-based channels map to RGB/RGBA, optional 16-bit values | **Preserve** in optional components | packet/channel vector tests |
-| ESP-NOW control | unversioned type byte plus native-sized values | **Legacy negotiation/adapter** alongside a versioned V2 protocol; never emit legacy until peer mode is known | raw packet fixtures and mixed-fleet tests |
-| ESP-NOW stream | type 1, big-endian universe/start channel, raw RGB triples | **Legacy negotiation/adapter** | raw stream fixture |
-| ESP-NOW pairing/wake | types 2, 3, and 4 | **Legacy negotiation/adapter** with bounded state machine | raw packet fixtures |
+| ESP-NOW control | unversioned type byte plus native-sized values | **Excluded**; V2-only packets are versioned and bounded | V2 peer, loss, reorder, and duplicate tests |
+| ESP-NOW stream | type 1, big-endian universe/start channel, raw RGB triples | **Excluded**; V2 streaming uses its own transport design | V1 fixture retained only as historical evidence |
+| ESP-NOW pairing/wake | types 2, 3, and 4 | **Excluded**; V2 pairing and wake require their own design | V1 fixture retained only as historical evidence |
 | WASM scripts | wasm3 module plus central native function bindings and dynamic events/parameters | **Source/API migration**, not binary ABI promise; capability manifest is versioned | later WASM SDK fixtures |
 | Empty/incomplete components | Sequence, RF24 placeholder, incomplete DC motor | **No parity claim** until a public use/capture is supplied; do not reproduce build breakage | issue evidence record |
 | Parser bugs/unsafe behavior | overreads, unbounded assumptions, non-atomic save, tokenizer quirks | **Intentionally not preserved** except benign lexical quirks in explicit legacy mode | fuzz and fault-injection tests |

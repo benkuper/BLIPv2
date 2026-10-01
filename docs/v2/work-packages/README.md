@@ -60,3 +60,4 @@ wire protocols, or public OSC paths.
 | [5.3](5.3-pm-dfs.md) | DFS with pixel-frame CPU locks; physical power measurements open |
 | [5.4](5.4-wifi-radio-profiles.md) | Live Wi-Fi suspension and reboot-applied driver memory reclamation; BLE and ESP-NOW profiles open |
 | [5.5 Bluetooth transports](5.5-ble-transport-foundation.md) | NimBLE GATT on six boards and Classic SPP on two original ESP32 boards; remaining coexistence and power qualification open |
+| [5.6 ESP-NOW V2](5.6-espnow-v2.md) | Bounded V2 peer control, ACK/retry and duplicate suppression; two-board C6 HIL passed, six-board gate open |

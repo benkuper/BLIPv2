@@ -17,6 +17,9 @@
 #include "blip/storage/littlefs_storage_component.hpp"
 #include "blip/storage/nvs_settings_component.hpp"
 #include "blip/transport/esp_serial_transport_component.hpp"
+#if defined(BLIP_ENABLE_ESPNOW)
+#include "blip/transport/esp_espnow_transport_component.hpp"
+#endif
 #if defined(BLIP_ENABLE_BLE)
 #include "blip/transport/esp_ble_transport_component.hpp"
 #endif
@@ -230,6 +233,10 @@ blip::transport::EspBleTransportComponent ble_transport_component{
 blip::transport::EspClassicTransportComponent classic_transport_component{
     control_component, settings_component.settings()};
 #endif
+#if defined(BLIP_ENABLE_ESPNOW)
+blip::transport::EspEspNowTransportComponent espnow_transport_component{
+    control_component, settings_component.settings(), wifi_component};
+#endif
 #if defined(CONFIG_IDF_TARGET_ESP32) && \
     (defined(BLIP_ENABLE_BLE) || defined(BLIP_ENABLE_CLASSIC_BT))
 // The original ESP32 reserves a fixed DRAM region for its BT controller. Keep
@@ -318,6 +325,12 @@ void reject_pending_update() noexcept {
 #if defined(BLIP_ENABLE_CLASSIC_BT)
         const auto classic_status = registry.add(classic_transport_component);
         if (!classic_status) {
+            return false;
+        }
+#endif
+#if defined(BLIP_ENABLE_ESPNOW)
+        const auto espnow_status = registry.add(espnow_transport_component);
+        if (!espnow_status) {
             return false;
         }
 #endif
@@ -503,6 +516,11 @@ extern "C" void app_main() {
 #if defined(BLIP_ENABLE_CLASSIC_BT)
     if (!safe_mode) {
         classic_transport_component.enable_control();
+    }
+#endif
+#if defined(BLIP_ENABLE_ESPNOW)
+    if (!safe_mode) {
+        espnow_transport_component.enable_control();
     }
 #endif
     const auto& diagnostics = diagnostics_component.snapshot();

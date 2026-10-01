@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5-6-ESPNOW-V2",
+  "state": "partial",
+  "timestamp_utc": "2026-10-01T10:07:32Z",
+  "host_tests": {
+    "command": "ctest --test-dir build/host-m4 -C Release -R blip_espnow_frames_tests|blip_transport_tests|blip_ble_fragments_tests --output-on-failure",
+    "result": "3 of 3 passed",
+    "espnow_cases": ["maximum envelope", "out-of-order fragments", "lost fragment", "lost ACK", "duplicate delivery", "stale ACK", "malformed header", "sequence wrap"]
+  },
+  "builds": [
+    {"board": "Seeed XIAO ESP32-C6", "profile": "m8-espnow-xiao", "app_bytes": 1283200, "app_partition_bytes": 1638400, "result": "pass"},
+    {"board": "Creators Ball V2", "profile": "m8-espnow-ball", "ble_included": true, "app_bytes": 1675424, "app_partition_bytes": 3145728, "result": "pass"}
+  ],
+  "hardware": {
+    "shared_wifi": true,
+    "computer_switched_to_blip_ap": false,
+    "xiao": {"port": "COM13", "station_mac": "10:51:db:1a:a6:68", "espnow_active": true, "wifi_state": 2},
+    "creators_ball_v2": {"port": "COM10", "station_mac": "08:92:72:f6:4d:dc", "espnow_active": true, "ble_active": true, "wifi_state": 2},
+    "simultaneous_remote_reads": "both directions returned valid integer values",
+    "xiao_to_ball_integer_write": {"value": 37, "remote_read": 37, "direct_serial_read": 37, "retries": 0},
+    "ball_to_xiao_integer_write": {"value": 42, "remote_read": 42, "direct_serial_read": 42, "retries": 0},
+    "string_response": "Ball read the XIAO station MAC over ESP-NOW",
+    "fragmented_request": {
+      "component_id_bytes": 63,
+      "control_id_bytes": 31,
+      "value_bytes": 128,
+      "control_envelope_bytes": 262,
+      "radio_fragments": 2,
+      "expected_result": "unknown component",
+      "ball_received_requests_before": 1,
+      "ball_received_requests_after": 2,
+      "xiao_retries": 0,
+      "ball_rejected_packets": 0
+    },
+    "live_disable_and_recovery": {
+      "ball_espnow_active_while_disabled": false,
+      "ball_ble_active_while_disabled": true,
+      "xiao_remote_read_while_disabled": "failed after bounded retries",
+      "xiao_retries": 5,
+      "ball_espnow_active_after_reenable": true,
+      "xiao_remote_read_after_reenable": 0
+    },
+    "peer_initiated_disable": {
+      "ball_remote_write_boolean_result": "success",
+      "xiao_espnow_active_after_write": false,
+      "xiao_wifi_state_after_write": 2,
+      "serial_reenable_result": "success",
+      "ball_remote_read_after_reenable": 19
+    },
+    "settings_persisted_across_flash_reset": true
+  },
+  "open": ["six-board ESP-NOW build gate", "long radio soak", "authenticated peer control"]
+}

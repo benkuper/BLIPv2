@@ -76,7 +76,7 @@ flowchart LR
 | `5.3` | Power management, sleep, wake | `5.1`, `1.5` | coordinated locks and measured sleep profiles |
 | `5.4` | RadioManager policies | `1.4`, `2.6`, `5.3` | explicit live-suspend/reboot-reclaim radio profiles |
 | `5.5` | NimBLE transport; optional ESP32 Classic BT | `5.4`, `2.5` | removable BLE service/serial transport |
-| `5.6` | Versioned ESP-NOW and V1 negotiation | `5.4`, `2.5`, `0.2` | bounded V2 protocol, ACK/fragment/dedup, mixed-fleet adapter |
+| `5.6` | Versioned V2 ESP-NOW | `5.4`, `2.5` | bounded V2 protocol, ACK/fragment/dedup, peer HIL |
 | `5.7` | Fleet clock, leader election, scheduled cues | `5.6`, `1.5` | non-blocking autonomous coordination |
 | `6.1` | wasm3/WAMR target benchmark | `GC`, `1.1` | reproducible benchmark and runtime ADR |
 | `6.2` | Runtime-neutral WASM service | `6.1`, `1.3` | replaceable runtime interface |

@@ -41,6 +41,7 @@ class EspNowTransmit {
     [[nodiscard]] std::size_t fragment(std::size_t index,
                                        std::span<std::byte> output) const noexcept;
     [[nodiscard]] bool acknowledge(const EspNowPacketView& packet) noexcept;
+    void reset() noexcept { pending_ = false; }
     [[nodiscard]] bool pending() const noexcept { return pending_; }
     [[nodiscard]] std::size_t fragment_count() const noexcept { return fragment_count_; }
 
