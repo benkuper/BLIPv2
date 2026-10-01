@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "gate_id": "M5-3-HUZZAH32-TIMED-DEEP-SLEEP",
+  "state": "partial",
+  "timestamp_utc": "2026-10-01T00:23:43Z",
+  "board": "Adafruit HUZZAH32",
+  "port": "COM5",
+  "firmware_sha256": "b562e4a0290cf8920bc92cdbfca972a2aa78e55381199b67b1724f9298cdec00",
+  "flash": "OTA selector and app image written; esptool verified both regions",
+  "deep_sleep_hil": {
+    "requested_ms": 2000,
+    "first_boot_sequence": [1, 2],
+    "repeat_boot_sequence": [2, 3],
+    "booted_from_deep_sleep": true,
+    "boot_wake_cause_mask": 16,
+    "timer_wake_bit": 16,
+    "reset_cause": 8,
+    "reset_cause_name": "deep_sleep",
+    "restored_wifi_enabled": true,
+    "restored_strip_enabled": true,
+    "restoration_errors": [],
+    "passed": true
+  },
+  "light_sleep_regression_on_intermediate_image": {
+    "requested_ms": 2000,
+    "last_sleep_us": 1999942,
+    "wake_cause_mask": 16,
+    "last_error": 0,
+    "passed": true
+  },
+  "builds": [
+    {"board": "Creators Ball V2", "profile": "m4-e131-ball-c6", "bytes": 1289200, "sha256": "0d46ded8f511e6e08e0557d4615225048d9dd7acdb7593e0dde0b9c188775d93", "result": "pass"},
+    {"board": "Creators Tab", "profile": "m4-e131-creators-tab", "bytes": 1140048, "sha256": "84c86c75cf06cc286321503e185840d61322cc9489735fd97e5626524258e876", "result": "pass"},
+    {"board": "Adafruit HUZZAH32", "profile": "m4-e131-huzzah32", "bytes": 1163936, "sha256": "b562e4a0290cf8920bc92cdbfca972a2aa78e55381199b67b1724f9298cdec00", "result": "pass"},
+    {"board": "M5Dial", "profile": "m4-e131-m5dial", "bytes": 1130240, "sha256": "dc2f7f949e5333d45326ca2547caf6d0917df507f9c34c1b2bffd7a8ab3b8aff", "result": "pass"},
+    {"board": "M5StickC", "profile": "m4-e131-m5stickc", "bytes": 1138848, "sha256": "147fe59669ce4e6f68486e185d07b9b5eeb0e5d67f1309e9a0966d014eb07802", "result": "pass"},
+    {"board": "Seeed XIAO ESP32-C6", "profile": "m4-e131-xiao-c6", "bytes": 1273424, "sha256": "a59c75cbdb4ec8bec0b41874d33f7b201a9d1e6ba08f64960a412bce76a33525", "result": "pass"}
+  ],
+  "limits": [
+    "No physical sleep-current measurement was made.",
+    "Deep sleep is currently enabled only on the USB-powered HUZZAH32 profile.",
+    "Board power-latch wake paths and PM locks remain open."
+  ]
+}

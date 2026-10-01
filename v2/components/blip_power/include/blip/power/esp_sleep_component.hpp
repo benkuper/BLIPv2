@@ -11,7 +11,7 @@
 
 namespace blip::power {
 
-// Manual, timer-bounded sleep for the USB-powered HUZZAH32 qualification rig.
+// Manual, timer-bounded light/deep sleep for the USB-powered HUZZAH32 rig.
 // Other boards need their power-latch and wake circuits qualified first.
 class EspSleepComponent final : public core::Component {
   public:
@@ -44,11 +44,14 @@ class EspSleepComponent final : public core::Component {
     std::atomic<bool> running_{};
     std::atomic<bool> quiesced_{true};
     std::atomic<std::uint32_t> state_{}; // 0 idle, 1 pending, 2 sleeping, 3 woke, 4 failed
+    std::atomic<std::uint32_t> requested_mode_{}; // 0 light, 1 deep
     std::atomic<std::uint32_t> requested_ms_{};
     std::atomic<std::uint32_t> completed_{};
     std::atomic<std::uint32_t> wake_cause_{};
     std::atomic<std::uint32_t> last_error_{};
     std::atomic<std::uint64_t> last_sleep_us_{};
+    std::uint32_t boot_wake_cause_{};
+    bool booted_from_deep_sleep_{};
 };
 
 } // namespace blip::power

@@ -20,7 +20,7 @@ namespace {
 
 constexpr char kTag[] = "blip_diagnostics";
 constexpr std::array<std::string_view, 1> kProvidedServices{"diagnostics.runtime"};
-constexpr std::array<ParameterDescriptor, 4> kParameters{{
+constexpr std::array<ParameterDescriptor, 6> kParameters{{
     {"log_level",
      "Default log level",
      ValueType::integer,
@@ -35,6 +35,10 @@ constexpr std::array<ParameterDescriptor, 4> kParameters{{
      Access::read_only, false, ScalarValue::from_integer(0), {}, "bytes"},
     {"heap_largest_internal", "Largest free internal block", ValueType::integer,
      Access::read_only, false, ScalarValue::from_integer(0), {}, "bytes"},
+    {"boot_sequence", "Boot sequence", ValueType::integer, Access::read_only,
+     false, ScalarValue::from_integer(0), {}, "boots"},
+    {"reset_cause", "Reset cause", ValueType::integer, Access::read_only,
+     false, ScalarValue::from_integer(0), {}, "enum"},
 }};
 constexpr std::array<ActionDescriptor, 2> kActions{{
     {"clear_safe_mode", "Clear safe mode on next reboot", {}},
@@ -351,6 +355,10 @@ Status EspDiagnosticsComponent::read_parameter(std::string_view id, ScalarValue&
     } else if (id == "heap_largest_internal") {
         output = ScalarValue::from_integer(
             heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+    } else if (id == "boot_sequence") {
+        output = ScalarValue::from_integer(snapshot_.boot.boot_sequence);
+    } else if (id == "reset_cause") {
+        output = ScalarValue::from_integer(static_cast<std::int64_t>(snapshot_.boot.reset_cause));
     } else {
         return Status::failure(
             diagnostics_error(ErrorCode::not_found, "read-parameter", "parameter-not-found"));

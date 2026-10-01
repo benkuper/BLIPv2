@@ -2,6 +2,7 @@
 
 #include "driver/uart.h"
 #include "esp_sleep.h"
+#include "esp_system.h"
 #include "esp_timer.h"
 
 #include <array>
@@ -11,7 +12,7 @@ namespace blip::power {
 namespace {
 constexpr std::array<std::string_view, 1> kServices{"power.sleep"};
 constexpr std::array<std::string_view, 2> kDependencies{"transport.wifi", "output.pixel-strip"};
-constexpr std::array<core::ParameterDescriptor, 5> kParameters{{
+constexpr std::array<core::ParameterDescriptor, 7> kParameters{{
     {"state", "Sleep state", core::ValueType::integer, core::Access::read_only, false,
      core::ScalarValue::from_integer(0), {true, 0, 4, 1}, ""},
     {"completed", "Completed sleeps", core::ValueType::integer, core::Access::read_only, false,
@@ -22,12 +23,17 @@ constexpr std::array<core::ParameterDescriptor, 5> kParameters{{
      core::ScalarValue::from_integer(0), {}, ""},
     {"last_sleep_us", "Last measured sleep interval", core::ValueType::integer,
      core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "us"},
+    {"boot_wake_cause", "Wake cause at boot", core::ValueType::integer,
+     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, ""},
+    {"booted_from_deep_sleep", "Boot followed deep sleep", core::ValueType::boolean,
+     core::Access::read_only, false, core::ScalarValue::from_bool(false), {}, ""},
 }};
 constexpr std::array<core::FieldDescriptor, 1> kSleepArguments{{
     {"duration_ms", core::ValueType::integer, true},
 }};
-constexpr std::array<core::ActionDescriptor, 1> kActions{{
+constexpr std::array<core::ActionDescriptor, 2> kActions{{
     {"light_sleep", "Timer-bounded light sleep (1000-30000 ms)", kSleepArguments},
+    {"deep_sleep", "Timer-bounded deep sleep (1000-30000 ms)", kSleepArguments},
 }};
 
 [[nodiscard]] constexpr core::ComponentDescriptor sleep_descriptor() noexcept {
@@ -35,7 +41,7 @@ constexpr std::array<core::ActionDescriptor, 1> kActions{{
     descriptor.schema_version = 1;
     descriptor.id = "blip.power.sleep";
     descriptor.display_name = "HUZZAH32 timed sleep";
-    descriptor.description = "Manual light sleep with mandatory timer wake and idle radio/LED preconditions";
+    descriptor.description = "Manual light/deep sleep with mandatory timer wake and idle radio/LED preconditions";
     descriptor.provided_services = kServices;
     descriptor.required_services = kDependencies;
     descriptor.parameters = kParameters;
@@ -63,6 +69,8 @@ core::Status EspSleepComponent::start(const core::StartContext&) noexcept {
     if (running_.load()) {
         return core::Status::success();
     }
+    booted_from_deep_sleep_ = esp_reset_reason() == ESP_RST_DEEPSLEEP;
+    boot_wake_cause_ = booted_from_deep_sleep_ ? esp_sleep_get_wakeup_causes() : 0U;
     quiesced_.store(false);
     running_.store(true);
     task_handle_ = xTaskCreateStatic(task_entry, "blip_sleep", task_stack_.size(), this, 4,
@@ -115,6 +123,10 @@ core::Status EspSleepComponent::read_parameter(std::string_view id,
         output = core::ScalarValue::from_integer(last_error_.load());
     } else if (id == "last_sleep_us") {
         output = core::ScalarValue::from_integer(last_sleep_us_.load());
+    } else if (id == "boot_wake_cause") {
+        output = core::ScalarValue::from_integer(boot_wake_cause_);
+    } else if (id == "booted_from_deep_sleep") {
+        output = core::ScalarValue::from_bool(booted_from_deep_sleep_);
     } else {
         return sleep_error(core::ErrorCode::not_found, "read-parameter", "parameter-not-found");
     }
@@ -126,7 +138,7 @@ core::Status EspSleepComponent::invoke_action(std::string_view id,
                                                std::span<core::ScalarValue>,
                                                std::size_t& output_count) noexcept {
     output_count = 0;
-    if (id != "light_sleep") {
+    if (id != "light_sleep" && id != "deep_sleep") {
         return sleep_error(core::ErrorCode::not_found, "invoke-action", "action-not-found");
     }
     if (!running_.load() || arguments.size() != 1 ||
@@ -143,6 +155,7 @@ core::Status EspSleepComponent::invoke_action(std::string_view id,
             return sleep_error(core::ErrorCode::invalid_state, "invoke-action", "sleep-busy");
         }
     } while (!state_.compare_exchange_weak(previous, 1));
+    requested_mode_.store(id == "deep_sleep" ? 1U : 0U);
     requested_ms_.store(static_cast<std::uint32_t>(arguments[0].integer));
     xTaskNotifyGive(task_handle_);
     return core::Status::success();
@@ -169,6 +182,16 @@ void EspSleepComponent::run() noexcept {
             continue;
         }
         const std::uint64_t duration_us = static_cast<std::uint64_t>(requested_ms_.load()) * 1000U;
+        if (requested_mode_.load() == 1U) {
+            // This call returns only if IDF rejects the sleep request. A timer
+            // wake starts a fresh boot and exposes boot_wake_cause afterward.
+            state_.store(2);
+            const esp_err_t rejected = esp_deep_sleep_try(duration_us);
+            static_cast<void>(esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER));
+            last_error_.store(rejected);
+            state_.store(4);
+            continue;
+        }
         const esp_err_t armed = esp_sleep_enable_timer_wakeup(duration_us);
         if (armed != ESP_OK) {
             last_error_.store(armed);
