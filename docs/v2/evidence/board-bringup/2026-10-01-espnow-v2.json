@@ -2,7 +2,7 @@
   "schema_version": 1,
   "gate_id": "M5-7-ESPNOW-V2",
   "state": "passed",
-  "timestamp_utc": "2026-10-01T10:59:05Z",
+  "timestamp_utc": "2026-10-01T11:04:39Z",
   "host_tests": {
     "command": "ctest --test-dir build/host-m4 -C Release -R blip_espnow_frames_tests|blip_transport_tests|blip_ble_fragments_tests --output-on-failure",
     "result": "3 of 3 passed",
@@ -40,7 +40,7 @@
                  "brightness": 102, "red_test_applied_frames": 1, "failed_frames": 0,
                  "estimated_current_ma": 157, "last_logical_pixel_stream_action": "success",
                  "applied_frames_after_stream_action": 5, "blackout_and_disable": "success",
-                 "visual_confirmation": "not observed"},
+                 "visual_confirmation": "user confirmed all LED sections showed correct and steady red, green, and blue"},
       "espnow_active_after_test": false
     },
     "post_test_observation": {
@@ -49,8 +49,25 @@
       "boot_signature": "V1 application after a later reset",
       "v2_flash_still_present": false,
       "readback": "bootloader, partition table, and app0 headers no longer matched the V2 image; app1 was erased",
-      "cause": "unknown; another flash operation after the V2 HIL is consistent with the readback",
+      "cause": "user confirmed concurrent work on the Club's BLIP V1 firmware caused the reflash",
       "computer_wifi_internet": true
+    },
+    "creators_club_visual_followup": {
+      "time_utc": "2026-10-01T11:04:39Z",
+      "v2_factory_image_reinstalled": true,
+      "flash_hash_verified": true,
+      "serial_protocol": 3,
+      "logical_pixels": 32,
+      "brightness_during_test": 32,
+      "pattern": "red, green, blue; five seconds per color; two cycles",
+      "user_observation": "All colors correct and steady",
+      "applied_frames": 18,
+      "failed_frames": 0,
+      "final_strip_enabled": false,
+      "final_brightness": 102,
+      "shared_wifi_reprovisioned": true,
+      "final_wifi_state": 2,
+      "computer_switched_to_blip_ap": false
     },
     "simultaneous_remote_reads": "both directions returned valid integer values",
     "xiao_to_ball_integer_write": {"value": 37, "remote_read": 37, "direct_serial_read": 37, "retries": 0},
@@ -85,5 +102,5 @@
     },
     "settings_persisted_across_flash_reset": true
   },
-  "open": ["long radio soak", "authenticated peer control", "Creators Club visible SK9822 output qualification", "identify the later Creators Club reflash before using it for further V2 HIL"]
+  "open": ["long radio soak", "authenticated peer control"]
 }

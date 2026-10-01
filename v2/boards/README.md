@@ -54,6 +54,9 @@ IMU, button, battery, and IR pins are reserved in the manifest; those devices
 do not yet have V2 components. V1 lists GPIO3 as charge sense, overlapping
 the ESP32 UART0 RX used by the USB serial bridge, so no charge sense driver
 claims that pin.
+The V2 full-strip red, green, and blue check was visually confirmed on
+2026-10-01; the SPI driver reported zero failed frames. Timing captures and
+physical current calibration remain separate qualification work.
 
 `m5stack-m5stickc.json` uses the M5Stack StickC pin map and the dormant V1
 M5StickC profile. Build it with `-DBLIP_BOARD_M5STICKC=ON`. The current pixel
