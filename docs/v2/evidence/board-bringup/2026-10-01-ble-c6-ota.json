@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-01",
+  "work_packages": ["3.3", "3.5", "5.5"],
+  "method": "HTTP application OTA over shared Wi-Fi, uploading the same version as the factory image",
+  "computer_joined_blip_ap": false,
+  "boards": [
+    {
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "partition_profile": "partitions-ble-4mb.csv",
+      "app_image_bytes": 1630048,
+      "ble_active_during_upload": true,
+      "ota_http_result": 202,
+      "post_reboot_ota_state": "confirmed",
+      "post_reboot_ble_gatt_active": true,
+      "post_reboot_http_root_status": 200
+    },
+    {
+      "board": "creators-ball-v2",
+      "partition_profile": "partitions-8mb.csv",
+      "app_image_bytes": 1646576,
+      "ble_active_attempt": "Client timed out after 300 seconds; board remained reachable with OTA state confirmed and no reported upload progress",
+      "ble_suspended_retry": "HTTP 202 accepted in about 10 seconds",
+      "post_reboot_ota_state": "confirmed",
+      "post_reboot_ble_reenabled": true,
+      "post_reboot_http_root_status": 200
+    }
+  ],
+  "limits": [
+    "The application image version was unchanged; this checks alternate-slot writing and confirmed reboot, not version migration",
+    "The browser Web Serial installer and browser OTA UI were not exercised",
+    "Ball sustained Wi-Fi transfer while BLE is active needs diagnosis"
+  ]
+}

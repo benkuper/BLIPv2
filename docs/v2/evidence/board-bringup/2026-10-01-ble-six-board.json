@@ -86,6 +86,7 @@
     "Creators Tab reliable Wi-Fi and BLE coexistence on a suitable power source",
     "Mixed BLE, Wi-Fi and LED traffic soak on six boards",
     "Optional Classic Bluetooth profile on original ESP32",
-    "Browser installation and OTA flow for BLE-specific partition layouts"
+    "Browser Web Serial installation for BLE-specific partition layouts",
+    "Creators Ball sustained Wi-Fi transfer while BLE is active"
   ]
 }

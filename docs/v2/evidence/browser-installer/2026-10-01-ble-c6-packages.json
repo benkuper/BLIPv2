@@ -28,6 +28,6 @@
     "source_board_images_physically_flashed": true,
     "merged_images_physically_flashed": false,
     "browser_web_serial_flow": "not run",
-    "ble_partition_ota_flow": "not run"
+    "ble_partition_ota_flow": "passed on XIAO with BLE active and Ball with BLE suspended; see board-bringup/2026-10-01-ble-c6-ota.json"
   }
 }
