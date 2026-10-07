@@ -1,6 +1,7 @@
 #include "blip/transport/esp_serial_transport_component.hpp"
 
 #include "driver/uart.h"
+#include "driver/uart_vfs.h"
 #include "esp_err.h"
 #include "soc/soc_caps.h"
 
@@ -80,6 +81,7 @@ core::Status EspSerialTransportComponent::install_driver() noexcept {
 #else
     if (uart_is_driver_installed(UART_NUM_0)) {
         driver_owned_ = false;
+        uart_vfs_dev_use_driver(UART_NUM_0);
         return core::Status::success();
     }
     if (uart_driver_install(UART_NUM_0, 1024, 1024, 0, nullptr, 0) != ESP_OK) {
@@ -93,6 +95,10 @@ core::Status EspSerialTransportComponent::install_driver() noexcept {
         return core::Status::failure(
             serial_error(core::ErrorCode::start_failed, "install-driver", "uart-baud-failed"));
     }
+    // Console polling writes bypass the driver's TX lock and can collide with
+    // binary replies. Route stdio through the same driver before enabling
+    // control; a whole framed uart_write_bytes call then owns the TX lock.
+    uart_vfs_dev_use_driver(UART_NUM_0);
 #endif
     driver_owned_ = true;
     return core::Status::success();
@@ -105,6 +111,7 @@ core::Status EspSerialTransportComponent::uninstall_driver() noexcept {
 #if SOC_USB_SERIAL_JTAG_SUPPORTED
     const esp_err_t result = usb_serial_jtag_driver_uninstall();
 #else
+    uart_vfs_dev_use_nonblocking(UART_NUM_0);
     const esp_err_t result = uart_driver_delete(UART_NUM_0);
 #endif
     driver_owned_ = false;

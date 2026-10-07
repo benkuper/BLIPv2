@@ -1,5 +1,6 @@
 #include "blip/wasm/wamr_runtime.hpp"
 #include "wasm_export.h"
+#include "linear_arena.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <algorithm>
@@ -60,26 +61,38 @@ bool automatic_entry(std::string_view name) noexcept {
 }
 }
 
-core::Status WamrRuntime::initialize(std::span<std::byte> pool, Limits limits) noexcept {
+core::Status WamrRuntime::initialize(std::span<std::byte> pool, Limits limits,
+                                     std::span<std::byte> linear_memory) noexcept {
     if (initialized_) return failure(core::ErrorCode::invalid_state, "initialize", "already-initialized");
     if (pool.size() < 16384 || pool.size() > std::numeric_limits<std::uint32_t>::max() ||
         reinterpret_cast<std::uintptr_t>(pool.data()) % 8 || limits.linear_memory_bytes != 65536 ||
         limits.wasm_stack_bytes < 2048 || limits.wasm_stack_bytes > 8192 ||
         limits.maximum_module_bytes < 8 || limits.maximum_module_bytes > 16384)
         return failure(core::ErrorCode::invalid_argument, "initialize", "unsupported-pool-or-limits");
+    if (!linear_memory.empty()) {
+        const auto begin = reinterpret_cast<std::uintptr_t>(pool.data());
+        const auto linear_begin = reinterpret_cast<std::uintptr_t>(linear_memory.data());
+        if (linear_memory.size() != 65536 || linear_begin % 4 ||
+            pool.size() > std::numeric_limits<std::uint32_t>::max() - linear_memory.size() ||
+            (begin <= linear_begin ? linear_begin - begin < pool.size() : begin - linear_begin < linear_memory.size()) ||
+            WASM_ENABLE_FAST_INTERP == 0)
+            return failure(core::ErrorCode::invalid_argument, "initialize", "unsupported-linear-arena");
+    }
     WamrRuntime* expected{};
     if (!owner.compare_exchange_strong(expected, this))
         return failure(core::ErrorCode::resource_conflict, "initialize", "runtime-already-owned");
+    blip_wasm_linear_arena(linear_memory.empty() ? nullptr : linear_memory.data(), linear_memory.size());
     RuntimeInitArgs args{};
     args.mem_alloc_type = Alloc_With_Pool;
     args.mem_alloc_option.pool.heap_buf = pool.data();
     args.mem_alloc_option.pool.heap_size = static_cast<std::uint32_t>(pool.size());
     if (!wasm_runtime_full_init(&args)) {
+        blip_wasm_linear_arena(nullptr, 0);
         owner.store(nullptr);
         return failure(core::ErrorCode::start_failed, "initialize", "runtime-initialization");
     }
     initialized_ = true;
-    pool_bytes_ = static_cast<std::uint32_t>(pool.size());
+    pool_bytes_ = static_cast<std::uint32_t>(pool.size() + linear_memory.size());
     limits_ = limits;
     fault_.fill(0);
     return core::Status::success();
@@ -228,6 +241,7 @@ void WamrRuntime::shutdown() noexcept {
     unload();
     if (initialized_) {
         wasm_runtime_destroy();
+        blip_wasm_linear_arena(nullptr, 0);
         initialized_ = false;
         pool_bytes_ = 0;
         owner.store(nullptr);
@@ -239,8 +253,9 @@ RuntimeSnapshot WamrRuntime::snapshot() const noexcept {
     out.fault = fault_;
     mem_alloc_info_t info{};
     if (initialized_ && wasm_runtime_get_mem_alloc_info(&info)) {
-        out.used_bytes = info.total_size - info.total_free_size;
-        out.peak_bytes = info.highmark_size;
+        out.used_bytes = info.total_size - info.total_free_size + blip_wasm_linear_used();
+        // Sum of each arena's high-water mark is a conservative total peak.
+        out.peak_bytes = info.highmark_size + blip_wasm_linear_peak();
     }
     return out;
 }

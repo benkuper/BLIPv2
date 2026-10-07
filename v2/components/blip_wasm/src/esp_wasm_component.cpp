@@ -98,13 +98,22 @@ core::Status EspWasmComponent::start(const core::StartContext&) noexcept {
     if (started_.load() || worker_created_ || !callbacks_quiesced()) return failure(ErrorCode::invalid_state, "start", "worker-state");
     if (epoch_.load() == 0xffffffffU || !admission_ || !snapshot_mutex_ || !monitor_mutex_ || !ready_ || !queue_)
         return failure(ErrorCode::resource_unavailable, "start", "runtime-resources");
-    pool_ = static_cast<std::byte*>(heap_caps_aligned_alloc(8, kPoolBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+    pool_ = static_cast<std::byte*>(heap_caps_aligned_alloc(8, kEnginePoolBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
     module_ = static_cast<std::byte*>(heap_caps_malloc(kModuleBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
-    if (!pool_ || !module_) {
-        ESP_LOGE("blip_wasm", "startup buffers unavailable pool=%u module=%u free=%u largest=%u",
+#if defined(CONFIG_IDF_TARGET_ESP32)
+    // Guest memory permits unaligned integer accesses. Unlike the engine pool,
+    // it needs only malloc's four-byte base alignment; requesting additional
+    // alignment makes TLSF skip the available 64 KiB size class on ESP32.
+    linear_ = static_cast<std::byte*>(heap_caps_malloc(kLinearBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_IRAM_8BIT));
+#endif
+    if (!pool_ || !module_ || (kLinearBytes && !linear_)) {
+        ESP_LOGE("blip_wasm", "startup buffers unavailable pool=%u module=%u linear=%u free=%u largest=%u iram_free=%u iram_largest=%u",
             static_cast<unsigned>(pool_ != nullptr), static_cast<unsigned>(module_ != nullptr),
+            static_cast<unsigned>(linear_ != nullptr),
             static_cast<unsigned>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT)),
-            static_cast<unsigned>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT)));
+            static_cast<unsigned>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT)),
+            static_cast<unsigned>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_IRAM_8BIT)),
+            static_cast<unsigned>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_IRAM_8BIT)));
         static_cast<void>(stop()); return failure(ErrorCode::resource_unavailable, "start", "runtime-buffers");
     }
     xQueueReset(queue_);
@@ -155,6 +164,7 @@ core::Status EspWasmComponent::stop() noexcept {
     supervisor_ = nullptr;
     heap_caps_free(pool_); pool_ = nullptr;
     heap_caps_free(module_); module_ = nullptr;
+    heap_caps_free(linear_); linear_ = nullptr;
     return core::Status::success();
 }
 bool EspWasmComponent::callbacks_quiesced() const noexcept { return worker_quiesced_.load() && supervisor_quiesced_.load(); }
@@ -211,7 +221,7 @@ void EspWasmComponent::supervisor_entry(void* context) noexcept {
     self->run_supervisor(); self->supervisor_quiesced_.store(true); vTaskDelete(nullptr);
 }
 void EspWasmComponent::run_worker() noexcept {
-    Service service(*runtime_, {pool_, kPoolBytes}, {module_, kModuleBytes});
+    Service service(*runtime_, {pool_, kEnginePoolBytes}, {module_, kModuleBytes}, {linear_, kLinearBytes});
     ModuleUpload upload({module_, kModuleBytes});
     const auto initialized = service.start();
     if (!initialized) {

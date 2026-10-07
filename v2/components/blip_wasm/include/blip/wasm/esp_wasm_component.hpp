@@ -13,6 +13,11 @@ namespace blip::wasm {
 class EspWasmComponent final : public core::Component {
   public:
     static constexpr std::size_t kPoolBytes = 81920, kModuleBytes = 16384;
+#if defined(CONFIG_IDF_TARGET_ESP32)
+    static constexpr std::size_t kEnginePoolBytes = 16384, kLinearBytes = 65536;
+#else
+    static constexpr std::size_t kEnginePoolBytes = kPoolBytes, kLinearBytes = 0;
+#endif
     static constexpr std::size_t kWorkerStackBytes = 8192, kSupervisorStackBytes = 4096;
     static constexpr std::size_t kQueueCapacity = 8, kCompletionCapacity = 16, kChunkBytes = 64;
     explicit EspWasmComponent(Runtime& runtime) noexcept;
@@ -53,6 +58,7 @@ class EspWasmComponent final : public core::Component {
     Runtime* runtime_;
     std::byte* pool_{};
     std::byte* module_{};
+    std::byte* linear_{};
     StaticSemaphore_t admission_storage_{}, snapshot_storage_{}, monitor_storage_{}, ready_storage_{};
     SemaphoreHandle_t admission_{}, snapshot_mutex_{}, monitor_mutex_{}, ready_{};
     StaticQueue_t queue_storage_{};

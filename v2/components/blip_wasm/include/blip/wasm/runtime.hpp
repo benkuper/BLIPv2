@@ -68,7 +68,10 @@ class Runtime {
   public:
     virtual ~Runtime() = default;
     virtual std::string_view name() const noexcept = 0;
-    virtual core::Status initialize(std::span<std::byte> pool, Limits limits) noexcept = 0;
+    // An optional, separately placed linear arena remains borrowed until
+    // shutdown. Unsupported backends must reject it, not silently ignore it.
+    virtual core::Status initialize(std::span<std::byte> pool, Limits limits,
+                                   std::span<std::byte> linear_memory = {}) noexcept = 0;
     virtual core::Status load(std::span<std::byte> module) noexcept = 0;
     virtual void unload() noexcept = 0;
     virtual void shutdown() noexcept = 0;

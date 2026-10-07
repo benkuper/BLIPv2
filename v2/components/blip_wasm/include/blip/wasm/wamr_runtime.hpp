@@ -15,7 +15,8 @@ class WamrRuntime final : public Runtime {
     WamrRuntime(const WamrRuntime&) = delete;
     WamrRuntime& operator=(const WamrRuntime&) = delete;
     std::string_view name() const noexcept override { return "wamr-2.4.5-fast-metered"; }
-    core::Status initialize(std::span<std::byte> pool, Limits limits) noexcept override;
+    core::Status initialize(std::span<std::byte> pool, Limits limits,
+                            std::span<std::byte> linear_memory = {}) noexcept override;
     core::Status load(std::span<std::byte> module) noexcept override;
     void unload() noexcept override;
     void shutdown() noexcept override;

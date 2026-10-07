@@ -1,0 +1,4 @@
+# The original ESP32 needs a separate byte-accessible IRAM linear arena.
+# Native/VM stacks and engine metadata remain in normal DRAM.
+CONFIG_FREERTOS_UNICORE=y
+CONFIG_ESP32_IRAM_AS_8BIT_ACCESSIBLE_MEMORY=y

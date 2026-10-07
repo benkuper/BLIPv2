@@ -24,7 +24,9 @@ core::Status Service::start(Limits limits) noexcept {
         limits.maximum_module_bytes > module_storage_.size() || !limits.linear_memory_bytes ||
         !limits.wasm_stack_bytes)
         return failure(core::ErrorCode::invalid_argument, "start", "invalid-limits");
-    const auto status = runtime_->initialize(pool_, limits);
+    if (!linear_memory_.empty() && linear_memory_.size() < limits.linear_memory_bytes)
+        return failure(core::ErrorCode::invalid_argument, "start", "linear-arena-too-small");
+    const auto status = runtime_->initialize(pool_, limits, linear_memory_);
     if (!status) { runtime_->shutdown(); return status; }
     limits_ = limits;
     snapshot_.state = State::ready;

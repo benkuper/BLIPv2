@@ -8,7 +8,9 @@ param(
     [Parameter(Mandatory = $true)] [string] $Ip,
     [string] $NetworkProfile = "Archi-wifi guest",
     [string] $InternetProfile = "Archi-Wifi",
-    [int] $Pixels = 36
+    [int] $Pixels = 36,
+    [ValidateRange(1, 100)] [int] $Cycles = 20,
+    [switch] $CoexistenceOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -54,8 +56,10 @@ try {
         if (-not $reachable) { Start-Sleep -Milliseconds 500 }
     } while (-not $reachable -and [DateTime]::UtcNow -lt $deadline)
     if (-not $reachable) { throw "device HTTP port is unreachable on the test network" }
-    & $Python (Join-Path $PSScriptRoot 'blip_wasm_hil.py') --port $Port --board $Board `
-        --build $BuildDirectory --output $Output --ip $Ip --pixels $Pixels --cycles 20
+    $trialArguments = @('--port', $Port, '--board', $Board, '--build', $BuildDirectory,
+        '--output', $Output, '--ip', $Ip, '--pixels', $Pixels, '--cycles', $Cycles)
+    if ($CoexistenceOnly) { $trialArguments += '--coexistence-only' }
+    & $Python (Join-Path $PSScriptRoot 'blip_wasm_hil.py') @trialArguments
     if ($LASTEXITCODE -ne 0) { throw "WASM network qualification failed" }
 } finally {
     if ($null -ne $guard) {

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "board": "m5stack-m5stickc",
+  "port": "COM12",
+  "mac": "94:b9:7e:8b:b7:84",
+  "before_fix_artifacts": {
+    "blip-v2.bin": "a58e6b3b1cdbb4bbcab891d38c19e613f0235da7e186f18cfe41d22015fc3f7b",
+    "blip-v2.elf": "bd754434df21ea8a3da09a4538885a044cf2e22561aff1faa5da018fc71a2113",
+    "blip-v2.map": "ff0ce0d7e6e7dd6cd75422d0e40d42853b854f13a8e8214dfbe42ee451c7b6cd",
+    "sdkconfig": "f37c39f50576e54ec02029cda146d004a972e661f5fc05f7b4e801c8cc3c7b78"
+  },
+  "before_fix_source_snapshot": {
+    "sha256": "a78a9f6dd5cbc6aa6185080b783ebd9e48704807dc5b70c0e5fddfaf1fe32568",
+    "files": {
+      "v2/components/blip_transport/src/esp_serial_transport_component.cpp": "530140d966b1da4299e242c23462563c491ba66a5418c453289b673f80e683d4",
+      "v2/components/blip_wasm/CMakeLists.txt": "f1721a4f405afeb35cef3c3b114503897cfde26847aea41a822d339f9bef43fa",
+      "v2/components/blip_wasm/include/blip/wasm/esp_wasm_component.hpp": "591c0bf8f79e4db6a4bd260278003ae228f10d0405a7ca4d2c70e4720d7e8e70",
+      "v2/components/blip_wasm/include/blip/wasm/module_upload.hpp": "6a9e315dd3e95a41353e6db17e2fe249124aa621e810d133f6e81c27f0863d72",
+      "v2/components/blip_wasm/include/blip/wasm/runtime.hpp": "b10a22f2a816cd19abfdceb747f9768f1c7325f9408bb3e24214a53ca3f0e4ef",
+      "v2/components/blip_wasm/include/blip/wasm/service.hpp": "49f1ff43b9e94818ebd4455a49d881c9252ef8d194e953e1f10464a0888118ba",
+      "v2/components/blip_wasm/include/blip/wasm/wamr_runtime.hpp": "3e38c337ba3e80fbcdae7dd69d1e1c07637fad00071019accca4cbd2b96045a6",
+      "v2/components/blip_wasm/src/esp_wasm_component.cpp": "3cf72d36d1f00badb145290aac334c23e5d571527e8c4210f110ee0b50c8483c",
+      "v2/components/blip_wasm/src/linear_arena.h": "f60014390989c433124fb1d4552aba17dbb69facd8fba32c03f75a884e6c634c",
+      "v2/components/blip_wasm/src/module_upload.cpp": "e3078a616d20be8ad30d7327f357e0ea07646625a04e3568fba9b340df691ab2",
+      "v2/components/blip_wasm/src/pool_memory.c": "6f2761057d056f2127279c0bf4b49c011e877dadc8e5720a33e30130b907abf5",
+      "v2/components/blip_wasm/src/service.cpp": "a124cfd9d93ecbace73e0a09793cd4088642dee7ae0aa150bed4d4d9f4baac9c",
+      "v2/components/blip_wasm/src/wamr_runtime.cpp": "324b33503b5e9632f90dadfc1bc9c7e5823ce3e4add6bea9c007bc22cb219677",
+      "v2/firmware/CMakeLists.txt": "d7b2320ede771e1db763300ec192601504df6c239d1b8095c680cefb6ba5dc99",
+      "v2/firmware/main/CMakeLists.txt": "c8199b533305ca60fbc63950f5c3b629c51ab0740d145e9062499cfbd3e176ee",
+      "v2/firmware/main/main.cpp": "dc67719e8d026e66765dd42305614daf1a2d05cb7703b684f9b772f88ab1ad88",
+      "v2/firmware/sdkconfig.wasm.defaults": "0896aadac662c8db2a4b95e7e2237d789679d24c395d874833b8e6b4d361046a",
+      "v2/firmware/sdkconfig.wasm.esp32.defaults": "067f83ebd6988d2cad4f365f10f9e9a9e2550535571eca9c6300ed7278e4cc7b",
+      "v2/qualification/wasm-service/main/fixtures.hpp": "6a980d7c7d6854b0e84afb6c73a100fdeef08c598b569bd8879987bc1ff67642",
+      "v2/qualification/wasm-worker/generate_fixtures.py": "b892f03a121a3c47a764d01b043a70cac9aca04089ba3045a2e316a946ea54a1",
+      "v2/qualification/wasm-worker/main/fixtures.hpp": "2ce94bc6255831322d027bd39bf94292b0f7d024a65500203ca90f0dc1b91c4d",
+      "v2/tools/control/blip_serial_control.py": "5646d006d65d0182757210afe2017844713692bc70d0ef17b2effa0ed888d5d2",
+      "v2/tools/control/blip_wasm_hil.py": "543f09de60f303f0750e5fbbda963aa91350c30957c2b611e596bb213abcf477",
+      "v2/tools/control/blip_wasm_network_hil.ps1": "b596de58718e92fa1bf23ee5a031bc9906978d2dde5a8f7cb27d03809791e3be",
+      "v2/tools/wifi/blip_wifi_guard.ps1": "3edc575bc0dc20041ed52a9ec2d5ae6577a5b89d8991827c73938dd212f22c7b",
+      "v2/tools/wifi/blip_wifi_recovery.ps1": "34cfce5048430bb55860c9f15e9ae08c3bdbd84748b754636ffe86cc3510b9ba"
+    }
+  },
+  "observation": "One queue-full reply lost the m byte in blip.wasm after its envelope CRC was formed; the original candidate cannot be COBS-decoded.",
+  "damaged_encoded_hex": "08424c495001180403d901010201022b0101010107212f1cac010301020902100409051120626c69702e77617363616c6c30776f726b65722d71756575652d66756c6c",
+  "reconstructed_encoded_hex": "08424c495001180403d901010201022b0101010107212f1cac010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+  "reconstructed_crc_valid": true,
+  "request_id": 473,
+  "reconstructed_response": {
+    "operation": "action",
+    "component": "blip.wasm",
+    "control": "call0",
+    "error_domain": "control",
+    "error_code": "queue_full",
+    "detail": "worker-queue-full",
+    "values": []
+  },
+  "firmware_remained_responsive": true,
+  "subsequent_probe_value": 0,
+  "root_cause_status": "Unresolved. Two large UART burst checks are explicitly omitted on this board; they remain mandatory on the other profiles.",
+  "attempted_mitigation": "UART stdio and framed replies were routed through the same driver; a large-burst reply still failed, so this is not a confirmed fix for the observed byte loss.",
+  "after_routing_app_sha256": "a58e6b3b1cdbb4bbcab891d38c19e613f0235da7e186f18cfe41d22015fc3f7b"
+}

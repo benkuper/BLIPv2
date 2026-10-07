@@ -22,17 +22,21 @@ class TestRuntime : public Runtime {
   public:
     std::uint32_t initialized{}, loads{}, invocations{}, unloads{}, shutdowns{};
     bool fail_initialize{}, fail_load{}, trap{}, wrong_count{}, wrong_type{};
-    std::span<std::byte> module{};
+    bool supports_linear{};
+    std::span<std::byte> module{}, linear{};
     std::string_view name() const noexcept override { return "test.direct"; }
-    Status initialize(std::span<std::byte>, Limits) noexcept override {
-        ++initialized; return fail_initialize ? failure(ErrorCode::resource_unavailable) : Status::success();
+    Status initialize(std::span<std::byte>, Limits, std::span<std::byte> arena = {}) noexcept override {
+        ++initialized;
+        if (!arena.empty() && !supports_linear) return failure(ErrorCode::invalid_argument);
+        linear = arena;
+        return fail_initialize ? failure(ErrorCode::resource_unavailable) : Status::success();
     }
     Status load(std::span<std::byte> data) noexcept override {
         ++loads; module = data;
         return fail_load ? failure(ErrorCode::corrupt_data) : Status::success();
     }
     void unload() noexcept override { ++unloads; module = {}; }
-    void shutdown() noexcept override { ++shutdowns; }
+    void shutdown() noexcept override { ++shutdowns; linear = {}; }
     Result<Signature> signature(std::string_view name) noexcept override {
         if (name != "echo") return Result<Signature>::failure(failure(ErrorCode::not_found).error());
         Signature signature{};
@@ -190,13 +194,33 @@ bool bounded_upload_crc_and_lifecycle() {
     CHECK(upload.begin(9, 0xcbf43926)); CHECK(upload.append(0, input)); CHECK(upload.finish());
     return true;
 }
+bool separately_borrowed_linear_memory() {
+    std::array<std::byte, 128> pool{}, module{}, arena{};
+    TestRuntime runtime;
+    Service undersized{runtime, pool, module, std::span(arena).first(63)};
+    CHECK(!undersized.start({64, 4096, 128}));
+    CHECK(runtime.initialized == 0 && runtime.shutdowns == 0);
+    Service service{runtime, pool, module, arena};
+    CHECK(!service.start({128, 4096, 128}));
+    CHECK(service.snapshot().state == State::stopped && runtime.shutdowns == 1);
+    runtime.supports_linear = true;
+    CHECK(service.start({128, 4096, 128}));
+    CHECK(runtime.linear.data() == arena.data() && runtime.linear.size() == arena.size());
+    CHECK(service.load(binary));
+    CHECK(runtime.linear.data() == arena.data());
+    service.stop(); CHECK(runtime.linear.empty());
+    CHECK(service.start({128, 4096, 128}));
+    CHECK(runtime.linear.data() == arena.data());
+    service.stop();
+    return true;
+}
 }
 
 int main() {
     if (!runtime_replacement_and_bit_values() || !caller_lifetime_and_prevalidation() ||
         !invalid_calls_never_enter_engine() || !fault_requires_reload_and_retains_diagnostic() ||
         !engine_failures_and_idempotent_cleanup() || !backend_contract_violations_are_faults() ||
-        !bounded_upload_crc_and_lifecycle()) return 1;
-    std::cout << "WASM service: 7 lifecycle, ownership, replacement, signature and upload cases passed\n";
+        !bounded_upload_crc_and_lifecycle() || !separately_borrowed_linear_memory()) return 1;
+    std::cout << "WASM service: 8 lifecycle, ownership, replacement, signature and upload cases passed\n";
     return 0;
 }

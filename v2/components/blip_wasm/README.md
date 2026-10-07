@@ -11,8 +11,11 @@ WAMR fast interpreter after the three-family hardware comparison. The
 project; its adapter is not the production service. The separate
 [service qualification](../../qualification/wasm-service/README.md) builds this
 implementation on all three processor families. The opt-in production worker
-has preliminary Ball C6 coexistence evidence. Seven-profile compatibility,
-native task lifecycle, provider/SDK work and full Gate D remain open.
+has Ball C6 and selected ESP32 coexistence evidence. The
+[profile memory follow-up](../../../docs/v2/work-packages/6.3-wasm-profile-memory.md)
+records seven builds and their declared hardware checks, with two large UART
+burst checks omitted on the M5StickC after damaged replies. Native task lifecycle,
+that serial issue, provider/SDK work and full Gate D remain open.
 
 ## Current contract
 
@@ -50,8 +53,14 @@ compile WAMR or claim interpreter validation coverage.
 
 [ADR-0010](../../../docs/v2/adr/0010-wasm-production-worker.md) declares the
 priority-2 worker (8 KiB native stack) and priority-6 supervisor (4 KiB stack).
-Startup reserves an aligned 80 KiB engine pool and 16 KiB module buffer in
-internal RAM. Requests and results are copied into an eight-request queue and
+Startup reserves 80 KiB for the engine and guest memory, plus a 16 KiB module
+buffer. On the original ESP32, [ADR-0011](../../../docs/v2/adr/0011-esp32-wasm-linear-arena.md)
+places the 64 KiB guest page in byte-accessible IRAM and keeps the 16 KiB engine
+pool, module buffer and stacks in DRAM. That profile requires single-core mode;
+C6/S3 retain the contiguous aligned pool. The optional runtime-neutral borrowed
+arena is explicit and unsupported backends must reject it. For separate arenas,
+peak usage is the conservative sum of their individual high-water marks.
+Requests and results are copied into an eight-request queue and
 sixteen-completion ring; overload rejects new work. IDs/epochs never repeat.
 
 `upload_begin(bytes, crc32)`, contiguous `upload_chunk(offset, hex)` chunks of
@@ -79,3 +88,5 @@ The HIL driver is `v2/tools/control/blip_wasm_hil.py`. Optional `--ip` traffic
 requires an already reachable board. `blip_wasm_network_hil.ps1` temporarily
 joins a saved network using an independent, verified recovery process and a
 temporary profile clone, then verifies the original Internet connection.
+Use `-CoexistenceOnly` after separate serial qualification to keep slow UART
+checks out of the independent recovery window.

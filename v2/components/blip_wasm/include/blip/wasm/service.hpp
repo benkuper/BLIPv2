@@ -22,8 +22,8 @@ struct Snapshot {
 class Service final {
   public:
     Service(Runtime& runtime, std::span<std::byte> pool,
-            std::span<std::byte> module_storage) noexcept
-        : runtime_(&runtime), pool_(pool), module_storage_(module_storage) {}
+            std::span<std::byte> module_storage, std::span<std::byte> linear_memory = {}) noexcept
+        : runtime_(&runtime), pool_(pool), module_storage_(module_storage), linear_memory_(linear_memory) {}
     Service(const Service&) = delete;
     Service& operator=(const Service&) = delete;
     [[nodiscard]] core::Status start(Limits limits = {}) noexcept;
@@ -39,6 +39,7 @@ class Service final {
     Runtime* runtime_;
     std::span<std::byte> pool_;
     std::span<std::byte> module_storage_;
+    std::span<std::byte> linear_memory_;
     Limits limits_{};
     Snapshot snapshot_{};
 };
