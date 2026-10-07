@@ -72,3 +72,4 @@ wire protocols, or public OSC paths.
 | [6.3](6.3-wasm-production-worker.md) | Opt-in supervised worker; Ball trap/cancellation/queue and LED/network/settings coexistence passed; full Gate D open |
 | [6.3 profile memory](6.3-wasm-profile-memory.md) | Seven production builds and declared memory/policy trials; selected ESP32 traffic passed; M5StickC large serial burst gap remains |
 | [6.3 native lifecycle](6.3-wasm-native-lifecycle.md) | 3,716 checks on three families; real task stop/restart, active/queued cancellation and injected startup cleanup passed; production stress and cold/global OOM remain open |
+| [6.3 M5StickC UART localization](6.3-m5stickc-uart-localization.md) | Three missing-byte replies correlate with valid full UART driver admissions; loss beyond encoding is reproduced; driver/physical/USB/host cause and serial burst gate remain open |

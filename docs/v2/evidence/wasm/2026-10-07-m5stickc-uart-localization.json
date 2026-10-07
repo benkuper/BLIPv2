@@ -1,0 +1,2882 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-10-07T21:17:40.120284+00:00",
+  "result": "M5StickC replies validated immediately before UART were accepted in full by the driver but reached pyserial with missing bytes",
+  "localization_passed": true,
+  "serial_burst_gate_passed": false,
+  "root_cause_status": "Open beyond the UART input boundary",
+  "firmware_restore_requested": false,
+  "test_firmware_left_installed": true,
+  "matched_missing_byte_frames": [
+    {
+      "trial": 1,
+      "request_id": 18,
+      "damaged_encoded_hex": "08424c4950011802021201010202260101010108752fe24c010301010101010309050110626c69702e7761736d63616c6c30010208020901010101010101",
+      "reconstructed_encoded_hex": "08424c495001180202120101020102260101010108752fe24c010301010101010309050110626c69702e7761736d63616c6c30010208020901010101010101",
+      "insertions": [
+        {
+          "offset": 13,
+          "byte": 1
+        }
+      ],
+      "pre_driver_trace": {
+        "sequence": 18,
+        "request_id": 18,
+        "encoded_bytes": 63,
+        "frame_crc32": 2712077134,
+        "pre_driver_valid": true,
+        "written": 65
+      }
+    },
+    {
+      "trial": 1,
+      "request_id": 22,
+      "damaged_encoded_hex": "08424c49500118020216010102010226010101010857873ece0103010101010103090501106269702e7761736d63616c6c30010208020d01010101010101",
+      "reconstructed_encoded_hex": "08424c49500118020216010102010226010101010857873ece010301010101010309050110626c69702e7761736d63616c6c30010208020d01010101010101",
+      "insertions": [
+        {
+          "offset": 38,
+          "byte": 108
+        }
+      ],
+      "pre_driver_trace": {
+        "sequence": 22,
+        "request_id": 22,
+        "encoded_bytes": 63,
+        "frame_crc32": 2496986593,
+        "pre_driver_valid": true,
+        "written": 65
+      }
+    },
+    {
+      "trial": 2,
+      "request_id": 59,
+      "damaged_encoded_hex": "424c4950011804023b01010201022b010101010747aea731010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+      "reconstructed_encoded_hex": "08424c4950011804023b01010201022b010101010747aea731010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+      "insertions": [
+        {
+          "offset": 0,
+          "byte": 8
+        }
+      ],
+      "pre_driver_trace": {
+        "sequence": 59,
+        "request_id": 59,
+        "encoded_bytes": 68,
+        "frame_crc32": 1329538741,
+        "pre_driver_valid": true,
+        "written": 70
+      }
+    }
+  ],
+  "baseline_report_sha256": "9e398b1878efe34f8dfbc2903857f248f6e22ddebfa355925c2192c631237bd4",
+  "baseline": {
+    "board": "m5stack-m5stickc",
+    "port": "COM12",
+    "chip": "esp32",
+    "pc_network_changed": false,
+    "firmware_restore_requested": false,
+    "source_snapshot": {
+      "sha256": "554b3aad72988fb2341006a3e5b03b7610766f6b169d08845e17fe7cdb279a4e",
+      "files": {
+        "v2/components/blip_transport/src/esp_serial_transport_component.cpp": "530140d966b1da4299e242c23462563c491ba66a5418c453289b673f80e683d4",
+        "v2/components/blip_wasm/CMakeLists.txt": "f1721a4f405afeb35cef3c3b114503897cfde26847aea41a822d339f9bef43fa",
+        "v2/components/blip_wasm/include/blip/wasm/esp_wasm_component.hpp": "591c0bf8f79e4db6a4bd260278003ae228f10d0405a7ca4d2c70e4720d7e8e70",
+        "v2/components/blip_wasm/include/blip/wasm/module_upload.hpp": "6a9e315dd3e95a41353e6db17e2fe249124aa621e810d133f6e81c27f0863d72",
+        "v2/components/blip_wasm/include/blip/wasm/runtime.hpp": "b10a22f2a816cd19abfdceb747f9768f1c7325f9408bb3e24214a53ca3f0e4ef",
+        "v2/components/blip_wasm/include/blip/wasm/service.hpp": "49f1ff43b9e94818ebd4455a49d881c9252ef8d194e953e1f10464a0888118ba",
+        "v2/components/blip_wasm/include/blip/wasm/wamr_runtime.hpp": "3e38c337ba3e80fbcdae7dd69d1e1c07637fad00071019accca4cbd2b96045a6",
+        "v2/components/blip_wasm/src/esp_wasm_component.cpp": "3cf72d36d1f00badb145290aac334c23e5d571527e8c4210f110ee0b50c8483c",
+        "v2/components/blip_wasm/src/linear_arena.h": "f60014390989c433124fb1d4552aba17dbb69facd8fba32c03f75a884e6c634c",
+        "v2/components/blip_wasm/src/module_upload.cpp": "e3078a616d20be8ad30d7327f357e0ea07646625a04e3568fba9b340df691ab2",
+        "v2/components/blip_wasm/src/pool_memory.c": "6f2761057d056f2127279c0bf4b49c011e877dadc8e5720a33e30130b907abf5",
+        "v2/components/blip_wasm/src/service.cpp": "a124cfd9d93ecbace73e0a09793cd4088642dee7ae0aa150bed4d4d9f4baac9c",
+        "v2/components/blip_wasm/src/wamr_runtime.cpp": "324b33503b5e9632f90dadfc1bc9c7e5823ce3e4add6bea9c007bc22cb219677",
+        "v2/firmware/CMakeLists.txt": "d7b2320ede771e1db763300ec192601504df6c239d1b8095c680cefb6ba5dc99",
+        "v2/firmware/main/CMakeLists.txt": "c8199b533305ca60fbc63950f5c3b629c51ab0740d145e9062499cfbd3e176ee",
+        "v2/firmware/main/main.cpp": "dc67719e8d026e66765dd42305614daf1a2d05cb7703b684f9b772f88ab1ad88",
+        "v2/firmware/sdkconfig.wasm.defaults": "0896aadac662c8db2a4b95e7e2237d789679d24c395d874833b8e6b4d361046a",
+        "v2/firmware/sdkconfig.wasm.esp32.defaults": "067f83ebd6988d2cad4f365f10f9e9a9e2550535571eca9c6300ed7278e4cc7b",
+        "v2/qualification/wasm-service/main/fixtures.hpp": "6a980d7c7d6854b0e84afb6c73a100fdeef08c598b569bd8879987bc1ff67642",
+        "v2/qualification/wasm-worker/generate_fixtures.py": "b892f03a121a3c47a764d01b043a70cac9aca04089ba3045a2e316a946ea54a1",
+        "v2/qualification/wasm-worker/main/fixtures.hpp": "2ce94bc6255831322d027bd39bf94292b0f7d024a65500203ca90f0dc1b91c4d",
+        "v2/tools/control/blip_serial_control.py": "5646d006d65d0182757210afe2017844713692bc70d0ef17b2effa0ed888d5d2",
+        "v2/tools/control/blip_wasm_hil.py": "8f85c4d22ea5f4fbb1c32b13f649bd6247e7d667712c23e3eda06ab635055256",
+        "v2/tools/control/blip_wasm_network_hil.ps1": "b596de58718e92fa1bf23ee5a031bc9906978d2dde5a8f7cb27d03809791e3be",
+        "v2/tools/wifi/blip_wifi_guard.ps1": "3edc575bc0dc20041ed52a9ec2d5ae6577a5b89d8991827c73938dd212f22c7b",
+        "v2/tools/wifi/blip_wifi_recovery.ps1": "34cfce5048430bb55860c9f15e9ae08c3bdbd84748b754636ffe86cc3510b9ba"
+      }
+    },
+    "trace_enabled": false,
+    "source_commit": "bfb88441c3eb4ead297808428ce7d5191c72f36d",
+    "diagnostic_sha256": {
+      "inject.cmake": "8b8c468003ad5d81932c83417041aa78c384567f2dbb7a79f4f9a5c0fa21de49",
+      "run_burst.py": "0fa92479ed80a0da13bb4402a32c662f72bfedc85556cb27fcf7ea5fc93f5bd9",
+      "uart_trace.cpp": "48f12f56baa16d997add70c8a5203ebba92bc576a4bec67a61e5354b7c26daa0"
+    },
+    "inputs": {
+      "blip-v2.bin": {
+        "bytes": 1266032,
+        "sha256": "a58e6b3b1cdbb4bbcab891d38c19e613f0235da7e186f18cfe41d22015fc3f7b"
+      },
+      "blip-v2.elf": {
+        "bytes": 17047436,
+        "sha256": "bd754434df21ea8a3da09a4538885a044cf2e22561aff1faa5da018fc71a2113"
+      },
+      "blip-v2.map": {
+        "bytes": 16737936,
+        "sha256": "ff0ce0d7e6e7dd6cd75422d0e40d42853b854f13a8e8214dfbe42ee451c7b6cd"
+      },
+      "sdkconfig": {
+        "bytes": 69301,
+        "sha256": "f37c39f50576e54ec02029cda146d004a972e661f5fc05f7b4e801c8cc3c7b78"
+      },
+      "ota_data_initial.bin": {
+        "bytes": 8192,
+        "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+      }
+    },
+    "trials": [
+      {
+        "trial": 1,
+        "requests": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "responses": [
+          {
+            "request_id": 17,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1284
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 18,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1285
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 19,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1286
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 21,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1288
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 22,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1289
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 23,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1290
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 24,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1291
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 25,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1292
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 26,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "request_id": 27,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "request_id": 28,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "request_id": 29,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "cancel_all",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": []
+            }
+          }
+        ],
+        "errors": [
+          {
+            "request_id": 20,
+            "error": "serial request 20 timed out"
+          }
+        ],
+        "raw_bytes": 852,
+        "raw_sha256": "1eb2296c2234f679b0d1e1dc63f3902d915e385f1ffdd09d418667f2ae146ea4",
+        "independently_decoded": [
+          {
+            "kind": 2,
+            "request_id": 17,
+            "encoded_hex": "08424c495001180202110101020102260101010108d9ef3187010301010101010309050110626c69702e7761736d63616c6c30010208030405010101010101",
+            "frame_crc32": 3177282422,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1284
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 18,
+            "encoded_hex": "08424c4950011802021201010201022601010101089d157549010301010101010309050110626c69702e7761736d63616c6c30010208030505010101010101",
+            "frame_crc32": 1299056836,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1285
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 19,
+            "encoded_hex": "08424c495001180202130101020102260101010108c8bb5fc6010301010101010309050110626c69702e7761736d63616c6c30010208030605010101010101",
+            "frame_crc32": 1247807233,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1286
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 21,
+            "encoded_hex": "08424c4950011802021501010201022601010101084e5c08d6010301010101010309050110626c69702e7761736d63616c6c30010208030805010101010101",
+            "frame_crc32": 2706981986,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1288
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 22,
+            "encoded_hex": "08424c4950011802021601010201022601010101080aa64c18010301010101010309050110626c69702e7761736d63616c6c30010208030905010101010101",
+            "frame_crc32": 1364604880,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1289
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 23,
+            "encoded_hex": "08424c4950011802021701010201022601010101085f086697010301010101010309050110626c69702e7761736d63616c6c30010208030a05010101010101",
+            "frame_crc32": 1448622101,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1290
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 24,
+            "encoded_hex": "08424c49500118020218010102010226010101010873199952010301010101010309050110626c69702e7761736d63616c6c30010208030b05010101010101",
+            "frame_crc32": 697690640,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1291
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 25,
+            "encoded_hex": "08424c495001180202190101020102260101010108dcb9f959010301010101010309050110626c69702e7761736d63616c6c30010208030c05010101010101",
+            "frame_crc32": 3615917608,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 1292
+                }
+              ]
+            }
+          },
+          {
+            "kind": 4,
+            "request_id": 26,
+            "encoded_hex": "08424c4950011804021a01010201022b01010101071c2b011c010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+            "frame_crc32": 3744311209,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "kind": 4,
+            "request_id": 27,
+            "encoded_hex": "08424c4950011804021b01010201022b0101010107ed2e4d75010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+            "frame_crc32": 3335905783,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "kind": 4,
+            "request_id": 28,
+            "encoded_hex": "08424c4950011804021c01010201022b01010101077b31d8b0010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+            "frame_crc32": 2335978093,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 29,
+            "encoded_hex": "08424c4950011802021d01010201021f01010101072d93721d0103010101010103090a0114626c69702e7761736d63616e63656c5f616c6c",
+            "frame_crc32": 291202221,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "cancel_all",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": []
+            }
+          }
+        ],
+        "invalid_candidates": [
+          {
+            "encoded_hex": "08424c49500118020214010102010226010101010854e78d0e010301010101010309050110626c69702e77616d63616c6c30010208030705010101010101",
+            "error": "invalid envelope header",
+            "one_byte_reconstructions": [
+              {
+                "encoded_hex": "08424c49500118020214010102010226010101010854e78d0e010301010101010309050110626c69702e7761736d63616c6c30010208030705010101010101",
+                "request_id": 20,
+                "frame_crc32": 1979836897,
+                "response": {
+                  "operation": "action",
+                  "component": "blip.wasm",
+                  "control": "call0",
+                  "error_domain": "none",
+                  "error_code": "none",
+                  "detail": "",
+                  "values": [
+                    {
+                      "type": "integer",
+                      "value": 1287
+                    }
+                  ]
+                },
+                "insertions": [
+                  {
+                    "offset": 44,
+                    "byte": 115
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "queue_overload_qualification": false,
+    "subsequent_probe_value": 0,
+    "diagnostic_completed": true
+  },
+  "traced_report_sha256": "de8e93f8e06fac94a743a79626a76c490b1cecac0b51fa92dd0e8d237e2e4745",
+  "traced": {
+    "board": "m5stack-m5stickc",
+    "port": "COM12",
+    "chip": "esp32",
+    "pc_network_changed": false,
+    "firmware_restore_requested": false,
+    "source_snapshot": {
+      "sha256": "554b3aad72988fb2341006a3e5b03b7610766f6b169d08845e17fe7cdb279a4e",
+      "files": {
+        "v2/components/blip_transport/src/esp_serial_transport_component.cpp": "530140d966b1da4299e242c23462563c491ba66a5418c453289b673f80e683d4",
+        "v2/components/blip_wasm/CMakeLists.txt": "f1721a4f405afeb35cef3c3b114503897cfde26847aea41a822d339f9bef43fa",
+        "v2/components/blip_wasm/include/blip/wasm/esp_wasm_component.hpp": "591c0bf8f79e4db6a4bd260278003ae228f10d0405a7ca4d2c70e4720d7e8e70",
+        "v2/components/blip_wasm/include/blip/wasm/module_upload.hpp": "6a9e315dd3e95a41353e6db17e2fe249124aa621e810d133f6e81c27f0863d72",
+        "v2/components/blip_wasm/include/blip/wasm/runtime.hpp": "b10a22f2a816cd19abfdceb747f9768f1c7325f9408bb3e24214a53ca3f0e4ef",
+        "v2/components/blip_wasm/include/blip/wasm/service.hpp": "49f1ff43b9e94818ebd4455a49d881c9252ef8d194e953e1f10464a0888118ba",
+        "v2/components/blip_wasm/include/blip/wasm/wamr_runtime.hpp": "3e38c337ba3e80fbcdae7dd69d1e1c07637fad00071019accca4cbd2b96045a6",
+        "v2/components/blip_wasm/src/esp_wasm_component.cpp": "3cf72d36d1f00badb145290aac334c23e5d571527e8c4210f110ee0b50c8483c",
+        "v2/components/blip_wasm/src/linear_arena.h": "f60014390989c433124fb1d4552aba17dbb69facd8fba32c03f75a884e6c634c",
+        "v2/components/blip_wasm/src/module_upload.cpp": "e3078a616d20be8ad30d7327f357e0ea07646625a04e3568fba9b340df691ab2",
+        "v2/components/blip_wasm/src/pool_memory.c": "6f2761057d056f2127279c0bf4b49c011e877dadc8e5720a33e30130b907abf5",
+        "v2/components/blip_wasm/src/service.cpp": "a124cfd9d93ecbace73e0a09793cd4088642dee7ae0aa150bed4d4d9f4baac9c",
+        "v2/components/blip_wasm/src/wamr_runtime.cpp": "324b33503b5e9632f90dadfc1bc9c7e5823ce3e4add6bea9c007bc22cb219677",
+        "v2/firmware/CMakeLists.txt": "d7b2320ede771e1db763300ec192601504df6c239d1b8095c680cefb6ba5dc99",
+        "v2/firmware/main/CMakeLists.txt": "c8199b533305ca60fbc63950f5c3b629c51ab0740d145e9062499cfbd3e176ee",
+        "v2/firmware/main/main.cpp": "dc67719e8d026e66765dd42305614daf1a2d05cb7703b684f9b772f88ab1ad88",
+        "v2/firmware/sdkconfig.wasm.defaults": "0896aadac662c8db2a4b95e7e2237d789679d24c395d874833b8e6b4d361046a",
+        "v2/firmware/sdkconfig.wasm.esp32.defaults": "067f83ebd6988d2cad4f365f10f9e9a9e2550535571eca9c6300ed7278e4cc7b",
+        "v2/qualification/wasm-service/main/fixtures.hpp": "6a980d7c7d6854b0e84afb6c73a100fdeef08c598b569bd8879987bc1ff67642",
+        "v2/qualification/wasm-worker/generate_fixtures.py": "b892f03a121a3c47a764d01b043a70cac9aca04089ba3045a2e316a946ea54a1",
+        "v2/qualification/wasm-worker/main/fixtures.hpp": "2ce94bc6255831322d027bd39bf94292b0f7d024a65500203ca90f0dc1b91c4d",
+        "v2/tools/control/blip_serial_control.py": "5646d006d65d0182757210afe2017844713692bc70d0ef17b2effa0ed888d5d2",
+        "v2/tools/control/blip_wasm_hil.py": "8f85c4d22ea5f4fbb1c32b13f649bd6247e7d667712c23e3eda06ab635055256",
+        "v2/tools/control/blip_wasm_network_hil.ps1": "b596de58718e92fa1bf23ee5a031bc9906978d2dde5a8f7cb27d03809791e3be",
+        "v2/tools/wifi/blip_wifi_guard.ps1": "3edc575bc0dc20041ed52a9ec2d5ae6577a5b89d8991827c73938dd212f22c7b",
+        "v2/tools/wifi/blip_wifi_recovery.ps1": "34cfce5048430bb55860c9f15e9ae08c3bdbd84748b754636ffe86cc3510b9ba"
+      }
+    },
+    "trace_enabled": true,
+    "source_commit": "bfb88441c3eb4ead297808428ce7d5191c72f36d",
+    "diagnostic_sha256": {
+      "inject.cmake": "8b8c468003ad5d81932c83417041aa78c384567f2dbb7a79f4f9a5c0fa21de49",
+      "run_burst.py": "0fa92479ed80a0da13bb4402a32c662f72bfedc85556cb27fcf7ea5fc93f5bd9",
+      "uart_trace.cpp": "edab506f73adc86ded67ee1f59d8ded3e6445a87527b409d127ee4737ab90877"
+    },
+    "inputs": {
+      "blip-v2.bin": {
+        "bytes": 1268672,
+        "sha256": "80b091b6d88142efc539d6c57ac44550e7ca9476f97e23ac444499f7249146fd"
+      },
+      "blip-v2.elf": {
+        "bytes": 17055560,
+        "sha256": "3f1dc083871b546dc041a2f9fed896523fcec128e3a276e512fbd0f73ba05bfb"
+      },
+      "blip-v2.map": {
+        "bytes": 16779072,
+        "sha256": "03855706fc753b6a652a4e678bcc223bca88f04b18a19da33358424c303944e1"
+      },
+      "sdkconfig": {
+        "bytes": 69301,
+        "sha256": "f37c39f50576e54ec02029cda146d004a972e661f5fc05f7b4e801c8cc3c7b78"
+      },
+      "ota_data_initial.bin": {
+        "bytes": 8192,
+        "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+      }
+    },
+    "trials": [
+      {
+        "trial": 1,
+        "requests": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "responses": [
+          {
+            "request_id": 17,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 8
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 19,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 10
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 23,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 14
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 24,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 15
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 25,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 16
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 26,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "request_id": 27,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "invalid_state",
+              "detail": "module-not-loaded",
+              "values": []
+            }
+          },
+          {
+            "request_id": 28,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "invalid_state",
+              "detail": "module-not-loaded",
+              "values": []
+            }
+          },
+          {
+            "request_id": 29,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "cancel_all",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": []
+            }
+          }
+        ],
+        "errors": [
+          {
+            "request_id": 18,
+            "error": "serial request 18 timed out"
+          },
+          {
+            "request_id": 20,
+            "error": "serial request 20 timed out"
+          },
+          {
+            "request_id": 21,
+            "error": "serial request 21 timed out"
+          },
+          {
+            "request_id": 22,
+            "error": "serial request 22 timed out"
+          }
+        ],
+        "probe_request_id": 30,
+        "probe_response": {
+          "operation": "get",
+          "component": "blip.bootstrap",
+          "control": "probe_value",
+          "error_domain": "none",
+          "error_code": "none",
+          "detail": "",
+          "values": [
+            {
+              "type": "integer",
+              "value": 0
+            }
+          ]
+        },
+        "trace_end_seen": true,
+        "driver_traces": [
+          {
+            "sequence": 1,
+            "request_id": 1,
+            "encoded_bytes": 70,
+            "frame_crc32": 2244645890,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 2,
+            "request_id": 2,
+            "encoded_bytes": 97,
+            "frame_crc32": 1322328069,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 3,
+            "request_id": 3,
+            "encoded_bytes": 70,
+            "frame_crc32": 1039952821,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 4,
+            "request_id": 4,
+            "encoded_bytes": 97,
+            "frame_crc32": 1222581369,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 5,
+            "request_id": 5,
+            "encoded_bytes": 70,
+            "frame_crc32": 1003543730,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 6,
+            "request_id": 6,
+            "encoded_bytes": 97,
+            "frame_crc32": 2002360977,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 7,
+            "request_id": 7,
+            "encoded_bytes": 70,
+            "frame_crc32": 878327356,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 8,
+            "request_id": 8,
+            "encoded_bytes": 97,
+            "frame_crc32": 208990262,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 9,
+            "request_id": 9,
+            "encoded_bytes": 70,
+            "frame_crc32": 3513316822,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 10,
+            "request_id": 10,
+            "encoded_bytes": 97,
+            "frame_crc32": 3574208910,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 11,
+            "request_id": 11,
+            "encoded_bytes": 70,
+            "frame_crc32": 939743282,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 12,
+            "request_id": 12,
+            "encoded_bytes": 97,
+            "frame_crc32": 2467254453,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 13,
+            "request_id": 13,
+            "encoded_bytes": 71,
+            "frame_crc32": 3876210564,
+            "pre_driver_valid": true,
+            "written": 73
+          },
+          {
+            "sequence": 14,
+            "request_id": 14,
+            "encoded_bytes": 97,
+            "frame_crc32": 1959754316,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 15,
+            "request_id": 15,
+            "encoded_bytes": 64,
+            "frame_crc32": 279846613,
+            "pre_driver_valid": true,
+            "written": 66
+          },
+          {
+            "sequence": 16,
+            "request_id": 16,
+            "encoded_bytes": 57,
+            "frame_crc32": 3457924750,
+            "pre_driver_valid": true,
+            "written": 59
+          },
+          {
+            "sequence": 17,
+            "request_id": 17,
+            "encoded_bytes": 63,
+            "frame_crc32": 1369993468,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 18,
+            "request_id": 18,
+            "encoded_bytes": 63,
+            "frame_crc32": 2712077134,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 19,
+            "request_id": 19,
+            "encoded_bytes": 63,
+            "frame_crc32": 2796096651,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 20,
+            "request_id": 20,
+            "encoded_bytes": 63,
+            "frame_crc32": 2596856427,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 21,
+            "request_id": 21,
+            "encoded_bytes": 63,
+            "frame_crc32": 398247424,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 22,
+            "request_id": 22,
+            "encoded_bytes": 63,
+            "frame_crc32": 2496986593,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 23,
+            "request_id": 23,
+            "encoded_bytes": 63,
+            "frame_crc32": 2480599588,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 24,
+            "request_id": 24,
+            "encoded_bytes": 63,
+            "frame_crc32": 3960938529,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 25,
+            "request_id": 25,
+            "encoded_bytes": 63,
+            "frame_crc32": 1775767252,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 26,
+            "request_id": 26,
+            "encoded_bytes": 68,
+            "frame_crc32": 3744311209,
+            "pre_driver_valid": true,
+            "written": 70
+          },
+          {
+            "sequence": 27,
+            "request_id": 27,
+            "encoded_bytes": 68,
+            "frame_crc32": 720463862,
+            "pre_driver_valid": true,
+            "written": 70
+          },
+          {
+            "sequence": 28,
+            "request_id": 28,
+            "encoded_bytes": 68,
+            "frame_crc32": 1729672300,
+            "pre_driver_valid": true,
+            "written": 70
+          },
+          {
+            "sequence": 29,
+            "request_id": 29,
+            "encoded_bytes": 56,
+            "frame_crc32": 291202221,
+            "pre_driver_valid": true,
+            "written": 58
+          },
+          {
+            "sequence": 30,
+            "request_id": 30,
+            "encoded_bytes": 74,
+            "frame_crc32": 612393819,
+            "pre_driver_valid": true,
+            "written": 76
+          }
+        ],
+        "invalid_trace_lines": [],
+        "raw_bytes": 1537,
+        "raw_sha256": "722b184f47ee2f81be0bd4b3a3dd8b557426dcaf74de7ecffa6c4c81714895d5",
+        "independently_decoded": [
+          {
+            "kind": 2,
+            "request_id": 17,
+            "encoded_hex": "08424c49500118020211010102010226010101010831d5a682010301010101010309050110626c69702e7761736d63616c6c30010208020801010101010101",
+            "frame_crc32": 1369993468,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 8
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 19,
+            "encoded_hex": "08424c4950011802021301010201022601010101082081c8c3010301010101010309050110626c69702e7761736d63616c6c30010208020a01010101010101",
+            "frame_crc32": 2796096651,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 10
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 23,
+            "encoded_hex": "08424c49500118020217010102010226010101010802291441010301010101010309050110626c69702e7761736d63616c6c30010208020e01010101010101",
+            "frame_crc32": 2480599588,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 14
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 24,
+            "encoded_hex": "08424c4950011802021801010201022601010101082e38eb84010301010101010309050110626c69702e7761736d63616c6c30010208020f01010101010101",
+            "frame_crc32": 3960938529,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 15
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 25,
+            "encoded_hex": "08424c4950011802021901010201022601010101081fb2d520010301010101010309050110626c69702e7761736d63616c6c30010208021001010101010101",
+            "frame_crc32": 1775767252,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 16
+                }
+              ]
+            }
+          },
+          {
+            "kind": 4,
+            "request_id": 26,
+            "encoded_hex": "08424c4950011804021a01010201022b01010101071c2b011c010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+            "frame_crc32": 3744311209,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "kind": 4,
+            "request_id": 27,
+            "encoded_hex": "08424c4950011804021b01010201022b01010101074a2c4fc9010301020902020409051120626c69702e7761736d63616c6c306d6f64756c652d6e6f742d6c6f61646564",
+            "frame_crc32": 720463862,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "invalid_state",
+              "detail": "module-not-loaded",
+              "values": []
+            }
+          },
+          {
+            "kind": 4,
+            "request_id": 28,
+            "encoded_hex": "08424c4950011804021c01010201022b0101010107dc33da0c010301020902020409051120626c69702e7761736d63616c6c306d6f64756c652d6e6f742d6c6f61646564",
+            "frame_crc32": 1729672300,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "invalid_state",
+              "detail": "module-not-loaded",
+              "values": []
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 29,
+            "encoded_hex": "08424c4950011802021d01010201021f01010101072d93721d0103010101010103090a0114626c69702e7761736d63616e63656c5f616c6c",
+            "frame_crc32": 291202221,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "cancel_all",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": []
+            }
+          }
+        ],
+        "invalid_candidates": [
+          {
+            "encoded_hex": "08424c4950011802021201010202260101010108752fe24c010301010101010309050110626c69702e7761736d63616c6c30010208020901010101010101",
+            "error": "invalid envelope header",
+            "one_byte_reconstructions": [
+              {
+                "encoded_hex": "08424c495001180202120101020102260101010108752fe24c010301010101010309050110626c69702e7761736d63616c6c30010208020901010101010101",
+                "request_id": 18,
+                "frame_crc32": 2712077134,
+                "response": {
+                  "operation": "action",
+                  "component": "blip.wasm",
+                  "control": "call0",
+                  "error_domain": "none",
+                  "error_code": "none",
+                  "detail": "",
+                  "values": [
+                    {
+                      "type": "integer",
+                      "value": 9
+                    }
+                  ]
+                },
+                "insertions": [
+                  {
+                    "offset": 13,
+                    "byte": 1
+                  }
+                ],
+                "driver_trace": {
+                  "sequence": 18,
+                  "request_id": 18,
+                  "encoded_bytes": 63,
+                  "frame_crc32": 2712077134,
+                  "pre_driver_valid": true,
+                  "written": 65
+                },
+                "matches_valid_pre_driver_frame": true
+              }
+            ]
+          },
+          {
+            "encoded_hex": "08424c495001180202140101020102260101010108bcdd1a0b010301010101010309050110626c69702e7761736d6c6c30010208020b01010101010101",
+            "error": "invalid envelope header",
+            "one_byte_reconstructions": []
+          },
+          {
+            "encoded_hex": "08424c4950011802021501010201022601010101047a04010301010101010309050110626c69702e7761736d63616c6c30010208020c01010101010101",
+            "error": "invalid envelope header",
+            "one_byte_reconstructions": []
+          },
+          {
+            "encoded_hex": "08424c49500118020216010102010226010101010857873ece0103010101010103090501106269702e7761736d63616c6c30010208020d01010101010101",
+            "error": "invalid envelope header",
+            "one_byte_reconstructions": [
+              {
+                "encoded_hex": "08424c49500118020216010102010226010101010857873ece010301010101010309050110626c69702e7761736d63616c6c30010208020d01010101010101",
+                "request_id": 22,
+                "frame_crc32": 2496986593,
+                "response": {
+                  "operation": "action",
+                  "component": "blip.wasm",
+                  "control": "call0",
+                  "error_domain": "none",
+                  "error_code": "none",
+                  "detail": "",
+                  "values": [
+                    {
+                      "type": "integer",
+                      "value": 13
+                    }
+                  ]
+                },
+                "insertions": [
+                  {
+                    "offset": 38,
+                    "byte": 108
+                  }
+                ],
+                "driver_trace": {
+                  "sequence": 22,
+                  "request_id": 22,
+                  "encoded_bytes": 63,
+                  "frame_crc32": 2496986593,
+                  "pre_driver_valid": true,
+                  "written": 65
+                },
+                "matches_valid_pre_driver_frame": true
+              }
+            ]
+          },
+          {
+            "encoded_hex": "492028343038382920776966693a73746174653a20696e6974202d3e2061757468202830786230290d0a492028343139312920776966693a73746174653a2061757468202d3e206173736f632028307830290d0a492028343230352920776966693a73746174653a206173736f63202d3e2072756e202830783130290d0a492028343232362920776966693a636f6e6e656374656420776974682041726368692d776966692067756573742c20616964203d20322c206368616e6e656c20312c20425732302c206273736964203d2033613a30373a31363a30393a30333a66310d0a492028343233352920776966693a73656375726974793a20575041322d50534b2c207068793a2062676e2c20727373693a202d37322c206369706865722870616972776973653a3078332c2067726f75703a307833292c20706d663a300d0a492028343234342920776966693a706d2073746172742c20747970653a20310d0a0d0a492028343234372920776966693a64703a20312c2062693a203132323838302c206c693a20322c207363616c65206c697374656e20696e74657276616c2066726f6d2033303732303020757320746f203234353736302075730d0a492028343330342920776966693a4150277320626561636f6e20696e74657276616c203d203132323838302075732c204454494d20706572696f64203d20320d0a492028343738312920776966693a3c62612d6164643e6964783a3020286966783a302c2033613a30373a31363a30393a30333a6631292c207469643a302c2073736e3a302c2077696e53697a653a36340d0a4920283830313529206573705f6e657469665f68616e646c6572733a207374612069703a203139322e3136382e32372e3134392c206d61736b3a203235352e3235352e3235352e3139322c2067773a203139322e3136382e32372e3132390d0a",
+            "error": "invalid delimited COBS frame",
+            "one_byte_reconstructions": []
+          }
+        ]
+      },
+      {
+        "trial": 2,
+        "requests": [
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62
+        ],
+        "responses": [
+          {
+            "request_id": 50,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 25
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 51,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 26
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 52,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 27
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 53,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 28
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 54,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 29
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 55,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 30
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 56,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 31
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 57,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 32
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 58,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 33
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 60,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "invalid_state",
+              "detail": "module-not-loaded",
+              "values": []
+            }
+          },
+          {
+            "request_id": 61,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "invalid_state",
+              "detail": "module-not-loaded",
+              "values": []
+            }
+          },
+          {
+            "request_id": 62,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "cancel_all",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": []
+            }
+          }
+        ],
+        "errors": [
+          {
+            "request_id": 59,
+            "error": "serial request 59 timed out"
+          }
+        ],
+        "probe_request_id": 63,
+        "probe_response": {
+          "operation": "get",
+          "component": "blip.bootstrap",
+          "control": "probe_value",
+          "error_domain": "none",
+          "error_code": "none",
+          "detail": "",
+          "values": [
+            {
+              "type": "integer",
+              "value": 0
+            }
+          ]
+        },
+        "trace_end_seen": true,
+        "driver_traces": [
+          {
+            "sequence": 32,
+            "request_id": 32,
+            "encoded_bytes": 64,
+            "frame_crc32": 2640285741,
+            "pre_driver_valid": true,
+            "written": 66
+          },
+          {
+            "sequence": 33,
+            "request_id": 33,
+            "encoded_bytes": 97,
+            "frame_crc32": 1858333908,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 34,
+            "request_id": 34,
+            "encoded_bytes": 70,
+            "frame_crc32": 2984811151,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 35,
+            "request_id": 35,
+            "encoded_bytes": 97,
+            "frame_crc32": 1051492647,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 36,
+            "request_id": 36,
+            "encoded_bytes": 70,
+            "frame_crc32": 3868819419,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 37,
+            "request_id": 37,
+            "encoded_bytes": 97,
+            "frame_crc32": 2998028959,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 38,
+            "request_id": 38,
+            "encoded_bytes": 70,
+            "frame_crc32": 3910374741,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 39,
+            "request_id": 39,
+            "encoded_bytes": 97,
+            "frame_crc32": 3272244189,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 40,
+            "request_id": 40,
+            "encoded_bytes": 70,
+            "frame_crc32": 203511487,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 41,
+            "request_id": 41,
+            "encoded_bytes": 97,
+            "frame_crc32": 616773889,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 42,
+            "request_id": 42,
+            "encoded_bytes": 70,
+            "frame_crc32": 3846896475,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 43,
+            "request_id": 43,
+            "encoded_bytes": 97,
+            "frame_crc32": 2358553429,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 44,
+            "request_id": 44,
+            "encoded_bytes": 70,
+            "frame_crc32": 3815132252,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 45,
+            "request_id": 45,
+            "encoded_bytes": 97,
+            "frame_crc32": 2836234202,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 46,
+            "request_id": 46,
+            "encoded_bytes": 71,
+            "frame_crc32": 1411249084,
+            "pre_driver_valid": true,
+            "written": 73
+          },
+          {
+            "sequence": 47,
+            "request_id": 47,
+            "encoded_bytes": 97,
+            "frame_crc32": 2244601663,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 48,
+            "request_id": 48,
+            "encoded_bytes": 64,
+            "frame_crc32": 3823321504,
+            "pre_driver_valid": true,
+            "written": 66
+          },
+          {
+            "sequence": 49,
+            "request_id": 49,
+            "encoded_bytes": 57,
+            "frame_crc32": 3925559350,
+            "pre_driver_valid": true,
+            "written": 59
+          },
+          {
+            "sequence": 50,
+            "request_id": 50,
+            "encoded_bytes": 63,
+            "frame_crc32": 653358573,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 51,
+            "request_id": 51,
+            "encoded_bytes": 63,
+            "frame_crc32": 570391080,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 52,
+            "request_id": 52,
+            "encoded_bytes": 63,
+            "frame_crc32": 496932040,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 53,
+            "request_id": 53,
+            "encoded_bytes": 63,
+            "frame_crc32": 3817732336,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 54,
+            "request_id": 54,
+            "encoded_bytes": 63,
+            "frame_crc32": 327322434,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 55,
+            "request_id": 55,
+            "encoded_bytes": 63,
+            "frame_crc32": 344753287,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 56,
+            "request_id": 56,
+            "encoded_bytes": 63,
+            "frame_crc32": 1799444098,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 57,
+            "request_id": 57,
+            "encoded_bytes": 63,
+            "frame_crc32": 1268874907,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 58,
+            "request_id": 58,
+            "encoded_bytes": 63,
+            "frame_crc32": 3148746025,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 59,
+            "request_id": 59,
+            "encoded_bytes": 68,
+            "frame_crc32": 1329538741,
+            "pre_driver_valid": true,
+            "written": 70
+          },
+          {
+            "sequence": 60,
+            "request_id": 60,
+            "encoded_bytes": 68,
+            "frame_crc32": 4008866606,
+            "pre_driver_valid": true,
+            "written": 70
+          },
+          {
+            "sequence": 61,
+            "request_id": 61,
+            "encoded_bytes": 68,
+            "frame_crc32": 4144641392,
+            "pre_driver_valid": true,
+            "written": 70
+          },
+          {
+            "sequence": 62,
+            "request_id": 62,
+            "encoded_bytes": 56,
+            "frame_crc32": 675436432,
+            "pre_driver_valid": true,
+            "written": 58
+          },
+          {
+            "sequence": 63,
+            "request_id": 63,
+            "encoded_bytes": 74,
+            "frame_crc32": 2840467091,
+            "pre_driver_valid": true,
+            "written": 76
+          }
+        ],
+        "invalid_trace_lines": [],
+        "raw_bytes": 852,
+        "raw_sha256": "e2140dc64154e5b1819bc7081c238d075475e4f53a974e23db3577d22bbdd89d",
+        "independently_decoded": [
+          {
+            "kind": 2,
+            "request_id": 50,
+            "encoded_hex": "08424c4950011802023201010201022601010101089e28ec04010301010101010309050110626c69702e7761736d63616c6c30010208021901010101010101",
+            "frame_crc32": 653358573,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 25
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 51,
+            "encoded_hex": "08424c495001180202330101020102260101010108cb86c68b010301010101010309050110626c69702e7761736d63616c6c30010208021a01010101010101",
+            "frame_crc32": 570391080,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 26
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 52,
+            "encoded_hex": "08424c49500118020234010102010226010101010857da1443010301010101010309050110626c69702e7761736d63616c6c30010208021b01010101010101",
+            "frame_crc32": 496932040,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 27
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 53,
+            "encoded_hex": "08424c495001180202350101020102260101010108f87a7448010301010101010309050110626c69702e7761736d63616c6c30010208021c01010101010101",
+            "frame_crc32": 3817732336,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 28
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 54,
+            "encoded_hex": "08424c495001180202360101020102260101010108bc803086010301010101010309050110626c69702e7761736d63616c6c30010208021d01010101010101",
+            "frame_crc32": 327322434,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 29
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 55,
+            "encoded_hex": "08424c495001180202370101020102260101010108e92e1a09010301010101010309050110626c69702e7761736d63616c6c30010208021e01010101010101",
+            "frame_crc32": 344753287,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 30
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 56,
+            "encoded_hex": "08424c495001180202380101020102260101010108c53fe5cc010301010101010309050110626c69702e7761736d63616c6c30010208021f01010101010101",
+            "frame_crc32": 1799444098,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 31
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 57,
+            "encoded_hex": "08424c495001180202390101020102260101010108a2d7ad91010301010101010309050110626c69702e7761736d63616c6c30010208022001010101010101",
+            "frame_crc32": 1268874907,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 32
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 58,
+            "encoded_hex": "08424c4950011802023a0101020102260101010108e62de95f010301010101010309050110626c69702e7761736d63616c6c30010208022101010101010101",
+            "frame_crc32": 3148746025,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 33
+                }
+              ]
+            }
+          },
+          {
+            "kind": 4,
+            "request_id": 60,
+            "encoded_hex": "08424c4950011804023c01010201022b010101010776b33048010301020902020409051120626c69702e7761736d63616c6c306d6f64756c652d6e6f742d6c6f61646564",
+            "frame_crc32": 4008866606,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "invalid_state",
+              "detail": "module-not-loaded",
+              "values": []
+            }
+          },
+          {
+            "kind": 4,
+            "request_id": 61,
+            "encoded_hex": "08424c4950011804023d01010201022b010101010787b67c21010301020902020409051120626c69702e7761736d63616c6c306d6f64756c652d6e6f742d6c6f61646564",
+            "frame_crc32": 4144641392,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "invalid_state",
+              "detail": "module-not-loaded",
+              "values": []
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 62,
+            "encoded_hex": "08424c4950011802023e01010201021f0101010107a8dcb2e40103010101010103090a0114626c69702e7761736d63616e63656c5f616c6c",
+            "frame_crc32": 675436432,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "cancel_all",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": []
+            }
+          }
+        ],
+        "invalid_candidates": [
+          {
+            "encoded_hex": "424c4950011804023b01010201022b010101010747aea731010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+            "error": "invalid COBS code",
+            "one_byte_reconstructions": [
+              {
+                "encoded_hex": "08424c4950011804023b01010201022b010101010747aea731010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+                "request_id": 59,
+                "frame_crc32": 1329538741,
+                "response": {
+                  "operation": "action",
+                  "component": "blip.wasm",
+                  "control": "call0",
+                  "error_domain": "control",
+                  "error_code": "queue_full",
+                  "detail": "worker-queue-full",
+                  "values": []
+                },
+                "insertions": [
+                  {
+                    "offset": 0,
+                    "byte": 8
+                  }
+                ],
+                "driver_trace": {
+                  "sequence": 59,
+                  "request_id": 59,
+                  "encoded_bytes": 68,
+                  "frame_crc32": 1329538741,
+                  "pre_driver_valid": true,
+                  "written": 70
+                },
+                "matches_valid_pre_driver_frame": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "trial": 3,
+        "requests": [
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95
+        ],
+        "responses": [
+          {
+            "request_id": 83,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 42
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 84,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 43
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 85,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 44
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 86,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 45
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 87,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 46
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 88,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 47
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 89,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 48
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 90,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 49
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 91,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 50
+                }
+              ]
+            }
+          },
+          {
+            "request_id": 92,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "request_id": 93,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "request_id": 94,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "request_id": 95,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "cancel_all",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": []
+            }
+          }
+        ],
+        "errors": [],
+        "probe_request_id": 96,
+        "probe_response": {
+          "operation": "get",
+          "component": "blip.bootstrap",
+          "control": "probe_value",
+          "error_domain": "none",
+          "error_code": "none",
+          "detail": "",
+          "values": [
+            {
+              "type": "integer",
+              "value": 0
+            }
+          ]
+        },
+        "trace_end_seen": true,
+        "driver_traces": [
+          {
+            "sequence": 65,
+            "request_id": 65,
+            "encoded_bytes": 64,
+            "frame_crc32": 1293799544,
+            "pre_driver_valid": true,
+            "written": 66
+          },
+          {
+            "sequence": 66,
+            "request_id": 66,
+            "encoded_bytes": 97,
+            "frame_crc32": 4157263823,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 67,
+            "request_id": 67,
+            "encoded_bytes": 70,
+            "frame_crc32": 2539157284,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 68,
+            "request_id": 68,
+            "encoded_bytes": 97,
+            "frame_crc32": 31513067,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 69,
+            "request_id": 69,
+            "encoded_bytes": 70,
+            "frame_crc32": 1438152367,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 70,
+            "request_id": 70,
+            "encoded_bytes": 97,
+            "frame_crc32": 2049700541,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 71,
+            "request_id": 71,
+            "encoded_bytes": 70,
+            "frame_crc32": 3483597054,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 72,
+            "request_id": 72,
+            "encoded_bytes": 97,
+            "frame_crc32": 1975737773,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 73,
+            "request_id": 73,
+            "encoded_bytes": 70,
+            "frame_crc32": 1507924129,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 74,
+            "request_id": 74,
+            "encoded_bytes": 97,
+            "frame_crc32": 995480457,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 75,
+            "request_id": 75,
+            "encoded_bytes": 70,
+            "frame_crc32": 3287946992,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 76,
+            "request_id": 76,
+            "encoded_bytes": 97,
+            "frame_crc32": 1232235059,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 77,
+            "request_id": 77,
+            "encoded_bytes": 70,
+            "frame_crc32": 1190448573,
+            "pre_driver_valid": true,
+            "written": 72
+          },
+          {
+            "sequence": 78,
+            "request_id": 78,
+            "encoded_bytes": 97,
+            "frame_crc32": 3587324855,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 79,
+            "request_id": 79,
+            "encoded_bytes": 71,
+            "frame_crc32": 598065111,
+            "pre_driver_valid": true,
+            "written": 73
+          },
+          {
+            "sequence": 80,
+            "request_id": 80,
+            "encoded_bytes": 97,
+            "frame_crc32": 163033921,
+            "pre_driver_valid": true,
+            "written": 99
+          },
+          {
+            "sequence": 81,
+            "request_id": 81,
+            "encoded_bytes": 64,
+            "frame_crc32": 2211267986,
+            "pre_driver_valid": true,
+            "written": 66
+          },
+          {
+            "sequence": 82,
+            "request_id": 82,
+            "encoded_bytes": 57,
+            "frame_crc32": 2178569214,
+            "pre_driver_valid": true,
+            "written": 59
+          },
+          {
+            "sequence": 83,
+            "request_id": 83,
+            "encoded_bytes": 63,
+            "frame_crc32": 1937041292,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 84,
+            "request_id": 84,
+            "encoded_bytes": 63,
+            "frame_crc32": 1326778732,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 85,
+            "request_id": 85,
+            "encoded_bytes": 63,
+            "frame_crc32": 2969986388,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 86,
+            "request_id": 86,
+            "encoded_bytes": 63,
+            "frame_crc32": 1091114726,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 87,
+            "request_id": 87,
+            "encoded_bytes": 63,
+            "frame_crc32": 1174870307,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 88,
+            "request_id": 88,
+            "encoded_bytes": 63,
+            "frame_crc32": 969591590,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 89,
+            "request_id": 89,
+            "encoded_bytes": 63,
+            "frame_crc32": 3154503123,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 90,
+            "request_id": 90,
+            "encoded_bytes": 63,
+            "frame_crc32": 1275762273,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 91,
+            "request_id": 91,
+            "encoded_bytes": 63,
+            "frame_crc32": 1258592676,
+            "pre_driver_valid": true,
+            "written": 65
+          },
+          {
+            "sequence": 92,
+            "request_id": 92,
+            "encoded_bytes": 68,
+            "frame_crc32": 1134082728,
+            "pre_driver_valid": true,
+            "written": 70
+          },
+          {
+            "sequence": 93,
+            "request_id": 93,
+            "encoded_bytes": 68,
+            "frame_crc32": 1516305654,
+            "pre_driver_valid": true,
+            "written": 70
+          },
+          {
+            "sequence": 94,
+            "request_id": 94,
+            "encoded_bytes": 68,
+            "frame_crc32": 1885877780,
+            "pre_driver_valid": true,
+            "written": 70
+          },
+          {
+            "sequence": 95,
+            "request_id": 95,
+            "encoded_bytes": 56,
+            "frame_crc32": 2392432788,
+            "pre_driver_valid": true,
+            "written": 58
+          },
+          {
+            "sequence": 96,
+            "request_id": 96,
+            "encoded_bytes": 74,
+            "frame_crc32": 444468842,
+            "pre_driver_valid": true,
+            "written": 76
+          }
+        ],
+        "invalid_trace_lines": [],
+        "raw_bytes": 853,
+        "raw_sha256": "83af8b13ed2c85d4c6ad7a70c94f6ff7fd89f62875072d6e06b66e42dffc6ee0",
+        "independently_decoded": [
+          {
+            "kind": 2,
+            "request_id": 83,
+            "encoded_hex": "08424c495001180202530101020102260101010108f68ed453010301010101010309050110626c69702e7761736d63616c6c30010208022a01010101010101",
+            "frame_crc32": 1937041292,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 42
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 84,
+            "encoded_hex": "08424c4950011802025401010201022601010101086ad2069b010301010101010309050110626c69702e7761736d63616c6c30010208022b01010101010101",
+            "frame_crc32": 1326778732,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 43
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 85,
+            "encoded_hex": "08424c495001180202550101020102260101010108c5726690010301010101010309050110626c69702e7761736d63616c6c30010208022c01010101010101",
+            "frame_crc32": 2969986388,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 44
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 86,
+            "encoded_hex": "08424c4950011802025601010201022601010101088188225e010301010101010309050110626c69702e7761736d63616c6c30010208022d01010101010101",
+            "frame_crc32": 1091114726,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 45
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 87,
+            "encoded_hex": "08424c495001180202570101020102260101010108d42608d1010301010101010309050110626c69702e7761736d63616c6c30010208022e01010101010101",
+            "frame_crc32": 1174870307,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 46
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 88,
+            "encoded_hex": "08424c495001180202580101020102260101010108f837f714010301010101010309050110626c69702e7761736d63616c6c30010208022f01010101010101",
+            "frame_crc32": 969591590,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 47
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 89,
+            "encoded_hex": "08424c495001180202590101020102260101010108c9bdc9b0010301010101010309050110626c69702e7761736d63616c6c30010208023001010101010101",
+            "frame_crc32": 3154503123,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 48
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 90,
+            "encoded_hex": "08424c4950011802025a01010201022601010101088d478d7e010301010101010309050110626c69702e7761736d63616c6c30010208023101010101010101",
+            "frame_crc32": 1275762273,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 49
+                }
+              ]
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 91,
+            "encoded_hex": "08424c4950011802025b0101020102260101010108d8e9a7f1010301010101010309050110626c69702e7761736d63616c6c30010208023201010101010101",
+            "frame_crc32": 1258592676,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 50
+                }
+              ]
+            }
+          },
+          {
+            "kind": 4,
+            "request_id": 92,
+            "encoded_hex": "08424c4950011804025c01010201022b01010101072f300d39010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+            "frame_crc32": 1134082728,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "kind": 4,
+            "request_id": 93,
+            "encoded_hex": "08424c4950011804025d01010201022b0101010107de354150010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+            "frame_crc32": 1516305654,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "kind": 4,
+            "request_id": 94,
+            "encoded_hex": "08424c4950011804025e01010201022b0101010107cd3b95eb010301020902100409051120626c69702e7761736d63616c6c30776f726b65722d71756575652d66756c6c",
+            "frame_crc32": 1885877780,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "call0",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "worker-queue-full",
+              "values": []
+            }
+          },
+          {
+            "kind": 2,
+            "request_id": 95,
+            "encoded_hex": "08424c4950011802025f01010201021f0101010107b321164b0103010101010103090a0114626c69702e7761736d63616e63656c5f616c6c",
+            "frame_crc32": 2392432788,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "cancel_all",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": []
+            }
+          }
+        ],
+        "invalid_candidates": []
+      }
+    ],
+    "queue_overload_qualification": false,
+    "flashed_mac": "94:b9:7e:8b:b7:84",
+    "subsequent_probe_value": 0,
+    "diagnostic_completed": true
+  },
+  "limitations": [
+    "A driver return count proves admission, not delivery on the physical wire. The UART driver/ISR, electrical path, USB bridge, Windows serial driver and pyserial remain possible locations.",
+    "Some malformed candidates have more than one missing byte and are not reconstructed by the one-byte diagnostic. Console text between delimiters is also recorded as an invalid COBS candidate; it is expected and is not a damaged binary reply.",
+    "The trace changes CPU/stack use; instrumentation still reproduced the loss in two of three trials, with the third healthy.",
+    "Offline reconstructions are diagnostic inference checked against both envelope and pre-driver frame CRCs. They were never accepted by the control client.",
+    "The diagnostic does not establish queue-overload acceptance or close the M5StickC's two omitted production HIL checks."
+  ]
+}
