@@ -10,8 +10,9 @@ WAMR fast interpreter after the three-family hardware comparison. The
 [benchmark](../../qualification/wasm/README.md) is a separate qualification
 project; its adapter is not the production service. The separate
 [service qualification](../../qualification/wasm-service/README.md) builds this
-implementation on all three processor families. Production component/task
-integration, provider/SDK work and Gate D remain open.
+implementation on all three processor families. The opt-in production worker
+has preliminary Ball C6 coexistence evidence. Seven-profile compatibility,
+native task lifecycle, provider/SDK work and full Gate D remain open.
 
 ## Current contract
 
@@ -35,11 +36,46 @@ integration, provider/SDK work and Gate D remain open.
   are rejected. Initialization must use an explicit budgeted export.
 - Calls enforce instruction fuel. Cancellation tokens are admission checks;
   active token/deadline observation belongs to the platform supervisor. Nonzero
-  deadlines are currently refused because that production supervisor is not yet
-  implemented. No wall-clock or real firmware task coexistence claim is made.
+  runtime-level deadlines are refused. `EspWasmComponent` owns the wall-clock
+  supervisor and passes fuel/admission cancellation into the runtime. It rejects
+  late results; completion can be delayed by higher-priority SDK/cache work.
 
-The component is not enabled in the production firmware entry point yet. Its
+Production selects it with `-D BLIP_ENABLE_WASM=ON`; the default is off. Its
 ESP-IDF CMake recipe requires `BLIP_WASM_DEPS` pointing to the pinned, unmodified
-WAMR checkout. The standalone qualifier supplies that property. Core host tests
+WAMR checkout (default `build/wasm-deps`). Core host tests
 exercise the same service against interchangeable fake engines; they do not
 compile WAMR or claim interpreter validation coverage.
+
+## Production worker
+
+[ADR-0010](../../../docs/v2/adr/0010-wasm-production-worker.md) declares the
+priority-2 worker (8 KiB native stack) and priority-6 supervisor (4 KiB stack).
+Startup reserves an aligned 80 KiB engine pool and 16 KiB module buffer in
+internal RAM. Requests and results are copied into an eight-request queue and
+sixteen-completion ring; overload rejects new work. IDs/epochs never repeat.
+
+`upload_begin(bytes, crc32)`, contiguous `upload_chunk(offset, hex)` chunks of
+up to 64 bytes, and `upload_commit` load a volatile module. Beginning an upload
+unloads the previous module before reusing its retained bytes. CRC validation
+is an integrity check. Decoded code/tables/memory must also fit the pool; an
+admissible 16 KiB input is not guaranteed to load successfully.
+
+`call0` and `call_i32` return asynchronous request IDs. `completion(id)` returns
+ready/error/result-count/elapsed-us; `result(id,index)` returns type/low32/high32
+numeric bits. Expired completions return an explicit error. The typed C++ entry
+point supports all numeric signatures. `cancel_all` invalidates active, queued
+and staged upload work; stale module generations cannot execute after reload.
+
+Instruction/deadline parameters are captured per call. Defaults are 10,000
+instructions and 10 ms; maxima are 1,000,000 and 50 ms. The WASM SDK profile uses
+1 ms ticks, bounds Wi-Fi buffers and places optional Wi-Fi fast paths in flash.
+Use a fresh build directory when enabling this SDK profile: defaults do not
+replace values in an existing `sdkconfig`. The recipe refuses other tick rates.
+No guest imports are available yet. The control path never invokes guest code
+inline. Stop disables admission, cancels and joins the worker before freeing
+its buffers, retaining resources if quiescence fails.
+
+The HIL driver is `v2/tools/control/blip_wasm_hil.py`. Optional `--ip` traffic
+requires an already reachable board. `blip_wasm_network_hil.ps1` temporarily
+joins a saved network using an independent, verified recovery process and a
+temporary profile clone, then verifies the original Internet connection.

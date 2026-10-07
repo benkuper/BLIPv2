@@ -1,4 +1,5 @@
 #include "blip/wasm/service.hpp"
+#include "blip/wasm/module_upload.hpp"
 #include <array>
 #include <cstring>
 #include <iostream>
@@ -168,12 +169,34 @@ bool backend_contract_violations_are_faults() {
     }
     return true;
 }
+bool bounded_upload_crc_and_lifecycle() {
+    std::array<std::byte, 16> storage{};
+    ModuleUpload upload(storage);
+    constexpr char text[] = "123456789";
+    const auto input = std::as_bytes(std::span(text, 9));
+    CHECK(!upload.append(0, input)); CHECK(!upload.begin(17, 0));
+    CHECK(upload.begin(9, 0xcbf43926)); CHECK(upload.append(0, input.first(4)));
+    CHECK(!upload.begin(1, 0)); CHECK(upload.received() == 4);
+    CHECK(!upload.append(0, input.first(4))); CHECK(!upload.append(5, input.last(5)));
+    CHECK(!upload.append(4, input.first(6))); CHECK(!upload.finish());
+    CHECK(upload.append(4, input.last(5)));
+    const auto valid = upload.finish(); CHECK(valid && valid.value().size() == 9);
+    CHECK(std::memcmp(valid.value().data(), text, 9) == 0);
+    CHECK(!upload.append(9, input.first(1)));
+    CHECK(upload.begin(9, 0)); CHECK(upload.append(0, input));
+    CHECK(!upload.finish()); CHECK(!upload.finish());
+    CHECK(upload.begin(9, 0xcbf43926)); upload.cancel();
+    CHECK(upload.received() == 0 && !upload.finish() && !upload.append(0, input));
+    CHECK(upload.begin(9, 0xcbf43926)); CHECK(upload.append(0, input)); CHECK(upload.finish());
+    return true;
+}
 }
 
 int main() {
     if (!runtime_replacement_and_bit_values() || !caller_lifetime_and_prevalidation() ||
         !invalid_calls_never_enter_engine() || !fault_requires_reload_and_retains_diagnostic() ||
-        !engine_failures_and_idempotent_cleanup() || !backend_contract_violations_are_faults()) return 1;
-    std::cout << "WASM service: 6 lifecycle, ownership, replacement and signature cases passed\n";
+        !engine_failures_and_idempotent_cleanup() || !backend_contract_violations_are_faults() ||
+        !bounded_upload_crc_and_lifecycle()) return 1;
+    std::cout << "WASM service: 7 lifecycle, ownership, replacement, signature and upload cases passed\n";
     return 0;
 }

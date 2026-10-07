@@ -114,10 +114,8 @@ core::Status WamrRuntime::load(std::span<std::byte> bytes) noexcept {
                                           fault_.data(), fault_.size());
     if (instance_) environment_ = wasm_runtime_create_exec_env(static_cast<wasm_module_inst_t>(instance_), limits_.wasm_stack_bytes);
     if (!environment_) { unload(); return failure(core::ErrorCode::capacity_exceeded, "load", "instance-allocation"); }
-    TaskStatus_t task{};
-    vTaskGetInfo(xTaskGetCurrentTaskHandle(), &task, pdFALSE, eInvalid);
     wasm_runtime_set_native_stack_boundary(static_cast<wasm_exec_env_t>(environment_),
-                                           reinterpret_cast<std::uint8_t*>(task.pxStackBase) + 2048);
+                                           reinterpret_cast<std::uint8_t*>(xTaskGetStackStart(nullptr)) + 2048);
     return core::Status::success();
 }
 

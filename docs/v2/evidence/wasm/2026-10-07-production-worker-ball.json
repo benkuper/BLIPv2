@@ -1,0 +1,1074 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-10-07T18:27:02.325313+00:00",
+  "result": "one-board production worker and coexistence passed; full Gate D qualification open",
+  "runtime": {
+    "name": "WAMR",
+    "commit": "25bd7eb63e828e4bd242cc9b38d260b4b31c6605",
+    "checkout_unmodified": true
+  },
+  "profile": {
+    "board": "creators-ball-v2",
+    "target": "esp32c6",
+    "enabled_features": [
+      "WASM",
+      "BLE",
+      "ESPNOW",
+      "FLEET",
+      "DDP",
+      "ARTNET"
+    ],
+    "app_bytes": 1806320,
+    "app_partition_bytes": 3145728
+  },
+  "fixed_costs": {
+    "engine_pool_bytes": 81920,
+    "module_buffer_bytes": 16384,
+    "wasm_stack_bytes_inside_pool": 4096,
+    "worker_native_stack_bytes": 8192,
+    "supervisor_native_stack_bytes": 4096,
+    "worker_priority": 2,
+    "supervisor_priority": 6,
+    "affinity": "none",
+    "queue_capacity": 8,
+    "completion_capacity": 16
+  },
+  "linked_size": {
+    "version": "1.2",
+    "total_size": 1805920,
+    "layout": [
+      {
+        "name": "Flash Code",
+        "total": 0,
+        "used": 1684320,
+        "free": 0,
+        "parts": {
+          ".text": {
+            "size": 1296960
+          },
+          ".rodata": {
+            "size": 386788
+          },
+          ".init_array": {
+            "size": 300
+          },
+          ".appdesc": {
+            "size": 256
+          },
+          ".tdata": {
+            "size": 16
+          }
+        }
+      },
+      {
+        "name": "DIRAM",
+        "total": 452112,
+        "used": 233668,
+        "free": 218444,
+        "parts": {
+          ".bss": {
+            "size": 111768
+          },
+          ".text": {
+            "size": 97436
+          },
+          ".data": {
+            "size": 24464
+          }
+        }
+      },
+      {
+        "name": "LP SRAM",
+        "total": 16384,
+        "used": 56,
+        "free": 16328,
+        "parts": {
+          ".rtc_noinit": {
+            "size": 32
+          },
+          ".rtc_reserved": {
+            "size": 24
+          }
+        }
+      }
+    ]
+  },
+  "comparison": {
+    "prior_ball_source_commit": "7a0f27050c33f70cf17090398632b6d984b4733e",
+    "prior_app_bytes": 1707232,
+    "prior_app_sha256": "0c55307b4e0df6871390b5adffaf8a51ffeba80939798e531dae447b0682d8d2",
+    "app_delta_bytes": 99088,
+    "note": "Profile comparison includes the new Wi-Fi RAM and tick settings; not an isolated engine delta."
+  },
+  "trial": {
+    "schema_version": 1,
+    "board": "creators-ball-v2",
+    "port": "COM10",
+    "passed": true,
+    "checks": [
+      {
+        "name": "initial-unload",
+        "passed": true
+      },
+      {
+        "name": "worker-ready",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 18824
+      },
+      {
+        "name": "i32-result-bits",
+        "passed": true,
+        "bits": [
+          0,
+          4294967295,
+          0
+        ],
+        "error": "none",
+        "count": 1,
+        "elapsed_us": 2613
+      },
+      {
+        "name": "unreachable",
+        "passed": true,
+        "state": "faulted",
+        "error": "verification_failed",
+        "count": 0,
+        "elapsed_us": 2147
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 16278
+      },
+      {
+        "name": "out-of-bounds",
+        "passed": true,
+        "state": "faulted",
+        "error": "verification_failed",
+        "count": 0,
+        "elapsed_us": 3005
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 14403
+      },
+      {
+        "name": "divide-zero",
+        "passed": true,
+        "state": "faulted",
+        "error": "verification_failed",
+        "count": 0,
+        "elapsed_us": 3747
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 14042
+      },
+      {
+        "name": "recursive-stack",
+        "passed": true,
+        "state": "faulted",
+        "error": "verification_failed",
+        "count": 0,
+        "elapsed_us": 2954
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 13603
+      },
+      {
+        "name": "instruction-fuel",
+        "passed": true,
+        "state": "faulted",
+        "error": "budget_exceeded",
+        "count": 0,
+        "elapsed_us": 52361
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 15994
+      },
+      {
+        "name": "reject-start_loop",
+        "passed": true,
+        "error": "validation_failed",
+        "count": 0,
+        "elapsed_us": 908
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 15045
+      },
+      {
+        "name": "reject-post_loop",
+        "passed": true,
+        "error": "validation_failed",
+        "count": 0,
+        "elapsed_us": 9871
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 18582
+      },
+      {
+        "name": "reject-ctor_loop",
+        "passed": true,
+        "error": "validation_failed",
+        "count": 0,
+        "elapsed_us": 4210
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 15334
+      },
+      {
+        "name": "reject-initialize_loop",
+        "passed": true,
+        "error": "validation_failed",
+        "count": 0,
+        "elapsed_us": 4838
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 14665
+      },
+      {
+        "name": "reject-imported",
+        "passed": true,
+        "error": "validation_failed",
+        "count": 0,
+        "elapsed_us": 3131
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 14400
+      },
+      {
+        "name": "reject-large_memory",
+        "passed": true,
+        "error": "capacity_exceeded",
+        "count": 0,
+        "elapsed_us": 4647
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 14827
+      },
+      {
+        "name": "crc-rejection",
+        "passed": true,
+        "error": "verification_failed",
+        "count": 0,
+        "elapsed_us": 841
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 17408
+      },
+      {
+        "name": "wall-clock-deadline",
+        "passed": true,
+        "error": "budget_exceeded",
+        "count": 0,
+        "elapsed_us": 7280
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 14335
+      },
+      {
+        "name": "cancel-call-admitted",
+        "passed": true
+      },
+      {
+        "name": "active-cancel",
+        "passed": true,
+        "error": "cancelled",
+        "count": 0,
+        "elapsed_us": 7975
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 19032
+      },
+      {
+        "name": "queue-reject-new",
+        "passed": true,
+        "accepted": [
+          1200,
+          1201,
+          1202,
+          1203,
+          1204,
+          1205,
+          1206,
+          1207
+        ],
+        "rejected": [
+          "queue_full",
+          "queue_full",
+          "queue_full",
+          "queue_full"
+        ]
+      },
+      {
+        "name": "queued-cancellation",
+        "passed": true,
+        "results": [
+          {
+            "error": "cancelled",
+            "count": 0,
+            "elapsed_us": 882
+          },
+          {
+            "error": "cancelled",
+            "count": 0,
+            "elapsed_us": 1181
+          },
+          {
+            "error": "cancelled",
+            "count": 0,
+            "elapsed_us": 835
+          },
+          {
+            "error": "cancelled",
+            "count": 0,
+            "elapsed_us": 1109
+          },
+          {
+            "error": "cancelled",
+            "count": 0,
+            "elapsed_us": 809
+          },
+          {
+            "error": "cancelled",
+            "count": 0,
+            "elapsed_us": 803
+          },
+          {
+            "error": "cancelled",
+            "count": 0,
+            "elapsed_us": 607
+          },
+          {
+            "error": "cancelled",
+            "count": 0,
+            "elapsed_us": 833
+          }
+        ]
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 14092
+      },
+      {
+        "name": "stale-module-generation",
+        "passed": true,
+        "results": [
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51840
+          },
+          {
+            "error": "none",
+            "count": 0,
+            "elapsed_us": 2930
+          },
+          {
+            "error": "cancelled",
+            "count": 0,
+            "elapsed_us": 827
+          }
+        ]
+      },
+      {
+        "name": "partial-upload-begin",
+        "passed": true
+      },
+      {
+        "name": "partial-upload-chunk",
+        "passed": true
+      },
+      {
+        "name": "cancel-upload-snapshot",
+        "passed": true
+      },
+      {
+        "name": "cancel-upload-commit",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 16172
+      },
+      {
+        "name": "expiry-baseline",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-ring-call",
+        "passed": true
+      },
+      {
+        "name": "completion-expired",
+        "passed": true,
+        "response": "completion-expired"
+      },
+      {
+        "name": "cycle-warmup",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 16082
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 14674
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 19299
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 16099
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 17830
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 21085
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 15499
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 16210
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 17310
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 17691
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 15935
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 17834
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 15649
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 17518
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 18208
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 15158
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 16219
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 14552
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 17763
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "valid-load",
+        "passed": true,
+        "error": "none",
+        "count": 0,
+        "elapsed_us": 15168
+      },
+      {
+        "name": "cycle-call",
+        "passed": true
+      },
+      {
+        "name": "cycle-unload",
+        "passed": true
+      },
+      {
+        "name": "non-growing-load-cycles",
+        "passed": true,
+        "before": 36120,
+        "after": 36120,
+        "cycles": 20
+      },
+      {
+        "name": "led-network-settings-coexistence",
+        "passed": true
+      }
+    ],
+    "fixture_sha256": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+    "source_snapshot": {
+      "sha256": "03d9768d2ec8c6b8fba3cd30c2f2e9616df24ceb6df4a2b0073c29a5086aec71",
+      "files": {
+        "v2/components/blip_wasm/CMakeLists.txt": "c121dce5ea16f19d11ce5033feac5d2a73404caec5a56c6762e4b6d16cc124b2",
+        "v2/components/blip_wasm/include/blip/wasm/esp_wasm_component.hpp": "80f7453e32135aba05c7cccd62e876ecd5efb90fa18655b617001d129623afd7",
+        "v2/components/blip_wasm/include/blip/wasm/module_upload.hpp": "6a9e315dd3e95a41353e6db17e2fe249124aa621e810d133f6e81c27f0863d72",
+        "v2/components/blip_wasm/include/blip/wasm/runtime.hpp": "e2e96efa9ac97e884ea4e749464caf5c98e1843b4a7e3af71d1a04f2bcd18e04",
+        "v2/components/blip_wasm/include/blip/wasm/service.hpp": "fa6eb0f44e18bbda0f8991bc5166783590bd813b57547160ee119629ed7680be",
+        "v2/components/blip_wasm/include/blip/wasm/wamr_runtime.hpp": "80d5e4eeab0818dab868d0cef99b22b11880eb5a0ca0607954b51e9580222161",
+        "v2/components/blip_wasm/src/esp_wasm_component.cpp": "b2d8901fbd38ce9f14c48e1b57be6309bce3f4ef152557d32f1149c9ca6bc160",
+        "v2/components/blip_wasm/src/module_upload.cpp": "e3078a616d20be8ad30d7327f357e0ea07646625a04e3568fba9b340df691ab2",
+        "v2/components/blip_wasm/src/pool_memory.c": "85dbf29f3a3f1df93f21a96b118d5226dd1018ab4577fad4e6c6c1f68a46280b",
+        "v2/components/blip_wasm/src/service.cpp": "6faddb4bb1029f5e28d41d815b843b695ada4bc564e834aab947193e4c2ee9fd",
+        "v2/components/blip_wasm/src/wamr_runtime.cpp": "aa887682569bf1037f53a87d50242a2c9e2596236dc590599244d3c6183bdbee",
+        "v2/firmware/CMakeLists.txt": "2faf05720ad5fd8bc8812a2bd8327ceb2ef078bea3eccfa539c7e0a3e580abb8",
+        "v2/firmware/main/CMakeLists.txt": "c8199b533305ca60fbc63950f5c3b629c51ab0740d145e9062499cfbd3e176ee",
+        "v2/firmware/main/main.cpp": "dc67719e8d026e66765dd42305614daf1a2d05cb7703b684f9b772f88ab1ad88",
+        "v2/firmware/sdkconfig.wasm.defaults": "0896aadac662c8db2a4b95e7e2237d789679d24c395d874833b8e6b4d361046a",
+        "v2/qualification/wasm-service/main/fixtures.hpp": "6a980d7c7d6854b0e84afb6c73a100fdeef08c598b569bd8879987bc1ff67642",
+        "v2/tools/control/blip_serial_control.py": "5646d006d65d0182757210afe2017844713692bc70d0ef17b2effa0ed888d5d2",
+        "v2/tools/control/blip_wasm_hil.py": "466dbb39939194b916044fd9985538fb25d2a62209c8cf19c17f1f333acf395e",
+        "v2/tools/control/blip_wasm_network_hil.ps1": "ab0f25839d7aa34515705598f183e50d1e95ef8dfbfccfd3fc6c20ae5d74dda2",
+        "v2/tools/wifi/blip_wifi_guard.ps1": "3edc575bc0dc20041ed52a9ec2d5ae6577a5b89d8991827c73938dd212f22c7b",
+        "v2/tools/wifi/blip_wifi_recovery.ps1": "34cfce5048430bb55860c9f15e9ae08c3bdbd84748b754636ffe86cc3510b9ba"
+      }
+    },
+    "artifacts": {
+      "blip-v2.bin": "f58ad51200732118be7bf7ad0b0ad0bb216740e4c4e1a4183b3a63d35d086c9e",
+      "blip-v2.elf": "afbb52f6f7cdd44bb9ed2a9397fd3feb8b5d0426eb415b42767ad767afa5b5a5",
+      "blip-v2.map": "a175530f180d5e70eb50dede5db20dd34deb36c242a459f51dbe0f94de5af2aa",
+      "sdkconfig": "421b8c54206c03ec2bf4b1cbd892a52c53df43c347c96a709aae8c7e96f41ac7"
+    },
+    "metrics": {
+      "state": "ready",
+      "submitted": 1426,
+      "completed": 1426,
+      "failed": 115,
+      "rejected": 12,
+      "deadlines": 49,
+      "cancelled": 30,
+      "pool_reserved": 81920,
+      "pool_used": 0,
+      "pool_peak": 72176,
+      "worker_stack_headroom": 5168,
+      "supervisor_stack_headroom": 3464
+    },
+    "heap": {
+      "heap_free_internal": 36120,
+      "heap_minimum_internal": 16876,
+      "heap_largest_internal": 14848
+    },
+    "coexistence": {
+      "passed": true,
+      "ip": "192.168.27.186",
+      "pixels": 36,
+      "ddp_rate_hz": 60,
+      "before": {
+        "led_frames": 290,
+        "led_failures": 0,
+        "ddp_accepted": 280,
+        "ddp_output_rejections": 0
+      },
+      "after": {
+        "led_frames": 439,
+        "led_failures": 0,
+        "ddp_accepted": 425,
+        "ddp_output_rejections": 0
+      },
+      "network": {
+        "ddp_sent": 148,
+        "ddp_failures": [],
+        "http_ok": 9,
+        "http_failures": [],
+        "http_max_ms": 321.45379995927215
+      },
+      "script_calls": [
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 74149,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 68146,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 68328,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 68746,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 69076,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 78171,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 94644,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 79786,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 52351,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 83962,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 97522,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 56626,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 54021,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 51956,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 54026,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 51948,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 64987,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 67332,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 51825,
+          "probe": 0
+        },
+        {
+          "error": "budget_exceeded",
+          "count": 0,
+          "elapsed_us": 99402,
+          "probe": 0
+        }
+      ],
+      "settings_writes": 20,
+      "settings_restored": true,
+      "worker_state_after": "ready",
+      "worker_stack_headroom_after": 5168,
+      "supervisor_stack_headroom_after": 3464,
+      "heap_free_after": 36096,
+      "heap_minimum": 16876
+    },
+    "host_network": {
+      "temporary_profile_removed": true,
+      "original_profile": "Archi-Wifi",
+      "original_wifi_and_internet_restored": true,
+      "recovery_delay_seconds": 45,
+      "test_ssid": "Archi-wifi guest",
+      "independent_recovery_armed": true
+    }
+  },
+  "limitations": [
+    "Only the Ball C6 production profile is qualified here; six remaining board profiles are open.",
+    "Native component task stop/restart and allocation-failure lifecycle qualification are open.",
+    "Network and LED counters establish operation, not physical LED waveform timing or long-term RF performance.",
+    "Deadline failure is enforced; low worker priority and SDK/cache work can delay completion beyond the requested deadline.",
+    "BLE advertises and fleet is present; active BLE/fleet traffic was not injected in this trial.",
+    "Modules are volatile; provider imports, checked string ABI, registry script declarations and generated SDK remain open."
+  ]
+}

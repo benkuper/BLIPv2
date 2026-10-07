@@ -3,6 +3,10 @@
 #include "blip/core/esp_diagnostics_component.hpp"
 #include "blip/core/registry.hpp"
 #include "blip/core/scheduler.hpp"
+#if defined(BLIP_ENABLE_WASM)
+#include "blip/wasm/esp_wasm_component.hpp"
+#include "blip/wasm/wamr_runtime.hpp"
+#endif
 #if defined(BLIP_ENABLE_FLEET)
 #include "blip/fleet/esp_fleet_component.hpp"
 #endif
@@ -231,6 +235,10 @@ blip::power::EspSleepComponent* sleep_component{&sleep_storage};
 blip::ota::EspOtaComponent ota_component{"blip-v2", CONFIG_IDF_TARGET, "minimal"};
 blip::core::Registry<20> registry{};
 blip::core::RegistryControlService<20> control_component{registry};
+#if defined(BLIP_ENABLE_WASM)
+blip::wasm::WamrRuntime wasm_runtime{};
+blip::wasm::EspWasmComponent wasm_component{wasm_runtime};
+#endif
 #if defined(BLIP_ENABLE_FLEET)
 blip::fleet::EspFleetComponent fleet_component{
     control_component, settings_component.settings(), wifi_component};
@@ -331,6 +339,9 @@ void reject_pending_update() noexcept {
         if (!registry.add(fleet_component)) {
             return false;
         }
+#endif
+#if defined(BLIP_ENABLE_WASM)
+        if (!registry.add(wasm_component)) return false;
 #endif
 #if defined(BLIP_ENABLE_BLE)
         const auto ble_status = registry.add(ble_transport_component);
@@ -524,6 +535,9 @@ extern "C" void app_main() {
         return;
     }
     serial_transport_component.enable_control();
+#if defined(BLIP_ENABLE_WASM)
+    if (!safe_mode) wasm_component.enable_control();
+#endif
 #if defined(BLIP_ENABLE_FLEET)
     if (!safe_mode) {
         fleet_component.enable_control();
