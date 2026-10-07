@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "measured_at_utc": "2026-10-07T17:07:37.435889+00:00",
+  "scope": "Actual portable service and WAMR adapter; standalone tasks, production integration/Gate D open",
+  "source_sha256": "5886c00ee76c2609919ed46d85f0acc6a4b3727e11b9772a49c69d40e04e3f1e",
+  "boards": [
+    {
+      "board": "seeed-xiao-esp32c6",
+      "port": "COM13",
+      "chip": "esp32c6",
+      "source_sha256": "5886c00ee76c2609919ed46d85f0acc6a4b3727e11b9772a49c69d40e04e3f1e",
+      "pc_network_changed": false,
+      "inputs": {
+        "blip-wasm-service.bin": {
+          "bytes": 231600,
+          "sha256": "07e89d9888d8415551528c3683e407411510ca219c9a7c516eab243a19ce18f0"
+        },
+        "blip-wasm-service.elf": {
+          "bytes": 8121700,
+          "sha256": "344182e4bdd9625b6a245c1506e7ba8aba2764e9e936767af8982582bddb1b5a"
+        },
+        "blip-wasm-service.map": {
+          "bytes": 8727278,
+          "sha256": "d889abc8f990efc52e4acdfed21ed02d6dd2106894a139816dcadb8ee520b537"
+        },
+        "sdkconfig": {
+          "bytes": 67663,
+          "sha256": "88c6355ce247cd9d0eb930bc35199e1d82213e06c0a965df2efcd687618ffc14"
+        }
+      },
+      "wamr_commit": "25bd7eb63e828e4bd242cc9b38d260b4b31c6605",
+      "restore_requested": false,
+      "restored": false,
+      "records": [
+        {
+          "type": "start",
+          "chip": "esp32c6",
+          "idf": "v6.0.2",
+          "engine": "wamr-2.4.5-fast-metered",
+          "cpu_mhz": 160,
+          "pool_bytes": 98304,
+          "module_bytes": 16384,
+          "wasm_stack_bytes": 4096,
+          "native_stack_bytes": 16384,
+          "fixture_sha256": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199"
+        },
+        {
+          "type": "complete",
+          "checks": 390,
+          "failures": 0,
+          "load_unload_cycles": 100,
+          "start_stop_cycles": 20,
+          "heap_after_warmup": 342856,
+          "heap_min": 342856,
+          "heap_max": 342856,
+          "heap_after_stop": 343192,
+          "unloaded_pool_used": 0,
+          "pool_peak": 72176,
+          "stack_headroom_bytes": 13708,
+          "maximum_trap_us": 4647,
+          "cancel_us": 5823,
+          "cancel_requests": 1
+        }
+      ],
+      "passed": true,
+      "build": "build/m6-service-xiao"
+    },
+    {
+      "board": "m5dial",
+      "port": "COM9",
+      "chip": "esp32s3",
+      "source_sha256": "5886c00ee76c2609919ed46d85f0acc6a4b3727e11b9772a49c69d40e04e3f1e",
+      "pc_network_changed": false,
+      "inputs": {
+        "blip-wasm-service.bin": {
+          "bytes": 240224,
+          "sha256": "89dec228a51db53ac3b2dc2a9e83d758cb10046c24d3676508c11bd416c9cc0f"
+        },
+        "blip-wasm-service.elf": {
+          "bytes": 7710268,
+          "sha256": "353330f73c1e275a1751125abdf1bb914e264cfc5bad0e4cd48e0d7ee02bca3f"
+        },
+        "blip-wasm-service.map": {
+          "bytes": 11039599,
+          "sha256": "5db89507caf828367187c1cb2c152adb2886931357417430ea20f9d2aaa8ff0a"
+        },
+        "sdkconfig": {
+          "bytes": 68722,
+          "sha256": "27f8808a480ec647d57653db0eb6fff85a0ff66d148050341e46377caedc8edb"
+        }
+      },
+      "wamr_commit": "25bd7eb63e828e4bd242cc9b38d260b4b31c6605",
+      "restore_requested": false,
+      "restored": false,
+      "records": [
+        {
+          "type": "start",
+          "chip": "esp32s3",
+          "idf": "v6.0.2",
+          "engine": "wamr-2.4.5-fast-metered",
+          "cpu_mhz": 240,
+          "pool_bytes": 98304,
+          "module_bytes": 16384,
+          "wasm_stack_bytes": 4096,
+          "native_stack_bytes": 16384,
+          "fixture_sha256": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199"
+        },
+        {
+          "type": "complete",
+          "checks": 390,
+          "failures": 0,
+          "load_unload_cycles": 100,
+          "start_stop_cycles": 20,
+          "heap_after_warmup": 263632,
+          "heap_min": 263632,
+          "heap_max": 263632,
+          "heap_after_stop": 263968,
+          "unloaded_pool_used": 0,
+          "pool_peak": 72176,
+          "stack_headroom_bytes": 13148,
+          "maximum_trap_us": 3655,
+          "cancel_us": 5382,
+          "cancel_requests": 1
+        }
+      ],
+      "passed": true,
+      "build": "build/m6-service-m5dial"
+    },
+    {
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "chip": "esp32",
+      "source_sha256": "5886c00ee76c2609919ed46d85f0acc6a4b3727e11b9772a49c69d40e04e3f1e",
+      "pc_network_changed": false,
+      "inputs": {
+        "blip-wasm-service.bin": {
+          "bytes": 225376,
+          "sha256": "861fce859cf8d26e561828ecd06b4e8cd103280f5f4ed40f335bc8db975d99d4"
+        },
+        "blip-wasm-service.elf": {
+          "bytes": 7132344,
+          "sha256": "b8677744e76f087c9a109b3fc7da857861a70c43267d42f9410a60c81209f06c"
+        },
+        "blip-wasm-service.map": {
+          "bytes": 10765024,
+          "sha256": "55f4b37e730c35bb5264d085df15988e8e58693a6abedb9918f7ae88f1ca7fc6"
+        },
+        "sdkconfig": {
+          "bytes": 60205,
+          "sha256": "d01241fe96833646d018e30a59ace3d0ac90819020acb567f608db86a3b904b9"
+        }
+      },
+      "wamr_commit": "25bd7eb63e828e4bd242cc9b38d260b4b31c6605",
+      "restore_requested": false,
+      "restored": false,
+      "records": [
+        {
+          "type": "start",
+          "chip": "esp32",
+          "idf": "v6.0.2",
+          "engine": "wamr-2.4.5-fast-metered",
+          "cpu_mhz": 240,
+          "pool_bytes": 98304,
+          "module_bytes": 16384,
+          "wasm_stack_bytes": 4096,
+          "native_stack_bytes": 16384,
+          "fixture_sha256": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199"
+        },
+        {
+          "type": "complete",
+          "checks": 390,
+          "failures": 0,
+          "load_unload_cycles": 100,
+          "start_stop_cycles": 20,
+          "heap_after_warmup": 164544,
+          "heap_min": 164544,
+          "heap_max": 164544,
+          "heap_after_stop": 164880,
+          "unloaded_pool_used": 0,
+          "pool_peak": 72176,
+          "stack_headroom_bytes": 13364,
+          "maximum_trap_us": 4493,
+          "cancel_us": 6070,
+          "cancel_requests": 1
+        }
+      ],
+      "passed": true,
+      "build": "build/m6-service-huzzah32"
+    }
+  ]
+}

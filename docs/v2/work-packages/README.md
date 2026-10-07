@@ -68,3 +68,4 @@ wire protocols, or public OSC paths.
 | Work package | Result |
 | --- | --- |
 | [6.1](6.1-wasm-runtime-benchmark.md) | Nine standalone target benchmarks; metered WAMR selected in ADR-0008; production service and Gate D open |
+| [6.2](6.2-wasm-service.md) | Runtime-neutral service and actual WAMR adapter; 390 checks on three chip families, repeated lifecycle and active cancellation passed; production integration and Gate D open |
