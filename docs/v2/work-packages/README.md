@@ -69,4 +69,6 @@ wire protocols, or public OSC paths.
 | --- | --- |
 | [6.1](6.1-wasm-runtime-benchmark.md) | Nine standalone target benchmarks; metered WAMR selected in ADR-0008; service and production follow in 6.2/6.3 |
 | [6.2](6.2-wasm-service.md) | Runtime-neutral service and actual WAMR adapter; 390 checks on three chip families and repeated lifecycle passed; production slice in 6.3 |
-| [6.3](6.3-wasm-production-worker.md) | Opt-in supervised worker; Ball trap/cancellation/queue and LED/network/settings coexistence passed; six remaining profiles, native task lifecycle and full Gate D open |
+| [6.3](6.3-wasm-production-worker.md) | Opt-in supervised worker; Ball trap/cancellation/queue and LED/network/settings coexistence passed; full Gate D open |
+| [6.3 profile memory](6.3-wasm-profile-memory.md) | Seven production builds and declared memory/policy trials; selected ESP32 traffic passed; M5StickC large serial burst gap remains |
+| [6.3 native lifecycle](6.3-wasm-native-lifecycle.md) | 3,716 checks on three families; real task stop/restart, active/queued cancellation and injected startup cleanup passed; production stress and cold/global OOM remain open |

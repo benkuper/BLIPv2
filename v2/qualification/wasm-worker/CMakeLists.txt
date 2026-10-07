@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.22)
+set(SDKCONFIG "${CMAKE_BINARY_DIR}/sdkconfig")
+set(SDKCONFIG_DEFAULTS "${CMAKE_CURRENT_LIST_DIR}/sdkconfig.defaults")
+if(IDF_TARGET STREQUAL "esp32")
+    list(APPEND SDKCONFIG_DEFAULTS "${CMAKE_CURRENT_LIST_DIR}/../../firmware/sdkconfig.wasm.esp32.defaults")
+endif()
+set(BLIP_WASM_DEPS "${CMAKE_CURRENT_LIST_DIR}/../../../build/wasm-deps" CACHE PATH "Pinned runtime checkouts")
+set(EXTRA_COMPONENT_DIRS
+    "${CMAKE_CURRENT_LIST_DIR}/../../components/blip_core"
+    "${CMAKE_CURRENT_LIST_DIR}/../../components/blip_wasm")
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+idf_build_set_property(BLIP_WASM_DEPS ${BLIP_WASM_DEPS})
+idf_build_set_property(BLIP_ENABLE_WASM ON)
+idf_build_set_property(MINIMAL_BUILD ON)
+project(blip-wasm-worker)
+idf_build_get_property(qualification_elf EXECUTABLE)
+# Fault injection is linked only into this qualification application.
+foreach(symbol heap_caps_aligned_alloc heap_caps_malloc calloc pthread_create xTaskCreate xTaskCreatePinnedToCore)
+    target_link_options(${qualification_elf} PRIVATE "-Wl,--wrap=${symbol}")
+endforeach()
