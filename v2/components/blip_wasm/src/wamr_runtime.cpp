@@ -221,6 +221,35 @@ core::Status WamrRuntime::invoke(std::string_view name, std::span<const Value> a
     return core::Status::success();
 }
 
+core::Result<std::byte*> WamrRuntime::memory_range(std::uint32_t offset, std::size_t bytes) noexcept {
+    using Result = core::Result<std::byte*>;
+    if (!instance_) return Result::failure(failure(core::ErrorCode::invalid_state, "memory", "module-not-loaded").error());
+    const auto memory = wasm_runtime_get_default_memory(static_cast<wasm_module_inst_t>(instance_));
+    if (!memory) return Result::failure(failure(core::ErrorCode::not_found, "memory", "guest-memory-unavailable").error());
+    const auto pages = wasm_memory_get_cur_page_count(memory), per_page = wasm_memory_get_bytes_per_page(memory);
+    // Keep the full extent in 64 bits and refuse an unsupported memory width.
+    if (per_page && pages > UINT32_MAX / per_page)
+        return Result::failure(failure(core::ErrorCode::capacity_exceeded, "memory", "guest-memory-width").error());
+    const auto extent = pages * per_page;
+    if (offset > extent || bytes > extent - offset)
+        return Result::failure(failure(core::ErrorCode::invalid_argument, "memory", "guest-memory-bounds").error());
+    auto* base = static_cast<std::byte*>(wasm_memory_get_base_address(memory));
+    if (!bytes) return Result::success(nullptr); // Do not form a pointer into an empty memory.
+    if (!base) return Result::failure(failure(core::ErrorCode::invalid_state, "memory", "guest-memory-base").error());
+    return Result::success(base + offset);
+}
+core::Status WamrRuntime::read_memory(std::uint32_t offset, std::span<std::byte> output) noexcept {
+    const auto range = memory_range(offset, output.size());
+    if (!range) return core::Status::failure(range.error());
+    if (!output.empty()) std::memmove(output.data(), range.value(), output.size());
+    return core::Status::success();
+}
+core::Status WamrRuntime::write_memory(std::uint32_t offset, std::span<const std::byte> input) noexcept {
+    const auto range = memory_range(offset, input.size());
+    if (!range) return core::Status::failure(range.error());
+    if (!input.empty()) std::memmove(range.value(), input.data(), input.size());
+    return core::Status::success();
+}
 void WamrRuntime::request_cancel() noexcept {
     const std::lock_guard lock(cancel_mutex_);
     if (running_) {

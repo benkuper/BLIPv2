@@ -43,6 +43,8 @@ class ObservedRuntime final : public Runtime {
     }
     void request_cancel() noexcept override { delegate.request_cancel(); }
     RuntimeSnapshot snapshot() const noexcept override { return delegate.snapshot(); }
+    blip::core::Status read_memory(std::uint32_t offset, std::span<std::byte> output) noexcept override { return delegate.read_memory(offset, output); }
+    blip::core::Status write_memory(std::uint32_t offset, std::span<const std::byte> input) noexcept override { return delegate.write_memory(offset, input); }
 };
 ObservedRuntime runtime;
 EspWasmComponent component(runtime);

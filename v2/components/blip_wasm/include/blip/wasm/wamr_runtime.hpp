@@ -26,6 +26,8 @@ class WamrRuntime final : public Runtime {
                         std::size_t& result_count) noexcept override;
     void request_cancel() noexcept override;
     RuntimeSnapshot snapshot() const noexcept override;
+    core::Status read_memory(std::uint32_t offset, std::span<std::byte> output) noexcept override;
+    core::Status write_memory(std::uint32_t offset, std::span<const std::byte> input) noexcept override;
 
   private:
     // Only this implementation casts opaque handles to WAMR types.
@@ -39,6 +41,8 @@ class WamrRuntime final : public Runtime {
     Limits limits_{};
     std::uint32_t pool_bytes_{};
     std::array<char, kMaximumDiagnosticBytes> fault_{};
+    // Checks the current instance/extent before producing a private native view.
+    core::Result<std::byte*> memory_range(std::uint32_t offset, std::size_t bytes) noexcept;
 };
 
 } // namespace blip::wasm

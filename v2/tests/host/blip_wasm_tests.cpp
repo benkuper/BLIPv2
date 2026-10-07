@@ -24,6 +24,17 @@ class TestRuntime : public Runtime {
     bool fail_initialize{}, fail_load{}, trap{}, wrong_count{}, wrong_type{};
     bool supports_linear{};
     std::span<std::byte> module{}, linear{};
+    std::array<std::byte, 512> memory{};
+    Status read_memory(std::uint32_t offset, std::span<std::byte> output) noexcept override {
+        if (module.empty() || offset > memory.size() || output.size() > memory.size() - offset) return failure(ErrorCode::invalid_argument);
+        if (!output.empty()) std::memmove(output.data(), memory.data() + offset, output.size());
+        return Status::success();
+    }
+    Status write_memory(std::uint32_t offset, std::span<const std::byte> input) noexcept override {
+        if (module.empty() || offset > memory.size() || input.size() > memory.size() - offset) return failure(ErrorCode::invalid_argument);
+        if (!input.empty()) std::memmove(memory.data() + offset, input.data(), input.size());
+        return Status::success();
+    }
     std::string_view name() const noexcept override { return "test.direct"; }
     Status initialize(std::span<std::byte>, Limits, std::span<std::byte> arena = {}) noexcept override {
         ++initialized;
@@ -214,13 +225,39 @@ bool separately_borrowed_linear_memory() {
     service.stop();
     return true;
 }
+bool string_copies_check_module_generation_and_lifecycle() {
+    Fixture f;
+    std::array<char, 8> output{}; output.fill('x');
+    std::size_t count = 99;
+    CHECK(!f.service.read_utf8({0,0}, 0, output, count)); CHECK(count == 0);
+    CHECK(!f.service.write_utf8(0, 0, "hello"));
+    CHECK(f.service.start(f.limits)); CHECK(!f.service.write_utf8(0, 0, "hello"));
+    CHECK(f.service.load(binary)); const auto generation = f.service.snapshot().generation;
+    CHECK(f.service.write_utf8(0, generation, "hello"));
+    CHECK(f.service.read_utf8({0,5}, generation, output, count));
+    CHECK(count == 5 && std::string_view(output.data(), count) == "hello" && output[5] == 'x');
+    CHECK(!f.service.read_utf8({511,2}, generation, output, count)); CHECK(count == 0);
+    CHECK(f.service.snapshot().state == State::loaded && f.runtime.invocations == 0);
+    CHECK(f.service.load(binary)); CHECK(f.service.snapshot().generation != generation);
+    const auto before = f.runtime.memory;
+    CHECK(!f.service.write_utf8(0, generation, "changed")); CHECK(f.runtime.memory == before);
+    CHECK(!f.service.read_utf8({0,5}, generation, output, count)); CHECK(count == 0);
+    f.runtime.trap = true;
+    const std::array arguments{Value::f64(1)};
+    CHECK(!f.service.call("echo", arguments, {}, f.results, f.count));
+    CHECK(!f.service.write_utf8(0, f.service.snapshot().generation, "changed"));
+    CHECK(f.runtime.memory == before);
+    f.service.stop(); CHECK(!f.service.read_utf8({0,5}, f.service.snapshot().generation, output, count));
+    return true;
+}
 }
 
 int main() {
     if (!runtime_replacement_and_bit_values() || !caller_lifetime_and_prevalidation() ||
         !invalid_calls_never_enter_engine() || !fault_requires_reload_and_retains_diagnostic() ||
         !engine_failures_and_idempotent_cleanup() || !backend_contract_violations_are_faults() ||
-        !bounded_upload_crc_and_lifecycle() || !separately_borrowed_linear_memory()) return 1;
-    std::cout << "WASM service: 8 lifecycle, ownership, replacement, signature and upload cases passed\n";
+        !bounded_upload_crc_and_lifecycle() || !separately_borrowed_linear_memory() ||
+        !string_copies_check_module_generation_and_lifecycle()) return 1;
+    std::cout << "WASM service: 9 lifecycle, ownership, replacement, signature, upload and string cases passed\n";
     return 0;
 }

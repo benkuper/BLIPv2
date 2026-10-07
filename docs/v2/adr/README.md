@@ -12,6 +12,8 @@
 | [0008](0008-wasm-runtime-selection.md) | Metered WAMR selection from three-family target benchmarks | Accepted for M6 runtime selection; Gate D open |
 | [0009](0009-wasm-service-boundary.md) | Runtime-neutral ownership, passive loading and host cancellation | Accepted for service boundary; production integration and Gate D open |
 | [0010](0010-wasm-production-worker.md) | Dedicated worker, owned queue/completions and deadline supervisor | Ball production slice qualified; full Gate D open |
+| [0011](0011-esp32-wasm-linear-arena.md) | ESP32 byte-accessible IRAM guest arena with DRAM engine/stacks | Seven production profile memory trials qualified; full Gate D open |
+| [0012](0012-wasm-checked-utf8.md) | Checked unsigned pointer/length UTF-8 copies, bounds and generation | Host and three-family strings qualified; provider bindings follow in 6.5 |
 
 Accepted ADRs are immutable contracts. A material change is recorded by a new
 ADR with `Supersedes`/`Superseded by` links.

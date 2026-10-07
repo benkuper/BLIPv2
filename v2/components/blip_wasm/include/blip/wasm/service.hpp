@@ -31,6 +31,9 @@ class Service final {
     [[nodiscard]] core::Status call(std::string_view name, std::span<const Value> arguments,
                                    ExecutionBudget budget, std::span<Value> results,
                                    std::size_t& result_count) noexcept;
+    [[nodiscard]] core::Status read_utf8(StringRef, std::uint32_t generation, std::span<char> output,
+                                         std::size_t& count) noexcept;
+    [[nodiscard]] core::Status write_utf8(std::uint32_t offset, std::uint32_t generation, std::string_view input) noexcept;
     void unload() noexcept;
     void stop() noexcept;
     [[nodiscard]] Snapshot snapshot() const noexcept;

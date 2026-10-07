@@ -1,6 +1,7 @@
 #pragma once
 
 #include "blip/core/error.hpp"
+#include "blip/wasm/utf8.hpp"
 #include <array>
 #include <atomic>
 #include <bit>
@@ -64,7 +65,7 @@ struct RuntimeSnapshot {
 // and unload respectively. Failed initialize/load must leave no partial engine
 // state. No engine handles or headers may escape this interface.
 // load must not execute guest code: initialization uses a budgeted export.
-class Runtime {
+class Runtime : public GuestMemory {
   public:
     virtual ~Runtime() = default;
     virtual std::string_view name() const noexcept = 0;

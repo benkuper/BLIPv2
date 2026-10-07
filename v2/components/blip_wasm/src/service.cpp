@@ -115,6 +115,17 @@ core::Status Service::call(std::string_view name, std::span<const Value> argumen
     return core::Status::success();
 }
 
+core::Status Service::read_utf8(StringRef ref, std::uint32_t generation, std::span<char> output, std::size_t& count) noexcept {
+    count = 0;
+    if (snapshot_.state != State::loaded || generation != snapshot_.generation)
+        return failure(core::ErrorCode::invalid_state, "utf8", "module-state-or-generation");
+    return blip::wasm::read_utf8(*runtime_, ref, output, count);
+}
+core::Status Service::write_utf8(std::uint32_t offset, std::uint32_t generation, std::string_view input) noexcept {
+    if (snapshot_.state != State::loaded || generation != snapshot_.generation)
+        return failure(core::ErrorCode::invalid_state, "utf8", "module-state-or-generation");
+    return blip::wasm::write_utf8(*runtime_, offset, input);
+}
 void Service::unload() noexcept {
     if (snapshot_.state == State::loaded || snapshot_.state == State::faulted) {
         runtime_->unload();
