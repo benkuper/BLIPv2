@@ -9,6 +9,7 @@
 | [0005](0005-persistence-and-migrations.md) | Versioned transactional persistence and migrations | Accepted |
 | [0006](0006-v1-compatibility-boundary.md) | V1 compatibility through explicit boundary adapters | Accepted |
 | [0007](0007-led-transport-qualification.md) | Milestone 3 LED transport baseline | Accepted for M3 vertical slice |
+| [0008](0008-wasm-runtime-selection.md) | Metered WAMR selection from three-family target benchmarks | Accepted for M6 runtime selection; Gate D open |
 
 Accepted ADRs are immutable contracts. A material change is recorded by a new
 ADR with `Supersedes`/`Superseded by` links.

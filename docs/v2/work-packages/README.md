@@ -62,3 +62,9 @@ wire protocols, or public OSC paths.
 | [5.5 Bluetooth transports](5.5-ble-transport-foundation.md) | NimBLE GATT on six boards and Classic SPP on two original ESP32 boards; remaining coexistence and power qualification open |
 | [5.6 ESP-NOW V2](5.6-espnow-v2.md) | Bounded V2 peer control, ACK/retry and duplicate suppression; seven-board build and Ball-to-peer HIL passed |
 | [5.7 Routerless fleet](5.7-routerless-fleet.md) | ESP-NOW broadcast election/clock/cues; 4,096-listener host case, seven-board build/flash and routerless recovery gates passed; physical timing and radio scale qualification open |
+
+## Milestone 6
+
+| Work package | Result |
+| --- | --- |
+| [6.1](6.1-wasm-runtime-benchmark.md) | Nine standalone target benchmarks; metered WAMR selected in ADR-0008; production service and Gate D open |

@@ -1,0 +1,2162 @@
+{
+  "schema_version": 1,
+  "measured_at_utc": "2026-10-07T16:32:33.982467+00:00",
+  "scope": "Standalone interpreter benchmark; production Gate D not qualified",
+  "runtimes": {
+    "wamr": {
+      "release": "WAMR-2.4.5",
+      "commit": "25bd7eb63e828e4bd242cc9b38d260b4b31c6605"
+    },
+    "wasm3": {
+      "release": "v0.9.0",
+      "commit": "0cd38327f0c721e75172f4f1eeb55854dc0517af"
+    }
+  },
+  "boards": [
+    {
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "chip": "esp32c6",
+      "pc_network_changed": false,
+      "runs": [
+        {
+          "build": "build/m6-wasm-images/esp32c6/baseline",
+          "image_sha256": "591ede8d8278a05f0a6d731dbd0ce6088f317128a26c84a6373f27f2392c0ed7",
+          "records": [
+            {
+              "type": "start",
+              "engine": "baseline",
+              "chip": "esp32c6",
+              "idf": "v6.0.2",
+              "cpu_mhz": 160,
+              "native_stack_bytes": 32768,
+              "wasm_stack_bytes": 8192,
+              "fixture_sha256": "775123b7d29346135c480d1fbe0b6e8eff5e784b04ec6912c28d04be1c4f60b5"
+            },
+            {
+              "type": "load",
+              "elapsed_us": 9,
+              "heap_before": 448440,
+              "heap_after": 448440,
+              "reserved_pool_bytes": 0,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0
+            },
+            {
+              "type": "memory_initialization",
+              "zero_initialized": true
+            },
+            {
+              "type": "timing",
+              "name": "noop",
+              "argument": 7,
+              "batch": 100,
+              "samples": 21,
+              "min_us": 58,
+              "median_us": 58,
+              "max_us": 60,
+              "result": 7,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "integer",
+              "argument": 4096,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 181,
+              "median_us": 181,
+              "max_us": 189,
+              "result": 2313998378,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "float",
+              "argument": 2048,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 2633,
+              "median_us": 2633,
+              "max_us": 2641,
+              "result": 1191116800,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "pixels",
+              "argument": 256,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 36,
+              "median_us": 36,
+              "max_us": 37,
+              "result": 2147483520,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "host_calls",
+              "argument": 512,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 54,
+              "median_us": 54,
+              "max_us": 54,
+              "result": 131840,
+              "valid": true
+            },
+            {
+              "type": "memory_growth",
+              "rejected": true
+            },
+            {
+              "type": "memory",
+              "heap_free": 448440,
+              "heap_minimum": 448440,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0,
+              "stack_headroom_bytes": 31612,
+              "probe_calls": 11264,
+              "failures": 0
+            },
+            {
+              "type": "cleanup",
+              "heap_free": 448440,
+              "heap_before": 448440,
+              "failures": 0
+            },
+            {
+              "type": "done",
+              "failures": 0,
+              "reset_recovery": false
+            }
+          ]
+        },
+        {
+          "build": "build/m6-wasm-images/esp32c6/wamr",
+          "image_sha256": "dd63cda4c56b44c566f1ab3de2c0dc101a3be42692348c2243535b244fb51dd0",
+          "records": [
+            {
+              "type": "start",
+              "engine": "wamr",
+              "chip": "esp32c6",
+              "idf": "v6.0.2",
+              "cpu_mhz": 160,
+              "native_stack_bytes": 32768,
+              "wasm_stack_bytes": 8192,
+              "fixture_sha256": "775123b7d29346135c480d1fbe0b6e8eff5e784b04ec6912c28d04be1c4f60b5"
+            },
+            {
+              "type": "load",
+              "elapsed_us": 4719,
+              "heap_before": 446952,
+              "heap_after": 315652,
+              "reserved_pool_bytes": 131072,
+              "pool_used_bytes": 76992,
+              "pool_peak_bytes": 76992
+            },
+            {
+              "type": "memory_initialization",
+              "zero_initialized": true
+            },
+            {
+              "type": "timing",
+              "name": "noop",
+              "argument": 7,
+              "batch": 100,
+              "samples": 21,
+              "min_us": 796,
+              "median_us": 796,
+              "max_us": 807,
+              "result": 7,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "integer",
+              "argument": 4096,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 6044,
+              "median_us": 6051,
+              "max_us": 6066,
+              "result": 2313998378,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "float",
+              "argument": 2048,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 6855,
+              "median_us": 6863,
+              "max_us": 6869,
+              "result": 1191116800,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "pixels",
+              "argument": 256,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 1023,
+              "median_us": 1023,
+              "max_us": 1026,
+              "result": 2147483520,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "host_calls",
+              "argument": 512,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 2249,
+              "median_us": 2249,
+              "max_us": 2257,
+              "result": 131840,
+              "valid": true
+            },
+            {
+              "type": "memory_growth",
+              "rejected": true
+            },
+            {
+              "type": "fault",
+              "name": "trap",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 42,
+              "error": "Exception: unreachable"
+            },
+            {
+              "type": "fault",
+              "name": "invalid",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 37,
+              "error": "Exception: out of bounds memory access"
+            },
+            {
+              "type": "fault",
+              "name": "divide",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 34,
+              "error": "Exception: integer divide by zero"
+            },
+            {
+              "type": "fault",
+              "name": "recursion",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 307,
+              "error": "Exception: wasm operand stack overflow"
+            },
+            {
+              "type": "memory",
+              "heap_free": 315652,
+              "heap_minimum": 315652,
+              "pool_used_bytes": 76992,
+              "pool_peak_bytes": 76992,
+              "stack_headroom_bytes": 30800,
+              "probe_calls": 11264,
+              "failures": 0
+            },
+            {
+              "type": "infinite_loop",
+              "bounded": true,
+              "recovered": true,
+              "instruction_limit": 10000,
+              "elapsed_us": 3680,
+              "supervisor_ticks": 45,
+              "reset_required": false
+            },
+            {
+              "type": "cleanup",
+              "heap_free": 446840,
+              "heap_before": 446952,
+              "failures": 0
+            },
+            {
+              "type": "done",
+              "failures": 0,
+              "reset_recovery": false
+            }
+          ]
+        },
+        {
+          "build": "build/m6-wasm-images/esp32c6/wasm3",
+          "image_sha256": "88f4572e66af3667a1eba41d26d56eec0f6152decd8c8ebe920575065364028a",
+          "records": [
+            {
+              "type": "start",
+              "engine": "wasm3",
+              "chip": "esp32c6",
+              "idf": "v6.0.2",
+              "cpu_mhz": 160,
+              "native_stack_bytes": 32768,
+              "wasm_stack_bytes": 8192,
+              "fixture_sha256": "775123b7d29346135c480d1fbe0b6e8eff5e784b04ec6912c28d04be1c4f60b5"
+            },
+            {
+              "type": "load",
+              "elapsed_us": 2847,
+              "heap_before": 448232,
+              "heap_after": 337872,
+              "reserved_pool_bytes": 0,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0
+            },
+            {
+              "type": "memory_initialization",
+              "zero_initialized": true
+            },
+            {
+              "type": "timing",
+              "name": "noop",
+              "argument": 7,
+              "batch": 100,
+              "samples": 21,
+              "min_us": 273,
+              "median_us": 273,
+              "max_us": 276,
+              "result": 7,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "integer",
+              "argument": 4096,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 2630,
+              "median_us": 2630,
+              "max_us": 2638,
+              "result": 2313998378,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "float",
+              "argument": 2048,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 7291,
+              "median_us": 7299,
+              "max_us": 7306,
+              "result": 1191116800,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "pixels",
+              "argument": 256,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 542,
+              "median_us": 542,
+              "max_us": 542,
+              "result": 2147483520,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "host_calls",
+              "argument": 512,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 722,
+              "median_us": 722,
+              "max_us": 722,
+              "result": 131840,
+              "valid": true
+            },
+            {
+              "type": "memory_growth",
+              "rejected": true
+            },
+            {
+              "type": "fault",
+              "name": "trap",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 33,
+              "error": "[trap] unreachable executed"
+            },
+            {
+              "type": "fault",
+              "name": "invalid",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 32,
+              "error": "[trap] out of bounds memory access"
+            },
+            {
+              "type": "fault",
+              "name": "divide",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 19,
+              "error": "[trap] integer divide by zero"
+            },
+            {
+              "type": "fault",
+              "name": "recursion",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 158,
+              "error": "[trap] stack overflow"
+            },
+            {
+              "type": "memory",
+              "heap_free": 337872,
+              "heap_minimum": 337872,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0,
+              "stack_headroom_bytes": 23732,
+              "probe_calls": 11264,
+              "failures": 0
+            },
+            {
+              "type": "infinite_loop",
+              "bounded": false,
+              "recovered": false,
+              "elapsed_us": 107895,
+              "supervisor_ticks": 43,
+              "reset_required": true
+            },
+            {
+              "type": "done",
+              "reset_recovery": true
+            }
+          ]
+        }
+      ],
+      "restored": true,
+      "harness_sha256": "8676a698122c2585483922b559a9008b4b304cbef6d4bfa28efb4fa1ebe6a64e",
+      "restore_image_sha256": "bc9768935c7193692e422469de6784e010be9f33fca6227b9642c9136cf6e50b",
+      "restore_serial_check": {
+        "component": "blip.bootstrap",
+        "control": "probe_value",
+        "detail": "",
+        "error_code": "none",
+        "error_domain": "none",
+        "ok": true,
+        "operation": "get",
+        "request_id": 3382535372,
+        "values": [
+          {
+            "type": "integer",
+            "value": 0
+          }
+        ]
+      },
+      "build_costs": {
+        "baseline": {
+          "app_bytes": 127920,
+          "elf_sha256": "ca5743bf79a04142d2b4d40aacdcc2e4b684d1af3c19cb029f3dd440a8f77485",
+          "map_sha256": "21a1a341e7a58ee5def33ec82ddf3b15304e08fedbf913e47431cf190d0377ba",
+          "sdkconfig_sha256": "022c74b81c8a21287ed967f6217f608a62267730e7ca3e9c261e2be65832a59d",
+          "size": {
+            "version": "1.2",
+            "total_size": 126486,
+            "layout": [
+              {
+                "name": "Flash Code",
+                "total": 0,
+                "used": 89554,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 62302
+                  },
+                  ".rodata": {
+                    "size": 26752
+                  },
+                  ".appdesc": {
+                    "size": 256
+                  },
+                  ".init_array": {
+                    "size": 228
+                  },
+                  ".tdata": {
+                    "size": 16
+                  }
+                }
+              },
+              {
+                "name": "DIRAM",
+                "total": 452112,
+                "used": 42272,
+                "free": 409840,
+                "parts": {
+                  ".text": {
+                    "size": 30332
+                  },
+                  ".data": {
+                    "size": 6828
+                  },
+                  ".bss": {
+                    "size": 5112
+                  }
+                }
+              },
+              {
+                "name": "LP SRAM",
+                "total": 16384,
+                "used": 28,
+                "free": 16356,
+                "parts": {
+                  ".rtc_reserved": {
+                    "size": 24
+                  },
+                  ".rtc_noinit": {
+                    "size": 4
+                  }
+                }
+              }
+            ]
+          },
+          "app_delta_from_baseline_bytes": 0,
+          "region_deltas_from_baseline_bytes": {
+            "Flash Code": 0,
+            "DIRAM": 0,
+            "LP SRAM": 0
+          }
+        },
+        "wamr": {
+          "app_bytes": 202512,
+          "elf_sha256": "f085ecfdb7beb0951e1cd98c97d17a29cd1ca1b300d552eeb1e005cb6fb57c69",
+          "map_sha256": "1b9857f3cd56be339b5d40ccc537b0d1c7eb02620a85dc088083326914de92da",
+          "sdkconfig_sha256": "022c74b81c8a21287ed967f6217f608a62267730e7ca3e9c261e2be65832a59d",
+          "size": {
+            "version": "1.2",
+            "total_size": 202174,
+            "layout": [
+              {
+                "name": "Flash Code",
+                "total": 0,
+                "used": 163866,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 128166
+                  },
+                  ".rodata": {
+                    "size": 35200
+                  },
+                  ".appdesc": {
+                    "size": 256
+                  },
+                  ".init_array": {
+                    "size": 228
+                  },
+                  ".tdata": {
+                    "size": 16
+                  }
+                }
+              },
+              {
+                "name": "DIRAM",
+                "total": 452112,
+                "used": 43768,
+                "free": 408344,
+                "parts": {
+                  ".text": {
+                    "size": 30636
+                  },
+                  ".data": {
+                    "size": 7900
+                  },
+                  ".bss": {
+                    "size": 5232
+                  }
+                }
+              },
+              {
+                "name": "LP SRAM",
+                "total": 16384,
+                "used": 28,
+                "free": 16356,
+                "parts": {
+                  ".rtc_reserved": {
+                    "size": 24
+                  },
+                  ".rtc_noinit": {
+                    "size": 4
+                  }
+                }
+              }
+            ]
+          },
+          "app_delta_from_baseline_bytes": 74592,
+          "region_deltas_from_baseline_bytes": {
+            "Flash Code": 74312,
+            "DIRAM": 1496,
+            "LP SRAM": 0
+          }
+        },
+        "wasm3": {
+          "app_bytes": 212080,
+          "elf_sha256": "e065c469c205a0eae6802e8064501ed74846e4df4b27f7a53de851130c50c97a",
+          "map_sha256": "f47eb03c3a3e01ff83419afa6726f07c9d2c68afa68a04ca8604bfdcdfd81488",
+          "sdkconfig_sha256": "022c74b81c8a21287ed967f6217f608a62267730e7ca3e9c261e2be65832a59d",
+          "size": {
+            "version": "1.2",
+            "total_size": 211744,
+            "layout": [
+              {
+                "name": "Flash Code",
+                "total": 0,
+                "used": 174662,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 136786
+                  },
+                  ".rodata": {
+                    "size": 37376
+                  },
+                  ".appdesc": {
+                    "size": 256
+                  },
+                  ".init_array": {
+                    "size": 228
+                  },
+                  ".tdata": {
+                    "size": 16
+                  }
+                }
+              },
+              {
+                "name": "DIRAM",
+                "total": 452112,
+                "used": 42478,
+                "free": 409634,
+                "parts": {
+                  ".text": {
+                    "size": 30482
+                  },
+                  ".data": {
+                    "size": 6828
+                  },
+                  ".bss": {
+                    "size": 5168
+                  }
+                }
+              },
+              {
+                "name": "LP SRAM",
+                "total": 16384,
+                "used": 28,
+                "free": 16356,
+                "parts": {
+                  ".rtc_reserved": {
+                    "size": 24
+                  },
+                  ".rtc_noinit": {
+                    "size": 4
+                  }
+                }
+              }
+            ]
+          },
+          "app_delta_from_baseline_bytes": 84160,
+          "region_deltas_from_baseline_bytes": {
+            "Flash Code": 85108,
+            "DIRAM": 206,
+            "LP SRAM": 0
+          }
+        }
+      }
+    },
+    {
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "chip": "esp32s3",
+      "pc_network_changed": false,
+      "runs": [
+        {
+          "build": "build/m6-wasm-images/esp32s3/baseline",
+          "image_sha256": "9b190da3a7daf2f9dc73c148a8fc16814f84955e3039063289efa427babfbf89",
+          "records": [
+            {
+              "type": "start",
+              "engine": "baseline",
+              "chip": "esp32s3",
+              "idf": "v6.0.2",
+              "cpu_mhz": 240,
+              "native_stack_bytes": 32768,
+              "wasm_stack_bytes": 8192,
+              "fixture_sha256": "775123b7d29346135c480d1fbe0b6e8eff5e784b04ec6912c28d04be1c4f60b5"
+            },
+            {
+              "type": "load",
+              "elapsed_us": 12,
+              "heap_before": 369268,
+              "heap_after": 369268,
+              "reserved_pool_bytes": 0,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0
+            },
+            {
+              "type": "memory_initialization",
+              "zero_initialized": true
+            },
+            {
+              "type": "timing",
+              "name": "noop",
+              "argument": 7,
+              "batch": 100,
+              "samples": 21,
+              "min_us": 43,
+              "median_us": 43,
+              "max_us": 47,
+              "result": 7,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "integer",
+              "argument": 4096,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 155,
+              "median_us": 155,
+              "max_us": 155,
+              "result": 2313998378,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "float",
+              "argument": 2048,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 95,
+              "median_us": 95,
+              "max_us": 96,
+              "result": 1191116800,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "pixels",
+              "argument": 256,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 26,
+              "median_us": 26,
+              "max_us": 27,
+              "result": 2147483520,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "host_calls",
+              "argument": 512,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 51,
+              "median_us": 51,
+              "max_us": 51,
+              "result": 131840,
+              "valid": true
+            },
+            {
+              "type": "memory_growth",
+              "rejected": true
+            },
+            {
+              "type": "memory",
+              "heap_free": 369268,
+              "heap_minimum": 369268,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0,
+              "stack_headroom_bytes": 31140,
+              "probe_calls": 11264,
+              "failures": 0
+            },
+            {
+              "type": "cleanup",
+              "heap_free": 369268,
+              "heap_before": 369268,
+              "failures": 0
+            },
+            {
+              "type": "done",
+              "failures": 0,
+              "reset_recovery": false
+            }
+          ]
+        },
+        {
+          "build": "build/m6-wasm-images/esp32s3/wamr",
+          "image_sha256": "bd2fbe139941974586179156978f8ce95bb5a00deb2686aee6725697c4ea2912",
+          "records": [
+            {
+              "type": "start",
+              "engine": "wamr",
+              "chip": "esp32s3",
+              "idf": "v6.0.2",
+              "cpu_mhz": 240,
+              "native_stack_bytes": 32768,
+              "wasm_stack_bytes": 8192,
+              "fixture_sha256": "775123b7d29346135c480d1fbe0b6e8eff5e784b04ec6912c28d04be1c4f60b5"
+            },
+            {
+              "type": "load",
+              "elapsed_us": 4497,
+              "heap_before": 367828,
+              "heap_after": 236528,
+              "reserved_pool_bytes": 131072,
+              "pool_used_bytes": 76992,
+              "pool_peak_bytes": 76992
+            },
+            {
+              "type": "memory_initialization",
+              "zero_initialized": true
+            },
+            {
+              "type": "timing",
+              "name": "noop",
+              "argument": 7,
+              "batch": 100,
+              "samples": 21,
+              "min_us": 881,
+              "median_us": 881,
+              "max_us": 895,
+              "result": 7,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "integer",
+              "argument": 4096,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 4730,
+              "median_us": 4742,
+              "max_us": 4759,
+              "result": 2313998378,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "float",
+              "argument": 2048,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 3341,
+              "median_us": 3341,
+              "max_us": 3353,
+              "result": 1191116800,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "pixels",
+              "argument": 256,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 769,
+              "median_us": 769,
+              "max_us": 786,
+              "result": 2147483520,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "host_calls",
+              "argument": 512,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 1550,
+              "median_us": 1550,
+              "max_us": 1563,
+              "result": 131840,
+              "valid": true
+            },
+            {
+              "type": "memory_growth",
+              "rejected": true
+            },
+            {
+              "type": "fault",
+              "name": "trap",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 48,
+              "error": "Exception: unreachable"
+            },
+            {
+              "type": "fault",
+              "name": "invalid",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 47,
+              "error": "Exception: out of bounds memory access"
+            },
+            {
+              "type": "fault",
+              "name": "divide",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 29,
+              "error": "Exception: integer divide by zero"
+            },
+            {
+              "type": "fault",
+              "name": "recursion",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 273,
+              "error": "Exception: wasm operand stack overflow"
+            },
+            {
+              "type": "memory",
+              "heap_free": 236528,
+              "heap_minimum": 236528,
+              "pool_used_bytes": 76992,
+              "pool_peak_bytes": 76992,
+              "stack_headroom_bytes": 30452,
+              "probe_calls": 11264,
+              "failures": 0
+            },
+            {
+              "type": "infinite_loop",
+              "bounded": true,
+              "recovered": true,
+              "instruction_limit": 10000,
+              "elapsed_us": 3019,
+              "supervisor_ticks": 30,
+              "reset_required": false
+            },
+            {
+              "type": "cleanup",
+              "heap_free": 367716,
+              "heap_before": 367828,
+              "failures": 0
+            },
+            {
+              "type": "done",
+              "failures": 0,
+              "reset_recovery": false
+            }
+          ]
+        },
+        {
+          "build": "build/m6-wasm-images/esp32s3/wasm3",
+          "image_sha256": "c2d59d4eb173757722afaadfb4533a6cd1ee5f556d6a9f05fe91032d78b7814e",
+          "records": [
+            {
+              "type": "start",
+              "engine": "wasm3",
+              "chip": "esp32s3",
+              "idf": "v6.0.2",
+              "cpu_mhz": 240,
+              "native_stack_bytes": 32768,
+              "wasm_stack_bytes": 8192,
+              "fixture_sha256": "775123b7d29346135c480d1fbe0b6e8eff5e784b04ec6912c28d04be1c4f60b5"
+            },
+            {
+              "type": "load",
+              "elapsed_us": 2339,
+              "heap_before": 368964,
+              "heap_after": 255952,
+              "reserved_pool_bytes": 0,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0
+            },
+            {
+              "type": "memory_initialization",
+              "zero_initialized": true
+            },
+            {
+              "type": "timing",
+              "name": "noop",
+              "argument": 7,
+              "batch": 100,
+              "samples": 21,
+              "min_us": 209,
+              "median_us": 209,
+              "max_us": 211,
+              "result": 7,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "integer",
+              "argument": 4096,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 3744,
+              "median_us": 3744,
+              "max_us": 3756,
+              "result": 2313998378,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "float",
+              "argument": 2048,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 5079,
+              "median_us": 5091,
+              "max_us": 5093,
+              "result": 1191116800,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "pixels",
+              "argument": 256,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 1101,
+              "median_us": 1101,
+              "max_us": 1101,
+              "result": 2147483520,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "host_calls",
+              "argument": 512,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 764,
+              "median_us": 764,
+              "max_us": 765,
+              "result": 131840,
+              "valid": true
+            },
+            {
+              "type": "memory_growth",
+              "rejected": true
+            },
+            {
+              "type": "fault",
+              "name": "trap",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 25,
+              "error": "[trap] unreachable executed"
+            },
+            {
+              "type": "fault",
+              "name": "invalid",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 21,
+              "error": "[trap] out of bounds memory access"
+            },
+            {
+              "type": "fault",
+              "name": "divide",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 13,
+              "error": "[trap] integer divide by zero"
+            },
+            {
+              "type": "fault",
+              "name": "recursion",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 85,
+              "error": "[trap] stack overflow"
+            },
+            {
+              "type": "memory",
+              "heap_free": 255952,
+              "heap_minimum": 255952,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0,
+              "stack_headroom_bytes": 23460,
+              "probe_calls": 11264,
+              "failures": 0
+            },
+            {
+              "type": "infinite_loop",
+              "bounded": false,
+              "recovered": false,
+              "elapsed_us": 100745,
+              "supervisor_ticks": 42,
+              "reset_required": true
+            },
+            {
+              "type": "done",
+              "reset_recovery": true
+            }
+          ]
+        }
+      ],
+      "restored": true,
+      "harness_sha256": "8676a698122c2585483922b559a9008b4b304cbef6d4bfa28efb4fa1ebe6a64e",
+      "restore_image_sha256": "e583fd4dbcda58a363cdca5caa27ba1b2f658df534100a0840bd91cf84e36956",
+      "restore_serial_check": {
+        "component": "blip.bootstrap",
+        "control": "probe_value",
+        "detail": "",
+        "error_code": "none",
+        "error_domain": "none",
+        "ok": true,
+        "operation": "get",
+        "request_id": 1390523180,
+        "values": [
+          {
+            "type": "integer",
+            "value": 0
+          }
+        ]
+      },
+      "build_costs": {
+        "baseline": {
+          "app_bytes": 143632,
+          "elf_sha256": "4c70a74905599d2b61719ef1dd2b4da412111e707c587879f5bbd03634e05b96",
+          "map_sha256": "1fc769490e57e5fc61278e94ff075e4632007202da0e25dab625bcdd8a5effdd",
+          "sdkconfig_sha256": "fdb66c5d3e6e39ede899e60e79c2139f8bdaf6a46b5f4d0feedb46226eb90221",
+          "size": {
+            "version": "1.2",
+            "total_size": 143518,
+            "layout": [
+              {
+                "name": "Flash Code",
+                "total": 0,
+                "used": 57472,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 57472
+                  }
+                }
+              },
+              {
+                "name": "DIRAM",
+                "total": 341760,
+                "used": 42958,
+                "free": 298802,
+                "parts": {
+                  ".text": {
+                    "size": 27103
+                  },
+                  ".data": {
+                    "size": 12367
+                  },
+                  ".bss": {
+                    "size": 3488
+                  }
+                }
+              },
+              {
+                "name": "Flash Data",
+                "total": 0,
+                "used": 30156,
+                "free": 0,
+                "parts": {
+                  ".rodata": {
+                    "size": 29884
+                  },
+                  ".appdesc": {
+                    "size": 256
+                  },
+                  ".tdata": {
+                    "size": 16
+                  }
+                }
+              },
+              {
+                "name": "IRAM",
+                "total": 16384,
+                "used": 16384,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 15356
+                  },
+                  ".vectors": {
+                    "size": 1028
+                  }
+                }
+              },
+              {
+                "name": "RTC SLOW",
+                "total": 8192,
+                "used": 40,
+                "free": 8152,
+                "parts": {
+                  ".force_slow": {
+                    "size": 36
+                  },
+                  ".rtc_noinit": {
+                    "size": 4
+                  }
+                }
+              },
+              {
+                "name": "RTC FAST",
+                "total": 8192,
+                "used": 24,
+                "free": 8168,
+                "parts": {
+                  ".rtc_reserved": {
+                    "size": 24
+                  }
+                }
+              }
+            ]
+          },
+          "app_delta_from_baseline_bytes": 0,
+          "region_deltas_from_baseline_bytes": {
+            "Flash Code": 0,
+            "DIRAM": 0,
+            "Flash Data": 0,
+            "IRAM": 0,
+            "RTC SLOW": 0,
+            "RTC FAST": 0
+          }
+        },
+        "wamr": {
+          "app_bytes": 210960,
+          "elf_sha256": "795f294ede06b6e310923b4f9035fb384e64d0b1b5cefdfc4c3bb945467e03bb",
+          "map_sha256": "889c208d803fe3720844533ce0b36e7af2983a8c3e5f6a235b75bd855ef96b40",
+          "sdkconfig_sha256": "fdb66c5d3e6e39ede899e60e79c2139f8bdaf6a46b5f4d0feedb46226eb90221",
+          "size": {
+            "version": "1.2",
+            "total_size": 210846,
+            "layout": [
+              {
+                "name": "Flash Code",
+                "total": 0,
+                "used": 115700,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 115700
+                  }
+                }
+              },
+              {
+                "name": "DIRAM",
+                "total": 341760,
+                "used": 44290,
+                "free": 297470,
+                "parts": {
+                  ".text": {
+                    "size": 27251
+                  },
+                  ".data": {
+                    "size": 13439
+                  },
+                  ".bss": {
+                    "size": 3600
+                  }
+                }
+              },
+              {
+                "name": "Flash Data",
+                "total": 0,
+                "used": 38036,
+                "free": 0,
+                "parts": {
+                  ".rodata": {
+                    "size": 37764
+                  },
+                  ".appdesc": {
+                    "size": 256
+                  },
+                  ".tdata": {
+                    "size": 16
+                  }
+                }
+              },
+              {
+                "name": "IRAM",
+                "total": 16384,
+                "used": 16384,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 15356
+                  },
+                  ".vectors": {
+                    "size": 1028
+                  }
+                }
+              },
+              {
+                "name": "RTC SLOW",
+                "total": 8192,
+                "used": 40,
+                "free": 8152,
+                "parts": {
+                  ".force_slow": {
+                    "size": 36
+                  },
+                  ".rtc_noinit": {
+                    "size": 4
+                  }
+                }
+              },
+              {
+                "name": "RTC FAST",
+                "total": 8192,
+                "used": 24,
+                "free": 8168,
+                "parts": {
+                  ".rtc_reserved": {
+                    "size": 24
+                  }
+                }
+              }
+            ]
+          },
+          "app_delta_from_baseline_bytes": 67328,
+          "region_deltas_from_baseline_bytes": {
+            "Flash Code": 58228,
+            "DIRAM": 1332,
+            "Flash Data": 7880,
+            "IRAM": 0,
+            "RTC SLOW": 0,
+            "RTC FAST": 0
+          }
+        },
+        "wasm3": {
+          "app_bytes": 215648,
+          "elf_sha256": "abecf7553498505b5f570f1c7cf338b4bb19e256923cc5c7894958e05df840d9",
+          "map_sha256": "3e848f6d8af87d917e61a8000d59e594bba73d044912d634c6abe940cdfd0265",
+          "sdkconfig_sha256": "fdb66c5d3e6e39ede899e60e79c2139f8bdaf6a46b5f4d0feedb46226eb90221",
+          "size": {
+            "version": "1.2",
+            "total_size": 215534,
+            "layout": [
+              {
+                "name": "Flash Code",
+                "total": 0,
+                "used": 119028,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 119028
+                  }
+                }
+              },
+              {
+                "name": "DIRAM",
+                "total": 341760,
+                "used": 43154,
+                "free": 298606,
+                "parts": {
+                  ".text": {
+                    "size": 27251
+                  },
+                  ".data": {
+                    "size": 12367
+                  },
+                  ".bss": {
+                    "size": 3536
+                  }
+                }
+              },
+              {
+                "name": "Flash Data",
+                "total": 0,
+                "used": 40468,
+                "free": 0,
+                "parts": {
+                  ".rodata": {
+                    "size": 40196
+                  },
+                  ".appdesc": {
+                    "size": 256
+                  },
+                  ".tdata": {
+                    "size": 16
+                  }
+                }
+              },
+              {
+                "name": "IRAM",
+                "total": 16384,
+                "used": 16384,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 15356
+                  },
+                  ".vectors": {
+                    "size": 1028
+                  }
+                }
+              },
+              {
+                "name": "RTC SLOW",
+                "total": 8192,
+                "used": 40,
+                "free": 8152,
+                "parts": {
+                  ".force_slow": {
+                    "size": 36
+                  },
+                  ".rtc_noinit": {
+                    "size": 4
+                  }
+                }
+              },
+              {
+                "name": "RTC FAST",
+                "total": 8192,
+                "used": 24,
+                "free": 8168,
+                "parts": {
+                  ".rtc_reserved": {
+                    "size": 24
+                  }
+                }
+              }
+            ]
+          },
+          "app_delta_from_baseline_bytes": 72016,
+          "region_deltas_from_baseline_bytes": {
+            "Flash Code": 61556,
+            "DIRAM": 196,
+            "Flash Data": 10312,
+            "IRAM": 0,
+            "RTC SLOW": 0,
+            "RTC FAST": 0
+          }
+        }
+      }
+    },
+    {
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "chip": "esp32",
+      "pc_network_changed": false,
+      "runs": [
+        {
+          "build": "build/m6-wasm-images/esp32/baseline",
+          "image_sha256": "db0141c31ee2aeab2acd86cd0f71a7c68c3de8b4f9c8875bd4fa899f35a4ef15",
+          "records": [
+            {
+              "type": "start",
+              "engine": "baseline",
+              "chip": "esp32",
+              "idf": "v6.0.2",
+              "cpu_mhz": 240,
+              "native_stack_bytes": 32768,
+              "wasm_stack_bytes": 8192,
+              "fixture_sha256": "775123b7d29346135c480d1fbe0b6e8eff5e784b04ec6912c28d04be1c4f60b5"
+            },
+            {
+              "type": "load",
+              "elapsed_us": 21,
+              "heap_before": 268824,
+              "heap_after": 268824,
+              "reserved_pool_bytes": 0,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0
+            },
+            {
+              "type": "memory_initialization",
+              "zero_initialized": true
+            },
+            {
+              "type": "timing",
+              "name": "noop",
+              "argument": 7,
+              "batch": 100,
+              "samples": 21,
+              "min_us": 44,
+              "median_us": 44,
+              "max_us": 55,
+              "result": 7,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "integer",
+              "argument": 4096,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 189,
+              "median_us": 189,
+              "max_us": 189,
+              "result": 2313998378,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "float",
+              "argument": 2048,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 104,
+              "median_us": 104,
+              "max_us": 104,
+              "result": 1191116800,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "pixels",
+              "argument": 256,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 28,
+              "median_us": 28,
+              "max_us": 29,
+              "result": 2147483520,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "host_calls",
+              "argument": 512,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 64,
+              "median_us": 64,
+              "max_us": 64,
+              "result": 131840,
+              "valid": true
+            },
+            {
+              "type": "memory_growth",
+              "rejected": true
+            },
+            {
+              "type": "memory",
+              "heap_free": 268824,
+              "heap_minimum": 268824,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0,
+              "stack_headroom_bytes": 31276,
+              "probe_calls": 11264,
+              "failures": 0
+            },
+            {
+              "type": "cleanup",
+              "heap_free": 268824,
+              "heap_before": 268824,
+              "failures": 0
+            },
+            {
+              "type": "done",
+              "failures": 0,
+              "reset_recovery": false
+            }
+          ]
+        },
+        {
+          "build": "build/m6-wasm-images/esp32/wamr",
+          "image_sha256": "e477a3a24f7de066ac54a15bc64e174919ea7e297ffdd30024b09f028b07bad3",
+          "records": [
+            {
+              "type": "start",
+              "engine": "wamr",
+              "chip": "esp32",
+              "idf": "v6.0.2",
+              "cpu_mhz": 240,
+              "native_stack_bytes": 32768,
+              "wasm_stack_bytes": 8192,
+              "fixture_sha256": "775123b7d29346135c480d1fbe0b6e8eff5e784b04ec6912c28d04be1c4f60b5"
+            },
+            {
+              "type": "load",
+              "elapsed_us": 8281,
+              "heap_before": 267632,
+              "heap_after": 136324,
+              "reserved_pool_bytes": 131072,
+              "pool_used_bytes": 76992,
+              "pool_peak_bytes": 76992
+            },
+            {
+              "type": "memory_initialization",
+              "zero_initialized": true
+            },
+            {
+              "type": "timing",
+              "name": "noop",
+              "argument": 7,
+              "batch": 100,
+              "samples": 21,
+              "min_us": 2224,
+              "median_us": 2224,
+              "max_us": 2243,
+              "result": 7,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "integer",
+              "argument": 4096,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 5884,
+              "median_us": 5898,
+              "max_us": 5919,
+              "result": 2313998378,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "float",
+              "argument": 2048,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 4160,
+              "median_us": 4164,
+              "max_us": 4182,
+              "result": 1191116800,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "pixels",
+              "argument": 256,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 965,
+              "median_us": 969,
+              "max_us": 974,
+              "result": 2147483520,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "host_calls",
+              "argument": 512,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 1947,
+              "median_us": 1947,
+              "max_us": 1965,
+              "result": 131840,
+              "valid": true
+            },
+            {
+              "type": "memory_growth",
+              "rejected": true
+            },
+            {
+              "type": "fault",
+              "name": "trap",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 125,
+              "error": "Exception: unreachable"
+            },
+            {
+              "type": "fault",
+              "name": "invalid",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 110,
+              "error": "Exception: out of bounds memory access"
+            },
+            {
+              "type": "fault",
+              "name": "divide",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 97,
+              "error": "Exception: integer divide by zero"
+            },
+            {
+              "type": "fault",
+              "name": "recursion",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 408,
+              "error": "Exception: wasm operand stack overflow"
+            },
+            {
+              "type": "memory",
+              "heap_free": 136324,
+              "heap_minimum": 136324,
+              "pool_used_bytes": 76992,
+              "pool_peak_bytes": 76992,
+              "stack_headroom_bytes": 30468,
+              "probe_calls": 11264,
+              "failures": 0
+            },
+            {
+              "type": "infinite_loop",
+              "bounded": true,
+              "recovered": true,
+              "instruction_limit": 10000,
+              "elapsed_us": 3880,
+              "supervisor_ticks": 46,
+              "reset_required": false
+            },
+            {
+              "type": "cleanup",
+              "heap_free": 267516,
+              "heap_before": 267632,
+              "failures": 0
+            },
+            {
+              "type": "done",
+              "failures": 0,
+              "reset_recovery": false
+            }
+          ]
+        },
+        {
+          "build": "build/m6-wasm-images/esp32/wasm3",
+          "image_sha256": "d5257660496cd33071623aa96a887a07dd6d7991133bb6eeace6a820c067a55f",
+          "records": [
+            {
+              "type": "start",
+              "engine": "wasm3",
+              "chip": "esp32",
+              "idf": "v6.0.2",
+              "cpu_mhz": 240,
+              "native_stack_bytes": 32768,
+              "wasm_stack_bytes": 8192,
+              "fixture_sha256": "775123b7d29346135c480d1fbe0b6e8eff5e784b04ec6912c28d04be1c4f60b5"
+            },
+            {
+              "type": "load",
+              "elapsed_us": 5152,
+              "heap_before": 268768,
+              "heap_after": 153688,
+              "reserved_pool_bytes": 0,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0
+            },
+            {
+              "type": "memory_initialization",
+              "zero_initialized": true
+            },
+            {
+              "type": "timing",
+              "name": "noop",
+              "argument": 7,
+              "batch": 100,
+              "samples": 21,
+              "min_us": 251,
+              "median_us": 251,
+              "max_us": 264,
+              "result": 7,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "integer",
+              "argument": 4096,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 4363,
+              "median_us": 4366,
+              "max_us": 4380,
+              "result": 2313998378,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "float",
+              "argument": 2048,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 5556,
+              "median_us": 5581,
+              "max_us": 5582,
+              "result": 1191116800,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "pixels",
+              "argument": 256,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 1303,
+              "median_us": 1304,
+              "max_us": 1318,
+              "result": 2147483520,
+              "valid": true
+            },
+            {
+              "type": "timing",
+              "name": "host_calls",
+              "argument": 512,
+              "batch": 1,
+              "samples": 21,
+              "min_us": 900,
+              "median_us": 911,
+              "max_us": 911,
+              "result": 131840,
+              "valid": true
+            },
+            {
+              "type": "memory_growth",
+              "rejected": true
+            },
+            {
+              "type": "fault",
+              "name": "trap",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 60,
+              "error": "[trap] unreachable executed"
+            },
+            {
+              "type": "fault",
+              "name": "invalid",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 43,
+              "error": "[trap] out of bounds memory access"
+            },
+            {
+              "type": "fault",
+              "name": "divide",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 34,
+              "error": "[trap] integer divide by zero"
+            },
+            {
+              "type": "fault",
+              "name": "recursion",
+              "trapped": true,
+              "recovered": true,
+              "elapsed_us": 101,
+              "error": "[trap] stack overflow"
+            },
+            {
+              "type": "memory",
+              "heap_free": 153688,
+              "heap_minimum": 153688,
+              "pool_used_bytes": 0,
+              "pool_peak_bytes": 0,
+              "stack_headroom_bytes": 23684,
+              "probe_calls": 11264,
+              "failures": 0
+            },
+            {
+              "type": "infinite_loop",
+              "bounded": false,
+              "recovered": false,
+              "elapsed_us": 106675,
+              "supervisor_ticks": 52,
+              "reset_required": true
+            },
+            {
+              "type": "done",
+              "reset_recovery": true
+            }
+          ]
+        }
+      ],
+      "restored": true,
+      "harness_sha256": "8676a698122c2585483922b559a9008b4b304cbef6d4bfa28efb4fa1ebe6a64e",
+      "restore_image_sha256": "c07a2b14ca8e5f715a6f1da11494f7248d7d563556b046d32ff3998794e3e3c2",
+      "restore_serial_check": {
+        "component": "blip.bootstrap",
+        "control": "probe_value",
+        "detail": "",
+        "error_code": "none",
+        "error_domain": "none",
+        "ok": true,
+        "operation": "get",
+        "request_id": 781242904,
+        "values": [
+          {
+            "type": "integer",
+            "value": 0
+          }
+        ]
+      },
+      "build_costs": {
+        "baseline": {
+          "app_bytes": 125728,
+          "elf_sha256": "28dcbf106bb41074c70405a6a99710de52567a0d4fe00f69cbedbbf8e20b9b8d",
+          "map_sha256": "99afbbf65b31e6bbff4daab18566cfeff3698290a15ccd0c5b4a7b9d03bcf5d8",
+          "sdkconfig_sha256": "c79e463fde3704244946bb860afe2aa2539c05ebbc89326831a8cc5e4e7cce65",
+          "size": {
+            "version": "1.2",
+            "total_size": 125605,
+            "layout": [
+              {
+                "name": "Flash Code",
+                "total": 0,
+                "used": 47816,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 47816
+                  }
+                }
+              },
+              {
+                "name": "IRAM",
+                "total": 131072,
+                "used": 38531,
+                "free": 92541,
+                "parts": {
+                  ".text": {
+                    "size": 37503
+                  },
+                  ".vectors": {
+                    "size": 1028
+                  }
+                }
+              },
+              {
+                "name": "Flash Data",
+                "total": 0,
+                "used": 28244,
+                "free": 0,
+                "parts": {
+                  ".rodata": {
+                    "size": 27972
+                  },
+                  ".appdesc": {
+                    "size": 256
+                  },
+                  ".tdata": {
+                    "size": 16
+                  }
+                }
+              },
+              {
+                "name": "DRAM",
+                "total": 180736,
+                "used": 14518,
+                "free": 166218,
+                "parts": {
+                  ".data": {
+                    "size": 10974
+                  },
+                  ".bss": {
+                    "size": 3544
+                  }
+                }
+              },
+              {
+                "name": "RTC SLOW",
+                "total": 8192,
+                "used": 68,
+                "free": 8124,
+                "parts": {
+                  ".force_slow": {
+                    "size": 40
+                  },
+                  ".rtc_slow_reserved": {
+                    "size": 24
+                  },
+                  ".rtc_noinit": {
+                    "size": 4
+                  }
+                }
+              }
+            ]
+          },
+          "app_delta_from_baseline_bytes": 0,
+          "region_deltas_from_baseline_bytes": {
+            "Flash Code": 0,
+            "IRAM": 0,
+            "Flash Data": 0,
+            "DRAM": 0,
+            "RTC SLOW": 0
+          }
+        },
+        "wamr": {
+          "app_bytes": 192928,
+          "elf_sha256": "3b2a58bcd84da3ade0b1135b47088b56d838b28c0b71da0b5dad87083224cef7",
+          "map_sha256": "eeeb46b1796f6a8a4cba0de8018598c3762af04d16678dd08864c77bad14f0a0",
+          "sdkconfig_sha256": "c79e463fde3704244946bb860afe2aa2539c05ebbc89326831a8cc5e4e7cce65",
+          "size": {
+            "version": "1.2",
+            "total_size": 192805,
+            "layout": [
+              {
+                "name": "Flash Code",
+                "total": 0,
+                "used": 105916,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 105916
+                  }
+                }
+              },
+              {
+                "name": "IRAM",
+                "total": 131072,
+                "used": 38679,
+                "free": 92393,
+                "parts": {
+                  ".text": {
+                    "size": 37651
+                  },
+                  ".vectors": {
+                    "size": 1028
+                  }
+                }
+              },
+              {
+                "name": "Flash Data",
+                "total": 0,
+                "used": 36124,
+                "free": 0,
+                "parts": {
+                  ".rodata": {
+                    "size": 35852
+                  },
+                  ".appdesc": {
+                    "size": 256
+                  },
+                  ".tdata": {
+                    "size": 16
+                  }
+                }
+              },
+              {
+                "name": "DRAM",
+                "total": 180736,
+                "used": 15710,
+                "free": 165026,
+                "parts": {
+                  ".data": {
+                    "size": 12046
+                  },
+                  ".bss": {
+                    "size": 3664
+                  }
+                }
+              },
+              {
+                "name": "RTC SLOW",
+                "total": 8192,
+                "used": 68,
+                "free": 8124,
+                "parts": {
+                  ".force_slow": {
+                    "size": 40
+                  },
+                  ".rtc_slow_reserved": {
+                    "size": 24
+                  },
+                  ".rtc_noinit": {
+                    "size": 4
+                  }
+                }
+              }
+            ]
+          },
+          "app_delta_from_baseline_bytes": 67200,
+          "region_deltas_from_baseline_bytes": {
+            "Flash Code": 58100,
+            "IRAM": 148,
+            "Flash Data": 7880,
+            "DRAM": 1192,
+            "RTC SLOW": 0
+          }
+        },
+        "wasm3": {
+          "app_bytes": 197904,
+          "elf_sha256": "e879b20f6e36a5a86444add80066f3e88c27c43577a3d55b16efba005aea817d",
+          "map_sha256": "05132d4e3d9470e70bc11fef5e8ad43996e94fa6d38885a4ebb06604ab1f289a",
+          "sdkconfig_sha256": "c79e463fde3704244946bb860afe2aa2539c05ebbc89326831a8cc5e4e7cce65",
+          "size": {
+            "version": "1.2",
+            "total_size": 197781,
+            "layout": [
+              {
+                "name": "Flash Code",
+                "total": 0,
+                "used": 109548,
+                "free": 0,
+                "parts": {
+                  ".text": {
+                    "size": 109548
+                  }
+                }
+              },
+              {
+                "name": "IRAM",
+                "total": 131072,
+                "used": 38679,
+                "free": 92393,
+                "parts": {
+                  ".text": {
+                    "size": 37651
+                  },
+                  ".vectors": {
+                    "size": 1028
+                  }
+                }
+              },
+              {
+                "name": "Flash Data",
+                "total": 0,
+                "used": 38540,
+                "free": 0,
+                "parts": {
+                  ".rodata": {
+                    "size": 38268
+                  },
+                  ".appdesc": {
+                    "size": 256
+                  },
+                  ".tdata": {
+                    "size": 16
+                  }
+                }
+              },
+              {
+                "name": "DRAM",
+                "total": 180736,
+                "used": 14574,
+                "free": 166162,
+                "parts": {
+                  ".data": {
+                    "size": 10974
+                  },
+                  ".bss": {
+                    "size": 3600
+                  }
+                }
+              },
+              {
+                "name": "RTC SLOW",
+                "total": 8192,
+                "used": 68,
+                "free": 8124,
+                "parts": {
+                  ".force_slow": {
+                    "size": 40
+                  },
+                  ".rtc_slow_reserved": {
+                    "size": 24
+                  },
+                  ".rtc_noinit": {
+                    "size": 4
+                  }
+                }
+              }
+            ]
+          },
+          "app_delta_from_baseline_bytes": 72176,
+          "region_deltas_from_baseline_bytes": {
+            "Flash Code": 61732,
+            "IRAM": 148,
+            "Flash Data": 10296,
+            "DRAM": 56,
+            "RTC SLOW": 0
+          }
+        }
+      }
+    }
+  ]
+}
