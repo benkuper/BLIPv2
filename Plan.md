@@ -161,6 +161,54 @@ soak. Deviating from the provisional table requires measurements in that ADR.
 
 ## Implementation roadmap
 
+### Required device web experience and self-updates
+
+The firmware must serve a complete, polished web interface for the device. A
+generic parameter shell is a foundation; it does not satisfy the finished product.
+
+* **Simple mode** is the default: a clean dashboard for the main controls,
+  connection and battery status, lighting, and installed sensors. Use clear
+  graphics, color previews, gauges, and live plots where they explain the actual
+  values. Show only capabilities present on this device, with useful empty,
+  disconnected, loading, and error states.
+* **Advanced mode** exposes every readable/writable parameter, action, event,
+  diagnostic, and resource assignment. Organize it by topic and component with
+  navigation and search, typed editors, units, ranges, access rules, and clear
+  save/reboot feedback. Changing modes must retain device values and connection.
+* Components declare presentation hints in the registry (topic, simple-mode
+  priority, widget, semantic role, units/ranges). Both modes are generated from
+  that schema, including dynamically loaded script controls. Unknown components
+  receive useful generic controls without requiring web source changes.
+* The interface checks `https://www.goldengeek.org/blip/update?<info_in_GET>`
+  (with a configurable endpoint override) for **both firmware
+  and web-interface updates for this exact device**. Show installed/available
+  versions, release notes, compatibility and update progress. Offer explicit
+  installation and an optional automatic policy; never interrupt active output
+  merely because a new release exists.
+* The GET query carries versioned public compatibility metadata: board, target,
+  profile/features, flash layout, installed firmware/web versions, API version,
+  and selected release channel. Never include Wi-Fi passwords, secrets, or
+  unnecessary personal/device identifiers. The website returns a versioned
+  machine-readable release catalog; document that server contract and publish
+  matching sample responses.
+* Firmware and web bundles update independently using the existing A/B rollback
+  and atomic asset-replacement services. A versioned authenticated release
+  manifest identifies board, target, flash layout, profile/features, artifact
+  lengths/digests, and supported firmware/web API versions. Reject mismatches,
+  corrupt/untrusted downloads, downgrades outside the selected policy, and
+  incompatible firmware/web combinations before activation.
+* Device-side update checks and downloads must work without keeping a browser
+  open. Keep memory bounded, validate TLS and release authenticity, preserve
+  normal control, handle offline/captive-network conditions, and recover from
+  interrupted downloads, asset replacement, and failed firmware boot.
+* Acceptance includes responsive phone/desktop layouts, keyboard accessibility,
+  actual graphical sensor updates, complete advanced-control coverage, schema
+  refresh after script replacement, and on-device check/download/install/reboot
+  tests on ESP32, ESP32-S3, and ESP32-C6. Host tests alone do not close this work.
+
+These requirements are added to Milestone 3 as work packages 3.7–3.9, with
+release hosting/artifact production in 8.5 and final qualification in 9.5–9.8.
+
 Each numbered item should normally become one PR. Large component-parity items can become an epic containing one PR per component.
 
 ### Milestone 0 — Preserve observable V1 behavior
@@ -208,7 +256,11 @@ This does not require faithfully reproducing V1 bugs or undocumented internal co
 | 3.5 | Add browser installation using esptool-js/Launchpad-compatible manifests.    | A factory device can be flashed, provisioned, opened and updated from a browser. |
 | 3.6 | Add broker-backed pin selectors and a complete pin/reservation inspector. Every pin-valued control lists all board-declared pins with its current owner and compatibility; component-owned conflicts offer explicit atomic swap or unassign-and-move operations, while system/critical reservations remain visible but unavailable. Model I2C pins as a shared bus assignment rather than conflicting per-device claims. | The UI cannot silently double-book an exclusive pin; stale or invalid changes roll back, all reservations remain inspectable, and compatible I2C members share one clearly identified bus without false conflicts. |
 
-**Gate B:** browser install → Wi-Fi setup → OSCQuery discovery → conflict-safe pin assignment/reservation inspection → LED control → settings save → OTA rollback works end to end.
+| 3.7 | Add registry presentation hints and polished Simple/Advanced device web modes. | Simple shows main controls and graphical sensors; Advanced exposes every control by topic/component; mode changes preserve live state. |
+| 3.8 | Add a versioned device-specific release catalog and web update center. | The UI checks the release website for independent firmware/web updates, shows versions/notes/progress, and rejects incompatible artifacts. |
+| 3.9 | Add bounded device-side HTTPS update checks, downloads and coordinated activation. | Checks work without an open browser; authentic compatible updates survive interruption and firmware rollback on all three targets. |
+
+**Gate B:** Simple/Advanced interface and independent firmware/web update qualification (3.7?3.9), plus browser install → Wi-Fi setup → OSCQuery discovery → conflict-safe pin assignment/reservation inspection → LED control → settings save → OTA rollback works end to end.
 
 ### Milestone 4 — Production LED engine
 
@@ -293,7 +345,7 @@ Every parity PR must include:
 | 8.2 | Generate`sdkconfig`, partition tables, component selection, pins and web schemas. | Generated files are reproducible from a committed manifest.                       |
 | 8.3 | Add a local CLI and reproducible containerized builder.                             | Identical inputs produce identical application artifacts.                         |
 | 8.4 | Build the web Kitchen for board selection, capabilities and configuration.          | It exports a manifest and installable firmware bundle.                            |
-| 8.5 | Add CI build caching and a release artifact matrix.                                 | Minimal, standard, LED-heavy, sensor-heavy and full profiles build automatically. |
+| 8.5 | Add CI build caching, a release artifact matrix, and the HTTPS release catalog with authenticated device-specific firmware/web manifests.                                 | Minimal, standard, LED-heavy, sensor-heavy and full profiles build automatically. |
 
 ### Milestone 9 — Hardening and cutover
 

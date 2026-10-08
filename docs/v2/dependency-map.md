@@ -52,7 +52,10 @@ flowchart LR
 | `3.4` | LED transport qualification ADR and native RMT functional vertical slice | `1.4`, `1.5`, `2.7` | measured per-target transport guidance, first output driver and registry-exposed strip; RMT baseline is non-binding for production |
 | `3.5` | Browser installer manifests | `3.2`, `3.3` | factory/install bundle and browser flow |
 | `3.6` | Pin reservation inspector and conflict-safe editor | `1.3`, `1.4`, `2.1`, `3.1` | complete pin/claim schema, atomic reassignment, and shared-bus-aware controls |
-| `GB` | Prove install-to-rollback vertical slice | `3.1`–`3.6` | Gate B evidence, including exclusive-pin conflict prevention and legal I2C sharing |
+| `3.7` | Simple/Advanced device web interface and presentation metadata | `3.1`, `3.6`, `6.6` for dynamic refresh | polished main controls and graphical sensors; exhaustive topic/component configuration |
+| `3.8` | Release catalog and firmware/web update center | `3.2`, `3.3`, `3.5`, `3.7` | authenticated device-specific catalog, independent versions, compatibility checks and progress |
+| `3.9` | Device-side HTTPS self-update service | `3.8`, `2.1`, `2.6` | bounded checks/downloads without an open browser, policy, atomic assets and firmware rollback |
+| `GB` | Prove install-to-rollback vertical slice | `3.1`–`3.9` | Gate B evidence, including Simple/Advanced UI, self-updates, exclusive-pin conflict prevention and legal I2C sharing |
 
 ## Milestones 4–6
 
