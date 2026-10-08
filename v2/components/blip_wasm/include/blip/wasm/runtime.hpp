@@ -87,6 +87,11 @@ class Runtime : public GuestMemory {
     virtual void unload() noexcept = 0;
     virtual void shutdown() noexcept = 0;
     virtual core::Result<Signature> signature(std::string_view name) noexcept = 0;
+    // Passive worker-only query. Reject missing, mutable or non-i32 globals.
+    virtual core::Result<std::uint32_t> immutable_i32_global(std::string_view) noexcept {
+        return core::Result<std::uint32_t>::failure({core::ErrorDomain::control, core::ErrorCode::validation_failed,
+            "blip.wasm", "global", "immutable-i32-global-unsupported"});
+    }
     virtual core::Status invoke(std::string_view name, std::span<const Value> arguments,
                                ExecutionBudget budget, std::span<Value> results,
                                std::size_t& result_count) noexcept = 0;

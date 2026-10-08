@@ -15,6 +15,9 @@
 | [0011](0011-esp32-wasm-linear-arena.md) | ESP32 byte-accessible IRAM guest arena with DRAM engine/stacks | Seven production profile memory trials qualified; full Gate D open |
 | [0012](0012-wasm-checked-utf8.md) | Checked unsigned pointer/length UTF-8 copies, bounds and generation | Host and three-family strings qualified; provider bindings follow in 6.5 |
 | [0013](0013-wasm-component-capabilities.md) | Component-owned versioned provider descriptors, bounded catalog and checked callbacks | Portable contract qualified; native import bridge follows |
+| [0014](0014-wasm-native-import-bridge.md) | Bounded WAMR guest-to-native bridge | Three chip families qualified |
+| [0015](0015-wasm-script-control-declarations.md) | Owned custom-section declarations and leased registry projection | Declaration/interfaces qualified; live production controls pending |
+| [0016](0016-wasm-owned-script-controls.md) | Owned values/queues, retirement and fixed guest callback buffer | Store/runtime query qualified; production wiring pending |
 
 Accepted ADRs are immutable contracts. A material change is recorded by a new
 ADR with `Supersedes`/`Superseded by` links.

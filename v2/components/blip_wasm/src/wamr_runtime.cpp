@@ -301,6 +301,20 @@ core::Result<Signature> WamrRuntime::signature(std::string_view name) noexcept {
     return Result::failure(failure(core::ErrorCode::not_found, "signature", "export-not-found").error());
 }
 
+core::Result<std::uint32_t> WamrRuntime::immutable_i32_global(std::string_view name) noexcept {
+    using Result = core::Result<std::uint32_t>;
+    std::array<char, kMaximumExportNameBytes + 1> terminated{};
+    if (!instance_ || !export_name(name, terminated))
+        return Result::failure(failure(core::ErrorCode::invalid_argument, "global", "module-or-name").error());
+    wasm_global_inst_t global{};
+    if (!wasm_runtime_get_export_global_inst(static_cast<wasm_module_inst_t>(instance_), terminated.data(), &global))
+        return Result::failure(failure(core::ErrorCode::not_found, "global", "export-not-found").error());
+    if (global.kind != WASM_I32 || global.is_mutable || !global.global_data)
+        return Result::failure(failure(core::ErrorCode::validation_failed, "global", "expected-immutable-i32").error());
+    std::uint32_t value{}; std::memcpy(&value, global.global_data, sizeof(value));
+    return Result::success(value);
+}
+
 core::Status WamrRuntime::invoke(std::string_view name, std::span<const Value> arguments,
                                 ExecutionBudget budget, std::span<Value> results,
                                 std::size_t& result_count) noexcept {

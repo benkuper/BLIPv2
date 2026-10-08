@@ -22,6 +22,7 @@ class WamrRuntime final : public Runtime {
     void unload() noexcept override;
     void shutdown() noexcept override;
     core::Result<Signature> signature(std::string_view name) noexcept override;
+    core::Result<std::uint32_t> immutable_i32_global(std::string_view name) noexcept override;
     core::Status invoke(std::string_view name, std::span<const Value> arguments,
                         ExecutionBudget budget, std::span<Value> results,
                         std::size_t& result_count) noexcept override;

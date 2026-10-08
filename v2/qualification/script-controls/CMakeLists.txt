@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.22)
+set(SDKCONFIG "${CMAKE_BINARY_DIR}/sdkconfig")
+set(SDKCONFIG_DEFAULTS "${CMAKE_CURRENT_LIST_DIR}/../wasm-worker/sdkconfig.defaults")
+set(BLIP_WASM_DEPS "${CMAKE_CURRENT_LIST_DIR}/../../../build/wasm-deps" CACHE PATH "Pinned runtime checkouts")
+set(EXTRA_COMPONENT_DIRS
+    "${CMAKE_CURRENT_LIST_DIR}/../../components/blip_core"
+    "${CMAKE_CURRENT_LIST_DIR}/../../components/blip_wasm")
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+idf_build_set_property(BLIP_WASM_DEPS ${BLIP_WASM_DEPS})
+idf_build_set_property(MINIMAL_BUILD ON)
+project(blip-script-controls)

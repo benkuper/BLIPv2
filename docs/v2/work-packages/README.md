@@ -75,3 +75,8 @@ wire protocols, or public OSC paths.
 | [6.3 M5StickC UART localization](6.3-m5stickc-uart-localization.md) | Three missing-byte replies correlate with valid full UART driver admissions; loss beyond encoding is reproduced; driver/physical/USB/host cause and serial burst gate remain open |
 | [6.4 checked UTF-8](6.4-wasm-checked-utf8.md) | Checked unsigned pointer/length copies, UTF-8 validation and generation guards; 23 host tests, 3,069 native checks and seven production builds passed; provider bindings follow in 6.5 |
 | [6.5 provider contract](6.5-component-provider-contract.md) | Component-owned versioned descriptors and portable catalog; 24 host suites, 619 XIAO native checks and seven production builds passed; guest-to-native bridge and production providers remain pending |
+| [6.5 native bridge](6.5-native-import-bridge.md) | Checked guest-to-native calls qualified on three families; production providers follow |
+| [6.5 production providers](6.5-production-providers.md) | Versioned LED/fleet providers and copied scheduled actions; seven builds and three-family production HIL passed |
+| [6.6 declarations](6.6-script-declaration-contract.md) | Owned declaration decoding/projection; live integration follows |
+| [6.6 registry interfaces](6.6-dynamic-registry-interfaces.md) | Leased dynamic controls and owned transport replies; surrogate and static production controls qualified |
+| [6.6 owned store](6.6-script-control-store.md) | Typed values, copied queues, leased retirement and actual callback/global checks; production owner/UI integration pending |
