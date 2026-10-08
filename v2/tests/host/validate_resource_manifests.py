@@ -178,9 +178,13 @@ def check_fixture(name: str, should_pass: bool, expected_text: str = "") -> None
 def validate_board(path: Path) -> None:
     document = load_manifest(path)
     require_keys(document, {"schema_version", "id", "target", "sources", "pins"},
-                 {"schema_version", "id", "target", "sources", "pins", "antenna", "buses"}, path.as_posix())
+                 {"schema_version", "id", "target", "sources", "pins", "antenna", "buses", "flash_bytes"}, path.as_posix())
     require(document["schema_version"] == 1, f"{path}: unsupported board schema")
     require(document["target"] in {"esp32", "esp32s3", "esp32c6"}, f"{path}: invalid target")
+    if "flash_bytes" in document:
+        require(type(document["flash_bytes"]) is int and document["flash_bytes"] >= 1024 * 1024
+                and document["flash_bytes"] % (1024 * 1024) == 0,
+                f"{path}: flash_bytes must be a positive whole MiB capacity")
     require(isinstance(document["sources"], list) and document["sources"] and
             all(isinstance(source, str) and source.startswith("https://")
                 for source in document["sources"]), f"{path}: authoritative sources required")
@@ -228,6 +232,8 @@ def validate_board(path: Path) -> None:
                 f"{path}: GPIO38 must remain reserved for RGB LED power")
     if document["id"] == "creators-ball-v2":
         require(document["target"] == "esp32c6", f"{path}: Creators Ball V2 target changed")
+        require(document.get("flash_bytes") == 8 * 1024 * 1024,
+                f"{path}: Creators Ball V2 requires 8 MiB flash")
         for gpio, owner, reason in (
             (2, "blip.output.strip0:clock", "hd108-clock"),
             (3, "blip.output.strip0:pin", "hd108-data"),

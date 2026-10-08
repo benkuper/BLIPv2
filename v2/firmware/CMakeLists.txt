@@ -118,6 +118,14 @@ idf_build_set_property(
 
 project(blip-v2 VERSION 0.1.0)
 
+# Defaults do not replace an existing sdkconfig. Refuse a stale generic C6
+# configuration before producing a Ball image with the wrong factory layout.
+if(BLIP_BOARD_CREATORS_BALL_V2 AND
+   (NOT CONFIG_ESPTOOLPY_FLASHSIZE_8MB OR
+    NOT CONFIG_PARTITION_TABLE_CUSTOM_FILENAME STREQUAL "partitions-8mb.csv"))
+    message(FATAL_ERROR "Creators Ball V2 requires 8 MB flash and partitions-8mb.csv. Use sdkconfig.ball-8mb.defaults in a fresh build directory or update the existing sdkconfig.")
+endif()
+
 # A full factory install must carry a valid empty LittleFS image. The storage
 # component then installs its embedded, integrity-checked browser bundle on the
 # first boot. App-only OTA builds continue to leave this partition untouched.

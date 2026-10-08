@@ -24,9 +24,12 @@ source still needs identification. The visible ring is the rotary control around
 the circular LCD, not an addressable LED ring. The LCD and encoder still need
 their V2 components.
 
-`creators-ball-v2.json` records the separate 8 MiB ESP32-C6 board wiring from
+`creators-ball-v2.json` records `flash_bytes: 8388608` (8 MiB, esptool `8MB`) and the ESP32-C6 board wiring from
 the pinned BLIP V1 `creatorsballv2` configuration. Build it with
-`-DBLIP_BOARD_CREATORS_BALL_V2=ON`. GPIO3 is HD108 data, GPIO2 is clock, GPIO14
+`-DBLIP_BOARD_CREATORS_BALL_V2=ON`. The build selects `sdkconfig.ball-8mb.defaults`
+and `partitions-8mb.csv`; an existing configuration with a different flash size
+or partition table is refused. The browser installer also verifies the 8 MB
+layout. GPIO3 is HD108 data, GPIO2 is clock, GPIO14
 is battery charge sense, GPIO21 enables the LEDs, and GPIO22 holds power. The
 XIAO RF-switch GPIO initialization is disabled in this build. The firmware
 raises GPIO22 at the start of `app_main`. Its fixed 36-pixel HD108 output now

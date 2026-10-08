@@ -1,0 +1,77 @@
+{
+  "created_utc": "2026-10-08T11:13:34.034607+00:00",
+  "passed": true,
+  "board": "creators-ball-v2",
+  "flash_bytes": 8388608,
+  "esptool_flash_size": "8MB",
+  "physical_identity": {
+    "chip": "ESP32-C6FH8",
+    "base_mac": "08:92:72:f6:4d:dc",
+    "prior_flash_log_sha256": "1441a13ffa32ea78354cef2ab0b14a016143161f40ac7e72e9e69b8828705e8f"
+  },
+  "partitions": [
+    {
+      "name": "nvs",
+      "offset": 36864,
+      "bytes": 61440
+    },
+    {
+      "name": "otadata",
+      "offset": 98304,
+      "bytes": 8192
+    },
+    {
+      "name": "phy_init",
+      "offset": 106496,
+      "bytes": 4096
+    },
+    {
+      "name": "ota_0",
+      "offset": 131072,
+      "bytes": 3145728
+    },
+    {
+      "name": "ota_1",
+      "offset": 3276800,
+      "bytes": 3145728
+    },
+    {
+      "name": "storage",
+      "offset": 6422528,
+      "bytes": 1835008
+    },
+    {
+      "name": "coredump",
+      "offset": 8257536,
+      "bytes": 131072
+    }
+  ],
+  "installer_profile": [
+    "esp32c6",
+    "8MB",
+    6422528
+  ],
+  "source_snapshot": {
+    "AGENTS.md": "d023013c65789072f817dc243f8e66b8e730ea1be9787759bde08e6af23b90d0",
+    "v2/boards/creators-ball-v2.json": "c4b476617110f3b5758f7b408bf604da6b8fdfe13ee6ee209d9bf24333fea3e0",
+    "v2/boards/README.md": "5e49ef8376fcb2b3c140b69e1c798b1febb094baffc4a4340ad825e4c55ab07a",
+    "v2/firmware/CMakeLists.txt": "7b54d482b81d752a3957d5dd3519cc1964f0d4f603648ecb3926ef4c87eb887d",
+    "v2/firmware/sdkconfig.ball-8mb.defaults": "80ff687d3a5153f8f1359e72c0cd01ca0461e680351a47f812fc46ea85af04a7",
+    "v2/firmware/partitions-8mb.csv": "878612255486c2b5c7c363c26fa598e1dd6dd9342872ad1afa40578e4048cca4",
+    "v2/installer/build_browser_installer.py": "cffdd8f0e0d87b744b98731f35ea81bcd0a382b22ce14cfe621a1c51bfa26ed9",
+    "v2/tests/host/validate_resource_manifests.py": "08c62aadf6ec225939ff7b70437f26b65f4a0ecba2ab455852ecd494cc9fc1a9"
+  },
+  "checks": {
+    "existing_8mb_configuration_accepted": true,
+    "existing_4mb_configuration_rejected": true,
+    "negative_log_sha256": "88aa36fe09246fb92650ed040c173980fb6f56743c5dc6109451daca76cc1859",
+    "positive_log_sha256": "6b5dffff4c706acea046c68bd788691631c5e7cb286f1f06cd469901257a9580",
+    "sdkconfig_sha256": "7599c768b706c7c3a9f44834f206fe7669fc9e0dbe0d267d3e20ccd171198de5",
+    "generated_flash_arguments_sha256": "ccaeef190a9096cec04d0019b27a586e14ae305fabef83242b095b51aaa66fdf",
+    "partition_end_matches_8mb": true
+  },
+  "limitations": [
+    "Configuration and manifest validation; no new flash or firmware restoration was needed",
+    "Physical identity is from the previously validated production-provider flash log"
+  ]
+}

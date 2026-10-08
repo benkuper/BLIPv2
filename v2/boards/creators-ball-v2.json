@@ -2,6 +2,7 @@
   "schema_version": 1,
   "id": "creators-ball-v2",
   "target": "esp32c6",
+  "flash_bytes": 8388608,
   "sources": ["https://github.com/Golden-Geek/BLIP/blob/1507f440b3ae635686d2bf759ecc742b391f08a7/configs/creators.ini"],
   "pins": [
     {"id":"gpio.0","label":"IMU SDA / GPIO0","gpio":0,"capabilities":["input","output","open-drain"],"electrical":"3.3V I2C","reserved_for":"bus.i2c.imu","reason":"onboard-imu-bus","bus":"i2c.imu","selectable":false},
