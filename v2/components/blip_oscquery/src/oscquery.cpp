@@ -260,12 +260,11 @@ class TreeWriter {
 
     [[nodiscard]] bool write_value(const core::ComponentDescriptor& descriptor,
                                    const core::ParameterDescriptor& parameter,
-                                   core::ScalarValue& current, bool& present) noexcept {
+                                   core::ControlResponse& response, core::ScalarValue& current, bool& present) noexcept {
         present = false;
         if (parameter.access == core::Access::write_only) {
             return true;
         }
-        core::ControlResponse response{};
         const auto status = controls_->execute(
             {core::ControlOperation::read_parameter, descriptor.id, parameter.id, {}}, response);
         if (!status || response.value_count != 1U || response.values[0].type != parameter.type) {
@@ -338,7 +337,8 @@ class TreeWriter {
         }
         core::ScalarValue current{};
         bool value_present{};
-        if (!write_value(descriptor, parameter, current, value_present)) {
+        core::ControlResponse value_response{};
+        if (!write_value(descriptor, parameter, value_response, current, value_present)) {
             return false;
         }
         char tag = type_tag(type);
@@ -509,13 +509,17 @@ class TreeWriter {
         return writer_.quoted({full_path.data(), path.size() + id.size() + 1U});
     }
 
-    [[nodiscard]] bool write_contents(std::string_view path,
-                                      const core::ComponentDescriptor* descriptor, bool&,
-                                      std::size_t depth) noexcept {
-        if (depth > 16U || !writer_.append("\"CONTENTS\":{")) {
-            return false;
-        }
-        bool contents_first = true;
+    // Descriptor/field scratch belongs to the control-writing call, so it is
+    // not retained in every recursive container frame. Keep the lease in the
+    // caller until all of that container has been serialized.
+    // The embedded compiler must not inline it back into the recursive frame.
+#ifdef ESP_PLATFORM
+    [[gnu::noinline]]
+#endif
+    [[nodiscard]] bool write_component_controls(std::string_view path,
+                                      const core::ComponentDescriptor* descriptor,
+                                      const core::DynamicSchemaLease& schema,
+                                      bool& contents_first) noexcept {
         if (descriptor != nullptr) {
             for (const auto& parameter : descriptor->parameters) {
                 if (!write_parameter(*descriptor, parameter, path, contents_first)) {
@@ -539,11 +543,42 @@ class TreeWriter {
                     return false;
                 }
             }
+            for (std::size_t index = 0; index < schema.size(); ++index) {
+                std::array<core::FieldDescriptor, core::kMaxControlValues> fields{};
+                switch (schema.kind(index)) {
+                case core::DynamicControlKind::parameter: {
+                    core::ParameterDescriptor parameter{};
+                    if (!schema.parameter(index, parameter) || !write_parameter(*descriptor, parameter, path, contents_first)) return false;
+                    break;
+                }
+                case core::DynamicControlKind::action: {
+                    core::ActionDescriptor action{};
+                    if (!schema.action(index, fields, action) || !write_action(action, path, contents_first)) return false;
+                    break;
+                }
+                case core::DynamicControlKind::event: {
+                    core::EventDescriptor event{};
+                    if (!schema.event(index, fields, event) || !write_event(event, path, contents_first)) return false;
+                    break;
+                }
+                }
+            }
         }
+        return true;
+    }
 
+    // Path matching/header scratch is also retired before descending into a
+    // child. Only the child's path and the schema lease remain in recursion.
+#ifdef ESP_PLATFORM
+    [[gnu::noinline]]
+#endif
+    [[nodiscard]] bool write_child_header(std::size_t index, std::string_view path,
+                                      std::span<char> child_path, std::size_t& child_size,
+                                      const core::ComponentDescriptor*& child_descriptor,
+                                      bool& contents_first) noexcept {
+        child_size = 0;
         std::array<char, kMaxOscAddressBytes + 1U> full{};
         std::array<char, kMaxOscAddressBytes + 1U> prior_full{};
-        for (std::size_t index = 0; index < registry_->component_count(); ++index) {
             std::size_t full_size{};
             const auto& candidate_descriptor = registry_->component_descriptor(index);
             if (!component_path(candidate_descriptor, full, full_size)) {
@@ -551,7 +586,7 @@ class TreeWriter {
             }
             const auto segment = next_segment({full.data(), full_size}, path);
             if (segment.empty()) {
-                continue;
+                return true;
             }
             bool first_segment = true;
             for (std::size_t prior = 0; prior < index; ++prior) {
@@ -567,12 +602,10 @@ class TreeWriter {
             }
             if (!first_segment || !begin_item(segment, contents_first)) {
                 if (!first_segment) {
-                    continue;
+                    return true;
                 }
                 return false;
             }
-            std::array<char, kMaxOscAddressBytes + 1U> child_path{};
-            std::size_t child_size{};
             if (path.empty()) {
                 child_path[0] = '/';
                 std::copy(segment.begin(), segment.end(), child_path.begin() + 1U);
@@ -587,7 +620,7 @@ class TreeWriter {
                 child_size = path.size() + segment.size() + 1U;
             }
             const std::string_view child{child_path.data(), child_size};
-            const auto* child_descriptor = descriptor_at_path(child);
+            child_descriptor = descriptor_at_path(child);
             const auto description =
                 child_descriptor == nullptr ? segment : child_descriptor->display_name;
             if (!writer_.append("{\"DESCRIPTION\":") || !writer_.quoted(description) ||
@@ -615,6 +648,30 @@ class TreeWriter {
             if (!writer_.append(",")) {
                 return false;
             }
+        return true;
+    }
+
+    [[nodiscard]] bool write_contents(std::string_view path,
+                                      const core::ComponentDescriptor* descriptor, bool&,
+                                      std::size_t depth) noexcept {
+        core::DynamicSchemaLease schema;
+        if (descriptor) {
+            if (!registry_->acquire_dynamic_schema(descriptor->id, schema)) return false;
+            if (schema.held() && (!writer_.append("\"BLIP_SCHEMA_GENERATION\":") ||
+                !writer_.number(schema.generation()) || !writer_.append(","))) return false;
+        }
+        if (depth > 16U || !writer_.append("\"CONTENTS\":{")) {
+            return false;
+        }
+        bool contents_first = true;
+        if (!write_component_controls(path, descriptor, schema, contents_first)) return false;
+        for (std::size_t index = 0; index < registry_->component_count(); ++index) {
+            std::array<char, kMaxOscAddressBytes + 1U> child_path{};
+            std::size_t child_size{};
+            const core::ComponentDescriptor* child_descriptor{};
+            if (!write_child_header(index, path, child_path, child_size, child_descriptor, contents_first)) return false;
+            if (child_size == 0) continue;
+            const std::string_view child{child_path.data(), child_size};
             bool ignored{};
             if (!write_contents(child, child_descriptor, ignored, depth + 1U) ||
                 !writer_.append("}")) {

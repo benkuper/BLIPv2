@@ -34,6 +34,7 @@ class LegacyOscEndpoint {
     core::ControlService* controls_{};
     DeviceIdentity identity_{};
     std::array<char, kMaxOscAddressBytes + 1U> response_address_{};
+    std::array<char, core::kControlResponseStringBytes> response_strings_{};
 };
 
 } // namespace blip::oscquery

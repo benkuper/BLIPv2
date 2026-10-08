@@ -258,6 +258,27 @@ core::Status LegacyOscEndpoint::handle_control(const OscMessage& request, bool u
         find_parameter(*matched, alias == nullptr ? control_id : alias->parameter_id);
     control.control_id = parameter == nullptr ? control_id : parameter->id;
     const auto* action = find_action(*matched, control_id);
+    core::DynamicSchemaLease schema;
+    core::ParameterDescriptor dynamic_parameter{};
+    core::ActionDescriptor dynamic_action{};
+    std::array<core::FieldDescriptor, core::kMaxControlValues> dynamic_fields{};
+    if (!parameter && !action) {
+        const auto acquired = registry_->acquire_dynamic_schema(matched->id, schema);
+        if (!acquired) return acquired;
+        for (std::size_t i = 0; i < schema.size(); ++i) {
+            if (schema.id(i) != control_id) continue;
+            if (schema.kind(i) == core::DynamicControlKind::parameter) {
+                const auto projected = schema.parameter(i, dynamic_parameter);
+                if (!projected) return projected;
+                parameter = &dynamic_parameter;
+            } else if (schema.kind(i) == core::DynamicControlKind::action) {
+                const auto projected = schema.action(i, dynamic_fields, dynamic_action);
+                if (!projected) return projected;
+                action = &dynamic_action;
+            }
+            control.generation = schema.generation(); break;
+        }
+    }
     if (parameter != nullptr) {
         control.operation = request.argument_count == 0U ? core::ControlOperation::read_parameter
                                                          : core::ControlOperation::write_parameter;
@@ -304,6 +325,21 @@ core::Status LegacyOscEndpoint::handle_control(const OscMessage& request, bool u
         }
     }
     response.argument_count = output_index;
+    std::size_t string_bytes{};
+    for (std::size_t i = 0; i < output_index; ++i) {
+        if (response.arguments[i].type != OscValueType::string) continue;
+        if (response.arguments[i].string.size() > response_strings_.size() - string_bytes)
+            return failure(core::ErrorCode::capacity_exceeded, "feedback", "string-storage");
+        string_bytes += response.arguments[i].string.size();
+    }
+    std::array<char, core::kControlResponseStringBytes> strings{};
+    string_bytes = 0;
+    for (std::size_t i = 0; i < output_index; ++i) {
+        auto& value = response.arguments[i]; if (value.type != OscValueType::string) continue;
+        if (!value.string.empty()) std::memcpy(strings.data() + string_bytes, value.string.data(), value.string.size());
+        value.string = {response_strings_.data() + string_bytes, value.string.size()}; string_bytes += value.string.size();
+    }
+    response_strings_ = strings;
     return core::Status::success();
 }
 

@@ -281,6 +281,14 @@ else()
     target_compile_options(blip_oscquery_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_oscquery_tests COMMAND blip_oscquery_tests)
+add_executable(blip_dynamic_controls_tests blip_dynamic_controls_tests.cpp)
+target_link_libraries(blip_dynamic_controls_tests PRIVATE blip_oscquery_host)
+if(MSVC)
+    target_compile_options(blip_dynamic_controls_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_dynamic_controls_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_dynamic_controls_tests COMMAND blip_dynamic_controls_tests)
 
 add_library(blip_led_host STATIC
     ../../components/blip_led/src/backend_selector.cpp

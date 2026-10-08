@@ -98,7 +98,11 @@ tokens, so old work cannot call a replacement module. Guest action execution
 belongs on the supervised worker and must not run inline on transport tasks or
 re-enter the guest from native callbacks.
 
-This checkpoint implements decoding and descriptor projection only. Production
-loading does not yet consume or publish this section. Live registry replacement,
-parameter value storage, action dispatch, event delivery, generated bindings and
-their lifecycle/concurrency evidence remain required for 6.6/6.7.
+The declaration checkpoint implements decoding and descriptor projection. The
+subsequent [registry interface checkpoint](../work-packages/6.6-dynamic-registry-interfaces.md)
+adds component-owned generation leases, checked dynamic dispatch, owned string
+replies and OSCQuery/OSC projection. Its native owner is a single-threaded
+surrogate; production loading does not yet consume or publish this section.
+Reader-safe schema replacement/retirement, parameter value storage, supervised
+guest action dispatch, event delivery, external generation tokens, generated
+bindings and their lifecycle/concurrency evidence remain required for 6.6/6.7.

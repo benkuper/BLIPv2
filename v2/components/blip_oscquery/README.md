@@ -49,3 +49,12 @@ The additive web-schema contract is recorded in
 [work package 3.1](../../../docs/v2/work-packages/3.1-schema-web-shell.md), and
 the asset-serving contract in
 [work package 3.2](../../../docs/v2/work-packages/3.2-filesystem-web-assets.md).
+
+Components can also provide immutable dynamic generations through
+`DynamicSchemaSource`. OSCQuery leases the schema while emitting its typed
+parameters/actions/events and publishes `BLIP_SCHEMA_GENERATION` on the component.
+OSC captures that generation for dispatch. String feedback is copied into each
+endpoint's fixed 512-byte arena and remains valid until its next call. The
+[6.6 interface checkpoint](../../../docs/v2/work-packages/6.6-dynamic-registry-interfaces.md)
+qualifies these interfaces with a surrogate owner; production guest-defined
+controls, event delivery and concurrent replacement remain pending.

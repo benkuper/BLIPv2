@@ -1,6 +1,7 @@
 #pragma once
 
 #include "blip/core/descriptor.hpp"
+#include "blip/core/dynamic_schema.hpp"
 #include "blip/core/error.hpp"
 
 #include <cstddef>
@@ -38,6 +39,17 @@ class Component {
     [[nodiscard]] virtual const ComponentDescriptor& descriptor() const noexcept = 0;
     // Optional, component-owned interface. No WASM engine dependency in core.
     [[nodiscard]] virtual wasm::CapabilityProvider* wasm_provider() noexcept { return nullptr; }
+    [[nodiscard]] virtual const DynamicSchemaSource* dynamic_schema() const noexcept { return nullptr; }
+    // Dynamic operations carry the leased schema generation. String reads copy
+    // into caller-owned scratch; they must not return mutable owner/guest views.
+    [[nodiscard]] virtual Status read_dynamic_parameter(std::uint32_t, std::string_view,
+        ScalarValue&, std::span<char>) noexcept { return dynamic_schema_error("read-unsupported"); }
+    [[nodiscard]] virtual Status write_dynamic_parameter(std::uint32_t, std::string_view,
+        const ScalarValue&) noexcept { return dynamic_schema_error("write-unsupported"); }
+    [[nodiscard]] virtual Status invoke_dynamic_action(std::uint32_t, std::string_view,
+        std::span<const ScalarValue>, std::span<ScalarValue>, std::span<char>, std::size_t& count) noexcept {
+        count = 0; return dynamic_schema_error("action-unsupported");
+    }
     [[nodiscard]] virtual Status validate(const ValidationContext&) noexcept {
         return Status::success();
     }

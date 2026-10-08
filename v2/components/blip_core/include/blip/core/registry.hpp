@@ -22,6 +22,9 @@ class RegistryView {
     [[nodiscard]] virtual wasm::CapabilityProvider* wasm_provider(std::size_t) const noexcept {
         return nullptr;
     }
+    [[nodiscard]] virtual Status acquire_dynamic_schema(std::string_view, DynamicSchemaLease& lease) const noexcept {
+        return lease.held() ? dynamic_schema_error("lease-already-held") : Status::success();
+    }
 };
 
 template <std::size_t MaxComponents> struct StartupReport {
@@ -269,6 +272,13 @@ class Registry final : public RegistryView {
     }
     [[nodiscard]] wasm::CapabilityProvider* wasm_provider(std::size_t index) const noexcept override {
         return entries_[index].instance->wasm_provider();
+    }
+    [[nodiscard]] Status acquire_dynamic_schema(std::string_view id, DynamicSchemaLease& lease) const noexcept override {
+        if (lease.held()) return dynamic_schema_error("lease-already-held");
+        const auto* entry = find(id);
+        if (!entry) return make_error(ErrorCode::not_found, id, "dynamic-schema", "component-not-found");
+        const auto* source = entry->instance->dynamic_schema();
+        return source ? source->acquire(lease) : Status::success();
     }
     [[nodiscard]] constexpr bool closed() const noexcept { return closed_; }
     [[nodiscard]] std::size_t dynamic_control_count() const noexcept override {
