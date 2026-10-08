@@ -1,5 +1,5 @@
 idf_build_get_property(deps BLIP_WASM_DEPS)
-set(srcs "src/service.cpp" "src/module_upload.cpp" "src/utf8.cpp" "src/esp_wasm_component.cpp" "src/wamr_runtime.cpp" "src/pool_memory.c")
+set(srcs "src/service.cpp" "src/module_upload.cpp" "src/utf8.cpp" "src/capability.cpp" "src/esp_wasm_component.cpp" "src/wamr_runtime.cpp" "src/pool_memory.c")
 set(engine_includes "")
 if(NOT CMAKE_BUILD_EARLY_EXPANSION)
     idf_build_get_property(worker_enabled BLIP_ENABLE_WASM)

@@ -7,6 +7,8 @@
 #include <span>
 #include <string_view>
 
+namespace blip::wasm { class CapabilityProvider; }
+
 namespace blip::core {
 
 enum class ComponentState : std::uint8_t {
@@ -34,6 +36,8 @@ class Component {
     Component& operator=(Component&&) = delete;
 
     [[nodiscard]] virtual const ComponentDescriptor& descriptor() const noexcept = 0;
+    // Optional, component-owned interface. No WASM engine dependency in core.
+    [[nodiscard]] virtual wasm::CapabilityProvider* wasm_provider() noexcept { return nullptr; }
     [[nodiscard]] virtual Status validate(const ValidationContext&) noexcept {
         return Status::success();
     }

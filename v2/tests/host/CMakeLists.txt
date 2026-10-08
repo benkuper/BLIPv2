@@ -8,6 +8,7 @@ add_library(blip_core_host STATIC
     ../../components/blip_core/src/boot_health.cpp
     ../../components/blip_core/src/descriptor_json.cpp
     ../../components/blip_core/src/diagnostics.cpp
+    ../../components/blip_core/src/wasm_descriptor.cpp
 )
 target_include_directories(blip_core_host PUBLIC ../../components/blip_core/include)
 target_compile_features(blip_core_host PUBLIC cxx_std_20)
@@ -105,7 +106,7 @@ else()
 endif()
 add_test(NAME blip_fleet_tests COMMAND blip_fleet_tests)
 
-add_library(blip_wasm_host STATIC ../../components/blip_wasm/src/service.cpp ../../components/blip_wasm/src/module_upload.cpp ../../components/blip_wasm/src/utf8.cpp)
+add_library(blip_wasm_host STATIC ../../components/blip_wasm/src/service.cpp ../../components/blip_wasm/src/module_upload.cpp ../../components/blip_wasm/src/utf8.cpp ../../components/blip_wasm/src/capability.cpp)
 target_include_directories(blip_wasm_host PUBLIC ../../components/blip_wasm/include)
 target_link_libraries(blip_wasm_host PUBLIC blip_core_host)
 target_compile_features(blip_wasm_host PUBLIC cxx_std_20)
@@ -127,6 +128,14 @@ else()
     target_compile_options(blip_wasm_utf8_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_wasm_utf8_tests COMMAND blip_wasm_utf8_tests)
+add_executable(blip_wasm_capability_tests blip_wasm_capability_tests.cpp)
+target_link_libraries(blip_wasm_capability_tests PRIVATE blip_wasm_host)
+if(MSVC)
+    target_compile_options(blip_wasm_capability_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_wasm_capability_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_wasm_capability_tests COMMAND blip_wasm_capability_tests)
 add_test(
     NAME blip_serial_control_self_test
     COMMAND ${Python3_EXECUTABLE}

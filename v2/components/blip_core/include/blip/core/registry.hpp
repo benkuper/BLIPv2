@@ -19,6 +19,9 @@ class RegistryView {
     [[nodiscard]] virtual std::size_t dynamic_control_count() const noexcept = 0;
     [[nodiscard]] virtual const DynamicControl&
     dynamic_control(std::size_t index) const noexcept = 0;
+    [[nodiscard]] virtual wasm::CapabilityProvider* wasm_provider(std::size_t) const noexcept {
+        return nullptr;
+    }
 };
 
 template <std::size_t MaxComponents> struct StartupReport {
@@ -121,7 +124,9 @@ class Registry final : public RegistryView {
         closed_ = true;
 
         for (const auto& entry : entries_) {
-            if (!valid_descriptor(*entry.descriptor)) {
+            if (!valid_descriptor(*entry.descriptor) ||
+                !valid_wasm_descriptor(entry.descriptor->id, entry.descriptor->wasm) ||
+                (entry.descriptor->wasm.functions.empty() != (entry.instance->wasm_provider() == nullptr))) {
                 return make_error(ErrorCode::validation_failed, entry.descriptor->id,
                                   "registry.validate", "descriptor");
             }
@@ -252,6 +257,9 @@ class Registry final : public RegistryView {
     [[nodiscard]] const ComponentDescriptor&
     component_descriptor(std::size_t index) const noexcept override {
         return *entries_[index].descriptor;
+    }
+    [[nodiscard]] wasm::CapabilityProvider* wasm_provider(std::size_t index) const noexcept override {
+        return entries_[index].instance->wasm_provider();
     }
     [[nodiscard]] constexpr bool closed() const noexcept { return closed_; }
     [[nodiscard]] std::size_t dynamic_control_count() const noexcept override {

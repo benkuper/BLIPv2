@@ -1,5 +1,7 @@
 #pragma once
 
+#include "blip/core/wasm_descriptor.hpp"
+
 #include <cstdint>
 #include <span>
 #include <string_view>
@@ -176,6 +178,7 @@ struct ComponentDescriptor {
     bool supports_resume{};
     bool supports_restart{};
     CostDescriptor cost{};
+    WasmCapabilityDescriptor wasm{};
 };
 
 enum class DynamicControlKind : std::uint8_t { parameter, action, event };

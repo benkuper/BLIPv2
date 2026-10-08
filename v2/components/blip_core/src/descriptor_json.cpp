@@ -1,6 +1,7 @@
 #include "blip/core/descriptor_json.hpp"
 
 #include <charconv>
+#include <array>
 #include <cstdint>
 #include <string_view>
 
@@ -12,7 +13,7 @@ class Writer {
     explicit Writer(std::span<char> output) noexcept : output_(output) {}
 
     [[nodiscard]] bool append(std::string_view text) noexcept {
-        if (position_ + text.size() >= output_.size()) {
+        if (text.size() >= output_.size() - position_) {
             return false;
         }
         for (const char character : text) {
@@ -26,6 +27,13 @@ class Writer {
             return false;
         }
         for (const char character : text) {
+            if (static_cast<unsigned char>(character) < 0x20) {
+                constexpr char digits[] = "0123456789abcdef";
+                const std::array escaped{'\\', 'u', '0', '0', digits[(static_cast<unsigned char>(character) >> 4) & 15],
+                                        digits[static_cast<unsigned char>(character) & 15]};
+                if (!append({escaped.data(), escaped.size()})) return false;
+                continue;
+            }
             if (character == '\"' || character == '\\') {
                 if (!append("\\")) {
                     return false;
@@ -149,6 +157,40 @@ template <typename Range, typename WriteItem>
         first = false;
     }
     return writer.append("]");
+}
+
+std::string_view wasm_type_name(WasmValueType type) noexcept {
+    switch (type) {
+    case WasmValueType::i32: return "i32";
+    case WasmValueType::i64: return "i64";
+    case WasmValueType::f32: return "f32";
+    case WasmValueType::f64: return "f64";
+    }
+    return "unknown";
+}
+std::string_view wasm_role_name(WasmArgumentRole role) noexcept {
+    switch (role) {
+    case WasmArgumentRole::scalar: return "scalar";
+    case WasmArgumentRole::utf8_offset: return "utf8_offset";
+    case WasmArgumentRole::utf8_length: return "utf8_length";
+    }
+    return "unknown";
+}
+bool wasm_capability(Writer& writer, const WasmCapabilityDescriptor& capability) noexcept {
+    if (capability.functions.empty()) return true;
+    return writer.append(",\"wasm\":{\"abi_version\":") && writer.unsigned_integer(capability.abi_version) &&
+        writer.append(",\"import_module\":") && writer.quoted(capability.import_module) &&
+        writer.append(",\"functions\":") && array(writer, capability.functions, [&writer](const WasmFunctionDescriptor& function) noexcept {
+            return writer.append("{\"id\":") && writer.quoted(function.id) &&
+                writer.append(",\"description\":") && writer.quoted(function.description) &&
+                writer.append(",\"arguments\":") && array(writer, function.arguments, [&writer](const WasmArgumentDescriptor& argument) noexcept {
+                    return writer.append("{\"id\":") && writer.quoted(argument.id) && writer.append(",\"type\":") &&
+                        writer.quoted(wasm_type_name(argument.type)) && writer.append(",\"role\":") &&
+                        writer.quoted(wasm_role_name(argument.role)) && writer.append("}");
+                }) && writer.append(",\"results\":") && array(writer, function.results, [&writer](WasmValueType type) noexcept {
+                    return writer.quoted(wasm_type_name(type));
+                }) && writer.append(",\"maximum_call_us\":") && writer.unsigned_integer(function.maximum_call_us) && writer.append("}");
+        }) && writer.append("}");
 }
 
 } // namespace
@@ -298,7 +340,8 @@ Result<std::size_t> write_descriptor_json(const ComponentDescriptor& descriptor,
         writer.append(",\"static_ram_bytes\":") &&
         writer.unsigned_integer(descriptor.cost.static_ram_bytes) &&
         writer.append(",\"task_stack_bytes\":") &&
-        writer.unsigned_integer(descriptor.cost.task_stack_bytes) && writer.append("}}");
+        writer.unsigned_integer(descriptor.cost.task_stack_bytes) && writer.append("}") &&
+        wasm_capability(writer, descriptor.wasm) && writer.append("}");
 
     if (!ok) {
         return Result<std::size_t>::failure({ErrorDomain::descriptor,

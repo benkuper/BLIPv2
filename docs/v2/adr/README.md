@@ -14,6 +14,7 @@
 | [0010](0010-wasm-production-worker.md) | Dedicated worker, owned queue/completions and deadline supervisor | Ball production slice qualified; full Gate D open |
 | [0011](0011-esp32-wasm-linear-arena.md) | ESP32 byte-accessible IRAM guest arena with DRAM engine/stacks | Seven production profile memory trials qualified; full Gate D open |
 | [0012](0012-wasm-checked-utf8.md) | Checked unsigned pointer/length UTF-8 copies, bounds and generation | Host and three-family strings qualified; provider bindings follow in 6.5 |
+| [0013](0013-wasm-component-capabilities.md) | Component-owned versioned provider descriptors, bounded catalog and checked callbacks | Portable contract qualified; native import bridge follows |
 
 Accepted ADRs are immutable contracts. A material change is recorded by a new
 ADR with `Supersedes`/`Superseded by` links.

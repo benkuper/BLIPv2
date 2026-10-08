@@ -1,6 +1,7 @@
 #pragma once
 
 #include "blip/core/error.hpp"
+#include "blip/core/wasm_descriptor.hpp"
 #include "blip/wasm/utf8.hpp"
 #include <array>
 #include <atomic>
@@ -12,12 +13,12 @@
 
 namespace blip::wasm {
 
-inline constexpr std::size_t kMaximumArguments = 8;
+inline constexpr std::size_t kMaximumArguments = core::kMaximumWasmArguments;
 inline constexpr std::size_t kMaximumResults = 8;
 inline constexpr std::size_t kMaximumExportNameBytes = 64;
 inline constexpr std::size_t kMaximumDiagnosticBytes = 128;
 
-enum class ValueType : std::uint8_t { i32, i64, f32, f64 };
+using ValueType = core::WasmValueType;
 
 // Preserve guest bit patterns, including NaNs and unsigned i32/i64 values.
 // These are Wasm values, not the registry's user-facing scalar representation.

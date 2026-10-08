@@ -1,0 +1,998 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-10-08T07:38:44.217118+00:00",
+  "passed": true,
+  "result": "portable component-owned provider contract qualified; native import bridge remains pending",
+  "source_snapshot": {
+    "v2/cmake/blip_component.cmake": "49a4c5166eb83852f8da7332030e6eba47fb0568674e433cf6d3a8d364e89b43",
+    "v2/components/blip_core/CMakeLists.txt": "9174c221ffb9277352652ea12a186f20eb0db5f3a5af0ca0c5139b5e04240aef",
+    "v2/components/blip_core/include/blip/core/boot_health.hpp": "43883466672796ac98dc8ac98f50498e75656d16d3f3280810767694ca9207e3",
+    "v2/components/blip_core/include/blip/core/component.hpp": "234ef1ec1de878db317158e8b90723153cc1ca8e4d71bd92f4cf78bfbf2e7669",
+    "v2/components/blip_core/include/blip/core/control.hpp": "0d374d91e4f8f7ead62816513f52ac3c70099411e155e373619a6e2926f40bdb",
+    "v2/components/blip_core/include/blip/core/descriptor.hpp": "a031bac69099ff1640a992cfbd3444070fae145e87332b65b8d9bb52f112e3d9",
+    "v2/components/blip_core/include/blip/core/descriptor_json.hpp": "ef70e5dfb1176db9f71ced626612d6b864aa45af9b72fae1e5972a5dd24671a0",
+    "v2/components/blip_core/include/blip/core/diagnostics.hpp": "e83f0452ff3d01fd376f317412aed893b10632953239ca950647356c54e4b055",
+    "v2/components/blip_core/include/blip/core/error.hpp": "6a38eadb3f1cdf00dc58e5b2830bccde605890b811dfd2e12242b3be745b2678",
+    "v2/components/blip_core/include/blip/core/esp_diagnostics_component.hpp": "d789c726ac8a6ae708fd133693d376f2aa7f4e8d595874f84cf06befc86b00f8",
+    "v2/components/blip_core/include/blip/core/event_bus.hpp": "c05d4e90ae2a971c1f15737c5644fe1351d8fbda5df934aa26cf37ff6a7101c6",
+    "v2/components/blip_core/include/blip/core/fixed_vector.hpp": "1cd1b3130cea19a97e692a83f48d7a13a8c1e0c74669160a352d3cdcdf80b441",
+    "v2/components/blip_core/include/blip/core/registry.hpp": "25175bfa06d894b9fe0f4dc571c0b64aee366a19ccf0c190fab672b7a13e7f75",
+    "v2/components/blip_core/include/blip/core/ring_queue.hpp": "fcaaf08c634e57f3eb262fcb0a9092bf829aa2617a1cb60d476bd0badd4cb7fb",
+    "v2/components/blip_core/include/blip/core/scheduler.hpp": "2d25c33d2ed75848a812d6c48fc6dbecc597cbc786ee31793a134ae4bc215374",
+    "v2/components/blip_core/include/blip/core/wasm_descriptor.hpp": "79947cb27a9918a296c451fa48548d11eee2d71e508f308314bae2440756809e",
+    "v2/components/blip_core/src/boot_health.cpp": "c915821d1fabe484e66cf0fed54d9f68f6b3688d07a4fc60e6bd1f2b54817286",
+    "v2/components/blip_core/src/descriptor_json.cpp": "2f47c2b0859ad1141769b83da99aa9d4ebf946f16eb74aa9499a5e08a6d09e02",
+    "v2/components/blip_core/src/diagnostics.cpp": "c77020b3f9cb19da6a9579aa7003964fe2aa50748fb207230806a4c865f846d6",
+    "v2/components/blip_core/src/esp_diagnostics_component.cpp": "64f70b5dc9da01d071969d7659867b1bf92271d665e1e422098ed2e58da45184",
+    "v2/components/blip_core/src/wasm_descriptor.cpp": "a3e03dbc40d90471d89635e734fabc47da596a8ef8e458bd92fcaf7ab2b3ca72",
+    "v2/components/blip_wasm/CMakeLists.txt": "df4b1202c2c1ebc7fcbe31c3afeb3addead15e46f0f57768209a8821b84bc2b8",
+    "v2/components/blip_wasm/include/blip/wasm/capability.hpp": "5a0be3c4f0a40f74e0fb26740949245028f2176ea8a73dadaba6facb7afddfc5",
+    "v2/components/blip_wasm/include/blip/wasm/esp_wasm_component.hpp": "591c0bf8f79e4db6a4bd260278003ae228f10d0405a7ca4d2c70e4720d7e8e70",
+    "v2/components/blip_wasm/include/blip/wasm/module_upload.hpp": "6a9e315dd3e95a41353e6db17e2fe249124aa621e810d133f6e81c27f0863d72",
+    "v2/components/blip_wasm/include/blip/wasm/runtime.hpp": "1ce232eeb4b0d13e027ab0c9a3f74db46b9536c6e2559fabad92a8ee1175e83a",
+    "v2/components/blip_wasm/include/blip/wasm/service.hpp": "5be4d5191eaa110d1d6c1734b5452595fda135c14c4177dde8c954241b9fbe9c",
+    "v2/components/blip_wasm/include/blip/wasm/utf8.hpp": "91fe3a932ca9eae4fd233447695d51dcdecec42ef7c94d86d74ef0251e224ca9",
+    "v2/components/blip_wasm/include/blip/wasm/wamr_runtime.hpp": "c34ded15836ad503b96072a4de3f3da151f0690d05de139821e7a1c6c26a0017",
+    "v2/components/blip_wasm/src/capability.cpp": "934443e1492ea8ca13659f544313f730dbf1372d2064e3e16ab1f17d52429f1d",
+    "v2/components/blip_wasm/src/esp_wasm_component.cpp": "3cf72d36d1f00badb145290aac334c23e5d571527e8c4210f110ee0b50c8483c",
+    "v2/components/blip_wasm/src/linear_arena.h": "f60014390989c433124fb1d4552aba17dbb69facd8fba32c03f75a884e6c634c",
+    "v2/components/blip_wasm/src/module_upload.cpp": "e3078a616d20be8ad30d7327f357e0ea07646625a04e3568fba9b340df691ab2",
+    "v2/components/blip_wasm/src/pool_memory.c": "6f2761057d056f2127279c0bf4b49c011e877dadc8e5720a33e30130b907abf5",
+    "v2/components/blip_wasm/src/service.cpp": "9babd5b0053fc2c47d31cba04594060b8e84d78b2379d2ed4e31ad09b189933e",
+    "v2/components/blip_wasm/src/utf8.cpp": "cf86a37b8a1f9418df44defa6e2b96e30354dce8c80a6db70c5f9831cd437a6a",
+    "v2/components/blip_wasm/src/wamr_runtime.cpp": "ebbcd74fcd2c6ec428ec54c56e5db63913740eb6ab5daa7116c3151e53f09223",
+    "v2/firmware/partitions.csv": "a5b6a4beba7ca2f2564a5f1e3e5b8cd4e8f51e1593854a3e590f4caa7589cd23",
+    "v2/firmware/sdkconfig.wasm.esp32.defaults": "067f83ebd6988d2cad4f365f10f9e9a9e2550535571eca9c6300ed7278e4cc7b",
+    "v2/qualification/wasm-capabilities/CMakeLists.txt": "27cb12c3f91c6349a3359b03e9e6dabdda2edf31cf2c7e44f06d75ebf852d141",
+    "v2/qualification/wasm-capabilities/main/CMakeLists.txt": "559c13460b481138faaeedc1899574040bcbde5f723a70ba05548ffba25f91df",
+    "v2/qualification/wasm-capabilities/main/main.cpp": "5d530e45b3c64dddff8988acc02b31fe38768cd83ac850e6de527ce0a598369f",
+    "v2/qualification/wasm-capabilities/run_capabilities.py": "79eb2cd386cdbce99a68be83ef09dd3e9aba483c55a63f0c4718eafb8db626ce",
+    "v2/qualification/wasm-strings/main/fixtures.hpp": "6c9f51a482911f182e378c9e9efd31f63237b7f50f327d39dc1898d902b2906b",
+    "v2/qualification/wasm-worker/sdkconfig.defaults": "7a011dac82866bf121f32646097bc9cc5fa475f0e3aabfc8656cd9cff20955c8",
+    "v2/qualification/wasm-worker/sdkconfig.defaults.esp32c6": "7f77e03af68467d0ccf09cf4c0665dc9627cacf77a4d8208f7329d098f9fbe35",
+    "v2/qualification/wasm-worker/sdkconfig.defaults.esp32s3": "a2ef5d350e457c52898a8dd9c02b1e4f017abb13b3c4510e49ed28adae418e7e"
+  },
+  "runtime": {
+    "commit": "25bd7eb63e828e4bd242cc9b38d260b4b31c6605",
+    "checkout_unmodified": true
+  },
+  "fixture_sha256": "f4d14dfc525ab44df0b300d364fdb06ad94353575b9b77e18ed65c04a77c2878",
+  "host_tests": 24,
+  "provider_host_cases": 10,
+  "host_log_sha256": "656ef4fd5686842f9f87a9043b340096234de70007184431d2f51bf8766270b0",
+  "tests_first_log_sha256": "a58e921b67af233660fa36d968e0876b5931974ebd741de115071fcefc553042",
+  "host_sources": {
+    "CMakeLists.txt": "87b1d668b11427df256519de1f38f637d65db0d7d4b68ef238a3817877a00c57",
+    "blip_wasm_capability_tests.cpp": "7e7801a0821bf7c497bfb5994a946c1ffe8944b68fdaa910bbabaa74fbc1df89",
+    "test_harness.hpp": "57ddfc61cc684eed503fe4deaafcb9b570b146b4038078f5498b020dbf2bddae"
+  },
+  "host_executable_sha256": "30aabc607dbe5e9345c8d4937ed1a43c41f7f890966d32d5b5251d7eba077e5b",
+  "native_checks": 619,
+  "native_trial_sha256": "23eebc6eeda4a0e3574871e116e71834724e9a94b22a1ffb0dc1205611978138",
+  "native_trial": {
+    "board": "seeed-xiao-esp32c6-chip-antenna",
+    "chip": "esp32c6",
+    "port": "COM13",
+    "source_snapshot": {
+      "v2/cmake/blip_component.cmake": "49a4c5166eb83852f8da7332030e6eba47fb0568674e433cf6d3a8d364e89b43",
+      "v2/components/blip_core/CMakeLists.txt": "9174c221ffb9277352652ea12a186f20eb0db5f3a5af0ca0c5139b5e04240aef",
+      "v2/components/blip_core/include/blip/core/boot_health.hpp": "43883466672796ac98dc8ac98f50498e75656d16d3f3280810767694ca9207e3",
+      "v2/components/blip_core/include/blip/core/component.hpp": "234ef1ec1de878db317158e8b90723153cc1ca8e4d71bd92f4cf78bfbf2e7669",
+      "v2/components/blip_core/include/blip/core/control.hpp": "0d374d91e4f8f7ead62816513f52ac3c70099411e155e373619a6e2926f40bdb",
+      "v2/components/blip_core/include/blip/core/descriptor.hpp": "a031bac69099ff1640a992cfbd3444070fae145e87332b65b8d9bb52f112e3d9",
+      "v2/components/blip_core/include/blip/core/descriptor_json.hpp": "ef70e5dfb1176db9f71ced626612d6b864aa45af9b72fae1e5972a5dd24671a0",
+      "v2/components/blip_core/include/blip/core/diagnostics.hpp": "e83f0452ff3d01fd376f317412aed893b10632953239ca950647356c54e4b055",
+      "v2/components/blip_core/include/blip/core/error.hpp": "6a38eadb3f1cdf00dc58e5b2830bccde605890b811dfd2e12242b3be745b2678",
+      "v2/components/blip_core/include/blip/core/esp_diagnostics_component.hpp": "d789c726ac8a6ae708fd133693d376f2aa7f4e8d595874f84cf06befc86b00f8",
+      "v2/components/blip_core/include/blip/core/event_bus.hpp": "c05d4e90ae2a971c1f15737c5644fe1351d8fbda5df934aa26cf37ff6a7101c6",
+      "v2/components/blip_core/include/blip/core/fixed_vector.hpp": "1cd1b3130cea19a97e692a83f48d7a13a8c1e0c74669160a352d3cdcdf80b441",
+      "v2/components/blip_core/include/blip/core/registry.hpp": "25175bfa06d894b9fe0f4dc571c0b64aee366a19ccf0c190fab672b7a13e7f75",
+      "v2/components/blip_core/include/blip/core/ring_queue.hpp": "fcaaf08c634e57f3eb262fcb0a9092bf829aa2617a1cb60d476bd0badd4cb7fb",
+      "v2/components/blip_core/include/blip/core/scheduler.hpp": "2d25c33d2ed75848a812d6c48fc6dbecc597cbc786ee31793a134ae4bc215374",
+      "v2/components/blip_core/include/blip/core/wasm_descriptor.hpp": "79947cb27a9918a296c451fa48548d11eee2d71e508f308314bae2440756809e",
+      "v2/components/blip_core/src/boot_health.cpp": "c915821d1fabe484e66cf0fed54d9f68f6b3688d07a4fc60e6bd1f2b54817286",
+      "v2/components/blip_core/src/descriptor_json.cpp": "2f47c2b0859ad1141769b83da99aa9d4ebf946f16eb74aa9499a5e08a6d09e02",
+      "v2/components/blip_core/src/diagnostics.cpp": "c77020b3f9cb19da6a9579aa7003964fe2aa50748fb207230806a4c865f846d6",
+      "v2/components/blip_core/src/esp_diagnostics_component.cpp": "64f70b5dc9da01d071969d7659867b1bf92271d665e1e422098ed2e58da45184",
+      "v2/components/blip_core/src/wasm_descriptor.cpp": "a3e03dbc40d90471d89635e734fabc47da596a8ef8e458bd92fcaf7ab2b3ca72",
+      "v2/components/blip_wasm/CMakeLists.txt": "df4b1202c2c1ebc7fcbe31c3afeb3addead15e46f0f57768209a8821b84bc2b8",
+      "v2/components/blip_wasm/include/blip/wasm/capability.hpp": "5a0be3c4f0a40f74e0fb26740949245028f2176ea8a73dadaba6facb7afddfc5",
+      "v2/components/blip_wasm/include/blip/wasm/esp_wasm_component.hpp": "591c0bf8f79e4db6a4bd260278003ae228f10d0405a7ca4d2c70e4720d7e8e70",
+      "v2/components/blip_wasm/include/blip/wasm/module_upload.hpp": "6a9e315dd3e95a41353e6db17e2fe249124aa621e810d133f6e81c27f0863d72",
+      "v2/components/blip_wasm/include/blip/wasm/runtime.hpp": "1ce232eeb4b0d13e027ab0c9a3f74db46b9536c6e2559fabad92a8ee1175e83a",
+      "v2/components/blip_wasm/include/blip/wasm/service.hpp": "5be4d5191eaa110d1d6c1734b5452595fda135c14c4177dde8c954241b9fbe9c",
+      "v2/components/blip_wasm/include/blip/wasm/utf8.hpp": "91fe3a932ca9eae4fd233447695d51dcdecec42ef7c94d86d74ef0251e224ca9",
+      "v2/components/blip_wasm/include/blip/wasm/wamr_runtime.hpp": "c34ded15836ad503b96072a4de3f3da151f0690d05de139821e7a1c6c26a0017",
+      "v2/components/blip_wasm/src/capability.cpp": "934443e1492ea8ca13659f544313f730dbf1372d2064e3e16ab1f17d52429f1d",
+      "v2/components/blip_wasm/src/esp_wasm_component.cpp": "3cf72d36d1f00badb145290aac334c23e5d571527e8c4210f110ee0b50c8483c",
+      "v2/components/blip_wasm/src/linear_arena.h": "f60014390989c433124fb1d4552aba17dbb69facd8fba32c03f75a884e6c634c",
+      "v2/components/blip_wasm/src/module_upload.cpp": "e3078a616d20be8ad30d7327f357e0ea07646625a04e3568fba9b340df691ab2",
+      "v2/components/blip_wasm/src/pool_memory.c": "6f2761057d056f2127279c0bf4b49c011e877dadc8e5720a33e30130b907abf5",
+      "v2/components/blip_wasm/src/service.cpp": "9babd5b0053fc2c47d31cba04594060b8e84d78b2379d2ed4e31ad09b189933e",
+      "v2/components/blip_wasm/src/utf8.cpp": "cf86a37b8a1f9418df44defa6e2b96e30354dce8c80a6db70c5f9831cd437a6a",
+      "v2/components/blip_wasm/src/wamr_runtime.cpp": "ebbcd74fcd2c6ec428ec54c56e5db63913740eb6ab5daa7116c3151e53f09223",
+      "v2/firmware/partitions.csv": "a5b6a4beba7ca2f2564a5f1e3e5b8cd4e8f51e1593854a3e590f4caa7589cd23",
+      "v2/firmware/sdkconfig.wasm.esp32.defaults": "067f83ebd6988d2cad4f365f10f9e9a9e2550535571eca9c6300ed7278e4cc7b",
+      "v2/qualification/wasm-capabilities/CMakeLists.txt": "27cb12c3f91c6349a3359b03e9e6dabdda2edf31cf2c7e44f06d75ebf852d141",
+      "v2/qualification/wasm-capabilities/main/CMakeLists.txt": "559c13460b481138faaeedc1899574040bcbde5f723a70ba05548ffba25f91df",
+      "v2/qualification/wasm-capabilities/main/main.cpp": "5d530e45b3c64dddff8988acc02b31fe38768cd83ac850e6de527ce0a598369f",
+      "v2/qualification/wasm-capabilities/run_capabilities.py": "79eb2cd386cdbce99a68be83ef09dd3e9aba483c55a63f0c4718eafb8db626ce",
+      "v2/qualification/wasm-strings/main/fixtures.hpp": "6c9f51a482911f182e378c9e9efd31f63237b7f50f327d39dc1898d902b2906b",
+      "v2/qualification/wasm-worker/sdkconfig.defaults": "7a011dac82866bf121f32646097bc9cc5fa475f0e3aabfc8656cd9cff20955c8",
+      "v2/qualification/wasm-worker/sdkconfig.defaults.esp32c6": "7f77e03af68467d0ccf09cf4c0665dc9627cacf77a4d8208f7329d098f9fbe35",
+      "v2/qualification/wasm-worker/sdkconfig.defaults.esp32s3": "a2ef5d350e457c52898a8dd9c02b1e4f017abb13b3c4510e49ed28adae418e7e"
+    },
+    "wamr_commit": "25bd7eb63e828e4bd242cc9b38d260b4b31c6605",
+    "pc_network_changed": false,
+    "firmware_restore_requested": false,
+    "test_firmware_left_installed": true,
+    "passed": true,
+    "inputs": {
+      "blip-wasm-capabilities.bin": {
+        "bytes": 242416,
+        "sha256": "bf2bfed0b3b4a562c036a5a292aa0eba97b51f78736a86fb22aa7989d4c7ea42"
+      },
+      "blip-wasm-capabilities.elf": {
+        "bytes": 8447852,
+        "sha256": "13188a77c4f372c15f96fa0086095c16df51a51baef96a7e7c557ce3fd22bc45"
+      },
+      "blip-wasm-capabilities.map": {
+        "bytes": 8767300,
+        "sha256": "299e23d650f2ee95337aab453e24aa80cbf4fdf67609fa4bd60e37df2ea5d68c"
+      },
+      "sdkconfig": {
+        "bytes": 67663,
+        "sha256": "32bea235d74e8c2f9c733238195cc5029f4b948f5ca981065927335e5d5c7c76"
+      },
+      "ota_data_initial.bin": {
+        "bytes": 8192,
+        "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+      }
+    },
+    "flashed_mac": "10:51:db:1a:a6:68",
+    "flashed_app_sha256": "bf2bfed0b3b4a562c036a5a292aa0eba97b51f78736a86fb22aa7989d4c7ea42",
+    "records": [
+      {
+        "type": "start",
+        "chip": "esp32c6",
+        "idf": "v6.0.2",
+        "worker_stack_bytes": 8192,
+        "catalog_bytes": 392,
+        "fixture_sha256": "f4d14dfc525ab44df0b300d364fdb06ad94353575b9b77e18ed65c04a77c2878"
+      },
+      {
+        "type": "complete",
+        "checks": 619,
+        "failures": 0,
+        "reload_cycles": 100,
+        "heap_baseline": 362336,
+        "heap_min": 362336,
+        "heap_max": 362336,
+        "pool_peak": 73648,
+        "worker_headroom": 5844,
+        "maximum_callback_us": 117,
+        "native_imports_exercised": false
+      }
+    ],
+    "console": [
+      "I (100) esp_image: segment 0: paddr=00020020 vaddr=42030020 sizeI (119) esp_image: segment 1: paddr=0002a948 vaddr=40800000 size=056d0h ( 22224) load",
+      "I (125) esp_image: segment 2: paddr=00030020 vaddr=42000020 size=26b2ch (158508) map",
+      "I (156) esp_image: segment 3: paddr=00056b54 vaddr=408056d0 size=027c4h ( 10180) load",
+      "I (159) esp_image: segment 4: paddr=00059320 vaddr=40807ea0 size=01fach (  8108) load",
+      "I (164) boot: Loaded app from partition at offset 0x20000",
+      "I (169) boot: Set actual ota_seq=1 in otadata[0]",
+      "I (169) boot: Disabling RNG early entropy source...",
+      "I (185) cpu_start: Unicore app",
+      "I (194) cpu_start: Pro cpu start user code",
+      "I (194) cpu_start: cpu freq: 160000000 Hz",
+      "I (194) app_init: Application information:",
+      "I (195) app_init: Project name:     blip-wasm-capabilities",
+      "I (195) app_init: App version:      7f0fc70-dirty",
+      "I (195) app_init: ELF file SHA256:  13188a77c...",
+      "I (196) app_init: ESP-IDF:          v6.0.2",
+      "I (196) efuse_init: Min chip rev:     v0.0",
+      "I (196) efuse_init: Max chip rev:     v0.99",
+      "I (197) efuse_init: Chip rev:         v0.2",
+      "I (197) heap_init: Initializing. RAM available for dynamic allocation:",
+      "I (197) heap_init: At 4080C0E0 len 00070530 (449 KiB): RAM",
+      "I (198) heap_init: At 4087C610 len 00002F54 (11 KiB): RAM",
+      "I (198) heap_init: At 50000000 len 00003FE8 (15 KiB): RTCRAM",
+      "I (199) spi_flash: detected chip: generic",
+      "I (199) spi_flash: flash io: dio",
+      "I (200) sleep_gpio: Configure to isolate all GPIO pins in sleep state",
+      "I (201) sleep_gpio: Enable automatic switching of GPIO sleep configuration",
+      "I (214) main_task: Started on CPU0",
+      "I (214) main_task: Calling app_main()",
+      "CAPABILITIES {\"type\":\"start\",\"chip\":\"esp32c6\",\"idf\":\"v6.0.2\",\"worker_stack_bytes\":8192,\"catalog_bytes\":392,\"fixture_sha256\":\"f4d14dfc525ab44df0b300d364fdb06ad94353575b9b77e18ed65c04a77c2878\"}",
+      "CAPABILITIES {\"type\":\"complete\",\"checks\":619,\"failures\":0,\"reload_cycles\":100,\"heap_baseline\":362336,\"heap_min\":362336,\"heap_max\":362336,\"pool_peak\":73648,\"worker_headroom\":5844,\"maximum_callback_us\":117,\"native_imports_exercised\":false}"
+    ]
+  },
+  "production_builds": [
+    {
+      "profile": "huzzah32",
+      "board": "adafruit-huzzah32",
+      "chip": "esp32",
+      "app_bytes": 1291728,
+      "app_partition_bytes": 1638400,
+      "prior_utf8_app_bytes": 1290224,
+      "app_delta_bytes": 1504,
+      "linked_size": {
+        "version": "1.2",
+        "total_size": 1291605,
+        "layout": [
+          {
+            "name": "Flash Code",
+            "total": 0,
+            "used": 877342,
+            "free": 0,
+            "parts": {
+              ".text": {
+                "size": 877342
+              }
+            }
+          },
+          {
+            "name": "Flash Data",
+            "total": 0,
+            "used": 329436,
+            "free": 0,
+            "parts": {
+              ".rodata": {
+                "size": 329164
+              },
+              ".appdesc": {
+                "size": 256
+              },
+              ".tdata": {
+                "size": 16
+              }
+            }
+          },
+          {
+            "name": "DRAM",
+            "total": 180736,
+            "used": 145024,
+            "free": 35712,
+            "parts": {
+              ".bss": {
+                "size": 121136
+              },
+              ".data": {
+                "size": 23884
+              },
+              ".noinit": {
+                "size": 4
+              }
+            }
+          },
+          {
+            "name": "IRAM",
+            "total": 131072,
+            "used": 60807,
+            "free": 70265,
+            "parts": {
+              ".text": {
+                "size": 59779
+              },
+              ".vectors": {
+                "size": 1028
+              }
+            }
+          },
+          {
+            "name": "RTC SLOW",
+            "total": 8192,
+            "used": 192,
+            "free": 8000,
+            "parts": {
+              ".force_slow": {
+                "size": 136
+              },
+              ".rtc_noinit": {
+                "size": 32
+              },
+              ".rtc_slow_reserved": {
+                "size": 24
+              }
+            }
+          }
+        ]
+      },
+      "static_ram_bytes": 145024,
+      "prior_memory_matrix_static_ram_bytes": 145024,
+      "static_ram_delta_vs_memory_matrix_bytes": 0,
+      "build_log_sha256": "7ecb14f94b0646bf79bb9827068b2734c279e35b7581e3c30dbc01227e90c001",
+      "provider_validator_linked": true,
+      "unused_catalog_removed": true,
+      "flashed_in_this_trial": false,
+      "artifacts": {
+        "blip-v2.bin": {
+          "bytes": 1291728,
+          "sha256": "c6a55d0e91193290572c643ef06db80ded8ae7c1579ed9877ea72c2a1f3240d8"
+        },
+        "blip-v2.elf": {
+          "bytes": 17482300,
+          "sha256": "53437e666b092dcaf122c9d3bab82768ff8ab9750f7e6609e08f03854fed656a"
+        },
+        "blip-v2.map": {
+          "bytes": 16868496,
+          "sha256": "9e458502847083a50d725a0f271ad97d834c7a3a7e92def04270f985bf52443c"
+        },
+        "sdkconfig": {
+          "bytes": 70183,
+          "sha256": "6bd7669ea74370bceeef20b5a96ded35f0c66594bde12e6daf243f9ca843050f"
+        }
+      }
+    },
+    {
+      "profile": "club",
+      "board": "creators-club",
+      "chip": "esp32",
+      "app_bytes": 1283712,
+      "app_partition_bytes": 1638400,
+      "prior_utf8_app_bytes": 1282240,
+      "app_delta_bytes": 1472,
+      "linked_size": {
+        "version": "1.2",
+        "total_size": 1283588,
+        "layout": [
+          {
+            "name": "Flash Code",
+            "total": 0,
+            "used": 866954,
+            "free": 0,
+            "parts": {
+              ".text": {
+                "size": 866954
+              }
+            }
+          },
+          {
+            "name": "Flash Data",
+            "total": 0,
+            "used": 328280,
+            "free": 0,
+            "parts": {
+              ".rodata": {
+                "size": 328008
+              },
+              ".appdesc": {
+                "size": 256
+              },
+              ".tdata": {
+                "size": 16
+              }
+            }
+          },
+          {
+            "name": "DRAM",
+            "total": 180736,
+            "used": 128467,
+            "free": 52269,
+            "parts": {
+              ".bss": {
+                "size": 104352
+              },
+              ".data": {
+                "size": 24111
+              },
+              ".noinit": {
+                "size": 4
+              }
+            }
+          },
+          {
+            "name": "IRAM",
+            "total": 131072,
+            "used": 64203,
+            "free": 66869,
+            "parts": {
+              ".text": {
+                "size": 63175
+              },
+              ".vectors": {
+                "size": 1028
+              }
+            }
+          },
+          {
+            "name": "RTC SLOW",
+            "total": 8192,
+            "used": 96,
+            "free": 8096,
+            "parts": {
+              ".force_slow": {
+                "size": 40
+              },
+              ".rtc_noinit": {
+                "size": 32
+              },
+              ".rtc_slow_reserved": {
+                "size": 24
+              }
+            }
+          }
+        ]
+      },
+      "static_ram_bytes": 128467,
+      "prior_memory_matrix_static_ram_bytes": 128467,
+      "static_ram_delta_vs_memory_matrix_bytes": 0,
+      "build_log_sha256": "5034f495f9312eb09628f80ee6467f79ec12e729e9b2bcc8e7f8446cf20827e9",
+      "provider_validator_linked": true,
+      "unused_catalog_removed": true,
+      "flashed_in_this_trial": false,
+      "artifacts": {
+        "blip-v2.bin": {
+          "bytes": 1283712,
+          "sha256": "cf79c3880fd20d9107091c9fb9e712951dab90db39e63391728536d2c2cd9539"
+        },
+        "blip-v2.elf": {
+          "bytes": 17340156,
+          "sha256": "f42959a73698fa0d774085bd801e85078a60c7c80f9248f8c14cf6402ce05a36"
+        },
+        "blip-v2.map": {
+          "bytes": 16784675,
+          "sha256": "0d7d312c55b699950a111967f84561ef67d454504bef17296e15a94514f80003"
+        },
+        "sdkconfig": {
+          "bytes": 69301,
+          "sha256": "f37c39f50576e54ec02029cda146d004a972e661f5fc05f7b4e801c8cc3c7b78"
+        }
+      }
+    },
+    {
+      "profile": "tab",
+      "board": "creators-tab",
+      "chip": "esp32",
+      "app_bytes": 1269376,
+      "app_partition_bytes": 1638400,
+      "prior_utf8_app_bytes": 1267904,
+      "app_delta_bytes": 1472,
+      "linked_size": {
+        "version": "1.2",
+        "total_size": 1269265,
+        "layout": [
+          {
+            "name": "Flash Code",
+            "total": 0,
+            "used": 862238,
+            "free": 0,
+            "parts": {
+              ".text": {
+                "size": 862238
+              }
+            }
+          },
+          {
+            "name": "Flash Data",
+            "total": 0,
+            "used": 324372,
+            "free": 0,
+            "parts": {
+              ".rodata": {
+                "size": 324100
+              },
+              ".appdesc": {
+                "size": 256
+              },
+              ".tdata": {
+                "size": 16
+              }
+            }
+          },
+          {
+            "name": "DRAM",
+            "total": 180736,
+            "used": 141592,
+            "free": 39144,
+            "parts": {
+              ".bss": {
+                "size": 117832
+              },
+              ".data": {
+                "size": 23756
+              },
+              ".noinit": {
+                "size": 4
+              }
+            }
+          },
+          {
+            "name": "IRAM",
+            "total": 131072,
+            "used": 58859,
+            "free": 72213,
+            "parts": {
+              ".text": {
+                "size": 57831
+              },
+              ".vectors": {
+                "size": 1028
+              }
+            }
+          },
+          {
+            "name": "RTC SLOW",
+            "total": 8192,
+            "used": 96,
+            "free": 8096,
+            "parts": {
+              ".force_slow": {
+                "size": 40
+              },
+              ".rtc_noinit": {
+                "size": 32
+              },
+              ".rtc_slow_reserved": {
+                "size": 24
+              }
+            }
+          }
+        ]
+      },
+      "static_ram_bytes": 141592,
+      "prior_memory_matrix_static_ram_bytes": 141592,
+      "static_ram_delta_vs_memory_matrix_bytes": 0,
+      "build_log_sha256": "e8308acc831cd47438bd20ca1abbef4513adf1c14c1b2a0c3ad0406c149114bc",
+      "provider_validator_linked": true,
+      "unused_catalog_removed": true,
+      "flashed_in_this_trial": false,
+      "artifacts": {
+        "blip-v2.bin": {
+          "bytes": 1269376,
+          "sha256": "7e6505384c986d4da98c046dbe61c8bdded32de721b7fce0a12c39cea48711ef"
+        },
+        "blip-v2.elf": {
+          "bytes": 17162424,
+          "sha256": "0435158f50fd6773dffc2775823debb0c6a2b9394cd285eb9d2daa5a0953a9ef"
+        },
+        "blip-v2.map": {
+          "bytes": 16764234,
+          "sha256": "9248ca81ee8a6e960dccfd039c04f9d79af3f81010df16ded0661e54a260885e"
+        },
+        "sdkconfig": {
+          "bytes": 69301,
+          "sha256": "f37c39f50576e54ec02029cda146d004a972e661f5fc05f7b4e801c8cc3c7b78"
+        }
+      }
+    },
+    {
+      "profile": "m5stickc",
+      "board": "m5stack-m5stickc",
+      "chip": "esp32",
+      "app_bytes": 1268176,
+      "app_partition_bytes": 1638400,
+      "prior_utf8_app_bytes": 1266704,
+      "app_delta_bytes": 1472,
+      "linked_size": {
+        "version": "1.2",
+        "total_size": 1268061,
+        "layout": [
+          {
+            "name": "Flash Code",
+            "total": 0,
+            "used": 861106,
+            "free": 0,
+            "parts": {
+              ".text": {
+                "size": 861106
+              }
+            }
+          },
+          {
+            "name": "Flash Data",
+            "total": 0,
+            "used": 324300,
+            "free": 0,
+            "parts": {
+              ".rodata": {
+                "size": 324028
+              },
+              ".appdesc": {
+                "size": 256
+              },
+              ".tdata": {
+                "size": 16
+              }
+            }
+          },
+          {
+            "name": "DRAM",
+            "total": 180736,
+            "used": 141592,
+            "free": 39144,
+            "parts": {
+              ".bss": {
+                "size": 117832
+              },
+              ".data": {
+                "size": 23756
+              },
+              ".noinit": {
+                "size": 4
+              }
+            }
+          },
+          {
+            "name": "IRAM",
+            "total": 131072,
+            "used": 58859,
+            "free": 72213,
+            "parts": {
+              ".text": {
+                "size": 57831
+              },
+              ".vectors": {
+                "size": 1028
+              }
+            }
+          },
+          {
+            "name": "RTC SLOW",
+            "total": 8192,
+            "used": 96,
+            "free": 8096,
+            "parts": {
+              ".force_slow": {
+                "size": 40
+              },
+              ".rtc_noinit": {
+                "size": 32
+              },
+              ".rtc_slow_reserved": {
+                "size": 24
+              }
+            }
+          }
+        ]
+      },
+      "static_ram_bytes": 141592,
+      "prior_memory_matrix_static_ram_bytes": 141592,
+      "static_ram_delta_vs_memory_matrix_bytes": 0,
+      "build_log_sha256": "7e94b5c6982ea4270d319c5fe57033835395fb13ae4a403e0a7e239b064766c9",
+      "provider_validator_linked": true,
+      "unused_catalog_removed": true,
+      "flashed_in_this_trial": false,
+      "artifacts": {
+        "blip-v2.bin": {
+          "bytes": 1268176,
+          "sha256": "6c7c578768915444e019eae6a89473000b799a3e3d1c58f356dd9a72ea9940e3"
+        },
+        "blip-v2.elf": {
+          "bytes": 17160444,
+          "sha256": "11345983970da438b997be5f400d7c7e4cd0da473e9e50ca5b70cd6e8f07e91b"
+        },
+        "blip-v2.map": {
+          "bytes": 16762764,
+          "sha256": "ff6ab6f5fbe6d7517b2024f3cc77514a3f82e4f209fb19a4686172bcae702af0"
+        },
+        "sdkconfig": {
+          "bytes": 69301,
+          "sha256": "f37c39f50576e54ec02029cda146d004a972e661f5fc05f7b4e801c8cc3c7b78"
+        }
+      }
+    },
+    {
+      "profile": "m5dial",
+      "board": "m5stack-m5dial",
+      "chip": "esp32s3",
+      "app_bytes": 1272080,
+      "app_partition_bytes": 1638400,
+      "prior_utf8_app_bytes": 1270624,
+      "app_delta_bytes": 1456,
+      "linked_size": {
+        "version": "1.2",
+        "total_size": 1271964,
+        "layout": [
+          {
+            "name": "Flash Code",
+            "total": 0,
+            "used": 847524,
+            "free": 0,
+            "parts": {
+              ".text": {
+                "size": 847524
+              }
+            }
+          },
+          {
+            "name": "Flash Data",
+            "total": 0,
+            "used": 331016,
+            "free": 0,
+            "parts": {
+              ".rodata": {
+                "size": 330744
+              },
+              ".appdesc": {
+                "size": 256
+              },
+              ".tdata": {
+                "size": 16
+              }
+            }
+          },
+          {
+            "name": "DIRAM",
+            "total": 341760,
+            "used": 193420,
+            "free": 148340,
+            "parts": {
+              ".bss": {
+                "size": 116416
+              },
+              ".text": {
+                "size": 46999
+              },
+              ".data": {
+                "size": 30005
+              }
+            }
+          },
+          {
+            "name": "IRAM",
+            "total": 16384,
+            "used": 16384,
+            "free": 0,
+            "parts": {
+              ".text": {
+                "size": 15356
+              },
+              ".vectors": {
+                "size": 1028
+              }
+            }
+          },
+          {
+            "name": "RTC SLOW",
+            "total": 8192,
+            "used": 68,
+            "free": 8124,
+            "parts": {
+              ".force_slow": {
+                "size": 36
+              },
+              ".rtc_noinit": {
+                "size": 32
+              }
+            }
+          },
+          {
+            "name": "RTC FAST",
+            "total": 8192,
+            "used": 24,
+            "free": 8168,
+            "parts": {
+              ".rtc_reserved": {
+                "size": 24
+              }
+            }
+          }
+        ]
+      },
+      "static_ram_bytes": 146421,
+      "prior_memory_matrix_static_ram_bytes": 146421,
+      "static_ram_delta_vs_memory_matrix_bytes": 0,
+      "build_log_sha256": "d25a1b2dfa91f0112109a00a32bac57db4547f69c926fc23edf571ad2d3dfee6",
+      "provider_validator_linked": true,
+      "unused_catalog_removed": true,
+      "flashed_in_this_trial": false,
+      "artifacts": {
+        "blip-v2.bin": {
+          "bytes": 1272080,
+          "sha256": "986fd813f38fa4ca728d4bfedcdba10dcea3056fa0b64d202146c6b3246efab5"
+        },
+        "blip-v2.elf": {
+          "bytes": 17961600,
+          "sha256": "0897b844ff04c30e67b8d3667995cb39e15b7c3fd5df645bb30509054d97fd38"
+        },
+        "blip-v2.map": {
+          "bytes": 17206661,
+          "sha256": "72da6f759846442ddfff766658bbe15e7549564e9c5fb4c8ba1907ef2cac2653"
+        },
+        "sdkconfig": {
+          "bytes": 79146,
+          "sha256": "348e043333acc8c7738c139628cdb8f26968d0271c1cc34bd6f1ca505fbd9593"
+        }
+      }
+    },
+    {
+      "profile": "ball",
+      "board": "creators-ball-v2",
+      "chip": "esp32c6",
+      "app_bytes": 1809200,
+      "app_partition_bytes": 3145728,
+      "prior_utf8_app_bytes": 1807648,
+      "app_delta_bytes": 1552,
+      "linked_size": {
+        "version": "1.2",
+        "total_size": 1808788,
+        "layout": [
+          {
+            "name": "Flash Code",
+            "total": 0,
+            "used": 1687188,
+            "free": 0,
+            "parts": {
+              ".text": {
+                "size": 1299204
+              },
+              ".rodata": {
+                "size": 387412
+              },
+              ".init_array": {
+                "size": 300
+              },
+              ".appdesc": {
+                "size": 256
+              },
+              ".tdata": {
+                "size": 16
+              }
+            }
+          },
+          {
+            "name": "DIRAM",
+            "total": 452112,
+            "used": 233692,
+            "free": 218420,
+            "parts": {
+              ".bss": {
+                "size": 111792
+              },
+              ".text": {
+                "size": 97436
+              },
+              ".data": {
+                "size": 24464
+              }
+            }
+          },
+          {
+            "name": "LP SRAM",
+            "total": 16384,
+            "used": 56,
+            "free": 16328,
+            "parts": {
+              ".rtc_noinit": {
+                "size": 32
+              },
+              ".rtc_reserved": {
+                "size": 24
+              }
+            }
+          }
+        ]
+      },
+      "static_ram_bytes": 136256,
+      "prior_memory_matrix_static_ram_bytes": 136256,
+      "static_ram_delta_vs_memory_matrix_bytes": 0,
+      "build_log_sha256": "db45c6a5137e549fa14f9bc228279eb17d921dd479cc7d5ed9a6544264f91ce8",
+      "provider_validator_linked": true,
+      "unused_catalog_removed": true,
+      "flashed_in_this_trial": false,
+      "artifacts": {
+        "blip-v2.bin": {
+          "bytes": 1809200,
+          "sha256": "39fd10798c6a6de03a7b554aeb94b743552ff3727585fe7f5c580b1f314ab855"
+        },
+        "blip-v2.elf": {
+          "bytes": 22166480,
+          "sha256": "87cccdf6c902cc684276364cd381fdc05ca6ffb0e5b2cc2dba8554d29bf74ec1"
+        },
+        "blip-v2.map": {
+          "bytes": 15740678,
+          "sha256": "3364c292397dfe5e4199473576fd5c0fc217b559d69d807238bde38dcff0a3a3"
+        },
+        "sdkconfig": {
+          "bytes": 95004,
+          "sha256": "421b8c54206c03ec2bf4b1cbd892a52c53df43c347c96a709aae8c7e96f41ac7"
+        }
+      }
+    },
+    {
+      "profile": "xiao",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "chip": "esp32c6",
+      "app_bytes": 1427040,
+      "app_partition_bytes": 1638400,
+      "prior_utf8_app_bytes": 1425520,
+      "app_delta_bytes": 1520,
+      "linked_size": {
+        "version": "1.2",
+        "total_size": 1426644,
+        "layout": [
+          {
+            "name": "Flash Code",
+            "total": 0,
+            "used": 1338252,
+            "free": 0,
+            "parts": {
+              ".text": {
+                "size": 987196
+              },
+              ".rodata": {
+                "size": 350492
+              },
+              ".init_array": {
+                "size": 292
+              },
+              ".appdesc": {
+                "size": 256
+              },
+              ".tdata": {
+                "size": 16
+              }
+            }
+          },
+          {
+            "name": "DIRAM",
+            "total": 452112,
+            "used": 211076,
+            "free": 241036,
+            "parts": {
+              ".bss": {
+                "size": 122392
+              },
+              ".text": {
+                "size": 65344
+              },
+              ".data": {
+                "size": 23340
+              }
+            }
+          },
+          {
+            "name": "LP SRAM",
+            "total": 16384,
+            "used": 56,
+            "free": 16328,
+            "parts": {
+              ".rtc_noinit": {
+                "size": 32
+              },
+              ".rtc_reserved": {
+                "size": 24
+              }
+            }
+          }
+        ]
+      },
+      "static_ram_bytes": 145732,
+      "prior_memory_matrix_static_ram_bytes": 145732,
+      "static_ram_delta_vs_memory_matrix_bytes": 0,
+      "build_log_sha256": "a284e0b60d49d00ecca58ef123c1081443c404b21ac36899a199a6e84b438a8b",
+      "provider_validator_linked": true,
+      "unused_catalog_removed": true,
+      "flashed_in_this_trial": false,
+      "artifacts": {
+        "blip-v2.bin": {
+          "bytes": 1427040,
+          "sha256": "59d601b8df073cc694603fc6015363ca2e2bcfba6e8e4b96867b7db34351b63c"
+        },
+        "blip-v2.elf": {
+          "bytes": 19883684,
+          "sha256": "d643013a4fd1d6de53d0e547fa4f98f275b8fd2ac8dea937e0bc102d74474f0f"
+        },
+        "blip-v2.map": {
+          "bytes": 13707318,
+          "sha256": "f3a5c784480ca0ab891ac64efdf052406701e1a1fe0161af3840fbeeea3f0078"
+        },
+        "sdkconfig": {
+          "bytes": 77999,
+          "sha256": "9e351b40c1af5bcd50237abc0d4228252b26805d93c1b504890ed6aba9597836"
+        }
+      }
+    }
+  ],
+  "size_tool_sha256": "d63d6cc928ab7ff046dd1b8633313064e765cede850651b371f62ac92cdc52ad",
+  "native_imports_exercised": false,
+  "limitations": [
+    "Guest imports remain rejected. Native registration, trampoline, import allowlist/signature checks and production-owned providers are the next 6.5 checkpoint.",
+    "Native dispatch used real WAMR guest memory on XIAO C6 with synthetic component-owned providers; no radio, LED, settings or production provider coexistence was exercised.",
+    "Seven production images were built but not flashed. They link the metadata validator; the unused provider catalog is removed by linker garbage collection.",
+    "Callback time bounds are declarations of trusted native work. This portable checkpoint does not enforce elapsed time or prove a bound under load.",
+    "Static RAM deltas use the earlier production memory matrix because the UTF-8 checkpoint did not record linked RAM. Production pool/module/native task reservations are unchanged.",
+    "Full Gate C/D, soaks, M5StickC serial burst recovery, SDK generation and script controls remain open."
+  ]
+}
