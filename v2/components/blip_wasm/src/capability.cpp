@@ -68,6 +68,20 @@ core::Result<std::size_t> CapabilityRegistry::resolve(std::string_view module, s
             return Result::success(i);
     return Result::failure(failure(core::ErrorCode::not_found, "import-unavailable").error());
 }
+core::Status CapabilityRegistry::check_import(std::string_view module, std::string_view name, const Signature& signature) const noexcept {
+    const auto index = resolve(module, name);
+    if (!index) return core::Status::failure(index.error());
+    const auto& function = *bindings_[index.value()].function;
+    if (signature.argument_count != function.arguments.size() || signature.result_count != function.results.size())
+        return failure(core::ErrorCode::validation_failed, "import-arity");
+    for (std::size_t i = 0; i < function.arguments.size(); ++i)
+        if (signature.arguments[i] != function.arguments[i].type)
+            return failure(core::ErrorCode::validation_failed, "import-argument-type");
+    for (std::size_t i = 0; i < function.results.size(); ++i)
+        if (signature.results[i] != function.results[i])
+            return failure(core::ErrorCode::validation_failed, "import-result-type");
+    return core::Status::success();
+}
 core::Status CapabilityRegistry::invoke(std::size_t index, GuestMemory& memory, std::span<const Value> arguments,
     std::span<Value> results, std::size_t& count, const std::atomic<bool>* cancellation) noexcept {
     count = 0;

@@ -54,6 +54,7 @@ class CapabilityRegistry final {
     [[nodiscard]] std::size_t size() const noexcept { return bindings_.size(); }
     [[nodiscard]] const Binding& binding(std::size_t index) const noexcept { return bindings_[index]; }
     [[nodiscard]] core::Result<std::size_t> resolve(std::string_view module, std::string_view function) const noexcept;
+    [[nodiscard]] core::Status check_import(std::string_view module, std::string_view function, const Signature&) const noexcept;
     [[nodiscard]] core::Status invoke(std::size_t index, GuestMemory&, std::span<const Value>,
         std::span<Value>, std::size_t& count, const std::atomic<bool>* cancellation = nullptr) noexcept;
   private:

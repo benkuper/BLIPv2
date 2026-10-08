@@ -12,6 +12,7 @@
 #include <string_view>
 
 namespace blip::wasm {
+class CapabilityRegistry;
 
 inline constexpr std::size_t kMaximumArguments = core::kMaximumWasmArguments;
 inline constexpr std::size_t kMaximumResults = 8;
@@ -59,6 +60,7 @@ struct RuntimeSnapshot {
     std::uint32_t used_bytes{};
     std::uint32_t peak_bytes{};
     std::array<char, kMaximumDiagnosticBytes> fault{};
+    std::uint32_t native_calls{}, native_failures{}, native_maximum_us{};
 };
 
 // Engine boundary. All operations except request_cancel are worker-confined.
@@ -70,6 +72,12 @@ class Runtime : public GuestMemory {
   public:
     virtual ~Runtime() = default;
     virtual std::string_view name() const noexcept = 0;
+    // Worker-only, before initialize. The immutable catalog/providers remain
+    // borrowed through shutdown. Unsupported backends explicitly refuse it.
+    virtual core::Status configure_capabilities(CapabilityRegistry* capabilities) noexcept {
+        return capabilities ? core::Status::failure({core::ErrorDomain::control, core::ErrorCode::validation_failed,
+            "blip.wasm", "capabilities", "backend-capabilities-unsupported"}) : core::Status::success();
+    }
     // An optional, separately placed linear arena remains borrowed until
     // shutdown. Unsupported backends must reject it, not silently ignore it.
     virtual core::Status initialize(std::span<std::byte> pool, Limits limits,

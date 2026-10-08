@@ -1,4 +1,5 @@
 #include "blip/wasm/capability.hpp"
+#include "blip/wasm/module_policy.hpp"
 #include "blip/core/descriptor_json.hpp"
 #include "test_harness.hpp"
 #include <array>
@@ -321,6 +322,65 @@ bool manifest_from_registry() {
     BLIP_CHECK(guarded.back() == 'Q');
     return true;
 }
+bool exact_import_policy() {
+    blip::core::Registry<1> r; TestComponent owner; BLIP_CHECK(r.add(owner)); BLIP_CHECK(r.validate());
+    CapabilityRegistry catalog; Signature signature{}; signature.argument_count = 1; signature.result_count = 1;
+    signature.arguments[0] = ValueType::i32; signature.results[0] = ValueType::i32;
+    BLIP_CHECK(!catalog.check_import("test.alpha.v1", "echo", signature));
+    BLIP_CHECK(catalog.bind(r)); BLIP_CHECK(catalog.check_import("test.alpha.v1", "echo", signature));
+    BLIP_CHECK(!catalog.check_import("test.alpha.v2", "echo", signature));
+    BLIP_CHECK(!catalog.check_import("test.alpha.v1", "_echo", signature));
+    BLIP_CHECK(!catalog.check_import("env", "echo", signature));
+    signature.arguments[0] = ValueType::i64; BLIP_CHECK(!catalog.check_import("test.alpha.v1", "echo", signature));
+    signature.arguments[0] = ValueType::i32; signature.result_count = 2;
+    BLIP_CHECK(!catalog.check_import("test.alpha.v1", "echo", signature));
+    signature.result_count = 1; signature.results[0] = ValueType::f32;
+    BLIP_CHECK(!catalog.check_import("test.alpha.v1", "echo", signature));
+    signature.results[0] = ValueType::i32; signature.argument_count = 255;
+    BLIP_CHECK(!catalog.check_import("test.alpha.v1", "echo", signature));
+    return true;
+}
+bool original_module_name_policy() {
+    blip::core::Registry<1> r; TestComponent owner; BLIP_CHECK(r.add(owner)); BLIP_CHECK(r.validate());
+    CapabilityRegistry catalog; BLIP_CHECK(catalog.bind(r));
+    // This tests the pre-engine section policy, not whole-module validity.
+    auto bytes = [](std::string_view module, std::string_view field, unsigned kind = 0) {
+        std::array<std::byte, 128> out{};
+        const std::array head{std::byte{0}, std::byte{0x61}, std::byte{0x73}, std::byte{0x6d},
+            std::byte{1}, std::byte{0}, std::byte{0}, std::byte{0}};
+        std::copy(head.begin(), head.end(), out.begin()); std::size_t at = 8;
+        out[at++] = std::byte{2}; const auto length_position = at++;
+        out[at++] = std::byte{1}; out[at++] = static_cast<std::byte>(module.size());
+        for (const char c : module) out[at++] = static_cast<std::byte>(c);
+        out[at++] = static_cast<std::byte>(field.size());
+        for (const char c : field) out[at++] = static_cast<std::byte>(c);
+        out[at++] = static_cast<std::byte>(kind); out[at++] = std::byte{0};
+        out[length_position] = static_cast<std::byte>(at - length_position - 1);
+        return std::pair{out, at};
+    };
+    const auto good = bytes("test.alpha.v1", "echo");
+    BLIP_CHECK(passive_module(std::span(good.first).first(good.second), &catalog));
+    BLIP_CHECK(!passive_module(std::span(good.first).first(good.second)));
+    for (const auto name : {std::string_view("test.alpha.v1\0evil", 18), std::string_view("test.alpha.v2")}) {
+        const auto bad = bytes(name, "echo"); BLIP_CHECK(!passive_module(std::span(bad.first).first(bad.second), &catalog));
+    }
+    for (const auto name : {std::string_view("echo\0evil", 9), std::string_view("_echo"), std::string_view("\xff", 1)}) {
+        const auto bad = bytes("test.alpha.v1", name); BLIP_CHECK(!passive_module(std::span(bad.first).first(bad.second), &catalog));
+    }
+    const auto memory = bytes("test.alpha.v1", "echo", 2);
+    BLIP_CHECK(!passive_module(std::span(memory.first).first(memory.second), &catalog));
+    for (std::size_t length = 0; length < good.second; ++length)
+        BLIP_CHECK(!passive_module(std::span(good.first).first(length), &catalog) || length == 8);
+    auto malformed = good; malformed.first[9] = std::byte{0xff};
+    BLIP_CHECK(!passive_module(std::span(malformed.first).first(malformed.second), &catalog));
+    const auto empty = std::span(good.first).first(8);
+    std::array<std::byte, 32> exported{}; std::copy(empty.begin(), empty.end(), exported.begin());
+    const std::array payload{std::byte{7},std::byte{11},std::byte{1},std::byte{7},std::byte{'e'},std::byte{'c'},std::byte{'h'},
+        std::byte{'o'},std::byte{0},std::byte{'e'},std::byte{'x'},std::byte{0},std::byte{0}};
+    std::copy(payload.begin(), payload.end(), exported.begin() + 8);
+    BLIP_CHECK(!passive_module(std::span(exported).first(8 + payload.size()), &catalog));
+    return true;
+}
 } // namespace
 int main() {
     const TestCase tests[]{
@@ -333,6 +393,8 @@ int main() {
         {"provider checked UTF-8 context", checked_text},
         {"raw numeric bits and void results", numeric_types_and_void},
         {"catalog bounds and atomic registration", catalog_bounds_and_atomic_binding},
-        {"registry-generated capability manifest", manifest_from_registry}};
+        {"registry-generated capability manifest", manifest_from_registry},
+        {"exact version/name/typed import policy", exact_import_policy},
+        {"original module names, truncation and C-string aliases", original_module_name_policy}};
     return run_tests(tests);
 }

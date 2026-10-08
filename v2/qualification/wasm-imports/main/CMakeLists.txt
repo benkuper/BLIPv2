@@ -1,0 +1,5 @@
+idf_build_get_property(deps BLIP_WASM_DEPS)
+idf_component_register(SRCS "main.cpp" PRIV_REQUIRES blip_wasm pthread esp_timer esp_system heap freertos INCLUDE_DIRS "" PRIV_INCLUDE_DIRS "${deps}/wamr/core/iwasm/include")
+include(${CMAKE_CURRENT_LIST_DIR}/../../../cmake/blip_component.cmake)
+blip_configure_component(${COMPONENT_LIB})
+target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=wasm_runtime_register_natives_raw")

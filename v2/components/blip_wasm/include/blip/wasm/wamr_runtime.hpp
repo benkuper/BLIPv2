@@ -15,6 +15,7 @@ class WamrRuntime final : public Runtime {
     WamrRuntime(const WamrRuntime&) = delete;
     WamrRuntime& operator=(const WamrRuntime&) = delete;
     std::string_view name() const noexcept override { return "wamr-2.4.5-fast-metered"; }
+    core::Status configure_capabilities(CapabilityRegistry*) noexcept override;
     core::Status initialize(std::span<std::byte> pool, Limits limits,
                             std::span<std::byte> linear_memory = {}) noexcept override;
     core::Status load(std::span<std::byte> module) noexcept override;
@@ -30,6 +31,17 @@ class WamrRuntime final : public Runtime {
     core::Status write_memory(std::uint32_t offset, std::span<const std::byte> input) noexcept override;
 
   private:
+    friend struct WamrNativeBridge;
+    core::Status install_capabilities() noexcept;
+    void release_capabilities() noexcept;
+    void raw_capability(void* environment, std::size_t binding, std::uint64_t* values) noexcept;
+    CapabilityRegistry* capabilities_{};
+    void* imports_{}; // Opaque allocation from the fixed WAMR pool, owned by the adapter.
+    std::atomic<bool> provider_cancelled_{};
+    const std::atomic<bool>* invocation_cancellation_{}; // Worker-confined, borrowed for this invocation only.
+    bool provider_active_{};
+    core::ErrorCode provider_error_{core::ErrorCode::none};
+    std::uint32_t native_calls_{}, native_failures_{}, native_maximum_us_{};
     // Only this implementation casts opaque handles to WAMR types.
     void* module_{};
     void* instance_{};

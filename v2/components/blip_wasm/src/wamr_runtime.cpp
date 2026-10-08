@@ -1,12 +1,16 @@
 #include "blip/wasm/wamr_runtime.hpp"
+#include "blip/wasm/capability.hpp"
+#include "blip/wasm/module_policy.hpp"
 #include "wasm_export.h"
 #include "linear_arena.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_timer.h"
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <limits>
+#include <memory>
 
 #if WASM_ENABLE_THREAD_MGR == 0 || WASM_ENABLE_INSTRUCTION_METERING == 0
 #error "BLIP WAMR requires instruction metering and the internal cancellation manager"
@@ -15,6 +19,31 @@
 namespace blip::wasm {
 namespace {
 std::atomic<WamrRuntime*> owner{};
+struct NativeAttachment { WamrRuntime* runtime{}; std::size_t binding{}; };
+struct NativeGroup {
+    std::array<char, core::kMaximumWasmImportNameBytes + 1> name{};
+    std::uint8_t first{}, count{};
+    bool registered{};
+};
+struct NativeImports {
+    std::array<NativeSymbol, kMaximumCapabilityFunctions> symbols{};
+    std::array<NativeAttachment, kMaximumCapabilityFunctions> attachments{};
+    std::array<std::array<char, 65>, kMaximumCapabilityFunctions> names{};
+    std::array<std::array<char, kMaximumArguments + 4>, kMaximumCapabilityFunctions> signatures{};
+    std::array<NativeGroup, kMaximumCapabilityProviders> groups{};
+    std::uint8_t group_count{};
+};
+static_assert(sizeof(NativeImports) <= 4096, "Native import metadata exceeds its fixed engine-pool bound");
+void increment(std::uint32_t& value) noexcept { if (value != UINT32_MAX) ++value; }
+char native_type(ValueType type) noexcept {
+    switch (type) {
+    case ValueType::i32: return 'i';
+    case ValueType::i64: return 'I';
+    case ValueType::f32: return 'f';
+    case ValueType::f64: return 'F';
+    }
+    return '?';
+}
 core::Status failure(core::ErrorCode code, std::string_view operation, std::string_view detail) noexcept {
     return core::Status::failure({core::ErrorDomain::control, code, "blip.wasm", operation, detail});
 }
@@ -32,33 +61,105 @@ bool type(wasm_valkind_t source, ValueType& target) noexcept {
     default: return false;
     }
 }
-// This is a bounded section walk, not a substitute for WAMR validation. WAMR
-// runs start sections during instantiation with unlimited fuel: reject them
-// before loading. Reject malformed/truncated length encodings as well.
-bool passive_module(std::span<const std::byte> bytes) noexcept {
-    constexpr std::array header{std::byte{0}, std::byte{0x61}, std::byte{0x73}, std::byte{0x6d},
-                                std::byte{1}, std::byte{0}, std::byte{0}, std::byte{0}};
-    if (bytes.size() < header.size() || !std::equal(header.begin(), header.end(), bytes.begin())) return false;
-    std::size_t cursor = header.size();
-    while (cursor < bytes.size()) {
-        const auto id = std::to_integer<unsigned>(bytes[cursor++]);
-        if (id == 8) return false;
-        std::uint32_t length{};
-        bool complete{};
-        for (unsigned i = 0; i < 5 && cursor < bytes.size(); ++i) {
-            const auto b = std::to_integer<unsigned>(bytes[cursor++]);
-            if (i == 4 && (b & 0xf0)) return false;
-            length |= (b & 0x7fU) << (i * 7);
-            if (!(b & 0x80)) { complete = true; break; }
-        }
-        if (!complete || length > bytes.size() - cursor) return false;
-        cursor += length;
-    }
-    return true;
-}
 bool automatic_entry(std::string_view name) noexcept {
     return name == "__post_instantiate" || name == "__wasm_call_ctors" || name == "_initialize";
 }
+}
+
+struct WamrNativeBridge {
+    static void dispatch(wasm_exec_env_t environment, std::uint64_t* values) noexcept {
+        const auto* attachment = static_cast<NativeAttachment*>(wasm_runtime_get_function_attachment(environment));
+        if (!attachment || !attachment->runtime) {
+            wasm_runtime_set_exception(wasm_runtime_get_module_inst(environment), "blip invalid capability attachment");
+            return;
+        }
+        attachment->runtime->raw_capability(environment, attachment->binding, values);
+    }
+};
+
+core::Status WamrRuntime::configure_capabilities(CapabilityRegistry* capabilities) noexcept {
+    if (initialized_ || module_ || imports_) return failure(core::ErrorCode::invalid_state, "capabilities", "runtime-already-started");
+    if (capabilities && !capabilities->bound()) return failure(core::ErrorCode::invalid_argument, "capabilities", "catalog-not-bound");
+    capabilities_ = capabilities;
+    return core::Status::success();
+}
+core::Status WamrRuntime::install_capabilities() noexcept {
+    if (!capabilities_ || capabilities_->size() == 0) return core::Status::success();
+    auto* table = static_cast<NativeImports*>(wasm_runtime_malloc(sizeof(NativeImports)));
+    if (!table) return failure(core::ErrorCode::capacity_exceeded, "capabilities", "registration-pool-exhausted");
+    imports_ = std::construct_at(table);
+    for (std::size_t i = 0; i < capabilities_->size(); ++i) {
+        const auto& binding = capabilities_->binding(i);
+        const auto& function = *binding.function;
+        const auto module = binding.component->wasm.import_module;
+        if (i == 0 || module != capabilities_->binding(i - 1).component->wasm.import_module) {
+            auto& group = table->groups[table->group_count++];
+            std::memcpy(group.name.data(), module.data(), module.size());
+            group.first = static_cast<std::uint8_t>(i);
+        }
+        ++table->groups[table->group_count - 1].count;
+        std::memcpy(table->names[i].data(), function.id.data(), function.id.size());
+        auto& signature = table->signatures[i];
+        std::size_t cursor{}; signature[cursor++] = '(';
+        for (const auto& argument : function.arguments) signature[cursor++] = native_type(argument.type);
+        signature[cursor++] = ')';
+        if (!function.results.empty()) signature[cursor++] = native_type(function.results[0]);
+        // Only numeric signatures: never WAMR '*'/'$' pointer conversion or scans.
+        table->attachments[i] = {this, i};
+        table->symbols[i] = {table->names[i].data(), reinterpret_cast<void*>(WamrNativeBridge::dispatch),
+                            signature.data(), &table->attachments[i]};
+    }
+    for (std::size_t i = 0; i < table->group_count; ++i) {
+        auto& group = table->groups[i];
+        if (!wasm_runtime_register_natives_raw(group.name.data(), table->symbols.data() + group.first, group.count))
+            return failure(core::ErrorCode::capacity_exceeded, "capabilities", "native-registration-failed");
+        group.registered = true;
+    }
+    return core::Status::success();
+}
+void WamrRuntime::release_capabilities() noexcept {
+    auto* table = static_cast<NativeImports*>(imports_);
+    if (!table) return;
+    for (std::size_t i = table->group_count; i > 0; --i) {
+        const auto& group = table->groups[i - 1];
+        if (group.registered) wasm_runtime_unregister_natives(group.name.data(), table->symbols.data() + group.first);
+    }
+    std::destroy_at(table); wasm_runtime_free(table); imports_ = nullptr;
+}
+void WamrRuntime::raw_capability(void* environment, std::size_t index, std::uint64_t* values) noexcept {
+    const auto exec = static_cast<wasm_exec_env_t>(environment);
+    const auto instance = wasm_runtime_get_module_inst(exec);
+    if (!provider_active_ || environment != environment_ || instance != instance_ || owner.load() != this ||
+        !capabilities_ || index >= capabilities_->size()) {
+        provider_error_ = core::ErrorCode::invalid_state;
+        wasm_runtime_set_exception(instance, "blip capability invocation state"); return;
+    }
+    const auto& binding = capabilities_->binding(index);
+    const auto& function = *binding.function;
+    std::array<Value, kMaximumArguments> arguments{};
+    for (std::size_t i = 0; i < function.arguments.size(); ++i) {
+        const auto type = function.arguments[i].type;
+        arguments[i] = {type, type == ValueType::i32 || type == ValueType::f32 ? values[i] & 0xffffffffU : values[i]};
+    }
+    if (invocation_cancellation_ && invocation_cancellation_->load()) provider_cancelled_.store(true);
+    std::array<Value, 1> result{}; std::size_t count{};
+    increment(native_calls_);
+    const auto began = esp_timer_get_time();
+    auto status = capabilities_->invoke(index, *this, std::span<const Value>(arguments).first(function.arguments.size()),
+        result, count, &provider_cancelled_);
+    const auto duration = static_cast<std::uint32_t>(std::min<std::uint64_t>(esp_timer_get_time() - began, UINT32_MAX));
+    native_maximum_us_ = std::max(native_maximum_us_, duration);
+    if (invocation_cancellation_ && invocation_cancellation_->load()) provider_cancelled_.store(true);
+    if (provider_cancelled_.load()) status = failure(core::ErrorCode::cancelled, "capabilities", "cancelled-provider");
+    else if (duration > function.maximum_call_us) status = failure(core::ErrorCode::budget_exceeded, "capabilities", "provider-time-budget");
+    if (!status) {
+        increment(native_failures_); provider_error_ = status.error().code;
+        std::snprintf(fault_.data(), fault_.size(), "capability %.*s:%.*s status=%u",
+            static_cast<int>(binding.component->wasm.import_module.size()), binding.component->wasm.import_module.data(),
+            static_cast<int>(function.id.size()), function.id.data(), static_cast<unsigned>(provider_error_));
+        wasm_runtime_set_exception(instance, fault_.data()); return;
+    }
+    if (count) values[0] = result[0].bits;
 }
 
 core::Status WamrRuntime::initialize(std::span<std::byte> pool, Limits limits,
@@ -95,22 +196,45 @@ core::Status WamrRuntime::initialize(std::span<std::byte> pool, Limits limits,
     pool_bytes_ = static_cast<std::uint32_t>(pool.size() + linear_memory.size());
     limits_ = limits;
     fault_.fill(0);
+    native_calls_ = native_failures_ = native_maximum_us_ = 0;
+    const auto registered = install_capabilities();
+    if (!registered) { shutdown(); return registered; }
     return core::Status::success();
 }
 
 core::Status WamrRuntime::load(std::span<std::byte> bytes) noexcept {
     if (!initialized_ || module_) return failure(core::ErrorCode::invalid_state, "load", "runtime-state");
-    if (bytes.size() > limits_.maximum_module_bytes || !passive_module(bytes))
+    if (bytes.size() > limits_.maximum_module_bytes || !passive_module(bytes, capabilities_))
         return failure(core::ErrorCode::validation_failed, "load", "invalid-or-automatic-module");
     fault_.fill(0);
     module_ = wasm_runtime_load(reinterpret_cast<std::uint8_t*>(bytes.data()),
                                 static_cast<std::uint32_t>(bytes.size()), fault_.data(), fault_.size());
     if (!module_) return failure(core::ErrorCode::corrupt_data, "load", "engine-validation");
-    // Capability imports will be installed by their owners in 6.5. Until that
-    // boundary exists no imported host function, memory or table is available.
-    if (wasm_runtime_get_import_count(static_cast<wasm_module_t>(module_)) != 0) {
-        unload();
-        return failure(core::ErrorCode::validation_failed, "load", "imports-unavailable");
+    const auto imports = wasm_runtime_get_import_count(static_cast<wasm_module_t>(module_));
+    if (imports < 0 || imports > static_cast<std::int32_t>(kMaximumCapabilityFunctions)) {
+        unload(); return failure(core::ErrorCode::validation_failed, "load", "import-count");
+    }
+    for (std::int32_t i = 0; i < imports; ++i) {
+        wasm_import_t item{};
+        wasm_runtime_get_import_type(static_cast<wasm_module_t>(module_), i, &item);
+        if (!capabilities_ || item.kind != WASM_IMPORT_EXPORT_KIND_FUNC || !item.linked) {
+            unload(); return failure(core::ErrorCode::validation_failed, "load", "import-unavailable-or-kind");
+        }
+        Signature signature{};
+        const auto arguments = wasm_func_type_get_param_count(item.u.func_type);
+        const auto results = wasm_func_type_get_result_count(item.u.func_type);
+        bool valid = arguments <= kMaximumArguments && results <= 1;
+        if (valid) {
+            signature.argument_count = static_cast<std::uint8_t>(arguments);
+            signature.result_count = static_cast<std::uint8_t>(results);
+            for (std::uint32_t j = 0; j < arguments; ++j)
+                valid &= type(wasm_func_type_get_param_valkind(item.u.func_type, j), signature.arguments[j]);
+            for (std::uint32_t j = 0; j < results; ++j)
+                valid &= type(wasm_func_type_get_result_valkind(item.u.func_type, j), signature.results[j]);
+        }
+        if (!valid || !capabilities_->check_import(item.module_name, item.name, signature)) {
+            unload(); return failure(core::ErrorCode::validation_failed, "load", "import-name-or-signature");
+        }
     }
     const auto count = wasm_runtime_get_export_count(static_cast<wasm_module_t>(module_));
     if (count < 0) { unload(); return failure(core::ErrorCode::corrupt_data, "load", "module-exports"); }
@@ -164,6 +288,7 @@ core::Status WamrRuntime::invoke(std::string_view name, std::span<const Value> a
                                 ExecutionBudget budget, std::span<Value> results,
                                 std::size_t& result_count) noexcept {
     result_count = 0;
+    if (provider_active_) return failure(core::ErrorCode::recursive_dispatch, "invoke", "guest-reentry");
     const auto expected = signature(name);
     if (!expected) return core::Status::failure(expected.error());
     if (arguments.size() != expected.value().argument_count || results.size() < expected.value().result_count ||
@@ -195,19 +320,23 @@ core::Status WamrRuntime::invoke(std::string_view name, std::span<const Value> a
         wasm_runtime_clear_exception(instance);
         wasm_runtime_set_instruction_count_limit(environment, static_cast<int>(budget.instructions));
         cancelled_ = false;
+        provider_cancelled_.store(false); provider_error_ = core::ErrorCode::none;
+        invocation_cancellation_ = budget.cancellation; provider_active_ = true;
         running_ = true;
     }
     bool success = wasm_runtime_call_wasm(environment, function, cell_count, cells.data());
     {
         const std::lock_guard lock(cancel_mutex_);
         running_ = false;
+        provider_active_ = false; invocation_cancellation_ = nullptr;
         if (cancelled_) success = false;
         if (!success) {
             const auto* exception = wasm_runtime_get_exception(instance);
             std::snprintf(fault_.data(), fault_.size(), "%s", exception ? exception : "cancelled");
             const bool exhausted = exception && std::strstr(exception, "instruction limit exceeded");
-            return failure(cancelled_ ? core::ErrorCode::cancelled : exhausted ? core::ErrorCode::budget_exceeded : core::ErrorCode::verification_failed,
-                           "invoke", cancelled_ ? "cancelled-execution" : "guest-trap");
+            return failure(cancelled_ ? core::ErrorCode::cancelled : provider_error_ != core::ErrorCode::none ? provider_error_ :
+                exhausted ? core::ErrorCode::budget_exceeded : core::ErrorCode::verification_failed,
+                "invoke", cancelled_ ? "cancelled-execution" : provider_error_ != core::ErrorCode::none ? "provider-failure" : "guest-trap");
         }
     }
     std::size_t cursor{};
@@ -254,6 +383,7 @@ void WamrRuntime::request_cancel() noexcept {
     const std::lock_guard lock(cancel_mutex_);
     if (running_) {
         cancelled_ = true;
+        provider_cancelled_.store(true);
         wasm_runtime_terminate(static_cast<wasm_module_inst_t>(instance_));
     }
 }
@@ -269,17 +399,20 @@ void WamrRuntime::unload() noexcept {
 void WamrRuntime::shutdown() noexcept {
     unload();
     if (initialized_) {
+        release_capabilities();
         wasm_runtime_destroy();
         blip_wasm_linear_arena(nullptr, 0);
         initialized_ = false;
         pool_bytes_ = 0;
         owner.store(nullptr);
     }
+    capabilities_ = nullptr;
 }
 RuntimeSnapshot WamrRuntime::snapshot() const noexcept {
     RuntimeSnapshot out{};
     out.reserved_bytes = pool_bytes_;
     out.fault = fault_;
+    out.native_calls = native_calls_; out.native_failures = native_failures_; out.native_maximum_us = native_maximum_us_;
     mem_alloc_info_t info{};
     if (initialized_ && wasm_runtime_get_mem_alloc_info(&info)) {
         out.used_bytes = info.total_size - info.total_free_size + blip_wasm_linear_used();

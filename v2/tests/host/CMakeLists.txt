@@ -106,7 +106,7 @@ else()
 endif()
 add_test(NAME blip_fleet_tests COMMAND blip_fleet_tests)
 
-add_library(blip_wasm_host STATIC ../../components/blip_wasm/src/service.cpp ../../components/blip_wasm/src/module_upload.cpp ../../components/blip_wasm/src/utf8.cpp ../../components/blip_wasm/src/capability.cpp)
+add_library(blip_wasm_host STATIC ../../components/blip_wasm/src/service.cpp ../../components/blip_wasm/src/module_upload.cpp ../../components/blip_wasm/src/utf8.cpp ../../components/blip_wasm/src/capability.cpp ../../components/blip_wasm/src/module_policy.cpp)
 target_include_directories(blip_wasm_host PUBLIC ../../components/blip_wasm/include)
 target_link_libraries(blip_wasm_host PUBLIC blip_core_host)
 target_compile_features(blip_wasm_host PUBLIC cxx_std_20)
