@@ -36,6 +36,7 @@ class EspDdpComponent final : public core::Component {
     Mapping mapping_{};
     SequenceTracker sequences_{};
     std::array<std::byte, 1536U> packet_{};
+    std::array<std::byte, 384U> response_{};
     alignas(16) std::array<StackType_t, kTaskStackWords> task_stack_{};
     StaticTask_t task_storage_{};
     TaskHandle_t task_{};
@@ -47,6 +48,7 @@ class EspDdpComponent final : public core::Component {
     std::atomic<std::uint32_t> invalid_{};
     std::atomic<std::uint32_t> stale_{};
     std::atomic<std::uint32_t> output_rejections_{};
+    std::atomic<std::uint32_t> discovery_replies_{};
 };
 
 } // namespace blip::ddp

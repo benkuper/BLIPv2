@@ -66,7 +66,23 @@ Internet access on the normal path; `-RecoveryDelaySeconds` defaults to 600:
 & v2/tools/control/blip_ap_control_hil.ps1 -DeviceSsid BLIP-7FAC18 -InternetProfile 'Archi-wifi guest'
 ```
 
-To check Art-Net discovery and send a short DMX test on shared Wi-Fi:
+For mDNS/OSCQuery, Art-Net and DDP discovery checks on shared Wi-Fi, install
+`zeroconf` and run the probe. `--cycles` additionally disables and re-enables
+the **board's** Wi-Fi over serial, checks withdrawal/re-advertising, and restores
+its enabled state. The computer stays on its existing network:
+
+```powershell
+python -m pip install zeroconf
+python v2/tools/control/blip_discovery_probe.py --port COM10 --cycles 2 --out discovery.json
+python v2/tools/control/blip_discovery_probe.py --host 192.168.27.186
+python v2/tools/control/blip_discovery_probe.py --host 192.168.27.186 --broadcast-address 192.168.27.191
+```
+
+Use `--no-lighting` for builds excluding Art-Net/DDP. The probe verifies DNS-SD
+PTR/SRV/address resolution, ports against HOST_INFO, UDP OSC ping and JSON tree access, Art-Net
+identity/Port-Address/targeted polls, and DDP STATUS/CONFIG replies.
+
+To send a short Art-Net DMX test:
 
 ```powershell
 python v2/tools/control/blip_artnet_probe.py --host 192.168.27.186 --pixels 36 --red 32 --frames 30

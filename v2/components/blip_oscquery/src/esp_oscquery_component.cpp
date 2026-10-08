@@ -366,12 +366,18 @@ core::Status EspOscQueryComponent::start(const core::StartContext&) noexcept {
         socket_ = -1;
         return component_failure(core::ErrorCode::start_failed, "start", "udp-task");
     }
+    const auto discovery = wifi_->advertise_osc(kOscPort);
+    if (!discovery) {
+        static_cast<void>(stop());
+        return discovery;
+    }
     ESP_LOGI(kTag, "OSC UDP port=%u and OSCQuery HTTP/WebSocket ready",
              static_cast<unsigned>(kOscPort));
     return core::Status::success();
 }
 
 core::Status EspOscQueryComponent::stop() noexcept {
+    wifi_->withdraw_osc();
     if (!started_.exchange(false) && task_quiesced_.load()) {
         return core::Status::success();
     }

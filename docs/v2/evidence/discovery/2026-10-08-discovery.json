@@ -1,0 +1,605 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-10-08T16:06:39.370998+00:00",
+  "passed": true,
+  "result": "OSC/OSCQuery DNS-SD advertising, native Art-Net node discovery and DDP STATUS/read-only CONFIG discovery",
+  "source_snapshot": {
+    "v2/components/blip_artnet/CMakeLists.txt": "2dba6f527adfa08fa267e2f3af0fb42f8bffc484270da963eb59c3c85d8cde65",
+    "v2/components/blip_artnet/include/blip/artnet/artnet.hpp": "295b32d180756c4f436ec71aa9fd83b33197c16a860dce6f6b98495f53406d5e",
+    "v2/components/blip_artnet/include/blip/artnet/esp_artnet_component.hpp": "f9aea2e7bf8b24e4c3701e09c653c46b5b75ff8557ef1c8ae65e666ba252e33a",
+    "v2/components/blip_artnet/src/artnet.cpp": "40632a3f05e2c2a0c453a0e6729fd263ba20398f5d08d65dacb8b95d86052c5c",
+    "v2/components/blip_artnet/src/esp_artnet_component.cpp": "e4412ce9bf877a408ac995f2a0f11dfe8f8f9fad7526c34194117558a79b1bfe",
+    "v2/components/blip_ddp/CMakeLists.txt": "b954d503aed2b1089b6cc732b1a746689feacd9c0da4c3d68fd44333b1b3715a",
+    "v2/components/blip_ddp/include/blip/ddp/ddp.hpp": "0f9de843720914a607bd3aa6727e0dc5c9f472f7b9c365d4fcc8d1ef1100b60f",
+    "v2/components/blip_ddp/include/blip/ddp/esp_ddp_component.hpp": "330b9c6c4d5ba07b497fc61985c2fcd17a5fa5d4ce6c963aed4025326c311d1d",
+    "v2/components/blip_ddp/src/ddp.cpp": "ed3b37643ba06fd4a94ed1b454147822386f756df2f9844ef05d0fd5d9016ec2",
+    "v2/components/blip_ddp/src/esp_ddp_component.cpp": "4412aa6b963b64cf266d97c702be699bf4e060a3586a935b5b0feff932ab7c4d",
+    "v2/components/blip_network/CMakeLists.txt": "380e6eef3ecac73a4313303bdf4cab99366a66a1e29eaa596bd9633c2c97e81d",
+    "v2/components/blip_network/README.md": "7624481ca714a1f6c184b297acdfd30cbdae2e76ae4853335b7d242a38d4f03e",
+    "v2/components/blip_network/idf_component.yml": "bf0b390aaf04bc6ea41a96c9538bc929952b23d719b14704dd7443d882eb2e6e",
+    "v2/components/blip_network/include/blip/network/esp_wifi_component.hpp": "750dc923e90e1fcb4b490c3c7328c4b62a1d9f68b0cde3cf9de8d652c3c1c03a",
+    "v2/components/blip_network/src/esp_wifi_component.cpp": "83825306970291e7ebc62cf2d4eb15fe1d708259e4395168a175900565e8ea1c",
+    "v2/components/blip_oscquery/README.md": "a85856351b000e427214bfb255c4f7ae342de5b8dd4670dae9044183f39c7b54",
+    "v2/components/blip_oscquery/src/esp_oscquery_component.cpp": "62fb91f12e96554c98543be172792c5e0920324f521a2029bb5511f637fedcd1",
+    "v2/firmware/CMakeLists.txt": "38ccf7b7834a246c880ecc56b0bf62f4f72c1955384e53cb1779979ab1c2aef8",
+    "v2/firmware/README.md": "a7614aa4124f407dbc6670c50aca5b7e466dd8384822f4c5642330fcc4398ce3",
+    "v2/firmware/dependencies.lock.esp32": "c3ea99feb70116b10d4fb5cf0f09c210aa67213b5a3f9fcc88a345ebd10b94b7",
+    "v2/firmware/dependencies.lock.esp32c6": "2bb7160da7d1cf7ae519e12f0f5437478c8b6f4f7e7d49fdeaf5e87f6fa02d35",
+    "v2/firmware/dependencies.lock.esp32s3": "445c8314086a59f3afb6911577e63737a5b93dab84b37d4e423f98ec82d1e993",
+    "v2/firmware/sdkconfig.defaults": "003f659bfa0ca48bfb6a2b0ef6bdf79e6645c74920950e7b1b27ab9b6473ffc3",
+    "v2/firmware/sdkconfig.wasm.ble.c6.defaults": "27e15de7f90c42a6d650f9f8e1fab8bc6ba634c0687361fdb87926ac247e777d",
+    "v2/tests/host/CMakeLists.txt": "62cfaf77d247faa45298cbe1475fb6ab67ce661cce5f884df7c65f90a4d9ff8b",
+    "v2/tests/host/blip_discovery_tests.cpp": "d1a87c0ea347745a33c59a7d63655089cf292f7050695ccfdb455cf29a37061a",
+    "v2/tools/control/README.md": "6fe8f45a2b764c0d39ba3ff0f034b894da2602aa0616822801838832e6ea8da4",
+    "v2/tools/control/blip_discovery_probe.py": "a4a82f5653b3d9bdfb57365dea1794f41a1609e79aa68bd62422d0be2b57299d"
+  },
+  "host_tests": {
+    "passed": true,
+    "tests_passed": 28
+  },
+  "builds": {
+    "Ball C6 BLE/WASM production": {
+      "passed": true,
+      "binary_bytes": 1867408,
+      "binary_sha256": "becfa0d08c120c8a7d9e167eacbbde1c821d7e3be3e8f3528485f9cfe87e965e",
+      "smallest_app_partition_bytes": 3145728,
+      "build_flags": {
+        "BLIP_BOARD_ADAFRUIT_HUZZAH32": "OFF",
+        "BLIP_ENABLE_ARTNET": "ON",
+        "BLIP_ENABLE_BLE": "ON",
+        "BLIP_ENABLE_CLASSIC_BT": "OFF",
+        "BLIP_ENABLE_DDP": "ON",
+        "BLIP_ENABLE_E131": "OFF",
+        "BLIP_ENABLE_ESPNOW": "ON",
+        "BLIP_ENABLE_FLEET": "ON",
+        "BLIP_ENABLE_WASM": "ON",
+        "BLIP_QUALIFY_WASM_PROVIDERS": "OFF"
+      },
+      "network_memory_configuration": {
+        "CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM": "4",
+        "CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM": "8",
+        "CONFIG_ESP_WIFI_STATIC_TX_BUFFER": "y",
+        "CONFIG_ESP_WIFI_STATIC_TX_BUFFER_NUM": "2",
+        "CONFIG_ESP_WIFI_RX_BA_WIN": "4",
+        "CONFIG_LWIP_TCP_SND_BUF_DEFAULT": "2880",
+        "CONFIG_MDNS_MAX_INTERFACES": "2",
+        "CONFIG_MDNS_MAX_SERVICES": "2",
+        "CONFIG_MDNS_MEMORY_CUSTOM_IMPL": "y"
+      }
+    },
+    "HUZZAH32 ESP32 WASM production": {
+      "passed": true,
+      "binary_bytes": 1343360,
+      "binary_sha256": "67b1762b47ed753a51022ff165648b0b984b648c2e7db50c851d0e87b1e71f90",
+      "smallest_app_partition_bytes": 1638400,
+      "build_flags": {
+        "BLIP_BOARD_ADAFRUIT_HUZZAH32": "ON",
+        "BLIP_ENABLE_ARTNET": "ON",
+        "BLIP_ENABLE_BLE": "OFF",
+        "BLIP_ENABLE_CLASSIC_BT": "OFF",
+        "BLIP_ENABLE_DDP": "ON",
+        "BLIP_ENABLE_E131": "OFF",
+        "BLIP_ENABLE_ESPNOW": "ON",
+        "BLIP_ENABLE_FLEET": "ON",
+        "BLIP_ENABLE_WASM": "ON",
+        "BLIP_QUALIFY_WASM_PROVIDERS": "OFF"
+      },
+      "network_memory_configuration": {
+        "CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM": "6",
+        "CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM": "8",
+        "CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM": "8",
+        "CONFIG_ESP_WIFI_RX_BA_WIN": "6",
+        "CONFIG_LWIP_TCP_SND_BUF_DEFAULT": "5760",
+        "CONFIG_MDNS_MAX_INTERFACES": "2",
+        "CONFIG_MDNS_MAX_SERVICES": "2",
+        "CONFIG_MDNS_MEMORY_CUSTOM_IMPL": "y"
+      }
+    },
+    "M5Dial S3 WASM production": {
+      "passed": true,
+      "binary_bytes": 1320656,
+      "binary_sha256": "c6e760e7680ceddb1aca4bc933ff2f6ae6c8b4afa64b53751b594babc79ef4f9",
+      "smallest_app_partition_bytes": 1638400,
+      "build_flags": {
+        "BLIP_BOARD_ADAFRUIT_HUZZAH32": "OFF",
+        "BLIP_ENABLE_ARTNET": "ON",
+        "BLIP_ENABLE_BLE": "OFF",
+        "BLIP_ENABLE_CLASSIC_BT": "OFF",
+        "BLIP_ENABLE_DDP": "ON",
+        "BLIP_ENABLE_E131": "OFF",
+        "BLIP_ENABLE_ESPNOW": "ON",
+        "BLIP_ENABLE_FLEET": "ON",
+        "BLIP_ENABLE_WASM": "ON",
+        "BLIP_QUALIFY_WASM_PROVIDERS": "OFF"
+      },
+      "network_memory_configuration": {
+        "CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM": "6",
+        "CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM": "8",
+        "CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM": "8",
+        "CONFIG_ESP_WIFI_RX_BA_WIN": "6",
+        "CONFIG_LWIP_TCP_SND_BUF_DEFAULT": "5760",
+        "CONFIG_MDNS_MAX_INTERFACES": "2",
+        "CONFIG_MDNS_MAX_SERVICES": "2",
+        "CONFIG_MDNS_MEMORY_CUSTOM_IMPL": "y"
+      }
+    },
+    "Ball C6 optional E1.31 receiver": {
+      "passed": true,
+      "binary_bytes": 1348880,
+      "binary_sha256": "71acbadd6978b9e52fac95381df5ff028287ae527ccbe69c1ddb951a5f1d5c2c",
+      "smallest_app_partition_bytes": 3145728,
+      "build_flags": {
+        "BLIP_BOARD_ADAFRUIT_HUZZAH32": "OFF",
+        "BLIP_ENABLE_ARTNET": "ON",
+        "BLIP_ENABLE_BLE": "OFF",
+        "BLIP_ENABLE_CLASSIC_BT": "OFF",
+        "BLIP_ENABLE_DDP": "ON",
+        "BLIP_ENABLE_E131": "ON",
+        "BLIP_ENABLE_ESPNOW": "OFF",
+        "BLIP_ENABLE_FLEET": "OFF",
+        "BLIP_ENABLE_WASM": "OFF",
+        "BLIP_QUALIFY_WASM_PROVIDERS": "OFF"
+      },
+      "network_memory_configuration": {
+        "CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM": "10",
+        "CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM": "32",
+        "CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM": "32",
+        "CONFIG_ESP_WIFI_RX_BA_WIN": "6",
+        "CONFIG_LWIP_TCP_SND_BUF_DEFAULT": "5760",
+        "CONFIG_MDNS_MAX_INTERFACES": "2",
+        "CONFIG_MDNS_MAX_SERVICES": "2",
+        "CONFIG_MDNS_MEMORY_CUSTOM_IMPL": "y"
+      }
+    }
+  },
+  "hardware": {
+    "Creators Ball V2": {
+      "host": "192.168.27.186",
+      "passed": true,
+      "cycles": [
+        {
+          "host": "192.168.27.186",
+          "withdrawn": true,
+          "readvertised": true
+        },
+        {
+          "host": "192.168.27.186",
+          "withdrawn": true,
+          "readvertised": true
+        },
+        {
+          "host": "192.168.27.186",
+          "withdrawn": true,
+          "readvertised": true
+        }
+      ],
+      "phase": "complete",
+      "host_info": {
+        "EXTENSIONS": {
+          "ACCESS": true,
+          "CLIPMODE": false,
+          "CRITICAL": false,
+          "RANGE": true,
+          "TAGS": false,
+          "TYPE": true,
+          "UNIT": false,
+          "VALUE": true,
+          "LISTEN": true,
+          "PATH_ADDED": true,
+          "PATH_REMOVED": true,
+          "PATH_RENAMED": true,
+          "PATH_CHANGED": false,
+          "BLIP_KIND": true,
+          "BLIP_FIELDS": true
+        },
+        "NAME": "BLIP V2",
+        "VERSION": "0.1.0",
+        "DEVICE_TYPE": "BLIP V2",
+        "DEVICE_ID": "08:92:72:F6:4D:DC",
+        "OSC_PORT": 9000,
+        "OSC_TRANSPORT": "UDP"
+      },
+      "services": {
+        "_osc._udp.local.": {
+          "name": "BLIP V2 089272F64DDC._osc._udp.local.",
+          "server": "blip-089272f64ddc.local.",
+          "port": 9000,
+          "addresses": [
+            "192.168.27.186"
+          ],
+          "txt": {
+            "": null
+          }
+        },
+        "_oscjson._tcp.local.": {
+          "name": "BLIP V2 089272F64DDC._oscjson._tcp.local.",
+          "server": "blip-089272f64ddc.local.",
+          "port": 80,
+          "addresses": [
+            "192.168.27.186"
+          ],
+          "txt": {
+            "path": "/"
+          }
+        }
+      },
+      "osc": {
+        "port": 9000,
+        "device_id": "08:92:72:F6:4D:DC"
+      },
+      "artnet": {
+        "port_name": "BLIP-089272F64DDC",
+        "universe": 0,
+        "status2": 15,
+        "mac": "08:92:72:f6:4d:dc"
+      },
+      "ddp": {
+        "status": {
+          "man": "BLIP",
+          "mod": "BLIP V2",
+          "ver": "0.1.0",
+          "mac": "08:92:72:F6:4D:DC",
+          "push": false,
+          "ntp": false
+        },
+        "config": {
+          "ports": [
+            {
+              "port": 1,
+              "l": 36,
+              "ss": 0
+            }
+          ],
+          "num_chan": 108,
+          "data_type": 11,
+          "destination": 1,
+          "read_only": true
+        }
+      },
+      "broadcast": {
+        "artnet": {
+          "port_name": "BLIP-089272F64DDC",
+          "universe": 0,
+          "status2": 15,
+          "mac": "08:92:72:f6:4d:dc"
+        },
+        "ddp": {
+          "status": {
+            "man": "BLIP",
+            "mod": "BLIP V2",
+            "ver": "0.1.0",
+            "mac": "08:92:72:F6:4D:DC",
+            "push": false,
+            "ntp": false
+          },
+          "config": {
+            "ports": [
+              {
+                "port": 1,
+                "l": 36,
+                "ss": 0
+              }
+            ],
+            "num_chan": 108,
+            "data_type": 11,
+            "destination": 1,
+            "read_only": true
+          }
+        }
+      },
+      "wifi_enabled_restored": true
+    },
+    "Adafruit HUZZAH32": {
+      "host": "192.168.27.156",
+      "passed": true,
+      "cycles": [
+        {
+          "host": "192.168.27.156",
+          "withdrawn": true,
+          "readvertised": true
+        }
+      ],
+      "phase": "complete",
+      "host_info": {
+        "EXTENSIONS": {
+          "ACCESS": true,
+          "CLIPMODE": false,
+          "CRITICAL": false,
+          "RANGE": true,
+          "TAGS": false,
+          "TYPE": true,
+          "UNIT": false,
+          "VALUE": true,
+          "LISTEN": true,
+          "PATH_ADDED": true,
+          "PATH_REMOVED": true,
+          "PATH_RENAMED": true,
+          "PATH_CHANGED": false,
+          "BLIP_KIND": true,
+          "BLIP_FIELDS": true
+        },
+        "NAME": "BLIP V2",
+        "VERSION": "0.1.0",
+        "DEVICE_TYPE": "BLIP V2",
+        "DEVICE_ID": "30:AE:A4:F2:D1:84",
+        "OSC_PORT": 9000,
+        "OSC_TRANSPORT": "UDP"
+      },
+      "services": {
+        "_osc._udp.local.": {
+          "name": "BLIP V2 30AEA4F2D184._osc._udp.local.",
+          "server": "blip-30aea4f2d184.local.",
+          "port": 9000,
+          "addresses": [
+            "192.168.27.156"
+          ],
+          "txt": {
+            "": null
+          }
+        },
+        "_oscjson._tcp.local.": {
+          "name": "BLIP V2 30AEA4F2D184._oscjson._tcp.local.",
+          "server": "blip-30aea4f2d184.local.",
+          "port": 80,
+          "addresses": [
+            "192.168.27.156"
+          ],
+          "txt": {
+            "path": "/"
+          }
+        }
+      },
+      "artnet": {
+        "port_name": "BLIP-30AEA4F2D184",
+        "universe": 0,
+        "status2": 15,
+        "mac": "30:ae:a4:f2:d1:84"
+      },
+      "ddp": {
+        "status": {
+          "man": "BLIP",
+          "mod": "BLIP V2",
+          "ver": "0.1.0",
+          "mac": "30:AE:A4:F2:D1:84",
+          "push": false,
+          "ntp": false
+        },
+        "config": {
+          "ports": [
+            {
+              "port": 1,
+              "l": 8,
+              "ss": 0
+            }
+          ],
+          "num_chan": 24,
+          "data_type": 11,
+          "destination": 1,
+          "read_only": true
+        }
+      },
+      "broadcast": {
+        "artnet": {
+          "port_name": "BLIP-30AEA4F2D184",
+          "universe": 0,
+          "status2": 15,
+          "mac": "30:ae:a4:f2:d1:84"
+        },
+        "ddp": {
+          "status": {
+            "man": "BLIP",
+            "mod": "BLIP V2",
+            "ver": "0.1.0",
+            "mac": "30:AE:A4:F2:D1:84",
+            "push": false,
+            "ntp": false
+          },
+          "config": {
+            "ports": [
+              {
+                "port": 1,
+                "l": 8,
+                "ss": 0
+              }
+            ],
+            "num_chan": 24,
+            "data_type": 11,
+            "destination": 1,
+            "read_only": true
+          }
+        }
+      },
+      "wifi_enabled_restored": true
+    },
+    "M5Dial": {
+      "host": "192.168.27.137",
+      "passed": true,
+      "cycles": [
+        {
+          "host": "192.168.27.137",
+          "withdrawn": true,
+          "readvertised": true
+        }
+      ],
+      "phase": "complete",
+      "host_info": {
+        "EXTENSIONS": {
+          "ACCESS": true,
+          "CLIPMODE": false,
+          "CRITICAL": false,
+          "RANGE": true,
+          "TAGS": false,
+          "TYPE": true,
+          "UNIT": false,
+          "VALUE": true,
+          "LISTEN": true,
+          "PATH_ADDED": true,
+          "PATH_REMOVED": true,
+          "PATH_RENAMED": true,
+          "PATH_CHANGED": false,
+          "BLIP_KIND": true,
+          "BLIP_FIELDS": true
+        },
+        "NAME": "BLIP V2",
+        "VERSION": "0.1.0",
+        "DEVICE_TYPE": "BLIP V2",
+        "DEVICE_ID": "B0:81:84:96:83:74",
+        "OSC_PORT": 9000,
+        "OSC_TRANSPORT": "UDP"
+      },
+      "services": {
+        "_osc._udp.local.": {
+          "name": "BLIP V2 B08184968374._osc._udp.local.",
+          "server": "blip-b08184968374.local.",
+          "port": 9000,
+          "addresses": [
+            "192.168.27.137"
+          ],
+          "txt": {
+            "": null
+          }
+        },
+        "_oscjson._tcp.local.": {
+          "name": "BLIP V2 B08184968374._oscjson._tcp.local.",
+          "server": "blip-b08184968374.local.",
+          "port": 80,
+          "addresses": [
+            "192.168.27.137"
+          ],
+          "txt": {
+            "path": "/"
+          }
+        }
+      },
+      "artnet": {
+        "port_name": "BLIP-B08184968374",
+        "universe": 0,
+        "status2": 15,
+        "mac": "b0:81:84:96:83:74"
+      },
+      "ddp": {
+        "status": {
+          "man": "BLIP",
+          "mod": "BLIP V2",
+          "ver": "0.1.0",
+          "mac": "B0:81:84:96:83:74",
+          "push": false,
+          "ntp": false
+        },
+        "config": {
+          "ports": [
+            {
+              "port": 1,
+              "l": 1,
+              "ss": 0
+            }
+          ],
+          "num_chan": 3,
+          "data_type": 11,
+          "destination": 1,
+          "read_only": true
+        }
+      },
+      "broadcast": {
+        "artnet": {
+          "port_name": "BLIP-B08184968374",
+          "universe": 0,
+          "status2": 15,
+          "mac": "b0:81:84:96:83:74"
+        },
+        "ddp": {
+          "status": {
+            "man": "BLIP",
+            "mod": "BLIP V2",
+            "ver": "0.1.0",
+            "mac": "B0:81:84:96:83:74",
+            "push": false,
+            "ntp": false
+          },
+          "config": {
+            "ports": [
+              {
+                "port": 1,
+                "l": 1,
+                "ss": 0
+              }
+            ],
+            "num_chan": 3,
+            "data_type": 11,
+            "destination": 1,
+            "read_only": true
+          }
+        }
+      },
+      "wifi_enabled_restored": true
+    }
+  },
+  "osc_udp_ping": {
+    "passed": true,
+    "results": {
+      "192.168.27.186": {
+        "port": 9000,
+        "device_id": "08:92:72:F6:4D:DC"
+      },
+      "192.168.27.156": {
+        "port": 9000,
+        "device_id": "30:AE:A4:F2:D1:84"
+      },
+      "192.168.27.137": {
+        "port": 9000,
+        "device_id": "B0:81:84:96:83:74"
+      }
+    }
+  },
+  "artnet_change_notifications": {
+    "passed": true,
+    "host": "192.168.27.156",
+    "change_notifications": 2,
+    "reports": [
+      "#0001 [0004] BLIP V2 ready",
+      "#0001 [0005] BLIP V2 ready",
+      "#0001 [0006] BLIP V2 ready"
+    ]
+  },
+  "ball_simultaneous_lighting_and_oscquery": {
+    "passed": true,
+    "host": "192.168.27.186",
+    "original_strip_enabled": true,
+    "pixels": 36,
+    "ble_enabled": true,
+    "before": {
+      "blip.diagnostics.heap_free_internal": 22264,
+      "blip.diagnostics.heap_minimum_internal": 15248,
+      "blip.output.strip0.applied_frames": 1,
+      "blip.output.strip0.failed_frames": 0,
+      "blip.input.artnet.accepted_packets": 0,
+      "blip.input.ddp.accepted_packets": 0
+    },
+    "traffic_seconds": 41.428,
+    "after": {
+      "blip.diagnostics.heap_free_internal": 22272,
+      "blip.diagnostics.heap_minimum_internal": 1448,
+      "blip.output.strip0.applied_frames": 1447,
+      "blip.output.strip0.failed_frames": 0,
+      "blip.input.artnet.accepted_packets": 821,
+      "blip.input.ddp.accepted_packets": 820
+    },
+    "sent": {
+      "artnet": 821,
+      "ddp": 821
+    },
+    "oscquery_reads": 8,
+    "strip_restored": true
+  },
+  "network": {
+    "pc_wifi_changed": false,
+    "shared_lan_broadcast": "192.168.27.191",
+    "prefix_length": 26
+  },
+  "ball_dma_fix": {
+    "cause": "Dynamic Wi-Fi TX frame allocations of 1682 DMA-capable bytes failed during large HTTP replies with BLE/WASM active.",
+    "resolution": "Prefer the RTC heap for C6 mDNS data; reserve two static TX and four static RX buffers and use a two-MSS TCP send window in the combined C6 BLE/WASM profile.",
+    "ble_left_enabled": true
+  },
+  "scope": "Short functional shared-LAN HIL and a 41-second two-protocol load check, not an endurance or physical timing qualification. The optional E1.31 receiver build was compiled, not flashed for this gate. AP-only discovery was not tested; the PC stayed on its original Wi-Fi. Validated production firmware remains installed on the three tested boards."
+}

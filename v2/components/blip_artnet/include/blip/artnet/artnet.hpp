@@ -18,7 +18,13 @@ struct Packet {
     std::uint16_t universe{};
     std::uint8_t sequence{};
     std::span<const std::byte> dmx{};
+    bool notify_changes{};
+    bool targeted{};
+    std::uint16_t target_top{};
+    std::uint16_t target_bottom{};
 };
+
+[[nodiscard]] bool poll_matches(const Packet& packet, std::uint16_t universe) noexcept;
 
 [[nodiscard]] core::Result<Packet> parse(std::span<const std::byte> datagram) noexcept;
 
@@ -29,6 +35,9 @@ struct NodeIdentity {
     std::string_view long_name{"BLIP V2 Art-Net node"};
     std::uint16_t oem{0x7ff0U};
     std::uint16_t universe{};
+    bool dhcp{};
+    bool output_active{};
+    std::uint16_t report_counter{};
 };
 
 inline constexpr std::size_t kPollReplyBytes = 239U;
@@ -49,8 +58,7 @@ struct PixelUpdate {
     std::uint8_t channels_per_pixel{3U};
     bool sixteen_bit{};
 };
-[[nodiscard]] core::Result<PixelUpdate> map_dmx(const Packet& packet,
-                                                const DmxMapping& mapping,
+[[nodiscard]] core::Result<PixelUpdate> map_dmx(const Packet& packet, const DmxMapping& mapping,
                                                 std::size_t maximum_pixels) noexcept;
 enum class ReceiverAction : std::uint8_t { ignored, stream_updated, poll_reply_ready, sync };
 

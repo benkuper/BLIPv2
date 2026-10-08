@@ -1,6 +1,7 @@
 #include "blip/ddp/esp_ddp_component.hpp"
 
 #include "esp_log.h"
+#include "esp_mac.h"
 #include "esp_timer.h"
 #include "lwip/inet.h"
 #include "lwip/sockets.h"
@@ -14,26 +15,77 @@ constexpr char kTag[] = "blip_ddp";
 constexpr std::array<std::string_view, 1> kProvided{"input.pixel-stream.ddp"};
 constexpr std::array<std::string_view, 2> kRequired{"transport.wifi", "output.pixel-strip"};
 constexpr std::array<core::MetadataEntry, 2> kMetadata{{
-    {"udp_port", "4048"}, {"mapping", "destination=1,offset=0,rgb8"},
+    {"udp_port", "4048"},
+    {"mapping", "destination=1,offset=0,rgb8"},
 }};
-constexpr std::array<core::ParameterDescriptor, 7> kParameters{{
-    {"port", "DDP UDP port", core::ValueType::integer, core::Access::read_only, false,
-     core::ScalarValue::from_integer(kPort), {}, ""},
-    {"accepted_packets", "Accepted pixel packets", core::ValueType::integer,
-     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "packets"},
-    {"rejected_packets", "Rejected pixel packets", core::ValueType::integer,
-     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "packets"},
-    {"invalid_packets", "Invalid DDP packets", core::ValueType::integer,
-     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "packets"},
-    {"stale_packets", "Stale sequence packets", core::ValueType::integer,
-     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "packets"},
-    {"output_rejections", "Packets rejected by pixel output", core::ValueType::integer,
-     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "packets"},
-    {"worker_stack_headroom", "DDP worker stack headroom", core::ValueType::integer,
-     core::Access::read_only, false, core::ScalarValue::from_integer(0),
-     {true, 0, EspDdpComponent::kTaskStackBytes, 1}, "bytes"},
+constexpr std::array<core::ParameterDescriptor, 8> kParameters{{
+    {"discovery_replies",
+     "DDP query replies",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {},
+     "packets"},
+    {"port",
+     "DDP UDP port",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(kPort),
+     {},
+     ""},
+    {"accepted_packets",
+     "Accepted pixel packets",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {},
+     "packets"},
+    {"rejected_packets",
+     "Rejected pixel packets",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {},
+     "packets"},
+    {"invalid_packets",
+     "Invalid DDP packets",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {},
+     "packets"},
+    {"stale_packets",
+     "Stale sequence packets",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {},
+     "packets"},
+    {"output_rejections",
+     "Packets rejected by pixel output",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {},
+     "packets"},
+    {"worker_stack_headroom",
+     "DDP worker stack headroom",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {true, 0, EspDdpComponent::kTaskStackBytes, 1},
+     "bytes"},
 }};
-constexpr std::array<core::DiagnosticDescriptor, 5> kDiagnostics{{
+constexpr std::array<core::DiagnosticDescriptor, 6> kDiagnostics{{
+    {"discovery_replies", core::ValueType::integer, "packets"},
     {"accepted_packets", core::ValueType::integer, "packets"},
     {"rejected_packets", core::ValueType::integer, "packets"},
     {"invalid_packets", core::ValueType::integer, "packets"},
@@ -45,7 +97,7 @@ constexpr std::array<core::DiagnosticDescriptor, 5> kDiagnostics{{
     descriptor.schema_version = 1U;
     descriptor.id = "blip.input.ddp";
     descriptor.display_name = "DDP pixel input";
-    descriptor.description = "Bounded RGB8 DDP input for the pixel stream layer";
+    descriptor.description = "Bounded RGB8 DDP input and node discovery";
     descriptor.metadata = kMetadata;
     descriptor.provided_services = kProvided;
     descriptor.required_services = kRequired;
@@ -54,13 +106,13 @@ constexpr std::array<core::DiagnosticDescriptor, 5> kDiagnostics{{
     descriptor.settings = {1U, 1U};
     descriptor.disable_policy = core::DisablePolicy::live;
     descriptor.supports_restart = true;
-    descriptor.cost = {8192U, 2048U, EspDdpComponent::kTaskStackBytes};
+    descriptor.cost = {8192U, 2560U, EspDdpComponent::kTaskStackBytes};
     return descriptor;
 }
 [[nodiscard]] core::Status failure(core::ErrorCode code, std::string_view operation,
                                    std::string_view detail) noexcept {
-    return core::Status::failure({core::ErrorDomain::transport, code, "blip.input.ddp",
-                                  operation, detail});
+    return core::Status::failure(
+        {core::ErrorDomain::transport, code, "blip.input.ddp", operation, detail});
 }
 void increment(std::atomic<std::uint32_t>& value) noexcept {
     auto current = value.load();
@@ -130,8 +182,10 @@ core::Status EspDdpComponent::stop() noexcept {
 bool EspDdpComponent::callbacks_quiesced() const noexcept { return task_quiesced_.load(); }
 
 core::Status EspDdpComponent::read_parameter(std::string_view id,
-                                              core::ScalarValue& output) noexcept {
-    if (id == "port") {
+                                             core::ScalarValue& output) noexcept {
+    if (id == "discovery_replies") {
+        output = core::ScalarValue::from_integer(discovery_replies_.load());
+    } else if (id == "port") {
         output = core::ScalarValue::from_integer(kPort);
     } else if (id == "accepted_packets") {
         output = core::ScalarValue::from_integer(accepted_.load());
@@ -158,14 +212,37 @@ void EspDdpComponent::task_entry(void* context) noexcept {
 
 void EspDdpComponent::run() noexcept {
     while (started_.load()) {
-        const auto received = recvfrom(socket_, packet_.data(), packet_.size(), 0, nullptr,
-                                       nullptr);
+        sockaddr_in source{};
+        socklen_t source_size = sizeof(source);
+        const auto received = recvfrom(socket_, packet_.data(), packet_.size(), 0,
+                                       reinterpret_cast<sockaddr*>(&source), &source_size);
         if (received <= 0) {
             continue;
         }
-        const auto update = map(
-            std::span<const std::byte>{packet_.data(), static_cast<std::size_t>(received)},
-            mapping_);
+        const auto datagram =
+            std::span<const std::byte>{packet_.data(), static_cast<std::size_t>(received)};
+        if ((std::to_integer<unsigned>(packet_[0]) & 0x02U) != 0U) {
+            DiscoveryIdentity identity{};
+            core::ScalarValue pixels{};
+            if (esp_read_mac(identity.mac.data(), ESP_MAC_WIFI_STA) != ESP_OK ||
+                !output_->read_parameter("pixels", pixels) || pixels.integer < 0 ||
+                pixels.integer > 65535) {
+                increment(rejected_);
+                continue;
+            }
+            identity.pixels = static_cast<std::uint16_t>(pixels.integer);
+            const auto reply = encode_query_reply(datagram, identity, response_);
+            if (reply && sendto(socket_, response_.data(), reply.value(), 0,
+                                reinterpret_cast<const sockaddr*>(&source),
+                                source_size) == static_cast<int>(reply.value()))
+                increment(discovery_replies_);
+            else {
+                increment(invalid_);
+                increment(rejected_);
+            }
+            continue;
+        }
+        const auto update = map(datagram, mapping_);
         const auto now_us = static_cast<std::uint64_t>(esp_timer_get_time());
         if (!update) {
             increment(invalid_);
@@ -177,9 +254,9 @@ void EspDdpComponent::run() noexcept {
             increment(rejected_);
             continue;
         }
-        if (!output_->ingest_stream(0U, update.value().start_pixel,
-                                     update.value().channels, update.value().channels_per_pixel,
-                                     update.value().sixteen_bit, now_us)) {
+        if (!output_->ingest_stream(0U, update.value().start_pixel, update.value().channels,
+                                    update.value().channels_per_pixel, update.value().sixteen_bit,
+                                    now_us)) {
             increment(output_rejections_);
             increment(rejected_);
             continue;

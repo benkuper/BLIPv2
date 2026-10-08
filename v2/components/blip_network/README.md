@@ -23,8 +23,21 @@ antenna setting is accepted without driving any GPIO; `external` is rejected.
 Transport protocols that use the resulting IP service remain in their own components;
 this component provides `transport.wifi` and `network.http`, owns the shared 2.4 GHz
 Wi-Fi radio request, and runs the bounded 8 KiB port-80 server used by provisioning and
-OSCQuery. While the public AP is active, plain `GET /` retains the setup form; OSCQuery
-queries and WebSocket upgrades are delegated to the registered protocol component.
+OSCQuery. While the public AP is active, browser requests accepting `text/html` at
+`GET /` retain the setup form. Other root requests, OSCQuery queries and WebSocket
+upgrades are delegated to the registered protocol component.
+
+The pinned Espressif mDNS responder publishes `_osc._udp` on port 9000 and
+`_oscjson._tcp` on port 80 when the OSC component and HTTP server are running.
+Both use the instance `BLIP V2 <12-digit STA MAC>` and hostname
+`blip-<12-digit STA MAC>.local`. The responder follows STA/AP address changes,
+withdraws records on server/OSC shutdown, and restarts with the shared server.
+Disabled Wi-Fi and autonomous ESP-NOW operation do not advertise these services.
+On C6, ordinary mDNS allocations prefer the byte-addressable RTC heap and fall
+back to internal RAM, preserving DMA memory for Wi-Fi frames. The combined C6
+BLE/WASM build reserves two static TX buffers at driver initialization and uses
+four static RX buffers with a two-MSS TCP send window. This bounds the network
+memory budget so large OSCQuery responses can progress alongside lighting input.
 
 See [work package 2.6](../../../docs/v2/work-packages/2.6-wifi-provisioning.md) for
 the settings format, state values, limits, verification, and rollback procedure.

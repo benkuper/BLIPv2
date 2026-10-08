@@ -65,6 +65,9 @@ class EspWifiComponent final : public core::Component {
     [[nodiscard]] std::uint32_t worker_stack_headroom_bytes() const noexcept;
     [[nodiscard]] bool set_http_root_delegate(HttpRootDelegate& delegate) noexcept;
     void clear_http_root_delegate(const HttpRootDelegate& delegate) noexcept;
+    // Publish only while the OSC listener and shared HTTP server are available.
+    [[nodiscard]] core::Status advertise_osc(std::uint16_t port) noexcept;
+    void withdraw_osc() noexcept;
     [[nodiscard]] bool local_ipv4(std::span<char> output, std::size_t& size) const noexcept;
     // Shared timing clients temporarily suspend modem sleep, without changing
     // persisted Wi-Fi configuration or the radio memory profile.
@@ -92,6 +95,8 @@ class EspWifiComponent final : public core::Component {
     [[nodiscard]] core::Status configure_ip_locked() noexcept;
     [[nodiscard]] core::Status start_portal_locked() noexcept;
     void stop_portal_locked() noexcept;
+    [[nodiscard]] core::Status start_discovery_locked() noexcept;
+    void stop_discovery_locked() noexcept;
     [[nodiscard]] core::Status provision(std::string_view ssid, std::string_view password,
                                          bool defer_radio) noexcept;
     [[nodiscard]] bool lock() noexcept;
@@ -138,6 +143,8 @@ class EspWifiComponent final : public core::Component {
     esp_netif_t* station_netif_{};
     esp_netif_t* access_point_netif_{};
     httpd_handle_t portal_{};
+    std::uint16_t advertised_osc_port_{};
+    bool mdns_started_{};
     esp_event_handler_instance_t wifi_event_instance_{};
     esp_event_handler_instance_t ip_event_instance_{};
     bool netif_owned_{};

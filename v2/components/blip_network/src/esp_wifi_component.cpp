@@ -3,10 +3,12 @@
 #include "blip/network/provisioning_form.hpp"
 #include "driver/gpio.h"
 #include "esp_err.h"
+#include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "esp_mac.h"
 #include "esp_wifi.h"
 #include "esp_wifi_default.h"
+#include "mdns.h"
 #include "soc/soc_caps.h"
 
 #include <algorithm>
@@ -14,6 +16,43 @@
 #include <cstdio>
 #include <cstring>
 #include <limits>
+
+// mDNS data needs byte-addressable memory, but does not need Wi-Fi DMA RAM.
+// On C6, use the otherwise idle RTC heap first to preserve DMA frame buffers.
+// Espressif mdns 1.14 exposes these allocator hooks with CUSTOM_IMPL enabled.
+#if defined(CONFIG_MDNS_MEMORY_CUSTOM_IMPL) && defined(CONFIG_IDF_TARGET_ESP32C6) &&               \
+    defined(CONFIG_ESP_SYSTEM_ALLOW_RTC_FAST_MEM_AS_HEAP)
+extern "C" void* mdns_mem_malloc(std::size_t size) {
+    return heap_caps_malloc_prefer(size, 2, MALLOC_CAP_RTCRAM | MALLOC_CAP_8BIT,
+                                   MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+}
+
+extern "C" void* mdns_mem_calloc(std::size_t count, std::size_t size) {
+    if (size != 0U && count > std::numeric_limits<std::size_t>::max() / size)
+        return nullptr;
+    const auto bytes = count * size;
+    void* allocation = mdns_mem_malloc(bytes);
+    if (allocation != nullptr)
+        std::memset(allocation, 0, bytes);
+    return allocation;
+}
+
+extern "C" char* mdns_mem_strndup(const char* text, std::size_t maximum) {
+    if (text == nullptr)
+        return nullptr;
+    const auto size = strnlen(text, maximum);
+    auto* copy = static_cast<char*>(mdns_mem_malloc(size + 1U));
+    if (copy != nullptr) {
+        std::memcpy(copy, text, size);
+        copy[size] = '\0';
+    }
+    return copy;
+}
+
+extern "C" char* mdns_mem_strdup(const char* text) {
+    return text == nullptr ? nullptr : mdns_mem_strndup(text, std::strlen(text));
+}
+#endif
 
 namespace blip::network {
 namespace {
@@ -61,14 +100,38 @@ constexpr std::array<core::MetadataEntry, 6> kMetadata{{
     {"antenna_modes", "0=board-default,1=onboard,2=external"},
 }};
 constexpr std::array<core::ParameterDescriptor, 23> kParameters{{
-    {"setup_ap_active", "Setup access point is advertising", core::ValueType::boolean,
-     core::Access::read_only, false, core::ScalarValue::from_bool(false), {}, ""},
-    {"autonomous_channel", "Routerless radio channel (0=normal networking)", core::ValueType::integer,
-     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "channel"},
-    {"low_latency_clients", "Clients suspending Wi-Fi modem sleep", core::ValueType::integer,
-     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "clients"},
-    {"latency_policy_failures", "Wi-Fi latency policy failures", core::ValueType::integer,
-     core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "failures"},
+    {"setup_ap_active",
+     "Setup access point is advertising",
+     core::ValueType::boolean,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_bool(false),
+     {},
+     ""},
+    {"autonomous_channel",
+     "Routerless radio channel (0=normal networking)",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {},
+     "channel"},
+    {"low_latency_clients",
+     "Clients suspending Wi-Fi modem sleep",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {},
+     "clients"},
+    {"latency_policy_failures",
+     "Wi-Fi latency policy failures",
+     core::ValueType::integer,
+     core::Access::read_only,
+     false,
+     core::ScalarValue::from_integer(0),
+     {},
+     "failures"},
     {"enabled",
      "Wi-Fi RF enabled (live suspension retains driver memory)",
      core::ValueType::boolean,
@@ -275,7 +338,7 @@ constexpr char kProvisionAccepted[] =
     descriptor.supports_restart = true;
     descriptor.cost = {196608, 10240,
                        EspWifiComponent::kPortalTaskStackBytes +
-                           EspWifiComponent::kWorkerTaskStackBytes};
+                           EspWifiComponent::kWorkerTaskStackBytes + CONFIG_MDNS_TASK_STACK_SIZE};
     return descriptor;
 }
 
@@ -514,7 +577,8 @@ core::Status EspWifiComponent::configure_access_point_locked() noexcept {
     std::memcpy(access_point.ap.ssid, ap_ssid_.data(), ap_ssid_size_);
     access_point.ap.ssid_len = static_cast<std::uint8_t>(ap_ssid_size_);
     access_point.ap.channel = autonomous_channel_.load() != 0U ? autonomous_channel_.load()
-        : config_.channel == 0U ? 1U : config_.channel;
+                              : config_.channel == 0U          ? 1U
+                                                               : config_.channel;
     access_point.ap.authmode = WIFI_AUTH_OPEN;
     access_point.ap.max_connection = 4;
     access_point.ap.pmf_cfg.required = false;
@@ -561,8 +625,7 @@ core::Status EspWifiComponent::configure_antenna_locked() noexcept {
     // Fixed onboard antennas have no switch to drive. Accept an already
     // persisted "onboard" choice when moving from a generic C6 image to the
     // correct board build; "external" still requires an RF switch.
-    return config_.antenna == WifiAntenna::board_default ||
-                   config_.antenna == WifiAntenna::onboard
+    return config_.antenna == WifiAntenna::board_default || config_.antenna == WifiAntenna::onboard
                ? core::Status::success()
                : core::Status::failure(wifi_error(core::ErrorCode::resource_unavailable,
                                                   "configure-antenna", "no-board-rf-switch"));
@@ -637,10 +700,74 @@ core::Status EspWifiComponent::start_portal_locked() noexcept {
         return core::Status::failure(
             wifi_error(core::ErrorCode::start_failed, "start-portal", "handler-register-failed"));
     }
+    const auto discovery = start_discovery_locked();
+    if (!discovery) {
+        stop_portal_locked();
+    }
+    return discovery;
+}
+
+core::Status EspWifiComponent::start_discovery_locked() noexcept {
+    if (mdns_started_ || portal_ == nullptr || advertised_osc_port_ == 0U)
+        return core::Status::success();
+    std::array<std::uint8_t, 6> mac{};
+    std::array<char, 18> hostname{};
+    std::array<char, 21> instance{};
+    if (esp_read_mac(mac.data(), ESP_MAC_WIFI_STA) != ESP_OK)
+        return platform_status(ESP_FAIL, "discovery", "read-mac");
+    std::snprintf(hostname.data(), hostname.size(), "blip-%02x%02x%02x%02x%02x%02x", mac[0], mac[1],
+                  mac[2], mac[3], mac[4], mac[5]);
+    std::snprintf(instance.data(), instance.size(), "BLIP V2 %02X%02X%02X%02X%02X%02X", mac[0],
+                  mac[1], mac[2], mac[3], mac[4], mac[5]);
+    auto result = mdns_init();
+    if (result != ESP_OK)
+        return platform_status(result, "discovery", "mdns-init");
+    mdns_started_ = true;
+    mdns_txt_item_t txt[]{{"path", "/"}};
+    result = mdns_hostname_set(hostname.data());
+    if (result == ESP_OK)
+        result = mdns_instance_name_set(instance.data());
+    if (result == ESP_OK)
+        result = mdns_service_add(nullptr, "_osc", "_udp", advertised_osc_port_, nullptr, 0);
+    if (result == ESP_OK)
+        result = mdns_service_add(nullptr, "_oscjson", "_tcp", 80, txt, 1);
+    if (result != ESP_OK) {
+        stop_discovery_locked();
+        return platform_status(result, "discovery", "mdns-services");
+    }
+    ESP_LOGI(kTag, "discovery host=%s.local OSC=%u OSCQuery=80", hostname.data(),
+             static_cast<unsigned>(advertised_osc_port_));
     return core::Status::success();
 }
 
+void EspWifiComponent::stop_discovery_locked() noexcept {
+    if (mdns_started_) {
+        mdns_free();
+        mdns_started_ = false;
+    }
+}
+
+core::Status EspWifiComponent::advertise_osc(std::uint16_t port) noexcept {
+    if (port == 0U || !lock())
+        return platform_status(ESP_ERR_INVALID_STATE, "discovery", "unavailable");
+    advertised_osc_port_ = port;
+    const auto status = start_discovery_locked();
+    if (!status)
+        advertised_osc_port_ = 0U;
+    unlock();
+    return status;
+}
+
+void EspWifiComponent::withdraw_osc() noexcept {
+    if (lock()) {
+        advertised_osc_port_ = 0U;
+        stop_discovery_locked();
+        unlock();
+    }
+}
+
 void EspWifiComponent::stop_portal_locked() noexcept {
+    stop_discovery_locked();
     if (portal_ != nullptr) {
         static_cast<void>(httpd_stop(portal_));
         portal_ = nullptr;
@@ -672,9 +799,11 @@ core::Status EspWifiComponent::reconfigure_radio_locked() noexcept {
     if (active_boot_profile_ == RadioBootProfile::reclaim_wifi) {
         effective.enabled = false;
     }
-    const WifiTransition transition = effective.enabled && autonomous_channel_.load() != 0U
-        ? state_machine_.enter_autonomous()
-        : state_machine_.apply(effective, static_cast<std::uint64_t>(esp_timer_get_time()) / 1000U);
+    const WifiTransition transition =
+        effective.enabled && autonomous_channel_.load() != 0U
+            ? state_machine_.enter_autonomous()
+            : state_machine_.apply(effective,
+                                   static_cast<std::uint64_t>(esp_timer_get_time()) / 1000U);
     update_public_state_locked();
     rssi_ = -127;
     if (!effective.enabled) {
@@ -684,7 +813,8 @@ core::Status EspWifiComponent::reconfigure_radio_locked() noexcept {
     if (!status) {
         return status;
     }
-    const wifi_mode_t mode = autonomous_channel_.load() != 0U ? WIFI_MODE_STA : state_machine_.station_active()
+    const wifi_mode_t mode = autonomous_channel_.load() != 0U ? WIFI_MODE_STA
+                             : state_machine_.station_active()
                                  ? (state_machine_.ap_active() ? WIFI_MODE_APSTA : WIFI_MODE_STA)
                                  : WIFI_MODE_AP;
     status = platform_status(esp_wifi_set_mode(mode), "configure", "set-mode-failed");
@@ -709,13 +839,17 @@ core::Status EspWifiComponent::reconfigure_radio_locked() noexcept {
     }
     radio_started_ = true;
     if (autonomous_channel_.load() != 0U) {
-        status = platform_status(esp_wifi_set_channel(autonomous_channel_.load(), WIFI_SECOND_CHAN_NONE),
-            "configure", "autonomous-channel-failed");
-        if (!status) return status;
+        status =
+            platform_status(esp_wifi_set_channel(autonomous_channel_.load(), WIFI_SECOND_CHAN_NONE),
+                            "configure", "autonomous-channel-failed");
+        if (!status)
+            return status;
     }
-    status = platform_status(esp_wifi_set_ps(low_latency_clients_.load() > 0U
-        ? WIFI_PS_NONE : previous_power_save_), "configure", "wifi-power-save-failed");
-    if (!status) return status;
+    status = platform_status(
+        esp_wifi_set_ps(low_latency_clients_.load() > 0U ? WIFI_PS_NONE : previous_power_save_),
+        "configure", "wifi-power-save-failed");
+    if (!status)
+        return status;
     status = configure_protocol_locked();
     if (!status) {
         return status;
@@ -880,6 +1014,7 @@ void EspWifiComponent::cleanup_platform() noexcept {
         }
         unlock();
     } else if (portal_ != nullptr) {
+        stop_discovery_locked();
         static_cast<void>(httpd_stop(portal_));
         portal_ = nullptr;
     }
@@ -953,10 +1088,13 @@ bool EspWifiComponent::callbacks_quiesced() const noexcept {
 
 core::Status EspWifiComponent::acquire_autonomous_radio(std::uint8_t channel) noexcept {
     if (channel < 1U || channel > 11U || !started_.load() || !lock())
-        return core::Status::failure(wifi_error(core::ErrorCode::invalid_argument, "autonomous-radio", "channel-or-state"));
-    if (!config_.enabled || active_boot_profile_ != RadioBootProfile::wifi_loaded || autonomous_channel_.load() != 0U) {
+        return core::Status::failure(
+            wifi_error(core::ErrorCode::invalid_argument, "autonomous-radio", "channel-or-state"));
+    if (!config_.enabled || active_boot_profile_ != RadioBootProfile::wifi_loaded ||
+        autonomous_channel_.load() != 0U) {
         unlock();
-        return core::Status::failure(wifi_error(core::ErrorCode::resource_conflict, "autonomous-radio", "radio-unavailable"));
+        return core::Status::failure(wifi_error(core::ErrorCode::resource_conflict,
+                                                "autonomous-radio", "radio-unavailable"));
     }
     autonomous_channel_.store(channel);
     const auto status = reconfigure_radio_locked();
@@ -969,7 +1107,9 @@ core::Status EspWifiComponent::acquire_autonomous_radio(std::uint8_t channel) no
 }
 
 core::Status EspWifiComponent::release_autonomous_radio() noexcept {
-    if (!lock()) return core::Status::failure(wifi_error(core::ErrorCode::invalid_state, "autonomous-radio", "not-started"));
+    if (!lock())
+        return core::Status::failure(
+            wifi_error(core::ErrorCode::invalid_state, "autonomous-radio", "not-started"));
     const auto channel = autonomous_channel_.exchange(0U);
     const auto status = channel == 0U ? core::Status::success() : reconfigure_radio_locked();
     unlock();
@@ -978,24 +1118,34 @@ core::Status EspWifiComponent::release_autonomous_radio() noexcept {
 
 core::Status EspWifiComponent::acquire_low_latency() noexcept {
     if (!started_.load() || !lock())
-        return core::Status::failure(wifi_error(core::ErrorCode::invalid_state, "latency", "not-started"));
+        return core::Status::failure(
+            wifi_error(core::ErrorCode::invalid_state, "latency", "not-started"));
     core::Status status = core::Status::success();
     if (!radio_started_ || low_latency_clients_.load() == UINT32_MAX) {
-        status = core::Status::failure(wifi_error(core::ErrorCode::invalid_state, "latency", "radio-unavailable"));
+        status = core::Status::failure(
+            wifi_error(core::ErrorCode::invalid_state, "latency", "radio-unavailable"));
     } else if (low_latency_clients_.load() == 0U) {
-        status = platform_status(esp_wifi_get_ps(&previous_power_save_), "latency", "get-power-save");
-        if (status) status = platform_status(esp_wifi_set_ps(WIFI_PS_NONE), "latency", "set-power-save");
+        status =
+            platform_status(esp_wifi_get_ps(&previous_power_save_), "latency", "get-power-save");
+        if (status)
+            status = platform_status(esp_wifi_set_ps(WIFI_PS_NONE), "latency", "set-power-save");
     }
-    if (status) low_latency_clients_.fetch_add(1U);
-    else latency_policy_failures_.fetch_add(1U);
+    if (status)
+        low_latency_clients_.fetch_add(1U);
+    else
+        latency_policy_failures_.fetch_add(1U);
     unlock();
     return status;
 }
 
 void EspWifiComponent::release_low_latency() noexcept {
-    if (!lock()) { latency_policy_failures_.fetch_add(1U); return; }
+    if (!lock()) {
+        latency_policy_failures_.fetch_add(1U);
+        return;
+    }
     const auto clients = low_latency_clients_.load();
-    if (clients == 0U) latency_policy_failures_.fetch_add(1U);
+    if (clients == 0U)
+        latency_policy_failures_.fetch_add(1U);
     else {
         low_latency_clients_.store(clients - 1U);
         if (clients == 1U && wifi_initialized_ && esp_wifi_set_ps(previous_power_save_) != ESP_OK)
@@ -1014,7 +1164,7 @@ core::Status EspWifiComponent::read_parameter(std::string_view id,
         wifi_mode_t mode = WIFI_MODE_NULL;
         const bool queried = wifi_initialized_ && esp_wifi_get_mode(&mode) == ESP_OK;
         output = core::ScalarValue::from_bool(queried && radio_started_ &&
-            (mode == WIFI_MODE_AP || mode == WIFI_MODE_APSTA));
+                                              (mode == WIFI_MODE_AP || mode == WIFI_MODE_APSTA));
     } else if (id == "autonomous_channel") {
         output = core::ScalarValue::from_integer(autonomous_channel_.load());
     } else if (id == "low_latency_clients") {
@@ -1050,7 +1200,9 @@ core::Status EspWifiComponent::read_parameter(std::string_view id,
         output = core::ScalarValue::from_integer(static_cast<std::int64_t>(state_machine_.state()));
     } else if (id == "ip_address") {
         esp_netif_t* netif = state_machine_.state() == WifiConnectionState::autonomous ? nullptr
-            : state_machine_.state() == WifiConnectionState::connected ? station_netif_ : access_point_netif_;
+                             : state_machine_.state() == WifiConnectionState::connected
+                                 ? station_netif_
+                                 : access_point_netif_;
         esp_netif_ip_info_t ip_info{};
         readback_text_size_ = 0U;
         if (netif != nullptr && esp_netif_get_ip_info(netif, &ip_info) == ESP_OK) {
@@ -1234,7 +1386,7 @@ void EspWifiComponent::run() noexcept {
                     WifiConfig same_live_settings = previous;
                     same_live_settings.boot_profile = candidate.boot_profile;
                     applied = same_live_settings == candidate ? core::Status::success()
-                                                               : reconfigure_radio_locked();
+                                                              : reconfigure_radio_locked();
                     if (!applied) {
                         config_ = previous;
                         static_cast<void>(reconfigure_radio_locked());
@@ -1342,7 +1494,12 @@ esp_err_t EspWifiComponent::handle_root(httpd_req_t* request) noexcept {
         socket >= 0 && httpd_ws_get_fd_info(request->handle, socket) == HTTPD_WS_CLIENT_WEBSOCKET;
     const bool query = httpd_req_get_url_query_len(request) != 0U;
     const bool root = std::string_view{request->uri} == "/";
-    if (delegate != nullptr && (websocket || query || !root || !public_ap_active_.load())) {
+    std::array<char, 256> accept{};
+    const bool html =
+        httpd_req_get_hdr_value_str(request, "Accept", accept.data(), accept.size()) == ESP_OK &&
+        std::string_view{accept.data()}.find("text/html") != std::string_view::npos;
+    if (delegate != nullptr &&
+        (websocket || query || !root || !public_ap_active_.load() || !html)) {
         return delegate->handle_http_root(request);
     }
     httpd_resp_set_type(request, "text/html; charset=utf-8");
@@ -1363,7 +1520,8 @@ void EspWifiComponent::clear_http_root_delegate(const HttpRootDelegate& delegate
 
 bool EspWifiComponent::local_ipv4(std::span<char> output, std::size_t& size) const noexcept {
     size = 0;
-    if (!started_.load() || output.size() < 16U || public_state_.load() == WifiConnectionState::autonomous) {
+    if (!started_.load() || output.size() < 16U ||
+        (public_state_.load() != WifiConnectionState::connected && !public_ap_active_.load())) {
         return false;
     }
     esp_netif_t* netif = public_state_.load() == WifiConnectionState::connected

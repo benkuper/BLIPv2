@@ -1,11 +1,13 @@
 #include "blip/artnet/esp_artnet_component.hpp"
 
 #include "esp_mac.h"
+#include "esp_random.h"
 #include "esp_timer.h"
 #include "lwip/inet.h"
 #include "lwip/sockets.h"
 
 #include <array>
+#include <cstdio>
 #include <cstring>
 #include <limits>
 
@@ -93,6 +95,15 @@ const core::ComponentDescriptor& EspArtNetComponent::descriptor() const noexcept
 core::Status EspArtNetComponent::start(const core::StartContext&) noexcept {
     if (started_.load())
         return core::Status::success();
+    controllers_ = {};
+    last_dmx_us_ = 0U;
+    identity_.report_counter = 0U;
+    if (esp_read_mac(identity_.mac.data(), ESP_MAC_WIFI_STA) != ESP_OK)
+        return failure(core::ErrorCode::start_failed, "start", "read-mac");
+    std::snprintf(node_name_.data(), node_name_.size(), "BLIP-%02X%02X%02X%02X%02X%02X",
+                  identity_.mac[0], identity_.mac[1], identity_.mac[2], identity_.mac[3],
+                  identity_.mac[4], identity_.mac[5]);
+    identity_.short_name = node_name_.data();
     socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
     if (socket_ < 0)
         return failure(core::ErrorCode::start_failed, "start", "udp-socket");
@@ -163,36 +174,41 @@ void EspArtNetComponent::task_entry(void* context) noexcept {
 
 void EspArtNetComponent::run() noexcept {
     while (started_.load()) {
+        service_discovery(static_cast<std::uint64_t>(esp_timer_get_time()));
         sockaddr_storage source{};
         socklen_t source_size = sizeof(source);
         const auto received = recvfrom(socket_, packet_.data(), packet_.size(), 0,
                                        reinterpret_cast<sockaddr*>(&source), &source_size);
         if (received <= 0)
             continue;
-        const auto packet = parse(
-            std::span<const std::byte>{packet_.data(), static_cast<std::size_t>(received)});
+        const auto packet =
+            parse(std::span<const std::byte>{packet_.data(), static_cast<std::size_t>(received)});
         if (!packet) {
             increment(rejected_);
             continue;
         }
         if (packet.value().kind == PacketKind::poll) {
-            std::array<char, 16> ip_text{};
-            std::size_t ip_size{};
-            in_addr ip{};
-            if (!wifi_->local_ipv4(ip_text, ip_size) ||
-                inet_pton(AF_INET, ip_text.data(), &ip) != 1 ||
-                esp_read_mac(identity_.mac.data(), ESP_MAC_WIFI_STA) != ESP_OK) {
-                increment(rejected_);
+            if (!poll_matches(packet.value(), mapping_.universe) || source.ss_family != AF_INET)
                 continue;
+            const auto& peer = reinterpret_cast<const sockaddr_in&>(source);
+            const auto now = static_cast<std::uint64_t>(esp_timer_get_time());
+            Controller* selected{};
+            for (auto& controller : controllers_) {
+                if (controller.ip == peer.sin_addr.s_addr && controller.port == peer.sin_port) {
+                    selected = &controller;
+                    break;
+                }
+                if (selected == nullptr || controller.expires_us < selected->expires_us)
+                    selected = &controller;
             }
-            std::memcpy(identity_.ipv4.data(), &ip.s_addr, identity_.ipv4.size());
-            const auto encoded = encode_poll_reply(identity_, response_);
-            if (!encoded || sendto(socket_, response_.data(), encoded.value(), 0,
-                                   reinterpret_cast<const sockaddr*>(&source), source_size) < 0) {
-                increment(rejected_);
-                continue;
-            }
-            increment(discovery_replies_);
+            const bool pending = selected->ip == peer.sin_addr.s_addr &&
+                                 selected->port == peer.sin_port && selected->reply_due_us != 0U;
+            selected->ip = peer.sin_addr.s_addr;
+            selected->port = peer.sin_port;
+            selected->expires_us = now + 10'000'000U;
+            if (!pending)
+                selected->reply_due_us = now + 1U + esp_random() % 1'000'000U;
+            selected->notify = packet.value().notify_changes;
             increment(accepted_);
             continue;
         }
@@ -217,17 +233,61 @@ void EspArtNetComponent::run() noexcept {
         }
         if (!update.value().channels.empty() &&
             !output_->ingest_stream(update.value().sequence, update.value().start_pixel,
-                                    update.value().channels,
-                                    update.value().channels_per_pixel,
+                                    update.value().channels, update.value().channels_per_pixel,
                                     update.value().sixteen_bit,
                                     static_cast<std::uint64_t>(esp_timer_get_time()))) {
             increment(rejected_);
             continue;
         }
         increment(accepted_);
+        if (!update.value().channels.empty())
+            last_dmx_us_ = static_cast<std::uint64_t>(esp_timer_get_time());
     }
     task_quiesced_.store(true);
     vTaskDelete(nullptr);
+}
+
+void EspArtNetComponent::service_discovery(std::uint64_t now_us) noexcept {
+    std::array<char, 16> ip_text{};
+    std::size_t ip_size{};
+    in_addr ip{};
+    if (!wifi_->local_ipv4(ip_text, ip_size) || inet_pton(AF_INET, ip_text.data(), &ip) != 1)
+        return;
+    std::array<std::uint8_t, 4> ipv4{};
+    std::memcpy(ipv4.data(), &ip.s_addr, ipv4.size());
+    core::ScalarValue manual_ip{};
+    const bool dhcp = wifi_->connection_state() == network::WifiConnectionState::connected &&
+                      wifi_->read_parameter("manual_ip", manual_ip) && manual_ip.string.empty();
+    const bool active = last_dmx_us_ != 0U && now_us - last_dmx_us_ < 2'500'000U;
+    const bool changed =
+        identity_.ipv4 != ipv4 || identity_.dhcp != dhcp || identity_.output_active != active;
+    identity_.ipv4 = ipv4;
+    identity_.dhcp = dhcp;
+    identity_.output_active = active;
+    for (auto& controller : controllers_) {
+        if (controller.expires_us <= now_us) {
+            controller = {};
+            continue;
+        }
+        if (changed && controller.notify && controller.reply_due_us == 0U)
+            controller.reply_due_us = now_us + 1U + esp_random() % 1'000'000U;
+        if (controller.reply_due_us == 0U || now_us < controller.reply_due_us)
+            continue;
+        sockaddr_in destination{};
+        destination.sin_family = AF_INET;
+        destination.sin_port = controller.port;
+        destination.sin_addr.s_addr = controller.ip;
+        identity_.report_counter =
+            static_cast<std::uint16_t>((identity_.report_counter + 1U) % 10000U);
+        const auto encoded = encode_poll_reply(identity_, response_);
+        if (encoded && sendto(socket_, response_.data(), encoded.value(), 0,
+                              reinterpret_cast<const sockaddr*>(&destination),
+                              sizeof(destination)) == static_cast<int>(encoded.value()))
+            increment(discovery_replies_);
+        else
+            increment(rejected_);
+        controller.reply_due_us = 0U;
+    }
 }
 
 } // namespace blip::artnet

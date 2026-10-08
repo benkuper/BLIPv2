@@ -22,6 +22,33 @@ either protocol component and its registry entry from a smaller build. Use a
 separate build directory for each option combination.
 The E1.31 receiver is optional and disabled by default; pass
 `-DBLIP_ENABLE_E131=ON` to include it.
+
+OSC and OSCQuery advertise through mDNS/Zeroconf as `_osc._udp` (9000) and
+`_oscjson._tcp` (80). Their shared hostname is `blip-<STA MAC without colons>.local`;
+service instances include the MAC so several BLIPs can be discovered together.
+Records are withdrawn when OSC or the HTTP server stops and recreated when the
+network server returns, including after a Wi-Fi restart.
+
+Art-Net uses native ArtPoll/ArtPollReply discovery. Replies describe one output
+on Port-Address 0, with a unique port name, current IP/MAC, DHCP status and web
+configuration capability. Targeted polls are filtered; up to four controllers
+can request change notifications, with a 10-second subscription expiry and
+randomized replies within approximately one second. Replies are unicast under
+the current [Art-Net specification](https://art-net.org.uk/downloads/art-net.pdf).
+GoodOutput indicates accepted ArtDmx traffic within the last 2.5 seconds.
+
+DDP supports native STATUS (251) discovery queries and read-only CONFIG (250)
+queries on UDP 4048, including broadcast requests. CONFIG reports the current
+RGB8 pixel/channel count and destination 1. Queries do not alter pixel data or
+sequence tracking; configuration writes remain unsupported. sACN/E1.31 is a
+receiver here: its [Universe Discovery](https://tsp.esta.org/tsp/documents/docs/E1-31-2016.pdf)
+advertises transmitting sources, so this receiver does not emit those packets.
+
+Discovery validation is recorded in the
+[2026-10-08 evidence report](../../docs/v2/evidence/discovery/2026-10-08-discovery.json):
+host tests, target builds, shared-LAN discovery/reconnect checks on C6/ESP32/S3,
+and simultaneous lighting traffic with full OSCQuery reads on the BLE/WASM Ball.
+
 For the Adafruit HUZZAH32 battery ADC on GPIO35, pass
 `-DBLIP_BOARD_ADAFRUIT_HUZZAH32=ON` in a dedicated ESP32 build directory.
 The battery registry entry is included only in that board build.

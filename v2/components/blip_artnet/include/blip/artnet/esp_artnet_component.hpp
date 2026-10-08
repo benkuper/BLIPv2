@@ -19,8 +19,7 @@ class EspArtNetComponent final : public core::Component {
     static constexpr std::size_t kTaskStackBytes = 4096U;
     static constexpr std::size_t kTaskStackWords = kTaskStackBytes / sizeof(StackType_t);
 
-    EspArtNetComponent(network::EspWifiComponent& wifi,
-                       led::EspRmtStripComponent& output) noexcept
+    EspArtNetComponent(network::EspWifiComponent& wifi, led::EspRmtStripComponent& output) noexcept
         : wifi_(&wifi), output_(&output) {}
 
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
@@ -33,6 +32,7 @@ class EspArtNetComponent final : public core::Component {
   private:
     static void task_entry(void* context) noexcept;
     void run() noexcept;
+    void service_discovery(std::uint64_t now_us) noexcept;
     static const core::ComponentDescriptor descriptor_;
 
     network::EspWifiComponent* wifi_{};
@@ -41,6 +41,16 @@ class EspArtNetComponent final : public core::Component {
     DmxMapping mapping_{};
     std::array<std::byte, 530> packet_{};
     std::array<std::byte, kPollReplyBytes> response_{};
+    std::array<char, 18> node_name_{};
+    struct Controller {
+        std::uint32_t ip{};
+        std::uint16_t port{};
+        std::uint64_t expires_us{};
+        std::uint64_t reply_due_us{};
+        bool notify{};
+    };
+    std::array<Controller, 4> controllers_{};
+    std::uint64_t last_dmx_us_{};
     alignas(16) std::array<StackType_t, kTaskStackWords> task_stack_{};
     StaticTask_t task_storage_{};
     TaskHandle_t task_{};

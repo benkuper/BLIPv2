@@ -1,6 +1,7 @@
 #include "blip/artnet/artnet.hpp"
 
 #include <algorithm>
+#include <cstdio>
 
 namespace blip::artnet {
 namespace {
@@ -43,11 +44,29 @@ core::Result<Packet> parse(std::span<const std::byte> datagram) noexcept {
     if (opcode == 0x2000U) {
         if (datagram.size() < 14U)
             return fail("short-poll");
-        return core::Result<Packet>::success({PacketKind::poll});
+        if (be16(datagram, 10U) < 14U)
+            return fail("old-protocol-version");
+        Packet packet{PacketKind::poll};
+        const auto flags = std::to_integer<std::uint8_t>(datagram[12U]);
+        packet.notify_changes = (flags & 0x02U) != 0U;
+        packet.targeted = (flags & 0x20U) != 0U;
+        // Missing fields in older, 14-byte polls are defined as zero.
+        const auto field = [datagram](std::size_t at) -> std::uint16_t {
+            const auto high =
+                at < datagram.size() ? std::to_integer<std::uint8_t>(datagram[at]) : 0U;
+            const auto low =
+                at + 1U < datagram.size() ? std::to_integer<std::uint8_t>(datagram[at + 1U]) : 0U;
+            return static_cast<std::uint16_t>((high << 8U) | low);
+        };
+        packet.target_top = field(14U);
+        packet.target_bottom = field(16U);
+        return core::Result<Packet>::success(packet);
     }
     if (opcode == 0x5200U) {
         if (datagram.size() < 14U)
             return fail("short-sync");
+        if (be16(datagram, 10U) < 14U)
+            return fail("old-protocol-version");
         return core::Result<Packet>::success({PacketKind::sync});
     }
     if (opcode != 0x5000U || datagram.size() < 18U)
@@ -62,6 +81,12 @@ core::Result<Packet> parse(std::span<const std::byte> datagram) noexcept {
          std::to_integer<std::uint8_t>(datagram[12U]), datagram.subspan(18U, length)});
 }
 
+bool poll_matches(const Packet& packet, std::uint16_t universe) noexcept {
+    return packet.kind == PacketKind::poll &&
+           (!packet.targeted ||
+            (universe >= packet.target_bottom && universe <= packet.target_top));
+}
+
 core::Result<std::size_t> encode_poll_reply(const NodeIdentity& identity,
                                             std::span<std::byte> output) noexcept {
     if (output.size() < kPollReplyBytes || identity.short_name.empty())
@@ -73,21 +98,29 @@ core::Result<std::size_t> encode_poll_reply(const NodeIdentity& identity,
     put_le16(output, 8U, 0x2100U);
     for (std::size_t i = 0; i < 4U; ++i)
         output[10U + i] = static_cast<std::byte>(identity.ipv4[i]);
-    put_be16(output, 14U, kPort);
+    put_le16(output, 14U, kPort);
     output[16U] = std::byte{0};
     output[17U] = std::byte{1};
     put_be16(output, 20U, identity.oem);
     text_field(output, 26U, 18U, identity.short_name);
     text_field(output, 44U, 64U, identity.long_name);
-    text_field(output, 108U, 64U, "#0001 [0000] BLIP V2 ready");
+    std::array<char, 64> report{};
+    std::snprintf(report.data(), report.size(), "#0001 [%04u] BLIP V2 ready",
+                  static_cast<unsigned>(identity.report_counter % 10000U));
+    text_field(output, 108U, 64U, report.data());
     put_be16(output, 172U, 1U);
     output[174U] = std::byte{0x80};
-    output[182U] = std::byte{0x80};
-    output[190U] = static_cast<std::byte>(identity.universe & 0xffU);
+    output[182U] = identity.output_active ? std::byte{0x80} : std::byte{0};
+    output[190U] = static_cast<std::byte>(identity.universe & 0x0fU);
     output[18U] = static_cast<std::byte>((identity.universe >> 8U) & 0x7fU);
+    output[19U] = static_cast<std::byte>((identity.universe >> 4U) & 0x0fU);
+    output[23U] = std::byte{0xc0}; // Indicators normal; no RDM/remote address programming.
     for (std::size_t i = 0; i < identity.mac.size(); ++i)
         output[201U + i] = static_cast<std::byte>(identity.mac[i]);
-    output[211U] = std::byte{0x01}; // DHCP capable.
+    for (std::size_t i = 0; i < 4U; ++i)
+        output[207U + i] = static_cast<std::byte>(identity.ipv4[i]);
+    output[211U] = static_cast<std::byte>(0x0dU | (identity.dhcp ? 0x02U : 0U));
+    // Web configuration, DHCP capable, 15-bit Port-Address; no sACN switching/RDM.
     return core::Result<std::size_t>::success(kPollReplyBytes);
 }
 
@@ -100,20 +133,20 @@ core::Result<PixelUpdate> map_dmx(const Packet& packet, const DmxMapping& mappin
         (mapping.channels_per_pixel != 3U && mapping.channels_per_pixel != 4U) ||
         maximum_pixels == 0U) {
         return core::Result<PixelUpdate>::failure({core::ErrorDomain::control,
-                                                    core::ErrorCode::validation_failed,
-                                                    "blip.artnet", "map-dmx", "invalid-mapping"});
+                                                   core::ErrorCode::validation_failed,
+                                                   "blip.artnet", "map-dmx", "invalid-mapping"});
     }
     const auto channel_offset = static_cast<std::size_t>(mapping.start_channel - 1U);
     if (channel_offset >= packet.dmx.size()) {
         return core::Result<PixelUpdate>::failure({core::ErrorDomain::control,
-                                                    core::ErrorCode::validation_failed,
-                                                    "blip.artnet", "map-dmx", "invalid-mapping"});
+                                                   core::ErrorCode::validation_failed,
+                                                   "blip.artnet", "map-dmx", "invalid-mapping"});
     }
     const auto available = packet.dmx.size() - channel_offset;
     const auto complete = std::min(available / bytes_per_pixel, maximum_pixels) * bytes_per_pixel;
-    return core::Result<PixelUpdate>::success(
-        {packet.sequence, mapping.start_pixel, packet.dmx.subspan(channel_offset, complete),
-         mapping.channels_per_pixel, mapping.sixteen_bit});
+    return core::Result<PixelUpdate>::success({packet.sequence, mapping.start_pixel,
+                                               packet.dmx.subspan(channel_offset, complete),
+                                               mapping.channels_per_pixel, mapping.sixteen_bit});
 }
 
 core::Result<ReceiverAction> Receiver::receive(std::span<const std::byte> datagram,
@@ -126,6 +159,8 @@ core::Result<ReceiverAction> Receiver::receive(std::span<const std::byte> datagr
         return core::Result<ReceiverAction>::failure(packet.error());
     }
     if (packet.value().kind == PacketKind::poll) {
+        if (!poll_matches(packet.value(), mapping_.universe))
+            return core::Result<ReceiverAction>::success(ReceiverAction::ignored);
         const auto encoded = encode_poll_reply(identity_, response);
         if (!encoded) {
             return core::Result<ReceiverAction>::failure(encoded.error());

@@ -1,0 +1,10 @@
+# Reserve TX DMA buffers before the full BLE/WASM profile consumes the heap.
+# Dynamic allocation can deadlock TCP progress when frame buffers no longer fit.
+CONFIG_ESP_WIFI_STATIC_TX_BUFFER=y
+CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER=n
+CONFIG_ESP_WIFI_STATIC_TX_BUFFER_NUM=2
+# Keep the receive block-ack window within the fixed RX reserve.
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=4
+CONFIG_ESP_WIFI_RX_BA_WIN=4
+# Two MSS-sized segments bound each control connection's queued TCP memory.
+CONFIG_LWIP_TCP_SND_BUF_DEFAULT=2880

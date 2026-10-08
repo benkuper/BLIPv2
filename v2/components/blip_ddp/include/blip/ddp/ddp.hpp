@@ -2,11 +2,20 @@
 #include "blip/core/error.hpp"
 #include "blip/led/stream.hpp"
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <span>
 namespace blip::ddp {
 inline constexpr std::uint16_t kPort = 4048U;
+struct DiscoveryIdentity {
+    std::array<std::uint8_t, 6> mac{};
+    std::uint16_t pixels{};
+};
+// STATUS (251) and read-only CONFIG (250); unsupported IDs get an empty reply.
+[[nodiscard]] core::Result<std::size_t> encode_query_reply(std::span<const std::byte> query,
+                                                           const DiscoveryIdentity& identity,
+                                                           std::span<std::byte> response) noexcept;
 struct Packet {
     bool push{};
     std::uint8_t sequence{};

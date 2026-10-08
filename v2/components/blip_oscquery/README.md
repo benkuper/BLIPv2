@@ -1,5 +1,13 @@
 # blip_oscquery
 
+Network discovery uses `_osc._udp.local.` (UDP 9000) and
+`_oscjson._tcp.local.` (HTTP/WebSocket 80), following the
+[OSCQuery proposal](https://github.com/Vidvox/OSCQueryProposal).
+Each device has a unique MAC-derived instance and `.local` hostname. Resolve
+OSCQuery, fetch `/?HOST_INFO` for the OSC transport/port, and fetch `/` with
+`Accept: application/json` for the address tree. The Wi-Fi owner manages the
+responder alongside the shared HTTP server, including AP and station transitions.
+
 Owns the bounded OSC compatibility endpoint and registry-generated OSCQuery
 discovery surface. UDP OSC listens on port 9000. The Wi-Fi component owns the
 shared port-80 HTTP server and delegates OSCQuery requests and WebSocket frames

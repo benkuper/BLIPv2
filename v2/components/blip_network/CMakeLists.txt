@@ -5,7 +5,7 @@ idf_component_register(
         "src/wifi_config.cpp"
         "src/wifi_state_machine.cpp"
     INCLUDE_DIRS "include"
-    REQUIRES blip_core blip_storage esp_driver_gpio esp_event esp_http_server esp_netif esp_timer esp_wifi freertos)
+    REQUIRES blip_core blip_storage esp_driver_gpio esp_event esp_http_server esp_netif esp_timer esp_wifi freertos mdns)
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/blip_component.cmake)
 blip_configure_component(${COMPONENT_LIB})
