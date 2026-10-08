@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-10-08T09:22:41.180513+00:00",
+  "passed": true,
+  "result": "failed and active consumers retain transitive providers during shutdown and startup rollback; independent cleanup and retry remain supported",
+  "source_snapshot": {
+    "v2/components/blip_core/include/blip/core/registry.hpp": "290d61804d435b7d986d78dc4d723641710c5f52e4848a0a1662a3c27bd37458",
+    "v2/tests/host/blip_core_tests.cpp": "dbacb3a8aea2efed692469b6897504afdf93bf12fa8a4e5eba3a59beec883810",
+    "docs/v2/adr/0001-component-lifecycle-and-registry.md": "52b4a080504ecefbda644573a7ad1237a4157d0dcf3d6b6f7147a2577f71a548"
+  },
+  "host_core_cases": 10,
+  "full_host_suites": 24,
+  "cases": [
+    "stop failure retains transitive providers",
+    "active callbacks retain transitive providers",
+    "partial start rollback stops failing instance and retains its providers on stop failure",
+    "independent components still stop",
+    "retry stops retained consumer before providers",
+    "successful stop remains idempotent"
+  ],
+  "host_core_executable_sha256": "a35bc1fcfacdb3b4bd841d91b74cd1099e2155fcb7da35b39707275318f27aae",
+  "host_core_run_sha256": "d88d0208435173d9224d27eb3d81b78ca6b776f8a6701e3e48535464edea6750",
+  "full_ctest_sha256": "19eb0dca8e6c2c6caf8aa65d0a61ce84b2e5a547939f83c55c145a40e0b36a95",
+  "tests_first_log_sha256": "35ae50888fc3a306cc4bb09bac01f3bd4ed7c180bb3ed0cee2299d61d18a9222",
+  "allocation_policy": "fixed bounded flags on lifecycle call stack; no additional registry object memory or heap allocation",
+  "limitations": [
+    "Host evidence establishes registry lifecycle policy, not physical provider teardown or production callback timing.",
+    "Production LED/fleet integration remains uncommitted and in qualification; ESP32/C6 tests passed while Ball timing and M5Dial serial startup need follow-up."
+  ]
+}

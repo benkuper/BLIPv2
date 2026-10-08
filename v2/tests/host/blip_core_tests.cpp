@@ -208,8 +208,38 @@ bool partial_start_cleanup_and_causes() {
     BLIP_CHECK(log[3].component == "test.a" && log[3].operation == "start");
     BLIP_CHECK(log[4].component == "test.b" && log[4].operation == "start");
     BLIP_CHECK(log[5].component == "test.c" && log[5].operation == "start");
-    BLIP_CHECK(log[6].component == "test.b" && log[6].operation == "stop");
-    BLIP_CHECK(log[7].component == "test.a" && log[7].operation == "stop");
+    BLIP_CHECK(log[6].component == "test.c" && log[6].operation == "stop");
+    BLIP_CHECK(log[7].component == "test.b" && log[7].operation == "stop");
+    BLIP_CHECK(log[8].component == "test.a" && log[8].operation == "stop");
+    return true;
+}
+
+bool failed_shutdown_retains_transitive_dependencies() {
+    constexpr std::array<std::string_view, 1> base_service{"service.base"}, owner_service{"service.owner"};
+    for (unsigned mode = 0; mode < 3; ++mode) {
+        CallLog log{};
+        TestComponent base{descriptor("test.base", base_service), log};
+        TestComponent owner{descriptor("test.owner", owner_service, base_service), log};
+        TestComponent worker{descriptor("test.worker", {}, owner_service), log};
+        TestComponent independent{descriptor("test.independent"), log};
+        Registry<4> registry{};
+        BLIP_CHECK(registry.add(worker) && registry.add(owner) && registry.add(base) && registry.add(independent));
+        BLIP_CHECK(registry.validate());
+        if (mode == 2) worker.start_status = component_error("test.worker", ErrorCode::start_failed, "start");
+        if (mode != 1) worker.stop_status = component_error("test.worker", ErrorCode::stop_failed, "stop");
+        worker.quiesced = mode != 1;
+        const auto started = registry.start_all();
+        if (mode == 2) BLIP_CHECK(!started.ok() && started.cleanup_errors.size() == 1);
+        else BLIP_CHECK(started.ok() && !registry.stop_all());
+        BLIP_CHECK(worker.stop_calls == 1 && owner.stop_calls == 0 && base.stop_calls == 0);
+        BLIP_CHECK(independent.stop_calls == 1);
+        BLIP_CHECK(registry.find("test.worker")->state == blip::core::ComponentState::stopping);
+        worker.stop_status = Status::success(); worker.quiesced = true;
+        BLIP_CHECK(registry.stop_all());
+        BLIP_CHECK(worker.stop_calls == 2 && owner.stop_calls == 1 && base.stop_calls == 1);
+        BLIP_CHECK(independent.stop_calls == 1);
+        BLIP_CHECK(registry.stop_all() && worker.stop_calls == 2);
+    }
     return true;
 }
 
@@ -408,6 +438,7 @@ int main() {
         {"missing dependency without callbacks", missing_dependency_has_no_callbacks},
         {"dependency cycle", dependency_cycle},
         {"partial start cleanup and causes", partial_start_cleanup_and_causes},
+        {"failed shutdown retains transitive providers and permits retry", failed_shutdown_retains_transitive_dependencies},
         {"lifecycle idempotence and quiescence", lifecycle_idempotence_and_quiescence},
         {"bounded extension transaction", bounded_extension_transaction},
         {"legacy alias validation and collision", legacy_alias_validation_and_dynamic_collision},

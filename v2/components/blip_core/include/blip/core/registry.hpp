@@ -183,7 +183,8 @@ class Registry final : public RegistryView {
             if (!status) {
                 entry.state = ComponentState::failed;
                 report.primary = status.error();
-                cleanup_started(started, report.cleanup_errors);
+                // A failed start can still own partial resources/callbacks.
+                cleanup_started(started + 1, report.cleanup_errors);
                 return report;
             }
             entry.state = ComponentState::running;
@@ -231,8 +232,11 @@ class Registry final : public RegistryView {
 
     [[nodiscard]] Status stop_all() noexcept {
         Error first_error{};
+        std::array<bool, MaxComponents> retained{};
         for (std::size_t reverse = entries_.size(); reverse > 0; --reverse) {
-            auto& entry = entries_[start_order_[reverse - 1]];
+            const auto index = start_order_[reverse - 1];
+            auto& entry = entries_[index];
+            if (retained[index]) continue;
             if (entry.state == ComponentState::stopped ||
                 entry.state == ComponentState::constructed ||
                 entry.state == ComponentState::validated) {
@@ -243,9 +247,14 @@ class Registry final : public RegistryView {
             if (!status && !first_error.valid()) {
                 first_error = status.error();
             }
-            if (!entry.instance->callbacks_quiesced() && !first_error.valid()) {
+            const bool quiesced = entry.instance->callbacks_quiesced();
+            if (!quiesced && !first_error.valid()) {
                 first_error = {ErrorDomain::lifecycle, ErrorCode::stop_failed, entry.descriptor->id,
                                "registry.stop_all", "callbacks-active"};
+            }
+            if (!status || !quiesced) {
+                retain_dependencies(index, retained);
+                continue; // Keep stopping state so shutdown can be retried.
             }
             entry.state = ComponentState::stopped;
         }
@@ -603,20 +612,41 @@ class Registry final : public RegistryView {
         return Status::success();
     }
 
+    void retain_dependencies(std::size_t consumer, std::array<bool, MaxComponents>& retained) const noexcept {
+        retained[consumer] = true;
+        // Providers precede consumers. One reverse pass also marks their providers.
+        for (std::size_t reverse = entries_.size(); reverse > 0; --reverse) {
+            const auto index = start_order_[reverse - 1];
+            if (!retained[index]) continue;
+            for (const auto service : entries_[index].descriptor->required_services) {
+                const auto provider = provider_index(service);
+                if (provider >= 0) retained[static_cast<std::size_t>(provider)] = true;
+            }
+        }
+    }
+
     void cleanup_started(std::size_t started,
                          FixedVector<Error, MaxComponents>& cleanup_errors) noexcept {
+        std::array<bool, MaxComponents> retained{};
         while (started > 0) {
             --started;
-            auto& entry = entries_[start_order_[started]];
+            const auto index = start_order_[started];
+            auto& entry = entries_[index];
+            if (retained[index]) continue;
             entry.state = ComponentState::stopping;
             const auto status = entry.instance->stop();
             if (!status) {
                 static_cast<void>(cleanup_errors.push_back(status.error()));
             }
-            if (!entry.instance->callbacks_quiesced()) {
+            const bool quiesced = entry.instance->callbacks_quiesced();
+            if (!quiesced) {
                 static_cast<void>(cleanup_errors.push_back(
                     {ErrorDomain::lifecycle, ErrorCode::stop_failed, entry.descriptor->id,
                      "registry.cleanup", "callbacks-active"}));
+            }
+            if (!status || !quiesced) {
+                retain_dependencies(index, retained);
+                continue;
             }
             entry.state = ComponentState::stopped;
         }

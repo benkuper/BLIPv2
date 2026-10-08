@@ -50,8 +50,12 @@ Rules:
    so host and device runs are reproducible.
 4. `start` receives only declared service/capability handles and granted resource
    leases. It must be safe to call once after successful validation.
-5. On start failure, already-started components stop in exact reverse start
-   order. The original error remains primary; cleanup errors are attached.
+5. On start failure, the failing instance is stopped first to clean up partial
+   resources, then already-started components stop in reverse start order.
+   The original error remains primary; cleanup errors are attached. If stop
+   fails or callbacks remain active, retain that consumer and its transitive
+   providers. Independent components can still stop. Retained instances remain
+   in `stopping` so shutdown can be retried without restarting them.
 6. `suspend` stops externally visible work without implying memory reclamation.
    It is idempotent. A descriptor states whether resume is supported.
 7. `stop` is idempotent, cancels producers, drains or discards bounded work by
@@ -82,3 +86,8 @@ validation without side effects, failure cleanup, cleanup error attachment,
 idempotent suspend/resume/stop, callback quiescence, and bounded dynamic registry
 extension are mandatory in work packages 1.2 and 1.3.
 
+The 2026-10-08 [dependency retention evidence](../evidence/core/2026-10-08-provider-shutdown.json)
+adds stop-error, active-callback and partial-start scenarios with transitive
+providers, independent cleanup, retry and idempotence. This closes a registry
+lifetime gap encountered while integrating component-owned WASM providers;
+it does not establish the providers' hardware or timing qualification.
