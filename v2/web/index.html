@@ -19,15 +19,19 @@
           <span id="connection-dot" class="connection-dot"></span>
           <span id="connection-status">Offline</span>
         </div>
+        <nav class="mode-switch" aria-label="Interface mode">
+          <button id="simple-mode" type="button" aria-pressed="true">Simple</button>
+          <button id="advanced-mode" type="button" aria-pressed="false">Advanced</button>
+        </nav>
       </header>
 
       <main>
         <section class="hero" aria-labelledby="device-name">
           <div>
             <p class="eyebrow">Device control</p>
-            <h1 id="device-name">Find your signal.</h1>
+            <h1 id="device-name">Your BLIP.<br>Your signal.</h1>
             <p id="device-meta" class="device-meta">
-              Connect to a BLIP device to build its controls from the live registry.
+              Light, motion and everything in between. Connect to get started.
             </p>
           </div>
           <button id="connect-button" class="primary-button" type="button">Connect</button>
@@ -39,16 +43,16 @@
             <span class="search-glyph" aria-hidden="true"></span>
             <input id="control-search" type="search" placeholder="Search controls" />
           </label>
-          <label class="toggle-field">
-            <input id="show-config" type="checkbox" checked />
-            <span>Configuration</span>
-          </label>
+          <span id="mode-description" class="mode-description">Main controls & live readings</span>
         </section>
+
+        <nav id="topics" class="topic-nav" aria-label="Control topics" hidden></nav>
+        <div class="section-intro"><h2 id="controls-heading">At a glance</h2><p id="sample-status" role="status">Waiting for your device</p></div>
 
         <p id="notice" class="notice" role="status" hidden></p>
         <section id="controls" class="control-grid" aria-label="Device controls"></section>
 
-        <section class="firmware-panel" aria-labelledby="reservations-heading">
+        <section class="firmware-panel advanced-only" aria-labelledby="reservations-heading" hidden>
           <div>
             <p class="eyebrow">Board resources</p>
             <h2 id="reservations-heading">Pin reservations</h2>
@@ -61,11 +65,12 @@
           <div id="reservations" aria-live="polite"></div>
         </section>
 
-        <section class="firmware-panel" aria-labelledby="firmware-heading">
+        <section class="firmware-panel advanced-only" aria-labelledby="firmware-heading" hidden>
           <div>
             <p class="eyebrow">Maintenance</p>
             <h2 id="firmware-heading">Firmware update</h2>
-            <p>Upload a target-matched ESP-IDF application image. The device validates its metadata and SHA-256 before switching OTA slots.</p>
+            <p>Choose an application image for your device. It will restart after the update is accepted.</p>
+            <a class="setup-link" href="/setup">Wi-Fi setup & recovery</a>
           </div>
           <div class="firmware-form">
             <label>
@@ -95,6 +100,6 @@
       </article>
     </template>
 
-    <script type="module" src="./src/app.js"></script>
+    <script type="module" src="./src/boot.js"></script>
   </body>
 </html>

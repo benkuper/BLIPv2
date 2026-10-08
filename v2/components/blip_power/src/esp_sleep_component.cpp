@@ -11,6 +11,7 @@
 namespace blip::power {
 namespace {
 constexpr std::array<std::string_view, 1> kServices{"power.sleep"};
+constexpr std::array<core::MetadataEntry, 1> kMetadata{{{"ui_topic", "Power & sensors"}}};
 constexpr std::array<std::string_view, 2> kDependencies{"transport.wifi", "output.pixel-strip"};
 constexpr std::array<core::ParameterDescriptor, 7> kParameters{{
     {"state", "Sleep state", core::ValueType::integer, core::Access::read_only, false,
@@ -43,6 +44,7 @@ constexpr std::array<core::ActionDescriptor, 2> kActions{{
     descriptor.display_name = "HUZZAH32 timed sleep";
     descriptor.description = "Manual light/deep sleep with mandatory timer wake and idle radio/LED preconditions";
     descriptor.provided_services = kServices;
+    descriptor.metadata = kMetadata;
     descriptor.required_services = kDependencies;
     descriptor.parameters = kParameters;
     descriptor.actions = kActions;

@@ -13,6 +13,8 @@
 namespace blip::fleet {
 namespace {
 constexpr std::uint8_t kBroadcast[6]{255, 255, 255, 255, 255, 255};
+constexpr std::array<core::MetadataEntry, 2> kMetadata{{
+    {"ui_topic", "Fleet"}, {"ui_primary", "enabled,active,synchronized,is_leader"}}};
 #if defined(BLIP_FLEET_WASM)
 constexpr std::array<std::string_view, 2> kProvided{"fleet.coordination", "blip.fleet.v1"};
 using WT = core::WasmValueType;
@@ -95,6 +97,7 @@ constexpr core::ComponentDescriptor make_descriptor() {
     result.display_name = "Fleet coordination";
     result.description = "Routerless ESP-NOW broadcast clock and scheduled control commands";
     result.provided_services = kProvided;
+    result.metadata = kMetadata;
     result.required_services = kRequired;
     result.parameters = kParameters;
     result.actions = kActions;

@@ -35,7 +35,9 @@ export class DeviceClient {
       throw new TypeError("Browser fetch and WebSocket support are required");
     }
     this.root = deviceRoot(baseUrl);
-    this.fetchImpl = fetchImpl;
+    // Window.fetch requires the Window receiver in browsers. Calling a stored
+    // native fetch as this.fetchImpl otherwise binds it to DeviceClient.
+    this.fetchImpl = fetchImpl.bind(globalThis);
     this.WebSocketImpl = WebSocketImpl;
     this.socket = null;
   }
@@ -72,6 +74,11 @@ export class DeviceClient {
     }
     if (!response.ok) throw new Error(`Device rejected reassignment (HTTP ${response.status})`);
     return boundedJson(response, MAX_RESOURCE_BYTES);
+  }
+
+  async loadTree() {
+    const url = new URL(this.root); url.search = "config=1";
+    return boundedJson(await this.fetchImpl(url, { cache: "no-store" }), MAX_TREE_BYTES);
   }
 
   open({ onMessage, onState, onError } = {}) {

@@ -37,6 +37,7 @@ wire protocols, or public OSC paths.
 | [3.5](3.5-browser-installer.md) | Browser-compatible factory artifacts and on-device firmware update flow |
 | [3.6](3.6-pin-reservation-ui.md) | Complete pin/reservation inspection with conflict-safe reassignment and shared-bus handling |
 | [3.7–3.9](3.7-device-web-and-self-update.md) | Required Simple/Advanced graphical web app and device-specific firmware/web self-updates; implementation pending |
+| [3.7 browser foundation](3.7-simple-advanced-foundation.md) | Simple/Advanced modes, real graphs and automatic script-schema refresh; seven builds and three-family device-served browser trials passed; remaining diagnostic/scalar surfaces and self-updates open |
 
 ## Milestone 4
 

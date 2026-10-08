@@ -15,8 +15,9 @@ namespace blip::artnet {
 namespace {
 constexpr std::array<std::string_view, 1> kProvided{"input.pixel-stream.artnet"};
 constexpr std::array<std::string_view, 2> kRequired{"transport.wifi", "output.pixel-strip"};
-constexpr std::array<core::MetadataEntry, 3> kMetadata{
-    {{"udp_port", "6454"}, {"protocol", "Art-Net-4"}, {"optional", "true"}}};
+constexpr std::array<core::MetadataEntry, 4> kMetadata{{
+    {"ui_topic", "Lighting inputs"}, {"udp_port", "6454"},
+    {"protocol", "Art-Net-4"}, {"optional", "true"}}};
 constexpr std::array<core::ParameterDescriptor, 4> kParameters{{
     {"port",
      "Art-Net UDP port",

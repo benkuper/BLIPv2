@@ -11,6 +11,13 @@ class ClosedSocket {
   close() {}
 }
 
+test("native fetch keeps its global receiver for polling and connection", async () => {
+  const client = new DeviceClient({ baseUrl: "http://192.0.2.8", WebSocketImpl: ClosedSocket,
+    fetchImpl: function () { assert.equal(this, globalThis); return Promise.resolve(response({ CONTENTS: {} })); } });
+  await client.load();
+  await client.loadTree();
+});
+
 function response(value) {
   return new Response(JSON.stringify(value), {
     status: 200,

@@ -9,6 +9,12 @@ function text(value, fallback = "") {
   return typeof value === "string" && value.length > 0 ? value : fallback;
 }
 
+function defaultTopic(id) {
+  const namespace = id.split(".")[1];
+  return ({ transport: "Connectivity", storage: "Storage", power: "Power & sensors",
+    input: "Lighting inputs", output: "Lighting", control: "System", diagnostics: "System" })[namespace] ?? "Components";
+}
+
 function typeFromTag(tag) {
   switch (tag) {
     case "T":
@@ -134,6 +140,7 @@ function normalizeControl(key, node, parentPath) {
     range: normalizeRange(node),
     unit: text(node.BLIP_UNIT),
     resourceSelector: normalizeResourceSelector(node),
+    dynamic: node.BLIP_DYNAMIC === true,
   };
   control.editor = control.resourceSelector?.class === "gpio" ? "pin" : editorFor(control);
   return control;
@@ -167,7 +174,14 @@ export function buildControlModel(tree) {
     }
     if (controls.length > 0) {
       const componentId = text(node.BLIP_COMPONENT_ID, path || key || "root");
-      for (const control of controls) control.resourceOwner = `${componentId}:${control.id}`;
+      const ui = isRecord(node.BLIP_UI) ? node.BLIP_UI : {};
+      const primary = new Set(text(ui.PRIMARY).split(",").map(id => id.trim()).filter(Boolean));
+      const gauges = new Set(text(ui.GAUGES).split(",").map(id => id.trim()).filter(Boolean));
+      for (const control of controls) {
+        control.resourceOwner = `${componentId}:${control.id}`;
+        control.primary = primary.has(control.id) || control.dynamic;
+        control.gauge = gauges.has(control.id);
+      }
       components.push({
         id: componentId,
         path,
@@ -175,6 +189,8 @@ export function buildControlModel(tree) {
         description: text(node.BLIP_DESCRIPTION),
         schemaVersion: Number.isInteger(node.BLIP_SCHEMA_VERSION) ? node.BLIP_SCHEMA_VERSION : null,
         disablePolicy: text(node.BLIP_DISABLE_POLICY),
+        topic: text(ui.TOPIC, defaultTopic(componentId)),
+        schemaGeneration: Number.isInteger(node.BLIP_SCHEMA_GENERATION) ? node.BLIP_SCHEMA_GENERATION : 0,
         controls,
       });
     }
@@ -183,6 +199,28 @@ export function buildControlModel(tree) {
   visit("root", tree, 0);
   components.sort((left, right) => left.path.localeCompare(right.path));
   return { components, index };
+}
+
+export function presentationModel(model, mode = "simple", topic = "All") {
+  const components = model.components.filter(component => topic === "All" || component.topic === topic)
+    .map(component => ({ ...component, controls: component.controls.filter(control => mode === "advanced" || control.primary) }))
+    .filter(component => component.controls.length);
+  return { components, index: new Map(components.flatMap(component => component.controls.map(control => [control.path, control]))) };
+}
+
+export function modelShapeKey(model) {
+  return JSON.stringify(model.components.map(component => ({ ...component,
+    controls: component.controls.map(({ value, ...control }) => control) })),
+    (key, value) => key === "tags" ? value.map(tag => tag === "T" || tag === "F" ? "b" : tag) :
+      key === "tag" && (value === "T" || value === "F") ? "b" : value);
+}
+
+export function sparklinePoints(samples) {
+  const values = samples.filter(Number.isFinite);
+  if (values.length < 2) return "";
+  const minimum = Math.min(...values), maximum = Math.max(...values);
+  return values.map((value, index) => `${Math.round(index * 120 / (values.length - 1))},${
+    maximum === minimum ? 24 : Math.round(46 - (value - minimum) * 44 / (maximum - minimum))}`).join(" ");
 }
 
 export function filterControlModel(model, query) {

@@ -42,7 +42,7 @@ constexpr std::array parameters{
     integer("last_error_code", "Last request error code"), integer("last_elapsed_us", "Last request duration", "us"),
     integer("pool_reserved", "Reserved engine pool", "bytes"), integer("pool_used", "Used engine pool", "bytes"),
     integer("pool_peak", "Peak engine pool use", "bytes"),
-    integer("buffer_reserved", "Fixed script buffer reservation", "bytes"),
+    integer("buffer_reserved", "Current script buffer reservation", "bytes"),
     integer("native_calls", "Native capability calls"), integer("native_failures", "Native capability failures"),
     integer("native_maximum_us", "Largest native callback wall duration", "us"),
     integer("native_last_us", "Last native callback wall duration", "us"),
@@ -62,10 +62,11 @@ constexpr std::array<core::ActionDescriptor, 9> actions{{
     {"call_i32", "Queue an export with one i32 argument", i32_fields}, {"unload", "Queue module unload", {}},
     {"cancel_all", "Cancel active and queued work", {}}, {"completion", "Read request completion", completion_fields},
     {"result", "Read typed result bits", result_fields}}};
-constexpr std::array<core::MetadataEntry, 7> metadata{{
+constexpr std::array<core::MetadataEntry, 9> metadata{{
+    {"ui_topic", "Scripts"}, {"ui_primary", "state"},
     {"worker_priority", "2"}, {"supervisor_priority", "6"}, {"core_affinity", "none"},
     {"queue_capacity", "8"}, {"completion_capacity", "16"}, {"overflow_policy", "reject-new"},
-    {"cost_ram_policy", "fixed startup buffers plus object; task stacks excluded"}}};
+    {"cost_ram_policy", "fixed pool plus bounded upload maximum and object; task stacks excluded"}}};
 constexpr core::ComponentDescriptor make_descriptor() {
     core::ComponentDescriptor d{};
     d.schema_version = 1; d.id = "blip.wasm"; d.display_name = "WASM scripts";

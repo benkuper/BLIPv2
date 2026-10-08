@@ -10,7 +10,8 @@ namespace blip::e131 {
 namespace {
 constexpr std::array<std::string_view, 1> kProvided{"input.pixel-stream.e131"};
 constexpr std::array<std::string_view, 2> kRequired{"transport.wifi", "output.pixel-strip"};
-constexpr std::array<core::MetadataEntry, 4> kMetadata{{
+constexpr std::array<core::MetadataEntry, 5> kMetadata{{
+    {"ui_topic", "Lighting inputs"},
     {"udp_port", "5568"}, {"universe", "1"}, {"maximum_sources", "2"},
     {"merge", "highest-priority-then-HTP"},
 }};

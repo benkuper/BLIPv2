@@ -1,6 +1,7 @@
 #include "blip/network/esp_wifi_component.hpp"
 
 #include "blip/network/provisioning_form.hpp"
+#include "blip/network/http_route.hpp"
 #include "driver/gpio.h"
 #include "esp_err.h"
 #include "esp_heap_caps.h"
@@ -91,7 +92,8 @@ constexpr std::array<core::LegacyParameterAlias, 7> kLegacyParameters{{
     {"tx_power", "txPower", "Tx Power", core::ValueType::string, kLegacyTxPowerValues},
     {"protocol", "wifiProtocol", "Wifi Protocol", core::ValueType::string, kLegacyProtocolValues},
 }};
-constexpr std::array<core::MetadataEntry, 6> kMetadata{{
+constexpr std::array<core::MetadataEntry, 8> kMetadata{{
+    {"ui_topic", "Connectivity"}, {"ui_primary", "ip_address,setup_ap_active"},
     {"legacy_path", "/wifi"},
     {"radio", "2.4GHz Wi-Fi"},
     {"provisioning", "serial-or-softap"},
@@ -1492,14 +1494,7 @@ esp_err_t EspWifiComponent::handle_root(httpd_req_t* request) noexcept {
     const int socket = httpd_req_to_sockfd(request);
     const bool websocket =
         socket >= 0 && httpd_ws_get_fd_info(request->handle, socket) == HTTPD_WS_CLIENT_WEBSOCKET;
-    const bool query = httpd_req_get_url_query_len(request) != 0U;
-    const bool root = std::string_view{request->uri} == "/";
-    std::array<char, 256> accept{};
-    const bool html =
-        httpd_req_get_hdr_value_str(request, "Accept", accept.data(), accept.size()) == ESP_OK &&
-        std::string_view{accept.data()}.find("text/html") != std::string_view::npos;
-    if (delegate != nullptr &&
-        (websocket || query || !root || !public_ap_active_.load() || !html)) {
+    if (!use_setup_portal(delegate != nullptr, request->uri, websocket)) {
         return delegate->handle_http_root(request);
     }
     httpd_resp_set_type(request, "text/html; charset=utf-8");

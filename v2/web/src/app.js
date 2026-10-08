@@ -1,5 +1,5 @@
 import { DeviceClient, deviceUrlFromLocation } from "./client.js";
-import { buildControlModel, describeHost } from "./model.js";
+import { buildControlModel, describeHost, presentationModel, modelShapeKey } from "./model.js";
 import { normalizeResourceSnapshot } from "./resources.js";
 import { ControlView, ReservationView } from "./view.js";
 import { uploadFirmware } from "./firmware.js";
@@ -13,7 +13,10 @@ const deviceName = document.querySelector("#device-name");
 const deviceMeta = document.querySelector("#device-meta");
 const notice = document.querySelector("#notice");
 const search = document.querySelector("#control-search");
-const showConfig = document.querySelector("#show-config");
+const simpleButton = document.querySelector("#simple-mode");
+const advancedButton = document.querySelector("#advanced-mode");
+const topicsRoot = document.querySelector("#topics");
+const sampleStatus = document.querySelector("#sample-status");
 const firmwareFile = document.querySelector("#firmware-file");
 const firmwareTarget = document.querySelector("#firmware-target");
 const firmwareButton = document.querySelector("#firmware-button");
@@ -22,6 +25,61 @@ const reservationsRoot = document.querySelector("#reservations");
 const reservationSearch = document.querySelector("#reservation-search");
 
 let client = null;
+let mode = "simple", topic = "All", model = { components: [], index: new Map() };
+let shape = "", refreshTimer, refreshFailures = 0;
+
+function present() {
+  view.setMode(mode);
+  view.setModel(presentationModel(model, mode, topic));
+  simpleButton.setAttribute("aria-pressed", String(mode === "simple"));
+  advancedButton.setAttribute("aria-pressed", String(mode === "advanced"));
+  document.querySelector("#mode-description").textContent = mode === "simple" ? "Main controls & live readings" : "All parameters, organized by component";
+  document.querySelector("#controls-heading").textContent = mode === "simple" ? "At a glance" : "Device configuration";
+  for (const panel of document.querySelectorAll(".advanced-only")) panel.hidden = mode !== "advanced";
+  topicsRoot.hidden = mode !== "advanced";
+  topicsRoot.replaceChildren();
+  for (const label of ["All", ...new Set(model.components.map(component => component.topic))]) {
+    const button = document.createElement("button"); button.type = "button";
+    button.textContent = label; button.setAttribute("aria-pressed", String(topic === label));
+    button.addEventListener("click", () => { topic = label; present(); }); topicsRoot.append(button);
+  }
+}
+
+function receive(message) {
+  const control = model.index.get(message.address);
+  if (control?.kind === "parameter" && message.values.length === 1) control.value = message.values[0].value;
+  view.applyMessage(message);
+}
+
+function scheduleRefresh(current) {
+  clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(async () => {
+    if (client !== current) return;
+    if (document.hidden) { scheduleRefresh(current); return; }
+    try {
+      const updated = buildControlModel(await current.loadTree());
+      if (client !== current) return;
+      const nextShape = modelShapeKey(updated);
+      if (nextShape !== shape) {
+        model = updated; shape = nextShape;
+        if (!model.components.some(component => component.topic === topic)) topic = "All";
+        present();
+      } else {
+        for (const control of updated.index.values()) {
+          if (control.readable && control.kind === "parameter" && control.value !== undefined)
+            receive({ address: control.path, values: [{ type: control.type, value: control.value }] });
+        }
+      }
+      refreshFailures = 0;
+      sampleStatus.textContent = `Readings updated ${new Date().toLocaleTimeString()} · every 3 seconds`;
+    } catch {
+      if (client !== current) return;
+      refreshFailures++;
+      sampleStatus.textContent = "Readings unavailable · retrying";
+    }
+    if (client === current) scheduleRefresh(current);
+  }, Math.min(30000, 3000 * 2 ** Math.min(refreshFailures, 4)));
+}
 
 function setConnection(state, label) {
   connectionDot.dataset.state = state;
@@ -69,23 +127,28 @@ async function connect() {
   try {
     client?.close();
     client = new DeviceClient({ baseUrl: deviceUrlFromLocation() });
-    const { host, tree, resources } = await client.load(showConfig.checked);
+    clearTimeout(refreshTimer);
+    const current = client;
+    const { host, tree, resources } = await current.load(true);
     const identity = describeHost(host);
-    const model = buildControlModel(tree);
+    model = buildControlModel(tree); shape = modelShapeKey(model);
     const resourceSnapshot = normalizeResourceSnapshot(resources);
     deviceName.textContent = identity.name;
     deviceMeta.textContent = `${identity.type} · ${identity.id} · firmware ${identity.version}`;
-    view.setModel(model);
     view.setResources(resourceSnapshot);
     reservationView.setSnapshot(resourceSnapshot);
-    client.open({
-      onMessage: (message) => view.applyMessage(message),
+    present();
+    current.open({
+      onMessage: receive,
       onState: (state) => {
         setConnection(state, state === "online" ? "Live" : "Offline");
         connectButton.textContent = state === "online" ? "Reconnect" : "Connect";
       },
       onError: showError,
     });
+    refreshFailures = 0;
+    sampleStatus.textContent = "Live readings · sampled every 3 seconds";
+    scheduleRefresh(current);
   } catch (error) {
     showError(error);
     connectButton.textContent = "Retry";
@@ -95,10 +158,12 @@ async function connect() {
 }
 
 connectButton.addEventListener("click", connect);
-showConfig.addEventListener("change", connect);
+simpleButton.addEventListener("click", () => { mode = "simple"; topic = "All"; present(); });
+advancedButton.addEventListener("click", () => { mode = "advanced"; topic = "All"; present(); });
 search.addEventListener("input", () => view.setFilter(search.value));
 reservationSearch.addEventListener("input", () => reservationView.setFilter(reservationSearch.value));
 view.setModel({ components: [], index: new Map() });
+present();
 
 firmwareButton.addEventListener("click", async () => {
   const file = firmwareFile.files?.[0];

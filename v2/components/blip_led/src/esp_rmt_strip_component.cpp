@@ -99,7 +99,9 @@ constexpr std::array<core::ResourceRequest, 1> kResources{{
      0U, 0x02U, 0U, false},
 }};
 #endif
-constexpr std::array<core::MetadataEntry, 8> kMetadata{{
+constexpr std::array<core::MetadataEntry, 10> kMetadata{{
+    {"ui_topic", "Lighting"},
+    {"ui_primary", "enabled,brightness,red,green,blue,white,estimated_current_ma"},
     {"backend", kClockedBoard ? "esp-spi-dma" : "native-rmt"},
     {"qualification", "ADR-0007"},
     {"lane_count", "1"},

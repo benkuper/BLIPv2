@@ -1,4 +1,4 @@
-import { coerceControlValue, filterControlModel } from "./model.js";
+import { coerceControlValue, filterControlModel, sparklinePoints } from "./model.js";
 import { buildReassignment, filterPins, pinOutcome } from "./resources.js";
 
 function element(document, tag, className, content) {
@@ -51,10 +51,13 @@ export class ControlView {
     this.query = "";
     this.rows = new Map();
     this.resources = null;
+    this.mode = "advanced";
+    this.samples = new Map();
   }
 
   setModel(model) {
     this.model = model;
+    for (const path of this.samples.keys()) if (!model.index.has(path)) this.samples.delete(path);
     this.render();
   }
 
@@ -62,6 +65,8 @@ export class ControlView {
     this.query = query;
     this.render();
   }
+
+  setMode(mode) { this.mode = mode; this.root.dataset.mode = mode; this.render(); }
 
   setResources(resources) {
     this.resources = resources;
@@ -82,9 +87,10 @@ export class ControlView {
   componentCard(component) {
     const card = element(this.document, "article", "component-card");
     const header = element(this.document, "header", "component-header");
+    header.append(element(this.document, "p", "eyebrow", component.topic));
     header.append(element(this.document, "h2", "", component.label));
-    header.append(element(this.document, "p", "component-path", component.path));
-    if (component.description) {
+    if (this.mode === "advanced") header.append(element(this.document, "p", "component-path", component.path));
+    if (component.description && this.mode === "advanced") {
       header.append(element(this.document, "p", "component-description", component.description));
     }
     card.append(header);
@@ -99,7 +105,7 @@ export class ControlView {
     row.dataset.path = control.path;
     const copy = element(this.document, "div", "control-copy");
     copy.append(element(this.document, "span", "control-label", control.label));
-    copy.append(element(this.document, "span", "control-hint", control.path));
+    if (this.mode === "advanced") copy.append(element(this.document, "span", "control-hint", control.path));
     row.append(copy);
     const editor = element(this.document, "div", "control-editor");
     row.append(editor);
@@ -122,6 +128,22 @@ export class ControlView {
           displayValue(control.value === undefined ? [] : [{ value: control.value }], "—"),
         ),
       );
+      if (control.unit) editor.append(element(this.document, "span", "unit", control.unit));
+      if (this.mode === "simple" && (control.type === "number" || control.type === "integer")) {
+        const graph = this.document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        graph.setAttribute("viewBox", "0 0 120 48");
+        graph.setAttribute("role", "img");
+        graph.setAttribute("aria-label", `${control.label}: recent readings`);
+        graph.classList.add("sensor-trend");
+        const line = this.document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        graph.append(line); editor.append(graph);
+        if (control.gauge && control.range.minimum !== undefined && control.range.maximum > control.range.minimum) {
+          const meter = element(this.document, "meter", "sensor-meter");
+          meter.min = control.range.minimum; meter.max = control.range.maximum;
+          meter.setAttribute("aria-label", control.label); editor.append(meter);
+        }
+        this.updateGraph(editor, control, control.value, false);
+      }
       return;
     }
     if (control.editor === "action") {
@@ -162,6 +184,13 @@ export class ControlView {
       if (control.range.minimum !== undefined) input.min = String(control.range.minimum);
       if (control.range.maximum !== undefined) input.max = String(control.range.maximum);
       if (control.range.step !== undefined) input.step = String(control.range.step);
+      if (this.mode === "simple" && control.editor === "number" && control.range.minimum !== undefined &&
+          control.range.maximum > control.range.minimum) {
+        input.type = "range";
+        const reading = element(this.document, "output", "slider-value", String(control.value ?? input.value));
+        input.addEventListener("input", () => { reading.textContent = input.value; });
+        editor.append(reading);
+      }
     }
     input.dataset.valueType = control.type;
     const form = element(this.document, "form", "control-editor");
@@ -279,9 +308,22 @@ export class ControlView {
     const value = message.values[0].value;
     if (entry.control.kind === "parameter") entry.control.value = value;
     const input = entry.editor.querySelector("input, select");
-    if (input === null || entry.control.editor === "password") return;
+    this.updateGraph(entry.editor, entry.control, value);
+    if (input === null || entry.control.editor === "password" || this.document.activeElement === input) return;
     if (input.type === "checkbox") input.checked = value === true;
     else input.value = String(value);
+  }
+
+  updateGraph(editor, control, value, append = true) {
+    if (!Number.isFinite(value)) return;
+    const line = editor.querySelector("polyline");
+    if (!line) return;
+    const samples = this.samples.get(control.path) ?? [];
+    if (append || !samples.length) samples.push(value); if (samples.length > 30) samples.shift();
+    this.samples.set(control.path, samples);
+    line.setAttribute("points", sparklinePoints(samples));
+    const meter = editor.querySelector("meter");
+    if (meter) meter.value = value;
   }
 }
 

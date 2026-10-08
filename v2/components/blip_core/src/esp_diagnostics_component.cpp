@@ -20,6 +20,8 @@ namespace {
 
 constexpr char kTag[] = "blip_diagnostics";
 constexpr std::array<std::string_view, 1> kProvidedServices{"diagnostics.runtime"};
+constexpr std::array<MetadataEntry, 2> kMetadata{{
+    {"ui_topic", "System"}, {"ui_primary", "heap_free_internal"}}};
 constexpr std::array<ParameterDescriptor, 6> kParameters{{
     {"log_level",
      "Default log level",
@@ -70,6 +72,7 @@ RTC_NOINIT_ATTR alignas(4) std::array<std::byte, kBootLedgerBytes> rtc_boot_ledg
     descriptor.display_name = "Runtime diagnostics";
     descriptor.description = "Bounded logs, metrics, reset/coredump reporting, and safe mode";
     descriptor.provided_services = kProvidedServices;
+    descriptor.metadata = kMetadata;
     descriptor.parameters = kParameters;
     descriptor.actions = kActions;
     descriptor.diagnostics = kDiagnostics;

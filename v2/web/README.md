@@ -5,12 +5,22 @@ the device's live OSCQuery tree. It contains no component IDs, OSC paths, or
 component-specific panels. Registry additions therefore appear without web
 source changes.
 
-The shell fetches `/?HOST_INFO` and `/?config=1` (or `config=0`), then controls
+Simple mode opens by default with component-declared main controls, switches,
+sliders and real recent-reading graphs/meters. Advanced exposes all published
+controls plus resource assignments, with topics and search. Component hints and
+the remaining scope are in [ADR-0018](../../docs/v2/adr/0018-device-web-presentation.md).
+
+The app fetches `/?HOST_INFO` and `/?config=1`, then controls
 the device through binary OSC messages on the root WebSocket. Parameters render
 as booleans, numbers, strings, password fields, enumerated selects, or read-only
 values. Actions render argument fields from `BLIP_FIELDS`; events render as live
 values. All labels are inserted with `textContent`, write-only values are never
 displayed, and protocol/schema inputs are bounded.
+
+Visible pages poll every three seconds with backoff, refresh dynamic schema
+generations and preserve focused input drafts during value updates. Module
+startup is sequential to fit the device's four HTTP sessions. The home page
+works on station/AP; `/setup` keeps independent Wi-Fi recovery available.
 
 ## Local use
 

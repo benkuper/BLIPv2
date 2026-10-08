@@ -21,7 +21,8 @@ constexpr char kTag[] = "blip_oscquery";
 constexpr std::array<std::string_view, 2> kProvidedServices{"transport.osc", "discovery.oscquery"};
 constexpr std::array<std::string_view, 4> kRequiredServices{"control.dispatch", "network.http",
                                                             "storage.web_assets", "firmware.ota"};
-constexpr std::array<core::MetadataEntry, 4> kMetadata{{
+constexpr std::array<core::MetadataEntry, 5> kMetadata{{
+    {"ui_topic", "Connectivity"},
     {"legacy_path", "/comm/osc"},
     {"osc_transport", "udp"},
     {"osc_port", "9000"},
@@ -152,7 +153,10 @@ class HttpChunkSink final : public TextSink, public resources::SnapshotSink {
 };
 
 [[nodiscard]] bool request_accepts_html(httpd_req_t* request) noexcept {
-    std::array<char, 128> accept{};
+    // Current browsers advertise HTML plus several image/media formats. Their
+    // normal navigation header exceeds 128 bytes; keep parsing bounded without
+    // misrouting a browser navigation to the OSCQuery JSON surface.
+    std::array<char, 256> accept{};
     const std::size_t size = httpd_req_get_hdr_value_len(request, "Accept");
     return size != 0U && size < accept.size() &&
            httpd_req_get_hdr_value_str(request, "Accept", accept.data(), accept.size()) == ESP_OK &&

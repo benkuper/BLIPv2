@@ -11,7 +11,8 @@ namespace {
 constexpr char kTag[] = "blip_ota";
 constexpr std::array<std::string_view, 1> kProvidedServices{"firmware.ota"};
 constexpr std::array<std::string_view, 1> kRequiredServices{"diagnostics.runtime"};
-constexpr std::array<core::MetadataEntry, 3> kMetadata{{
+constexpr std::array<core::MetadataEntry, 4> kMetadata{{
+    {"ui_topic", "Updates"},
     {"protocol", "raw-esp-image-v1"},
     {"rollback", "bootloader-confirmation"},
     {"signature", "esp-idf-policy"},

@@ -1,5 +1,6 @@
 #include "blip/network/provisioning_form.hpp"
 #include "blip/network/wifi_config.hpp"
+#include "blip/network/http_route.hpp"
 #include "blip/network/wifi_state_machine.hpp"
 #include "blip/storage/imported_settings.hpp"
 
@@ -272,8 +273,19 @@ bool autonomous_radio_has_no_association_retry_or_access_point() {
 
 } // namespace
 
+bool setup_portal_and_app_routing() {
+    BLIP_CHECK(!blip::network::use_setup_portal(true, "/"));
+    BLIP_CHECK(!blip::network::use_setup_portal(true, "/?HOST_INFO"));
+    BLIP_CHECK(!blip::network::use_setup_portal(true, "/index.html"));
+    BLIP_CHECK(blip::network::use_setup_portal(true, "/setup?retry=1"));
+    BLIP_CHECK(blip::network::use_setup_portal(false, "/"));
+    BLIP_CHECK(!blip::network::use_setup_portal(true, "/", true));
+    return true;
+}
+
 int main() {
     const std::array tests{
+        setup_portal_and_app_routing,
         native_config_round_trip_and_corruption,
         config_validation_rejects_unsafe_credentials_and_addresses,
         version_one_native_settings_migrate_to_board_default_antenna,

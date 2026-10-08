@@ -20,7 +20,8 @@ namespace {
 using namespace blip::core;
 using namespace blip::oscquery;
 
-constexpr std::array<MetadataEntry, 1> kMetadata{{{"legacy_path", "/leds/strip1"}}};
+constexpr std::array<MetadataEntry, 4> kMetadata{{{"legacy_path", "/leds/strip1"},
+    {"ui_topic", "Lighting"}, {"ui_primary", "brightness,level"}, {"ui_gauges", "level"}}};
 constexpr std::array<ParameterDescriptor, 4> kParameters{{
     {"brightness",
      "Brightness",
@@ -304,6 +305,7 @@ bool oscquery_is_registry_derived_and_filters_config() {
     BLIP_CHECK(complete.value.find("\"VALUE\":[0.75]") != std::string::npos);
     BLIP_CHECK(complete.value.find("\"RANGE\":[{\"MIN\":0,\"MAX\":1}]") != std::string::npos);
     BLIP_CHECK(complete.value.find("\"BLIP_KIND\":\"component\"") != std::string::npos);
+    BLIP_CHECK(complete.value.find("\"BLIP_UI\":{\"TOPIC\":\"Lighting\",\"PRIMARY\":\"brightness,level\",\"GAUGES\":\"level\"}") != std::string::npos);
     BLIP_CHECK(complete.value.find("\"BLIP_COMPONENT_ID\":\"blip.test_strip\"") !=
                std::string::npos);
     BLIP_CHECK(complete.value.find("\"BLIP_KIND\":\"parameter\"") != std::string::npos);
@@ -326,7 +328,7 @@ bool oscquery_is_registry_derived_and_filters_config() {
 
     StringSink filtered{};
     BLIP_CHECK(write_oscquery_tree(registry, controls, false, filtered));
-    BLIP_CHECK(filtered.value.find("brightness") == std::string::npos);
+    BLIP_CHECK(filtered.value.find("\"brightness\":{") == std::string::npos);
     BLIP_CHECK(filtered.value.find("legacyMode") == std::string::npos);
     BLIP_CHECK(filtered.value.find("token") == std::string::npos);
     BLIP_CHECK(filtered.value.find("/leds/strip1/level") != std::string::npos);

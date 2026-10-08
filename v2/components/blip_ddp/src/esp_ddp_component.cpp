@@ -14,7 +14,8 @@ namespace {
 constexpr char kTag[] = "blip_ddp";
 constexpr std::array<std::string_view, 1> kProvided{"input.pixel-stream.ddp"};
 constexpr std::array<std::string_view, 2> kRequired{"transport.wifi", "output.pixel-strip"};
-constexpr std::array<core::MetadataEntry, 2> kMetadata{{
+constexpr std::array<core::MetadataEntry, 3> kMetadata{{
+    {"ui_topic", "Lighting inputs"},
     {"udp_port", "4048"},
     {"mapping", "destination=1,offset=0,rgb8"},
 }};

@@ -9,6 +9,9 @@
 namespace blip::power {
 namespace {
 constexpr std::array<std::string_view, 1> kServices{"power.battery"};
+constexpr std::array<core::MetadataEntry, 3> kMetadata{{
+    {"ui_topic", "Power & sensors"}, {"ui_primary", "filtered_mv,soc_per_mille,low,valid"},
+    {"ui_gauges", "soc_per_mille"}}};
 constexpr std::array<core::ParameterDescriptor, 8> kParameters{{
     {"pin_mv", "ADC pin voltage", core::ValueType::integer, core::Access::read_only,
      false, core::ScalarValue::from_integer(0), {}, "mV"},
@@ -36,6 +39,7 @@ constexpr std::array<core::ParameterDescriptor, 8> kParameters{{
     descriptor.display_name = "HUZZAH32 battery";
     descriptor.description = "Calibrated ADC1 battery voltage and filtered low-battery state";
     descriptor.provided_services = kServices;
+    descriptor.metadata = kMetadata;
     descriptor.parameters = kParameters;
     descriptor.settings = {1U, 1U};
     descriptor.disable_policy = core::DisablePolicy::reboot_required;

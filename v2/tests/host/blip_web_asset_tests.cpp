@@ -217,8 +217,8 @@ bool factory_bundle_loads_and_streams() {
     }
     BLIP_CHECK(factory_status);
     BLIP_CHECK(store.active());
-    BLIP_CHECK(store.info().bundle_version == 1000U);
-    BLIP_CHECK(store.info().asset_count == 9U);
+    BLIP_CHECK(store.info().bundle_version == 2000U);
+    BLIP_CHECK(store.info().asset_count == 10U);
 
     const auto* index = store.find("/");
     BLIP_CHECK(index != nullptr && index->path_view() == "/index.html");
@@ -240,19 +240,19 @@ bool factory_bundle_loads_and_streams() {
 
 bool corrupt_update_retains_active_bundle() {
     const auto factory = factory_bundle();
-    auto corrupt = versioned_bundle(1001U);
+    auto corrupt = versioned_bundle(2001U);
     corrupt.back() ^= std::byte{0x55};
     FakeAssetBackend backend{};
     std::array<std::byte, 131> scratch{};
     WebAssetStore store{backend, scratch};
     BLIP_CHECK(store.ensure_factory(factory));
     BLIP_CHECK(!install(store, corrupt));
-    BLIP_CHECK(store.active() && store.info().bundle_version == 1000U);
+    BLIP_CHECK(store.active() && store.info().bundle_version == 2000U);
 
     std::array<std::byte, 137> reboot_scratch{};
     WebAssetStore rebooted{backend, reboot_scratch};
     const auto loaded = rebooted.load_active();
-    BLIP_CHECK(loaded && loaded.value().bundle_version == 1000U);
+    BLIP_CHECK(loaded && loaded.value().bundle_version == 2000U);
     return true;
 }
 
@@ -269,14 +269,14 @@ bool boot_cleans_staging_and_recovers_corrupt_active() {
     std::array<std::byte, 149> scratch{};
     WebAssetStore store{backend, scratch};
     BLIP_CHECK(store.ensure_factory(factory));
-    BLIP_CHECK(store.active() && store.info().bundle_version == 1000U);
+    BLIP_CHECK(store.active() && store.info().bundle_version == 2000U);
     BLIP_CHECK(!backend.upload_present());
     return true;
 }
 
 bool interrupted_and_complete_updates_are_atomic() {
     const auto factory = factory_bundle();
-    const auto update = versioned_bundle(1001U);
+    const auto update = versioned_bundle(2001U);
     FakeAssetBackend backend{};
     std::array<std::byte, 193> scratch{};
     WebAssetStore store{backend, scratch};
@@ -288,16 +288,16 @@ bool interrupted_and_complete_updates_are_atomic() {
     std::array<std::byte, 197> reboot_scratch{};
     WebAssetStore rebooted{backend, reboot_scratch};
     auto loaded = rebooted.load_active();
-    BLIP_CHECK(loaded && loaded.value().bundle_version == 1000U);
+    BLIP_CHECK(loaded && loaded.value().bundle_version == 2000U);
     BLIP_CHECK(install(rebooted, update));
     loaded = rebooted.load_active();
-    BLIP_CHECK(loaded && loaded.value().bundle_version == 1001U);
+    BLIP_CHECK(loaded && loaded.value().bundle_version == 2001U);
     return true;
 }
 
 bool rename_failures_recover_old_or_new_bundle() {
     const auto factory = factory_bundle();
-    const auto update = versioned_bundle(1001U);
+    const auto update = versioned_bundle(2001U);
     for (const auto scenario : {FakeAssetBackend::ReplaceFailure::before_mutation,
                                 FakeAssetBackend::ReplaceFailure::after_mutation}) {
         FakeAssetBackend backend{};
@@ -315,7 +315,7 @@ bool rename_failures_recover_old_or_new_bundle() {
         WebAssetStore rebooted{backend, reboot_scratch};
         const auto loaded = rebooted.load_active();
         const std::uint32_t expected =
-            scenario == FakeAssetBackend::ReplaceFailure::before_mutation ? 1000U : 1001U;
+            scenario == FakeAssetBackend::ReplaceFailure::before_mutation ? 2000U : 2001U;
         BLIP_CHECK(loaded && loaded.value().bundle_version == expected);
     }
     return true;

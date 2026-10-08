@@ -319,11 +319,11 @@ class TreeWriter {
 
     [[nodiscard]] bool write_parameter(const core::ComponentDescriptor& descriptor,
                                        const core::ParameterDescriptor& parameter,
-                                       std::string_view path, bool& first) noexcept {
+                                       std::string_view path, bool& first, bool dynamic = false) noexcept {
         if (!include_config_ && parameter.persisted) {
             return true;
         }
-        const auto* alias = legacy_alias(descriptor, parameter);
+        const auto* alias = dynamic ? nullptr : legacy_alias(descriptor, parameter);
         const std::string_view id = alias == nullptr ? parameter.id : alias->id;
         const std::string_view label = alias == nullptr ? parameter.label : alias->label;
         const core::ValueType type = alias == nullptr ? parameter.type : alias->type;
@@ -374,6 +374,7 @@ class TreeWriter {
                     !writer_.number(parameter.bounds.maximum) || !writer_.append("}]"))) {
             return false;
         }
+        if (dynamic && !writer_.append(",\"BLIP_DYNAMIC\":true")) return false;
         if (!writer_.append(",\"BLIP_KIND\":\"parameter\",\"BLIP_PERSISTED\":")) {
             return false;
         }
@@ -448,24 +449,24 @@ class TreeWriter {
     }
 
     [[nodiscard]] bool write_action(const core::ActionDescriptor& action, std::string_view path,
-                                    bool& first) noexcept {
+                                    bool& first, bool dynamic = false) noexcept {
         if (!begin_item(action.id, first) || !writer_.append("{\"DESCRIPTION\":") ||
             !writer_.quoted(action.label) || !writer_.append(",\"ACCESS\":3,\"TYPE\":") ||
             !write_type_fields(action.arguments, true) || !writer_.append(",\"FULL_PATH\":")) {
             return false;
         }
-        return write_control_path(path, action.id) && writer_.append(",\"BLIP_KIND\":\"action\"") &&
+        return write_control_path(path, action.id) && (!dynamic || writer_.append(",\"BLIP_DYNAMIC\":true")) && writer_.append(",\"BLIP_KIND\":\"action\"") &&
                write_field_schema(action.arguments) && writer_.append("}");
     }
 
     [[nodiscard]] bool write_event(const core::EventDescriptor& event, std::string_view path,
-                                   bool& first) noexcept {
+                                   bool& first, bool dynamic = false) noexcept {
         if (!begin_item(event.id, first) || !writer_.append("{\"DESCRIPTION\":") ||
             !writer_.quoted(event.id) || !writer_.append(",\"ACCESS\":1,\"TYPE\":") ||
             !write_type_fields(event.fields, false) || !writer_.append(",\"FULL_PATH\":")) {
             return false;
         }
-        return write_control_path(path, event.id) && writer_.append(",\"BLIP_KIND\":\"event\"") &&
+        return write_control_path(path, event.id) && (!dynamic || writer_.append(",\"BLIP_DYNAMIC\":true")) && writer_.append(",\"BLIP_KIND\":\"event\"") &&
                write_field_schema(event.fields) && writer_.append("}");
     }
 
@@ -548,17 +549,17 @@ class TreeWriter {
                 switch (schema.kind(index)) {
                 case core::DynamicControlKind::parameter: {
                     core::ParameterDescriptor parameter{};
-                    if (!schema.parameter(index, parameter) || !write_parameter(*descriptor, parameter, path, contents_first)) return false;
+                    if (!schema.parameter(index, parameter) || !write_parameter(*descriptor, parameter, path, contents_first, true)) return false;
                     break;
                 }
                 case core::DynamicControlKind::action: {
                     core::ActionDescriptor action{};
-                    if (!schema.action(index, fields, action) || !write_action(action, path, contents_first)) return false;
+                    if (!schema.action(index, fields, action) || !write_action(action, path, contents_first, true)) return false;
                     break;
                 }
                 case core::DynamicControlKind::event: {
                     core::EventDescriptor event{};
-                    if (!schema.event(index, fields, event) || !write_event(event, path, contents_first)) return false;
+                    if (!schema.event(index, fields, event) || !write_event(event, path, contents_first, true)) return false;
                     break;
                 }
                 }
@@ -645,6 +646,12 @@ class TreeWriter {
                                            : "reboot-required")) {
                 return false;
             }
+            if (child_descriptor != nullptr && !writer_.append(",\"BLIP_UI\":{\"TOPIC\":")) return false;
+            if (child_descriptor != nullptr &&
+                (!writer_.quoted(metadata_value(*child_descriptor, "ui_topic")) ||
+                 !writer_.append(",\"PRIMARY\":") || !writer_.quoted(metadata_value(*child_descriptor, "ui_primary")) ||
+                 !writer_.append(",\"GAUGES\":") || !writer_.quoted(metadata_value(*child_descriptor, "ui_gauges")) ||
+                 !writer_.append("}"))) return false;
             if (!writer_.append(",")) {
                 return false;
             }
