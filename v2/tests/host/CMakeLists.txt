@@ -37,6 +37,7 @@ add_test(NAME blip_diagnostics_tests COMMAND blip_diagnostics_tests)
 
 add_library(blip_ota_host STATIC
     ../../components/blip_ota/src/update_service.cpp
+    ../../components/blip_ota/src/release_catalog.cpp
 )
 target_include_directories(blip_ota_host PUBLIC ../../components/blip_ota/include)
 target_link_libraries(blip_ota_host PUBLIC blip_core_host)
@@ -52,6 +53,15 @@ else()
     target_compile_options(blip_ota_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_ota_tests COMMAND blip_ota_tests)
+
+add_executable(blip_release_catalog_tests blip_release_catalog_tests.cpp)
+target_link_libraries(blip_release_catalog_tests PRIVATE blip_ota_host)
+if(MSVC)
+    target_compile_options(blip_release_catalog_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_release_catalog_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_release_catalog_tests COMMAND blip_release_catalog_tests)
 
 add_library(blip_transport_host STATIC
     ../../components/blip_transport/src/ble_fragments.cpp

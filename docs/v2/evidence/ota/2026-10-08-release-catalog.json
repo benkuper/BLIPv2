@@ -1,0 +1,106 @@
+{
+  "recorded_at": "2026-10-08T21:29:45.881392+00:00",
+  "contract": "release-catalog-v1",
+  "passed": true,
+  "host_suites": 29,
+  "server_tests": 5,
+  "cross_language_http_response_checked": true,
+  "sources": {
+    "v2/components/blip_ota/include/blip/ota/release_catalog.hpp": "7f948e7d64e81cd93123125e548e409546d6474a45cbe9f9696b5812af60f9e9",
+    "v2/components/blip_ota/src/release_catalog.cpp": "e5e364ddbf88dbc3c0379bc807246aed17da2fd9afe9aeb16010d2cf2d3cb563",
+    "v2/components/blip_ota/CMakeLists.txt": "43ee2006648d0034d37a84957b9ea0ac234b2123ea2b653988c8452a6ff0178c",
+    "v2/tests/host/blip_release_catalog_tests.cpp": "dba77a740cbeb3ac9e2f36ce1af07d5f4cf0cc3158bfaf89db86e2c3ef75b6b6",
+    "v2/tests/host/CMakeLists.txt": "ec8a5ce6ca922f416388438ce0655bfa9d8b524f50df021e2d460dcba6a0d379",
+    "v2/tools/ota/release_server.py": "d1dc2457232ee51bf2dd4e2bf91db851299775aa99d000d62bed0c082e52ba45",
+    "v2/tools/ota/test_release_server.py": "712f7f2c71d08551885749090111614b0eea32649948d786c30f9f5842e221b2",
+    "v2/tools/ota/collect_catalog_evidence.py": "aa684cd6b8ef13d780334e4680b08cc80a0ecb33f41f407e0ff2e0cfd6c94a01"
+  },
+  "builds": [
+    {
+      "profile": "huzzah32",
+      "board": "adafruit-huzzah32",
+      "target": "esp32",
+      "app_bytes": 1361328,
+      "app_partition_bytes": 1638400,
+      "build_log_sha256": "6ab54f6acc23db87c6df93a13bdf0e816595633605f7dbc7f91f222b67e62f23",
+      "compiled_parser_sha256": "2dca15aeb2753d1bed6ea6fdac6d12256fac7674288301bfe91270cccf63ff0a",
+      "application_sha256": "55c1babb6bff229532cf1f945d560f6ab5c998777e8c54370436fc2492a79d58"
+    },
+    {
+      "profile": "club",
+      "board": "creators-club",
+      "target": "esp32",
+      "app_bytes": 1353296,
+      "app_partition_bytes": 1638400,
+      "build_log_sha256": "13fe5a4f63085df99bbf8b787b61f0c7690a2e4d3766bd458bd5a367bb333507",
+      "compiled_parser_sha256": "2dca15aeb2753d1bed6ea6fdac6d12256fac7674288301bfe91270cccf63ff0a",
+      "application_sha256": "f00b32527ef43b9b3ef9df3bd519915d5db0642ea6b9312128c7ac6ab6e3cbdc"
+    },
+    {
+      "profile": "tab",
+      "board": "creators-tab",
+      "target": "esp32",
+      "app_bytes": 1338976,
+      "app_partition_bytes": 1638400,
+      "build_log_sha256": "aaf3c54c66ee378db5b9ace79b292a146d4d8d746f04457d6d63c43a1e54c65f",
+      "compiled_parser_sha256": "2dca15aeb2753d1bed6ea6fdac6d12256fac7674288301bfe91270cccf63ff0a",
+      "application_sha256": "1391ac4252196b7737a0b0e296009f5ba75861b2cf39a70f74f90ca4b19b8d06"
+    },
+    {
+      "profile": "m5stickc",
+      "board": "m5stack-m5stickc",
+      "target": "esp32",
+      "app_bytes": 1337760,
+      "app_partition_bytes": 1638400,
+      "build_log_sha256": "2d5c56f60dc6f800d82eb9616d692f1199581b362ac41322827bcd8d6a8aba4c",
+      "compiled_parser_sha256": "2dca15aeb2753d1bed6ea6fdac6d12256fac7674288301bfe91270cccf63ff0a",
+      "application_sha256": "21997282106fdb3b561a07a8a2be312c257c9c45771f4c889b82c89748bd91af"
+    },
+    {
+      "profile": "m5dial",
+      "board": "m5stack-m5dial",
+      "target": "esp32s3",
+      "app_bytes": 1338608,
+      "app_partition_bytes": 1638400,
+      "build_log_sha256": "4f1ad6908e50be308c5cb5ae9489511edd29dc7daa81bf3f51ca35e2dec4bd23",
+      "compiled_parser_sha256": "bf99e0a0874286e1e074131ca92809a0f798e723e53b9027c79f06735bb7e003",
+      "application_sha256": "1c942fef74398e8e5b9fc613d26132dd066fae6daaef07b38095880176dfd15b"
+    },
+    {
+      "profile": "ball",
+      "board": "creators-ball-v2",
+      "target": "esp32c6",
+      "app_bytes": 1885552,
+      "app_partition_bytes": 3145728,
+      "build_log_sha256": "6c837a9fc5bd34a7ad3543e8e11912f149068e197eb40e56f832dadff185824b",
+      "compiled_parser_sha256": "3a62e40121da80b3f7c8bc890fe1219c481f9ac66f199c27d5d957b354920eaa",
+      "application_sha256": "a4e6703bf6a7fca0ee1f01186b8027f0b92003e49268c288691093765da19e15"
+    },
+    {
+      "profile": "xiao",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "target": "esp32c6",
+      "app_bytes": 1503072,
+      "app_partition_bytes": 1638400,
+      "build_log_sha256": "a427827f1c3b1d29c695c49a040b71379d42bd850e5bf8cee2c3efe4a988f406",
+      "compiled_parser_sha256": "3a62e40121da80b3f7c8bc890fe1219c481f9ac66f199c27d5d957b354920eaa",
+      "application_sha256": "446540100a5c30d60588147dad9b0fb5f0c49e4d97638896605dfbd871a6a7c3"
+    }
+  ],
+  "test_logs": {
+    "build/m38-catalog-host-tests.log": "650dc2f7f6187d24fc36acbd160d1c9e19561b5ac0865d66e66a012bf2664dda",
+    "build/m38-release-server-tests.log": "ac67ab4a06630c5bbbe376d8e9a2b1dd8efe52f0600e73f474cec451068c8c4a"
+  },
+  "device_https_worker_qualified": false,
+  "device_installation_qualified": false,
+  "goldengeek_catalog_deployed": false,
+  "pc_network_changed": false,
+  "remaining": [
+    "embedded firmware identity",
+    "native HTTPS checks/downloads",
+    "update center",
+    "automatic policy",
+    "release publication",
+    "corruption/interruption/rollback HIL"
+  ]
+}

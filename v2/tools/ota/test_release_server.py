@@ -1,0 +1,105 @@
+import copy
+import json
+import unittest
+import os
+import subprocess
+import tempfile
+import threading
+from http.server import HTTPServer
+from pathlib import Path
+from urllib.request import urlopen
+from urllib.error import HTTPError
+from urllib.parse import urlencode
+from release_server import ReleaseIndex, unique_object, https_url, handler
+
+IDENTITY = {"project": "blip-v2", "board": "creators-ball-v2", "target": "esp32c6", "layout": "ota-8mb-v1",
+            "profile": "minimal", "channel": "stable", "flash_bytes": 8388608, "features": 123, "api": 1}
+ARTIFACT = {"code": 2, "version": "0.2.0-alpha", "bytes": 1000000, "url": "https://www.goldengeek.org/blip/releases/app.bin",
+            "sha256": "0123456789abcdef" * 4, "minimum_other_code": 2000}
+QUERY = {"schema": 1, **IDENTITY, "fw_code": 1, "fw_version": "0.1.0", "web_code": 2000}
+
+
+class ReleaseServerTests(unittest.TestCase):
+    def index(self, **changes):
+        return ReleaseIndex({"schema": 1, "releases": [{**IDENTITY, "firmware": copy.deepcopy(ARTIFACT), "web": None, **changes}]})
+
+    def test_exact_identity_and_independent_artifacts(self):
+        index = self.index()
+        response = index.answer(urlencode(QUERY))
+        self.assertEqual(response["firmware"], ARTIFACT)
+        self.assertIsNone(response["web"])
+        for key, value in (("board", "another-c6"), ("features", 122), ("api", 2), ("flash_bytes", 4194304), ("channel", "beta")):
+            with self.subTest(key=key):
+                self.assertIsNone(index.answer(urlencode({**QUERY, key: value}))["firmware"])
+        self.assertEqual(index.answer(urlencode({**QUERY, "fw_code": 3}))["firmware"], ARTIFACT)
+
+    def test_invalid_duplicate_private_and_oversized_queries(self):
+        index = self.index()
+        for query in (urlencode(QUERY) + "&board=evil", urlencode(QUERY) + "&password=secret",
+                      urlencode({**QUERY, "features": -1}), urlencode({**QUERY, "schema": 2}),
+                      urlencode({**QUERY, "features": "01"}), urlencode({**QUERY, "api": "1e0"}),
+                      urlencode({**QUERY, "fw_version": "x" * 32}), "x" * 1025):
+            with self.subTest(query=query[:30]):
+                with self.assertRaises(ValueError):
+                    index.answer(query)
+
+    def test_catalog_rejects_duplicate_keys_and_identity(self):
+        with self.assertRaises(ValueError):
+            json.loads('{"schema":1,"schema":2}', object_pairs_hook=unique_object)
+        release = {**IDENTITY, "firmware": ARTIFACT, "web": None}
+        with self.assertRaises(ValueError):
+            ReleaseIndex({"schema": 1, "releases": [release, release]})
+        for change in ({"bytes": 0}, {"code": True}, {"sha256": "x" * 64}, {"url": "http://example/app"}, {"extra": 1}):
+            with self.assertRaises(ValueError):
+                self.index(firmware={**ARTIFACT, **change})
+
+    def test_https_policy_matches_device(self):
+        for url in ("http://example/app", "https://user:pass@example/app", "https://example/app#fragment",
+                    "https:///app", "https://example:0/app", "https://example:99999/app", "https://example/ bad", "https://example/%zz"):
+            with self.assertRaises(ValueError):
+                https_url(url)
+        self.assertEqual(https_url("https://127.0.0.1:8443/artifact%20one.bin"), "https://127.0.0.1:8443/artifact%20one.bin")
+
+    def test_handler_files_errors_and_cpp_contract(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            catalog = root / "catalog.json"
+            payload = b"fixture artifact"
+            (root / "app.bin").write_bytes(payload)
+            catalog.write_text(json.dumps({"schema": 1, "releases": [{**IDENTITY, "firmware": ARTIFACT, "web": None}]}), encoding="utf-8")
+            server = HTTPServer(("127.0.0.1", 0), handler(catalog, root))
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            base = f"http://127.0.0.1:{server.server_port}"
+            try:
+                with urlopen(base + "/blip/update?" + urlencode(QUERY), timeout=2) as response:
+                    answer = response.read()
+                    self.assertEqual(response.headers["Cache-Control"], "no-store")
+                    self.assertEqual(json.loads(answer)["firmware"], ARTIFACT)
+                cpp = os.environ.get("BLIP_RELEASE_CATALOG_TEST_EXE")
+                if cpp:
+                    fixture = root / "device-response.json"
+                    fixture.write_bytes(answer)
+                    subprocess.run([cpp, str(fixture)], check=True, timeout=5)
+                    print("C++ device parser accepted the HTTP catalog response", flush=True)
+                with urlopen(base + "/blip/releases/app.bin", timeout=2) as response:
+                    self.assertEqual(response.read(), payload)
+                for path, status in (("/blip/update?schema=1", 400), ("/blip/releases/unknown.bin", 404),
+                                     ("/blip/releases/../catalog.json", 404), ("/blip/releases/app.bin?x=1", 404)):
+                    with self.subTest(path=path), self.assertRaises(HTTPError) as error:
+                        urlopen(base + path, timeout=2)
+                    self.assertEqual(error.exception.code, status)
+                    error.exception.close()
+                catalog.write_text("invalid", encoding="utf-8")
+                with self.assertRaises(HTTPError) as error:
+                    urlopen(base + "/blip/update?" + urlencode(QUERY), timeout=2)
+                self.assertEqual(error.exception.code, 503)
+                error.exception.close()
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=2)
+
+
+if __name__ == "__main__":
+    unittest.main()
