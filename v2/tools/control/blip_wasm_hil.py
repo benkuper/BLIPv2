@@ -43,7 +43,8 @@ class Client:
     def send(self, operation, component, name, *values):
         self.next_id += 1
         scalars = [wire.Scalar(wire.VALUE_STRING if isinstance(value, str) else
-                   wire.VALUE_BOOLEAN if isinstance(value, bool) else wire.VALUE_INTEGER, value)
+                   wire.VALUE_BOOLEAN if isinstance(value, bool) else
+                   wire.VALUE_NUMBER if isinstance(value, float) else wire.VALUE_INTEGER, value)
                    for value in values]
         payload = wire.encode_control(wire.OPERATION_BY_NAME[operation], component, name, scalars)
         self.connection.write(b"\0" + wire.cobs_encode(

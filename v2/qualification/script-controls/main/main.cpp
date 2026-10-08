@@ -17,7 +17,7 @@ int blip_script_controls_run_tests();
 namespace {
 using namespace blip::wasm;
 namespace core = blip::core;
-constexpr unsigned kStackBytes = 24576, kCases = 6, kRepeatCycles = 20, kEngineCycles = 20;
+constexpr unsigned kStackBytes = 24576, kCases = 7, kRepeatCycles = 20, kEngineCycles = 20;
 alignas(8) std::array<std::byte, 98304> pool{};
 alignas(8) std::array<std::byte, 16384> module{};
 WamrRuntime runtime;

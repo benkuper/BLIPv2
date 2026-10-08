@@ -73,8 +73,8 @@ constexpr core::ComponentDescriptor make_descriptor() {
     d.provided_services = provided; d.required_services = required;
     d.parameters = parameters; d.actions = actions; d.metadata = metadata;
     d.settings = {1, 1}; d.disable_policy = core::DisablePolicy::live; d.supports_restart = true;
-    // Fixed boot reservations are included even though the two buffers use the
-    // startup heap. Native stacks are counted only in task_stack_bytes.
+    // Report the maximum admitted upload reservation; actual reserved bytes
+    // track its bounded worker-owned allocation. Stacks are counted separately.
     d.cost = {131072, sizeof(EspWasmComponent) +
         EspWasmComponent::kPoolBytes + EspWasmComponent::kModuleBytes,
         EspWasmComponent::kWorkerStackBytes + EspWasmComponent::kSupervisorStackBytes};
@@ -109,7 +109,7 @@ core::Status EspWasmComponent::release_reservation() noexcept {
     if (!guard.held || started_.load() || worker_created_ || !callbacks_quiesced())
         return failure(ErrorCode::invalid_state, "release", "worker-not-retired");
     heap_caps_free(pool_); pool_ = nullptr;
-    heap_caps_free(module_); module_ = nullptr;
+    heap_caps_free(module_); module_ = nullptr; module_capacity_ = 0;
     heap_caps_free(linear_); linear_ = nullptr;
     buffer_reserved_.store(0);
     return core::Status::success();
@@ -129,14 +129,12 @@ core::Status EspWasmComponent::bind_capabilities(const core::RegistryView& regis
     descriptor_.required_services = std::span<const std::string_view>(required_services_).first(count);
     return core::Status::success();
 }
-core::Status EspWasmComponent::start(const core::StartContext&) noexcept {
-    if (started_.load() || worker_created_ || !callbacks_quiesced()) return failure(ErrorCode::invalid_state, "start", "worker-state");
-    if (epoch_.load() == 0xffffffffU || !admission_ || !snapshot_mutex_ || !monitor_mutex_ || !ready_ || !queue_)
-        return failure(ErrorCode::resource_unavailable, "start", "runtime-resources");
-    const bool retained = buffer_reserved_.load() != 0;
-    if (!retained) {
+core::Status EspWasmComponent::reserve_buffers() noexcept {
+    Guard guard(admission_);
+    if (!guard.held || started_.load() || worker_created_ || !callbacks_quiesced())
+        return failure(ErrorCode::invalid_state, "reserve", "worker-not-retired");
+    if (!pool_) {
         pool_ = static_cast<std::byte*>(heap_caps_aligned_alloc(8, kEnginePoolBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
-        module_ = static_cast<std::byte*>(heap_caps_malloc(kModuleBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
 #if defined(CONFIG_IDF_TARGET_ESP32)
         // Guest memory permits unaligned integer accesses. Unlike the engine pool,
         // it needs only malloc's four-byte base alignment; requesting additional
@@ -144,7 +142,7 @@ core::Status EspWasmComponent::start(const core::StartContext&) noexcept {
         linear_ = static_cast<std::byte*>(heap_caps_malloc(kLinearBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_IRAM_8BIT));
 #endif
     }
-    if (!pool_ || !module_ || (kLinearBytes && !linear_)) {
+    if (!pool_ || (kLinearBytes && !linear_)) {
         ESP_LOGE("blip_wasm", "startup buffers unavailable pool=%u module=%u linear=%u free=%u largest=%u iram_free=%u iram_largest=%u",
             static_cast<unsigned>(pool_ != nullptr), static_cast<unsigned>(module_ != nullptr),
             static_cast<unsigned>(linear_ != nullptr),
@@ -152,11 +150,22 @@ core::Status EspWasmComponent::start(const core::StartContext&) noexcept {
             static_cast<unsigned>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT)),
             static_cast<unsigned>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_IRAM_8BIT)),
             static_cast<unsigned>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_IRAM_8BIT)));
-        static_cast<void>(stop());
-        static_cast<void>(release_reservation());
+        heap_caps_free(pool_); pool_ = nullptr;
+        heap_caps_free(linear_); linear_ = nullptr;
+        buffer_reserved_.store(0);
         return failure(ErrorCode::resource_unavailable, "start", "runtime-buffers");
     }
-    buffer_reserved_.store(kPoolBytes + kModuleBytes);
+    buffer_reserved_.store(kPoolBytes + module_capacity_);
+    return core::Status::success();
+}
+core::Status EspWasmComponent::start(const core::StartContext&) noexcept {
+    if (started_.load() || worker_created_ || !callbacks_quiesced()) return failure(ErrorCode::invalid_state, "start", "worker-state");
+    if (epoch_.load() == 0xffffffffU || !admission_ || !snapshot_mutex_ || !monitor_mutex_ || !ready_ || !queue_)
+        return failure(ErrorCode::resource_unavailable, "start", "runtime-resources");
+    const bool retained = buffer_reserved_.load() != 0;
+    const auto reserved = reserve_buffers();
+    if (!reserved) return reserved;
+    script_admission_ = false;
     xQueueReset(queue_);
     static_cast<void>(xSemaphoreTake(ready_, 0));
     control_ready_.store(false);
@@ -199,6 +208,8 @@ core::Status EspWasmComponent::stop() noexcept {
         Guard guard(admission_);
         if (!guard.held) return failure(ErrorCode::stop_failed, "stop", "admission-busy");
         control_ready_.store(false);
+        script_admission_ = false;
+        controls_.retire();
         started_.store(false);
         if (epoch_.load() != 0xffffffffU) epoch_.fetch_add(1);
     }
@@ -210,7 +221,9 @@ core::Status EspWasmComponent::stop() noexcept {
     supervisor_ = nullptr;
     return core::Status::success();
 }
-bool EspWasmComponent::callbacks_quiesced() const noexcept { return worker_quiesced_.load() && supervisor_quiesced_.load(); }
+bool EspWasmComponent::callbacks_quiesced() const noexcept {
+    return worker_quiesced_.load() && supervisor_quiesced_.load() && controls_.quiescent();
+}
 
 core::Result<std::uint32_t> EspWasmComponent::submit(Request& request) noexcept {
     using Result = core::Result<std::uint32_t>;
@@ -226,7 +239,40 @@ core::Result<std::uint32_t> EspWasmComponent::submit(Request& request) noexcept 
         return Result::failure(failure(ErrorCode::queue_full, "submit", "worker-queue-full").error());
     }
     ++next_id_;
+    if (request.kind == Kind::begin || request.kind == Kind::commit || request.kind == Kind::unload) {
+        script_admission_ = false; closed_through_ = request.id;
+    }
     return Result::success(request.id);
+}
+core::Status EspWasmComponent::read_dynamic_parameter(std::uint32_t generation, std::string_view id,
+    core::ScalarValue& output, std::span<char> strings) noexcept {
+    return controls_.read_id(generation, id, output, strings);
+}
+core::Status EspWasmComponent::write_dynamic_parameter(std::uint32_t generation, std::string_view id,
+    const core::ScalarValue& value) noexcept {
+    return controls_.write_id(generation, id, value);
+}
+core::Status EspWasmComponent::invoke_dynamic_action(std::uint32_t generation, std::string_view id,
+    std::span<const core::ScalarValue> input, std::span<core::ScalarValue> output, std::span<char>, std::size_t& count) noexcept {
+    count = 0;
+    if (output.empty()) return failure(ErrorCode::capacity_exceeded, "action", "request-id-output");
+    Guard guard(admission_);
+    if (!guard.held || !started_.load() || !control_ready_.load() || !script_admission_)
+        return failure(ErrorCode::invalid_state, "action", "script-admission-closed");
+    if (next_id_ == UINT32_MAX || epoch_.load() == UINT32_MAX)
+        return failure(ErrorCode::generation_exhausted, "action", "request-generation");
+    if (!uxQueueSpacesAvailable(queue_)) {
+        rejected_.fetch_add(1); return failure(ErrorCode::queue_full, "action", "worker-queue-full");
+    }
+    Request request{}; request.kind = Kind::script_action; request.id = next_id_ + 1; request.epoch = epoch_.load();
+    request.instructions = instruction_budget_.load(); request.deadline_ms = deadline_ms_.load();
+    const auto copied = controls_.enqueue_action(generation, id, input, request.id, request.epoch);
+    if (!copied) { rejected_.fetch_add(1); return copied; }
+    // All producers hold admission_; the consumer only frees slots. Space was
+    // checked before the store copy, so this send cannot reject an owned ticket.
+    const auto queued = xQueueSend(queue_, &request, 0); configASSERT(queued == pdTRUE);
+    ++next_id_; output[0] = core::ScalarValue::from_integer(request.id); count = 1;
+    return core::Status::success();
 }
 core::Result<std::uint32_t> EspWasmComponent::call(std::string_view name, std::span<const Value> arguments) noexcept {
     using Result = core::Result<std::uint32_t>;
@@ -264,8 +310,8 @@ void EspWasmComponent::supervisor_entry(void* context) noexcept {
     self->run_supervisor(); self->supervisor_quiesced_.store(true); vTaskDelete(nullptr);
 }
 void EspWasmComponent::run_worker() noexcept {
-    Service service(*runtime_, {pool_, kEnginePoolBytes}, {module_, kModuleBytes}, {linear_, kLinearBytes});
-    ModuleUpload upload({module_, kModuleBytes});
+    Service service(*runtime_, {pool_, kEnginePoolBytes}, {module_, module_capacity_}, {linear_, kLinearBytes});
+    ModuleUpload upload({module_, module_capacity_});
     auto initialized = runtime_->configure_capabilities(capabilities_.size() ? &capabilities_ : nullptr);
     if (initialized) initialized = service.start();
     if (!initialized) {
@@ -287,21 +333,67 @@ void EspWasmComponent::run_worker() noexcept {
         const auto began = static_cast<std::uint64_t>(esp_timer_get_time());
         core::Status status = core::Status::success();
         std::array<Value, kMaximumResults> results{}; std::size_t count{};
+        // Markers and copied payloads are admitted together under admission_.
+        // Take even canceled payloads so every accepted ticket is completed and
+        // replacement cannot strand an old action in the store.
+        if (request.kind == Kind::script_action) {
+            Guard guard(admission_, portMAX_DELAY);
+            status = controls_.take_action(action_scratch_);
+            if (status && (action_scratch_.ticket != request.id || action_scratch_.epoch != request.epoch))
+                status = failure(ErrorCode::verification_failed, "action", "payload-order");
+        }
         if (!started_.load() || request.epoch != epoch_.load()) {
             status = failure(ErrorCode::cancelled, "work", "stale-work-epoch"); cancelled_.fetch_add(1);
+        } else if (!status) {
+            // Preserve the bounded payload admission failure.
         } else if (request.kind == Kind::begin) {
-            service.unload(); status = upload.begin(request.number, request.crc);
+            controls_.retire();
+            service.unload(); upload.cancel();
+            if (module_capacity_ != request.number) {
+                status = service.replace_module_storage({});
+                if (status) {
+                    heap_caps_free(module_); module_ = nullptr; module_capacity_ = 0;
+                    module_ = static_cast<std::byte*>(heap_caps_malloc(request.number, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+                    module_capacity_ = module_ ? request.number : 0;
+                    upload = ModuleUpload({module_, module_capacity_});
+                    buffer_reserved_.store(kPoolBytes + module_capacity_);
+                    status = module_ ? service.replace_module_storage({module_, module_capacity_})
+                                     : failure(ErrorCode::resource_unavailable, "upload", "module-buffer-unavailable");
+                }
+            }
+            if (status) status = upload.begin(request.number, request.crc);
         } else if (request.kind == Kind::chunk) {
             status = upload.append(request.number, std::span<const std::byte>(request.bytes).first(request.size));
         } else if (request.kind == Kind::commit) {
             const auto bytes = upload.finish();
-            status = bytes ? service.load(bytes.value()) : core::Status::failure(bytes.error());
+            controls_.retire();
+            status = bytes ? controls_.prepare(bytes.value(), descriptor_) : core::Status::failure(bytes.error());
+            if (status) status = service.load(bytes.value());
+            {
+                Guard guard(admission_, portMAX_DELAY);
+                if (status && (!started_.load() || request.epoch != epoch_.load()))
+                    status = failure(ErrorCode::cancelled, "commit", "stale-work-epoch");
+                if (status) status = controls_.publish(*runtime_, service.snapshot().generation);
+                if (!status) { controls_.retire(); service.unload(); }
+                script_admission_ = status.ok() && started_.load() && request.epoch == epoch_.load() && request.id >= closed_through_;
+            }
         } else if (request.kind == Kind::unload) {
+            controls_.retire();
             upload.cancel(); service.unload();
-        } else if (request.kind == Kind::call) {
-            if (request.generation != service.snapshot().generation) {
+        } else if (request.kind == Kind::call || request.kind == Kind::script_action) {
+            const bool script = request.kind == Kind::script_action;
+            if ((script ? action_scratch_.module_generation : request.generation) != service.snapshot().generation ||
+                (script && action_scratch_.generation != controls_.generation())) {
                 status = failure(ErrorCode::cancelled, "call", "stale-module-generation"); cancelled_.fetch_add(1);
             } else {
+                if (script) {
+                    std::size_t arguments{};
+                    status = copy_script_action_arguments(*runtime_, controls_.action_buffer(), action_scratch_, request.arguments, arguments);
+                    if (status) {
+                        request.argument_count = static_cast<std::uint8_t>(arguments);
+                        request.name = action_scratch_.name;
+                    }
+                }
                 {
                     Guard guard(monitor_mutex_, portMAX_DELAY);
                     active_epoch_ = request.epoch;
@@ -311,8 +403,9 @@ void EspWasmComponent::run_worker() noexcept {
                 }
                 // The platform owns the absolute deadline. Runtime receives fuel
                 // and the admission token; the supervisor issues active cancel.
-                status = service.call(request.name.data(), std::span<const Value>(request.arguments).first(request.argument_count),
+                if (status) status = service.call(request.name.data(), std::span<const Value>(request.arguments).first(request.argument_count),
                     {request.instructions, 0, &call_cancelled_}, results, count);
+                controls_.end_invocation();
                 Cancellation reason{};
                 {
                     Guard guard(monitor_mutex_, portMAX_DELAY);
@@ -329,6 +422,10 @@ void EspWasmComponent::run_worker() noexcept {
                         "call", reason == Cancellation::deadline ? "execution-deadline" : "execution-cancelled");
                     if (reason == Cancellation::deadline) deadlines_.fetch_add(1); else cancelled_.fetch_add(1);
                 }
+                if (service.snapshot().state != State::loaded) {
+                    controls_.retire();
+                    Guard guard(admission_, portMAX_DELAY); script_admission_ = false;
+                }
             }
         }
         worker_headroom_.store(uxTaskGetStackHighWaterMark(nullptr));
@@ -336,10 +433,15 @@ void EspWasmComponent::run_worker() noexcept {
     }
     Request pending{};
     while (xQueueReceive(queue_, &pending, 0) == pdTRUE) {
+        if (pending.kind == Kind::script_action) {
+            Guard guard(admission_, portMAX_DELAY);
+            const auto taken = controls_.take_action(action_scratch_);
+            configASSERT(taken.ok() && action_scratch_.ticket == pending.id);
+        }
         cancelled_.fetch_add(1);
         complete(pending, failure(ErrorCode::cancelled, "stop", "worker-stopped"), {}, 0, service.snapshot(), 0);
     }
-    service.stop();
+    controls_.retire(); service.stop();
     { Guard guard(snapshot_mutex_, portMAX_DELAY); snapshot_ = service.snapshot(); upload_received_ = 0; }
     worker_quiesced_.store(true);
 }

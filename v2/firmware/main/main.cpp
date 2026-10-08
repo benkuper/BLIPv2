@@ -442,6 +442,15 @@ void reject_pending_update() noexcept {
                  error.detail.data());
         return false;
     }
+#if defined(BLIP_ENABLE_WASM)
+    if (!safe_mode) {
+        const auto reserved = wasm_component.reserve_buffers();
+        if (!reserved) {
+            ESP_LOGE(kTag, "WASM fixed pool reservation failed before service startup");
+            return false;
+        }
+    }
+#endif
     const auto started = registry.start_all();
     if (!started.ok()) {
         const auto& error = started.primary;

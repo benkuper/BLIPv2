@@ -189,6 +189,28 @@ bool concurrent_reader_retirement_and_replacement() {
     finish.store(true, std::memory_order_release); reader.join();
     BLIP_CHECK(refused && valid.load() && store.quiescent() && load(store, backend, 2)); store.retire(); return true;
 }
+bool copied_action_arguments_use_checked_memory() {
+    ScriptControlStore store; Backend backend; BLIP_CHECK(load(store, backend));
+    const std::array args{ScalarValue::from_bool(true), ScalarValue::from_integer(-9007199254740993LL),
+        ScalarValue::from_number(2.5), ScalarValue::from_string(std::string_view("ok\0!", 4))};
+    BLIP_CHECK(store.enqueue_action(store.generation(), "fire", args, 1, 1));
+    ScriptControlMessage message; BLIP_CHECK(store.take_action(message));
+    std::array<Value, kMaximumArguments> values{}; std::size_t count = 99;
+    BLIP_CHECK(copy_script_action_arguments(backend, store.action_buffer(), message, values, count));
+    BLIP_CHECK(count == 5 && values[0].type == blip::wasm::ValueType::i32 && values[0].bits == 1);
+    BLIP_CHECK(values[1].type == blip::wasm::ValueType::i64 && std::bit_cast<std::int64_t>(values[1].bits) == -9007199254740993LL);
+    BLIP_CHECK(values[2].type == blip::wasm::ValueType::f64 && std::bit_cast<double>(values[2].bits) == 2.5);
+    BLIP_CHECK(values[3].bits == 896 && values[4].bits == 4);
+    BLIP_CHECK(std::memcmp(backend.memory.data() + 896, "ok\0!", 4) == 0);
+    BLIP_CHECK(!copy_script_action_arguments(backend, 0xfffffffeU, message, values, count) && count == 0);
+    BLIP_CHECK(!copy_script_action_arguments(backend, 1024, message, values, count) && count == 0);
+    BLIP_CHECK(!copy_script_action_arguments(backend, 512, message, std::span<Value>(values).first(4), count) && count == 0);
+    message.count = 5;
+    BLIP_CHECK(!copy_script_action_arguments(backend, 512, message, values, count) && count == 0);
+    message.count = 4; message.values[3].bytes = 129;
+    BLIP_CHECK(!copy_script_action_arguments(backend, 512, message, values, count) && count == 0);
+    store.retire(); return true;
+}
 } // namespace
 int blip_script_controls_run_tests() {
     const TestCase tests[]{
@@ -197,7 +219,8 @@ int blip_script_controls_run_tests() {
         {"action queues copy fields reject overflow and retain cancellation IDs", actions_are_owned_bounded_and_tagged},
         {"publication checks callback signatures string arena and reserved controls", publication_validates_callbacks_buffer_and_collisions},
         {"event builder requires all fields and delivers owned generation tagged payloads", event_builder_and_owned_delivery},
-        {"concurrent reader pins retired metadata until safe replacement", concurrent_reader_retirement_and_replacement}
+        {"concurrent reader pins retired metadata until safe replacement", concurrent_reader_retirement_and_replacement},
+        {"copied action arguments preserve bits and validate guest memory", copied_action_arguments_use_checked_memory}
     }; return run_tests(tests);
 }
 #ifndef ESP_PLATFORM

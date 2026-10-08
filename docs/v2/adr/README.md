@@ -18,6 +18,7 @@
 | [0014](0014-wasm-native-import-bridge.md) | Bounded WAMR guest-to-native bridge | Three chip families qualified |
 | [0015](0015-wasm-script-control-declarations.md) | Owned custom-section declarations and leased registry projection | Declaration/interfaces qualified; live production controls pending |
 | [0016](0016-wasm-owned-script-controls.md) | Owned values/queues, retirement and fixed guest callback buffer | Store/runtime query qualified; production wiring pending |
+| [0017](0017-wasm-live-controls-upload-storage.md) | Production declaration publication, ordered script actions and upload-sized storage | Accepted for publication/actions; guest imports/events/web refresh remain open |
 
 Accepted ADRs are immutable contracts. A material change is recorded by a new
 ADR with `Supersedes`/`Superseded by` links.

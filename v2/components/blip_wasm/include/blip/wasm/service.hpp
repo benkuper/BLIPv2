@@ -16,7 +16,8 @@ struct Snapshot {
 
 // Runtime-neutral lifecycle/policy service. The worker exclusively owns these
 // methods; a platform queue transfers control requests to that worker. Module
-// scratch and pool are borrowed fixed-capacity startup allocations. No I/O,
+// scratch and pool are borrowed allocations. The worker may replace the bounded
+// module scratch only after unload; the engine pool stays fixed. No I/O,
 // task creation, registration, allocator or render callback is hidden here.
 // Explicitly stop on the worker before destroying the service/runtime/buffers.
 class Service final {
@@ -28,6 +29,9 @@ class Service final {
     Service& operator=(const Service&) = delete;
     [[nodiscard]] core::Status start(Limits limits = {}) noexcept;
     [[nodiscard]] core::Status load(std::span<const std::byte> bytes) noexcept;
+    // Worker-only, after unload. Detach with an empty span before freeing an
+    // upload allocation; a later load checks both policy and borrowed capacity.
+    [[nodiscard]] core::Status replace_module_storage(std::span<std::byte>) noexcept;
     [[nodiscard]] core::Status call(std::string_view name, std::span<const Value> arguments,
                                    ExecutionBudget budget, std::span<Value> results,
                                    std::size_t& result_count) noexcept;

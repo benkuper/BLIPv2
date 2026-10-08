@@ -2,6 +2,7 @@
 
 - Status: Accepted for the Ball production slice; full qualification open
 - Date: 2026-10-07
+- Superseded for startup/upload reservation: [ADR-0017](0017-wasm-live-controls-upload-storage.md)
 - Related: [ADR-0003](0003-threading-and-scheduling.md), [ADR-0009](0009-wasm-service-boundary.md)
 
 ## Decision

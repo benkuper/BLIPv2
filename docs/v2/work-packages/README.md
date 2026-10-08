@@ -36,6 +36,7 @@ wire protocols, or public OSC paths.
 | [3.4](3.4-native-rmt-strip.md) | Native single-strip RMT vertical slice and qualification boundary |
 | [3.5](3.5-browser-installer.md) | Browser-compatible factory artifacts and on-device firmware update flow |
 | [3.6](3.6-pin-reservation-ui.md) | Complete pin/reservation inspection with conflict-safe reassignment and shared-bus handling |
+| [3.7–3.9](3.7-device-web-and-self-update.md) | Required Simple/Advanced graphical web app and device-specific firmware/web self-updates; implementation pending |
 
 ## Milestone 4
 
@@ -80,3 +81,4 @@ wire protocols, or public OSC paths.
 | [6.6 declarations](6.6-script-declaration-contract.md) | Owned declaration decoding/projection; live integration follows |
 | [6.6 registry interfaces](6.6-dynamic-registry-interfaces.md) | Leased dynamic controls and owned transport replies; surrogate and static production controls qualified |
 | [6.6 owned store](6.6-script-control-store.md) | Typed values, copied queues, leased retirement and actual callback/global checks; production owner/UI integration pending |
+| [6.6 production controls](6.6-production-live-controls.md) | Live registry publication and copied supervised actions; seven builds, three-family production trials and provider regressions passed; guest events/transport/UI/SDK pending |

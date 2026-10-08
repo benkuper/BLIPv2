@@ -1,0 +1,2052 @@
+{
+  "schema_version": 1,
+  "work_package": "6.6",
+  "checkpoint": "production-live-controls",
+  "created_at": "2026-10-08T20:40:32.099639+00:00",
+  "repository_head_before_commit": "4f8d63a186707ee7f60efc38be98e9ba8aa8af40",
+  "source_snapshot": {
+    "sha256": "5709e70046cefa0aadef575a3e6001ad87b9ead981a85ad976af33a3d1a2ef26",
+    "files": {
+      "v2/components/blip_transport/src/esp_serial_transport_component.cpp": "79619a09811848fd1a7396225002beef488509cf01bfc81712f23df36e40e217",
+      "v2/components/blip_wasm/CMakeLists.txt": "988e51480c5a3f0a768b4c882dbeba4e5d25d6c79ad0c3d43e37e46deaa4c7d2",
+      "v2/components/blip_wasm/include/blip/wasm/capability.hpp": "27cc003c98dad7697c118efbe1e273df0f7a3a33b998969efbd7b9f826599ab5",
+      "v2/components/blip_wasm/include/blip/wasm/esp_wasm_component.hpp": "b0f2b671da0b5688d9b342a3b7b5e545d5fda232dc496f04b68d5ba76a691d73",
+      "v2/components/blip_wasm/include/blip/wasm/module_policy.hpp": "efdf4bfad389816d3fb60f911fc86f0880fad64a65d6b24d126663306e09d5e0",
+      "v2/components/blip_wasm/include/blip/wasm/module_upload.hpp": "6a9e315dd3e95a41353e6db17e2fe249124aa621e810d133f6e81c27f0863d72",
+      "v2/components/blip_wasm/include/blip/wasm/runtime.hpp": "4b02fd92565568b8c82b0450ec72e7ca1bee5ddae5dad784cd8117e6f681c8ed",
+      "v2/components/blip_wasm/include/blip/wasm/script_controls.hpp": "480462d089dd3c60cbce0afb259c56dd0aa7fcabcef3baf9d6f34b80bb631422",
+      "v2/components/blip_wasm/include/blip/wasm/script_manifest.hpp": "839586b22398201a03e6a11a18ce91e67f26730d37c59f2172aad5b82c330f2d",
+      "v2/components/blip_wasm/include/blip/wasm/service.hpp": "9e43b677bbbf5b3589563e7f3d5406db68604fdb635dc10fdd8f55f51bc92521",
+      "v2/components/blip_wasm/include/blip/wasm/utf8.hpp": "91fe3a932ca9eae4fd233447695d51dcdecec42ef7c94d86d74ef0251e224ca9",
+      "v2/components/blip_wasm/include/blip/wasm/wamr_runtime.hpp": "acf8ab868c6ba8e2b87f54659a423a5f6f32639bb311f60c5affb1531685a20c",
+      "v2/components/blip_wasm/src/capability.cpp": "1a439d770791527a857f1233ffb6139267dd96ced722179978e4071348ce5721",
+      "v2/components/blip_wasm/src/esp_wasm_component.cpp": "2cfa58953b06068367546f02e763ce4870bf88937391d79d3fd740e698ff25ca",
+      "v2/components/blip_wasm/src/linear_arena.h": "f60014390989c433124fb1d4552aba17dbb69facd8fba32c03f75a884e6c634c",
+      "v2/components/blip_wasm/src/module_policy.cpp": "5ddef0be3c0020063db677a74c761663d503817bda96bd4f85ac6faf3a006db9",
+      "v2/components/blip_wasm/src/module_upload.cpp": "e3078a616d20be8ad30d7327f357e0ea07646625a04e3568fba9b340df691ab2",
+      "v2/components/blip_wasm/src/pool_memory.c": "6f2761057d056f2127279c0bf4b49c011e877dadc8e5720a33e30130b907abf5",
+      "v2/components/blip_wasm/src/script_controls.cpp": "e5bb33a2e91e5ecc23bfd42af991c40cf0ad6c231fc5a3699e5c55809650abe7",
+      "v2/components/blip_wasm/src/script_manifest.cpp": "5ca47a259beeefdc26eac2c382472b376d82476e3156e2530a7a9731a6afa4a8",
+      "v2/components/blip_wasm/src/service.cpp": "f6fa95a2747185b1e85d506ded0927b15de71a567c88e5865a19336933bcd008",
+      "v2/components/blip_wasm/src/utf8.cpp": "cf86a37b8a1f9418df44defa6e2b96e30354dce8c80a6db70c5f9831cd437a6a",
+      "v2/components/blip_wasm/src/wamr_runtime.cpp": "5a0af77010ef71262ebacd1f4819b145e4585489874d00ad6e617ba9b3261b88",
+      "v2/firmware/CMakeLists.txt": "38ccf7b7834a246c880ecc56b0bf62f4f72c1955384e53cb1779979ab1c2aef8",
+      "v2/firmware/main/CMakeLists.txt": "79b4a85dd1cb2377f2429f225945430fd9ca85c902ad6202de18726b852d2da2",
+      "v2/firmware/main/main.cpp": "2f12031ce39254282a8a71ed9998da99a969f52d433a49f6195e4620b21ca851",
+      "v2/firmware/sdkconfig.wasm.defaults": "4c0e5faf9a03415c0336a34534acb9826e19c9c04432d790fa112e34d7793064",
+      "v2/firmware/sdkconfig.wasm.esp32.defaults": "067f83ebd6988d2cad4f365f10f9e9a9e2550535571eca9c6300ed7278e4cc7b",
+      "v2/qualification/wasm-service/main/fixtures.hpp": "6a980d7c7d6854b0e84afb6c73a100fdeef08c598b569bd8879987bc1ff67642",
+      "v2/qualification/wasm-worker/generate_fixtures.py": "b892f03a121a3c47a764d01b043a70cac9aca04089ba3045a2e316a946ea54a1",
+      "v2/qualification/wasm-worker/main/fixtures.hpp": "2ce94bc6255831322d027bd39bf94292b0f7d024a65500203ca90f0dc1b91c4d",
+      "v2/tools/control/blip_serial_control.py": "5646d006d65d0182757210afe2017844713692bc70d0ef17b2effa0ed888d5d2",
+      "v2/tools/control/blip_wasm_hil.py": "dc26514be8d9893a18c401ebee268fe7a7933fa26c85975262ce5a28f0afd736",
+      "v2/tools/control/blip_wasm_network_hil.ps1": "b596de58718e92fa1bf23ee5a031bc9906978d2dde5a8f7cb27d03809791e3be",
+      "v2/tools/wifi/blip_wifi_guard.ps1": "3edc575bc0dc20041ed52a9ec2d5ae6577a5b89d8991827c73938dd212f22c7b",
+      "v2/tools/wifi/blip_wifi_recovery.ps1": "34cfce5048430bb55860c9f15e9ae08c3bdbd84748b754636ffe86cc3510b9ba"
+    }
+  },
+  "wamr_commit": "25bd7eb63e828e4bd242cc9b38d260b4b31c6605",
+  "production_builds": [
+    {
+      "profile": "huzzah32",
+      "board": "adafruit-huzzah32",
+      "chip": "esp32",
+      "app_bytes": 1356832,
+      "app_partition_bytes": 1638400,
+      "static_ram_bytes": 162744,
+      "build_log_sha256": "96f2a6e297b46cb7ab4db392dfc7dd1e04da1f82c849c6e2b539341165975806",
+      "artifacts": {
+        "blip-v2.bin": "9046b2e36d240ec1a553e592051c1d45edf612130efaaf53f71b63f84438944e",
+        "blip-v2.elf": "3a09c51a31617b416ccec8f1e85c5cdd66023732cdb4b489502c79c1e060fc39",
+        "blip-v2.map": "412aa3f7326b2a7c1bf4065f1114af943c85449168be9d23df1055eb0dd1ccfd",
+        "sdkconfig": "2990d3edc0d5083b56d2a37844c84d589a71b0e1228417d3ff5664aa6e838ea1"
+      }
+    },
+    {
+      "profile": "club",
+      "board": "creators-club",
+      "chip": "esp32",
+      "app_bytes": 1348928,
+      "app_partition_bytes": 1638400,
+      "static_ram_bytes": 146155,
+      "build_log_sha256": "056a86d70938e2657f47618053de7f6745ff27a61ac1fc0fb672d107fb9a3787",
+      "artifacts": {
+        "blip-v2.bin": "bc0fa275529395fa033bdc95bd175eb12ebc95945fc11c2a4f3c7c4d32c03a3b",
+        "blip-v2.elf": "993e314c2bbd3c97db04efdc018d023495a4e3289618ffbc0cd5f86fb4bef53c",
+        "blip-v2.map": "b6d48b47357159665d677bbac2af6acf82ca3c5607a220a6e1f6e50bf3c0c5e8",
+        "sdkconfig": "efa84aa878ab8dd3dec1173648e2de62c715e267fea4b1c97fd39266a4f1ffa6"
+      }
+    },
+    {
+      "profile": "tab",
+      "board": "creators-tab",
+      "chip": "esp32",
+      "app_bytes": 1334560,
+      "app_partition_bytes": 1638400,
+      "static_ram_bytes": 159280,
+      "build_log_sha256": "6cbc766b2012ba2efbf49358a20bbe492375609a15f988b535e74759fd034c08",
+      "artifacts": {
+        "blip-v2.bin": "0c281acf0235e09ffe9bdcf6777ce903d829ea65f41f4034d120d68aa6097f22",
+        "blip-v2.elf": "cd262620788aa416fe20d7c2aee2f58b662854948adde6724abcb3b6863cbbde",
+        "blip-v2.map": "23fa6c137a8a62a3ae394890b859961631d3ef05c9986fba6c85b7500a2a232a",
+        "sdkconfig": "efa84aa878ab8dd3dec1173648e2de62c715e267fea4b1c97fd39266a4f1ffa6"
+      }
+    },
+    {
+      "profile": "m5stickc",
+      "board": "m5stack-m5stickc",
+      "chip": "esp32",
+      "app_bytes": 1333376,
+      "app_partition_bytes": 1638400,
+      "static_ram_bytes": 159280,
+      "build_log_sha256": "7093bb718ce540347bbdb35b3877425b71e8ba62c2deefddd1aef7996e57a72b",
+      "artifacts": {
+        "blip-v2.bin": "54d1679a2321a6f59f1431921159afbfb6f6447be0bd6b2db8a3f85c31441f34",
+        "blip-v2.elf": "8242781ab528347850ca057775ebb9c6ad119c65212e39fee60fa1f869ea1f1e",
+        "blip-v2.map": "243b41834858e042bca0947608a77a188e0a1a80274b2291c6ce7a788fa5ddb2",
+        "sdkconfig": "efa84aa878ab8dd3dec1173648e2de62c715e267fea4b1c97fd39266a4f1ffa6"
+      }
+    },
+    {
+      "profile": "m5dial",
+      "board": "m5stack-m5dial",
+      "chip": "esp32s3",
+      "app_bytes": 1334208,
+      "app_partition_bytes": 1638400,
+      "static_ram_bytes": 163845,
+      "build_log_sha256": "50cfa5536978816d7418c245514d182c07cd0debd7bbb29fa42b4d5c3d993cd3",
+      "artifacts": {
+        "blip-v2.bin": "cbb28b83aebd55c9ebafcecebaa521be2e26551045a37da1031a33259fa12dd2",
+        "blip-v2.elf": "767382d7b878df1014b775b78f1b3ec3e1d95f86aa60cb239da0777747f4139b",
+        "blip-v2.map": "0eb5946542df707d63dfadafd63bbc68fa2b6cdb8b6ffb4b7e47b5063ae05b76",
+        "sdkconfig": "dd2d88c9f99d30076102d5ea61bb34fdcb64f9cafed14362e333e79ed3bc3d4e"
+      }
+    },
+    {
+      "profile": "ball",
+      "board": "creators-ball-v2",
+      "chip": "esp32c6",
+      "app_bytes": 1881232,
+      "app_partition_bytes": 3145728,
+      "static_ram_bytes": 153952,
+      "build_log_sha256": "c91eb81b3bb7c2ff202859d92331e1824fda7eb10d9e25cc55fe2e01001c52ff",
+      "artifacts": {
+        "blip-v2.bin": "d63dff7ac14e33a3929e91163f8f511b2348b4f19ccf99e87d165a0e0d403820",
+        "blip-v2.elf": "037995e6c3cfe1e1fe0d6904eaf4fb0606da57b97af2e8bbe2ffd64f8c2fae5b",
+        "blip-v2.map": "a064891f17940fcd9251122faa3e1a1ac4db8bee3b4f07d19608f7dae7e8fbaf",
+        "sdkconfig": "1e95fef6a4377857cfc7e89abb277c8936ccddf423de21467228d1904a1f84ce"
+      }
+    },
+    {
+      "profile": "xiao",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "chip": "esp32c6",
+      "app_bytes": 1498752,
+      "app_partition_bytes": 1638400,
+      "static_ram_bytes": 163428,
+      "build_log_sha256": "6e10c203b01c9ee358979481824719c833d6f7ce9b7fecf48893b2b14fd03a88",
+      "artifacts": {
+        "blip-v2.bin": "38e91dc8015ad2f61b25358938de86430fb2d25e104dcf88f602040fd2f68664",
+        "blip-v2.elf": "54c8417b070bcb944c781eee982fe364af014c11fe26a95d348c849e32113e23",
+        "blip-v2.map": "3fdf83c6a4ec0636ff186cac8b754034553284db6fec7d14a9badcc03b123d48",
+        "sdkconfig": "f565c1775b28f77685fcaa95981a5c9537e2ffa58ac35316c0f4e0c063a42ed9"
+      }
+    }
+  ],
+  "live_control_trials": [
+    {
+      "profile": "ball",
+      "report_sha256": "199151d0fe05d06841584dda1fdbe976d95f682c615d812330cefc5cdb8ebc03",
+      "trial": {
+        "board": "creators-ball-v2",
+        "port": "COM10",
+        "passed": true,
+        "checks": [
+          {
+            "name": "initial-unload",
+            "passed": true
+          },
+          {
+            "name": "publish",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 0,
+              "elapsed_us": 17201
+            }
+          },
+          {
+            "name": "default-value",
+            "passed": true
+          },
+          {
+            "name": "dynamic-write-read",
+            "passed": true
+          },
+          {
+            "name": "action-admitted",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 11
+                }
+              ]
+            }
+          },
+          {
+            "name": "action-completed",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 0,
+              "elapsed_us": 2863
+            }
+          },
+          {
+            "name": "export-armed",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 1721
+            }
+          },
+          {
+            "name": "export-count",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 1516
+            }
+          },
+          {
+            "name": "export-rate",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 2844
+            }
+          },
+          {
+            "name": "export-length",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 1818
+            }
+          },
+          {
+            "name": "export-text_word",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 1445
+            }
+          },
+          {
+            "name": "copied-typed-callback",
+            "passed": true
+          },
+          {
+            "name": "live-oscquery-schema",
+            "passed": true
+          },
+          {
+            "name": "unload",
+            "passed": true
+          },
+          {
+            "name": "retired-schema-hidden",
+            "passed": true
+          },
+          {
+            "name": "bad-signature",
+            "passed": true,
+            "completion": {
+              "error": "validation_failed",
+              "count": 0,
+              "elapsed_us": 17992
+            }
+          },
+          {
+            "name": "bad-signature-hidden",
+            "passed": true
+          },
+          {
+            "name": "reserved-id",
+            "passed": true,
+            "completion": {
+              "error": "duplicate_id",
+              "count": 0,
+              "elapsed_us": 2935
+            }
+          },
+          {
+            "name": "reserved-id-hidden",
+            "passed": true
+          },
+          {
+            "name": "reload-after-failure",
+            "passed": true
+          },
+          {
+            "name": "fault",
+            "passed": true
+          },
+          {
+            "name": "fault-schema-hidden",
+            "passed": true
+          },
+          {
+            "name": "loop-load",
+            "passed": true
+          },
+          {
+            "name": "bounded-action-refusal",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "action-queue-full",
+              "values": []
+            }
+          },
+          {
+            "name": "bounded-action-refusal",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "action-queue-full",
+              "values": []
+            }
+          },
+          {
+            "name": "bounded-action-refusal",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "action-queue-full",
+              "values": []
+            }
+          },
+          {
+            "name": "bounded-action-refusal",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "action-queue-full",
+              "values": []
+            }
+          },
+          {
+            "name": "cancel-admitted",
+            "passed": true
+          },
+          {
+            "name": "action-tickets-ordered",
+            "passed": true,
+            "tickets": [
+              55,
+              56,
+              57,
+              58
+            ]
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 869
+            }
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 593
+            }
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 1636
+            }
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 823
+            }
+          },
+          {
+            "name": "reload-before-unload-barrier",
+            "passed": true
+          },
+          {
+            "name": "unload-barrier-admitted",
+            "passed": true
+          },
+          {
+            "name": "old-action-admission-closed",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "invalid_state",
+              "detail": "script-admission-closed",
+              "values": []
+            }
+          },
+          {
+            "name": "unload-barrier-completed",
+            "passed": true
+          },
+          {
+            "name": "reload-0",
+            "passed": true
+          },
+          {
+            "name": "defaults-0",
+            "passed": true
+          },
+          {
+            "name": "retire-0",
+            "passed": true
+          },
+          {
+            "name": "reload-1",
+            "passed": true
+          },
+          {
+            "name": "defaults-1",
+            "passed": true
+          },
+          {
+            "name": "retire-1",
+            "passed": true
+          },
+          {
+            "name": "reload-2",
+            "passed": true
+          },
+          {
+            "name": "defaults-2",
+            "passed": true
+          },
+          {
+            "name": "retire-2",
+            "passed": true
+          },
+          {
+            "name": "reload-3",
+            "passed": true
+          },
+          {
+            "name": "defaults-3",
+            "passed": true
+          },
+          {
+            "name": "retire-3",
+            "passed": true
+          },
+          {
+            "name": "reload-4",
+            "passed": true
+          },
+          {
+            "name": "defaults-4",
+            "passed": true
+          },
+          {
+            "name": "retire-4",
+            "passed": true
+          },
+          {
+            "name": "reload-5",
+            "passed": true
+          },
+          {
+            "name": "defaults-5",
+            "passed": true
+          },
+          {
+            "name": "retire-5",
+            "passed": true
+          },
+          {
+            "name": "reload-6",
+            "passed": true
+          },
+          {
+            "name": "defaults-6",
+            "passed": true
+          },
+          {
+            "name": "retire-6",
+            "passed": true
+          },
+          {
+            "name": "reload-7",
+            "passed": true
+          },
+          {
+            "name": "defaults-7",
+            "passed": true
+          },
+          {
+            "name": "retire-7",
+            "passed": true
+          },
+          {
+            "name": "reload-8",
+            "passed": true
+          },
+          {
+            "name": "defaults-8",
+            "passed": true
+          },
+          {
+            "name": "retire-8",
+            "passed": true
+          },
+          {
+            "name": "reload-9",
+            "passed": true
+          },
+          {
+            "name": "defaults-9",
+            "passed": true
+          },
+          {
+            "name": "retire-9",
+            "passed": true
+          },
+          {
+            "name": "reload-10",
+            "passed": true
+          },
+          {
+            "name": "defaults-10",
+            "passed": true
+          },
+          {
+            "name": "retire-10",
+            "passed": true
+          },
+          {
+            "name": "reload-11",
+            "passed": true
+          },
+          {
+            "name": "defaults-11",
+            "passed": true
+          },
+          {
+            "name": "retire-11",
+            "passed": true
+          },
+          {
+            "name": "reload-12",
+            "passed": true
+          },
+          {
+            "name": "defaults-12",
+            "passed": true
+          },
+          {
+            "name": "retire-12",
+            "passed": true
+          },
+          {
+            "name": "reload-13",
+            "passed": true
+          },
+          {
+            "name": "defaults-13",
+            "passed": true
+          },
+          {
+            "name": "retire-13",
+            "passed": true
+          },
+          {
+            "name": "reload-14",
+            "passed": true
+          },
+          {
+            "name": "defaults-14",
+            "passed": true
+          },
+          {
+            "name": "retire-14",
+            "passed": true
+          },
+          {
+            "name": "reload-15",
+            "passed": true
+          },
+          {
+            "name": "defaults-15",
+            "passed": true
+          },
+          {
+            "name": "retire-15",
+            "passed": true
+          },
+          {
+            "name": "reload-16",
+            "passed": true
+          },
+          {
+            "name": "defaults-16",
+            "passed": true
+          },
+          {
+            "name": "retire-16",
+            "passed": true
+          },
+          {
+            "name": "reload-17",
+            "passed": true
+          },
+          {
+            "name": "defaults-17",
+            "passed": true
+          },
+          {
+            "name": "retire-17",
+            "passed": true
+          },
+          {
+            "name": "reload-18",
+            "passed": true
+          },
+          {
+            "name": "defaults-18",
+            "passed": true
+          },
+          {
+            "name": "retire-18",
+            "passed": true
+          },
+          {
+            "name": "reload-19",
+            "passed": true
+          },
+          {
+            "name": "defaults-19",
+            "passed": true
+          },
+          {
+            "name": "retire-19",
+            "passed": true
+          },
+          {
+            "name": "worker-stack-reserve",
+            "passed": true
+          },
+          {
+            "name": "warmed-heap-stable",
+            "passed": true
+          }
+        ],
+        "pc_network_changed": false,
+        "production_script_owner_exercised": true,
+        "source_snapshot": {
+          "sha256": "5709e70046cefa0aadef575a3e6001ad87b9ead981a85ad976af33a3d1a2ef26",
+          "files": {
+            "v2/components/blip_transport/src/esp_serial_transport_component.cpp": "79619a09811848fd1a7396225002beef488509cf01bfc81712f23df36e40e217",
+            "v2/components/blip_wasm/CMakeLists.txt": "988e51480c5a3f0a768b4c882dbeba4e5d25d6c79ad0c3d43e37e46deaa4c7d2",
+            "v2/components/blip_wasm/include/blip/wasm/capability.hpp": "27cc003c98dad7697c118efbe1e273df0f7a3a33b998969efbd7b9f826599ab5",
+            "v2/components/blip_wasm/include/blip/wasm/esp_wasm_component.hpp": "b0f2b671da0b5688d9b342a3b7b5e545d5fda232dc496f04b68d5ba76a691d73",
+            "v2/components/blip_wasm/include/blip/wasm/module_policy.hpp": "efdf4bfad389816d3fb60f911fc86f0880fad64a65d6b24d126663306e09d5e0",
+            "v2/components/blip_wasm/include/blip/wasm/module_upload.hpp": "6a9e315dd3e95a41353e6db17e2fe249124aa621e810d133f6e81c27f0863d72",
+            "v2/components/blip_wasm/include/blip/wasm/runtime.hpp": "4b02fd92565568b8c82b0450ec72e7ca1bee5ddae5dad784cd8117e6f681c8ed",
+            "v2/components/blip_wasm/include/blip/wasm/script_controls.hpp": "480462d089dd3c60cbce0afb259c56dd0aa7fcabcef3baf9d6f34b80bb631422",
+            "v2/components/blip_wasm/include/blip/wasm/script_manifest.hpp": "839586b22398201a03e6a11a18ce91e67f26730d37c59f2172aad5b82c330f2d",
+            "v2/components/blip_wasm/include/blip/wasm/service.hpp": "9e43b677bbbf5b3589563e7f3d5406db68604fdb635dc10fdd8f55f51bc92521",
+            "v2/components/blip_wasm/include/blip/wasm/utf8.hpp": "91fe3a932ca9eae4fd233447695d51dcdecec42ef7c94d86d74ef0251e224ca9",
+            "v2/components/blip_wasm/include/blip/wasm/wamr_runtime.hpp": "acf8ab868c6ba8e2b87f54659a423a5f6f32639bb311f60c5affb1531685a20c",
+            "v2/components/blip_wasm/src/capability.cpp": "1a439d770791527a857f1233ffb6139267dd96ced722179978e4071348ce5721",
+            "v2/components/blip_wasm/src/esp_wasm_component.cpp": "2cfa58953b06068367546f02e763ce4870bf88937391d79d3fd740e698ff25ca",
+            "v2/components/blip_wasm/src/linear_arena.h": "f60014390989c433124fb1d4552aba17dbb69facd8fba32c03f75a884e6c634c",
+            "v2/components/blip_wasm/src/module_policy.cpp": "5ddef0be3c0020063db677a74c761663d503817bda96bd4f85ac6faf3a006db9",
+            "v2/components/blip_wasm/src/module_upload.cpp": "e3078a616d20be8ad30d7327f357e0ea07646625a04e3568fba9b340df691ab2",
+            "v2/components/blip_wasm/src/pool_memory.c": "6f2761057d056f2127279c0bf4b49c011e877dadc8e5720a33e30130b907abf5",
+            "v2/components/blip_wasm/src/script_controls.cpp": "e5bb33a2e91e5ecc23bfd42af991c40cf0ad6c231fc5a3699e5c55809650abe7",
+            "v2/components/blip_wasm/src/script_manifest.cpp": "5ca47a259beeefdc26eac2c382472b376d82476e3156e2530a7a9731a6afa4a8",
+            "v2/components/blip_wasm/src/service.cpp": "f6fa95a2747185b1e85d506ded0927b15de71a567c88e5865a19336933bcd008",
+            "v2/components/blip_wasm/src/utf8.cpp": "cf86a37b8a1f9418df44defa6e2b96e30354dce8c80a6db70c5f9831cd437a6a",
+            "v2/components/blip_wasm/src/wamr_runtime.cpp": "5a0af77010ef71262ebacd1f4819b145e4585489874d00ad6e617ba9b3261b88",
+            "v2/firmware/CMakeLists.txt": "38ccf7b7834a246c880ecc56b0bf62f4f72c1955384e53cb1779979ab1c2aef8",
+            "v2/firmware/main/CMakeLists.txt": "79b4a85dd1cb2377f2429f225945430fd9ca85c902ad6202de18726b852d2da2",
+            "v2/firmware/main/main.cpp": "2f12031ce39254282a8a71ed9998da99a969f52d433a49f6195e4620b21ca851",
+            "v2/firmware/sdkconfig.wasm.defaults": "4c0e5faf9a03415c0336a34534acb9826e19c9c04432d790fa112e34d7793064",
+            "v2/firmware/sdkconfig.wasm.esp32.defaults": "067f83ebd6988d2cad4f365f10f9e9a9e2550535571eca9c6300ed7278e4cc7b",
+            "v2/qualification/wasm-service/main/fixtures.hpp": "6a980d7c7d6854b0e84afb6c73a100fdeef08c598b569bd8879987bc1ff67642",
+            "v2/qualification/wasm-worker/generate_fixtures.py": "b892f03a121a3c47a764d01b043a70cac9aca04089ba3045a2e316a946ea54a1",
+            "v2/qualification/wasm-worker/main/fixtures.hpp": "2ce94bc6255831322d027bd39bf94292b0f7d024a65500203ca90f0dc1b91c4d",
+            "v2/tools/control/blip_serial_control.py": "5646d006d65d0182757210afe2017844713692bc70d0ef17b2effa0ed888d5d2",
+            "v2/tools/control/blip_wasm_hil.py": "dc26514be8d9893a18c401ebee268fe7a7933fa26c85975262ce5a28f0afd736",
+            "v2/tools/control/blip_wasm_network_hil.ps1": "b596de58718e92fa1bf23ee5a031bc9906978d2dde5a8f7cb27d03809791e3be",
+            "v2/tools/wifi/blip_wifi_guard.ps1": "3edc575bc0dc20041ed52a9ec2d5ae6577a5b89d8991827c73938dd212f22c7b",
+            "v2/tools/wifi/blip_wifi_recovery.ps1": "34cfce5048430bb55860c9f15e9ae08c3bdbd84748b754636ffe86cc3510b9ba"
+          }
+        },
+        "checker_sha256": "84e487cf5ffa4780efa0d829d4a5721ce08ca9f7a2f5078bac85925826ebff76",
+        "flashed_mac": "08:92:72:f6:4d:dc",
+        "flash_log_sha256": "d22b77ba0389c19e2ce472f14ac9de9f5a5cf90c727e5eb7969c5441e5d55b4c",
+        "artifacts": {
+          "blip-v2.bin": "d63dff7ac14e33a3929e91163f8f511b2348b4f19ccf99e87d165a0e0d403820",
+          "blip-v2.elf": "037995e6c3cfe1e1fe0d6904eaf4fb0606da57b97af2e8bbe2ffd64f8c2fae5b",
+          "sdkconfig": "1e95fef6a4377857cfc7e89abb277c8936ccddf423de21467228d1904a1f84ce"
+        },
+        "heap_samples": [
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552,
+          25552
+        ],
+        "worker_stack_headroom": 5084
+      }
+    },
+    {
+      "profile": "huzzah32",
+      "report_sha256": "20a2415e71d784c461b30766e07f5b9c38540f5dd149a00cdebca22326508f02",
+      "trial": {
+        "board": "adafruit-huzzah32",
+        "port": "COM5",
+        "passed": true,
+        "checks": [
+          {
+            "name": "initial-unload",
+            "passed": true
+          },
+          {
+            "name": "publish",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 0,
+              "elapsed_us": 17538
+            }
+          },
+          {
+            "name": "default-value",
+            "passed": true
+          },
+          {
+            "name": "dynamic-write-read",
+            "passed": true
+          },
+          {
+            "name": "action-admitted",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 11
+                }
+              ]
+            }
+          },
+          {
+            "name": "action-completed",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 0,
+              "elapsed_us": 2890
+            }
+          },
+          {
+            "name": "export-armed",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 2061
+            }
+          },
+          {
+            "name": "export-count",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 1876
+            }
+          },
+          {
+            "name": "export-rate",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 2281
+            }
+          },
+          {
+            "name": "export-length",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 2018
+            }
+          },
+          {
+            "name": "export-text_word",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 2181
+            }
+          },
+          {
+            "name": "copied-typed-callback",
+            "passed": true
+          },
+          {
+            "name": "live-oscquery-schema",
+            "passed": true
+          },
+          {
+            "name": "unload",
+            "passed": true
+          },
+          {
+            "name": "retired-schema-hidden",
+            "passed": true
+          },
+          {
+            "name": "bad-signature",
+            "passed": true,
+            "completion": {
+              "error": "validation_failed",
+              "count": 0,
+              "elapsed_us": 17884
+            }
+          },
+          {
+            "name": "bad-signature-hidden",
+            "passed": true
+          },
+          {
+            "name": "reserved-id",
+            "passed": true,
+            "completion": {
+              "error": "duplicate_id",
+              "count": 0,
+              "elapsed_us": 2018
+            }
+          },
+          {
+            "name": "reserved-id-hidden",
+            "passed": true
+          },
+          {
+            "name": "reload-after-failure",
+            "passed": true
+          },
+          {
+            "name": "fault",
+            "passed": true
+          },
+          {
+            "name": "fault-schema-hidden",
+            "passed": true
+          },
+          {
+            "name": "loop-load",
+            "passed": true
+          },
+          {
+            "name": "bounded-action-refusal",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "action-queue-full",
+              "values": []
+            }
+          },
+          {
+            "name": "bounded-action-refusal",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "action-queue-full",
+              "values": []
+            }
+          },
+          {
+            "name": "bounded-action-refusal",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "not_found",
+              "detail": "inactive-schema",
+              "values": []
+            }
+          },
+          {
+            "name": "cancel-admitted",
+            "passed": true
+          },
+          {
+            "name": "action-tickets-ordered",
+            "passed": true,
+            "tickets": [
+              55,
+              56,
+              57,
+              58,
+              59
+            ]
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "budget_exceeded",
+              "count": 0,
+              "elapsed_us": 53384
+            }
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 559
+            }
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 762
+            }
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 733
+            }
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 413
+            }
+          },
+          {
+            "name": "reload-before-unload-barrier",
+            "passed": true
+          },
+          {
+            "name": "unload-barrier-admitted",
+            "passed": true
+          },
+          {
+            "name": "old-action-admission-closed",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "not_found",
+              "detail": "inactive-schema",
+              "values": []
+            }
+          },
+          {
+            "name": "unload-barrier-completed",
+            "passed": true
+          },
+          {
+            "name": "reload-0",
+            "passed": true
+          },
+          {
+            "name": "defaults-0",
+            "passed": true
+          },
+          {
+            "name": "retire-0",
+            "passed": true
+          },
+          {
+            "name": "reload-1",
+            "passed": true
+          },
+          {
+            "name": "defaults-1",
+            "passed": true
+          },
+          {
+            "name": "retire-1",
+            "passed": true
+          },
+          {
+            "name": "reload-2",
+            "passed": true
+          },
+          {
+            "name": "defaults-2",
+            "passed": true
+          },
+          {
+            "name": "retire-2",
+            "passed": true
+          },
+          {
+            "name": "reload-3",
+            "passed": true
+          },
+          {
+            "name": "defaults-3",
+            "passed": true
+          },
+          {
+            "name": "retire-3",
+            "passed": true
+          },
+          {
+            "name": "reload-4",
+            "passed": true
+          },
+          {
+            "name": "defaults-4",
+            "passed": true
+          },
+          {
+            "name": "retire-4",
+            "passed": true
+          },
+          {
+            "name": "reload-5",
+            "passed": true
+          },
+          {
+            "name": "defaults-5",
+            "passed": true
+          },
+          {
+            "name": "retire-5",
+            "passed": true
+          },
+          {
+            "name": "reload-6",
+            "passed": true
+          },
+          {
+            "name": "defaults-6",
+            "passed": true
+          },
+          {
+            "name": "retire-6",
+            "passed": true
+          },
+          {
+            "name": "reload-7",
+            "passed": true
+          },
+          {
+            "name": "defaults-7",
+            "passed": true
+          },
+          {
+            "name": "retire-7",
+            "passed": true
+          },
+          {
+            "name": "reload-8",
+            "passed": true
+          },
+          {
+            "name": "defaults-8",
+            "passed": true
+          },
+          {
+            "name": "retire-8",
+            "passed": true
+          },
+          {
+            "name": "reload-9",
+            "passed": true
+          },
+          {
+            "name": "defaults-9",
+            "passed": true
+          },
+          {
+            "name": "retire-9",
+            "passed": true
+          },
+          {
+            "name": "reload-10",
+            "passed": true
+          },
+          {
+            "name": "defaults-10",
+            "passed": true
+          },
+          {
+            "name": "retire-10",
+            "passed": true
+          },
+          {
+            "name": "reload-11",
+            "passed": true
+          },
+          {
+            "name": "defaults-11",
+            "passed": true
+          },
+          {
+            "name": "retire-11",
+            "passed": true
+          },
+          {
+            "name": "reload-12",
+            "passed": true
+          },
+          {
+            "name": "defaults-12",
+            "passed": true
+          },
+          {
+            "name": "retire-12",
+            "passed": true
+          },
+          {
+            "name": "reload-13",
+            "passed": true
+          },
+          {
+            "name": "defaults-13",
+            "passed": true
+          },
+          {
+            "name": "retire-13",
+            "passed": true
+          },
+          {
+            "name": "reload-14",
+            "passed": true
+          },
+          {
+            "name": "defaults-14",
+            "passed": true
+          },
+          {
+            "name": "retire-14",
+            "passed": true
+          },
+          {
+            "name": "reload-15",
+            "passed": true
+          },
+          {
+            "name": "defaults-15",
+            "passed": true
+          },
+          {
+            "name": "retire-15",
+            "passed": true
+          },
+          {
+            "name": "reload-16",
+            "passed": true
+          },
+          {
+            "name": "defaults-16",
+            "passed": true
+          },
+          {
+            "name": "retire-16",
+            "passed": true
+          },
+          {
+            "name": "reload-17",
+            "passed": true
+          },
+          {
+            "name": "defaults-17",
+            "passed": true
+          },
+          {
+            "name": "retire-17",
+            "passed": true
+          },
+          {
+            "name": "reload-18",
+            "passed": true
+          },
+          {
+            "name": "defaults-18",
+            "passed": true
+          },
+          {
+            "name": "retire-18",
+            "passed": true
+          },
+          {
+            "name": "reload-19",
+            "passed": true
+          },
+          {
+            "name": "defaults-19",
+            "passed": true
+          },
+          {
+            "name": "retire-19",
+            "passed": true
+          },
+          {
+            "name": "worker-stack-reserve",
+            "passed": true
+          },
+          {
+            "name": "warmed-heap-stable",
+            "passed": true
+          }
+        ],
+        "pc_network_changed": false,
+        "production_script_owner_exercised": true,
+        "source_snapshot": {
+          "sha256": "5709e70046cefa0aadef575a3e6001ad87b9ead981a85ad976af33a3d1a2ef26",
+          "files": {
+            "v2/components/blip_transport/src/esp_serial_transport_component.cpp": "79619a09811848fd1a7396225002beef488509cf01bfc81712f23df36e40e217",
+            "v2/components/blip_wasm/CMakeLists.txt": "988e51480c5a3f0a768b4c882dbeba4e5d25d6c79ad0c3d43e37e46deaa4c7d2",
+            "v2/components/blip_wasm/include/blip/wasm/capability.hpp": "27cc003c98dad7697c118efbe1e273df0f7a3a33b998969efbd7b9f826599ab5",
+            "v2/components/blip_wasm/include/blip/wasm/esp_wasm_component.hpp": "b0f2b671da0b5688d9b342a3b7b5e545d5fda232dc496f04b68d5ba76a691d73",
+            "v2/components/blip_wasm/include/blip/wasm/module_policy.hpp": "efdf4bfad389816d3fb60f911fc86f0880fad64a65d6b24d126663306e09d5e0",
+            "v2/components/blip_wasm/include/blip/wasm/module_upload.hpp": "6a9e315dd3e95a41353e6db17e2fe249124aa621e810d133f6e81c27f0863d72",
+            "v2/components/blip_wasm/include/blip/wasm/runtime.hpp": "4b02fd92565568b8c82b0450ec72e7ca1bee5ddae5dad784cd8117e6f681c8ed",
+            "v2/components/blip_wasm/include/blip/wasm/script_controls.hpp": "480462d089dd3c60cbce0afb259c56dd0aa7fcabcef3baf9d6f34b80bb631422",
+            "v2/components/blip_wasm/include/blip/wasm/script_manifest.hpp": "839586b22398201a03e6a11a18ce91e67f26730d37c59f2172aad5b82c330f2d",
+            "v2/components/blip_wasm/include/blip/wasm/service.hpp": "9e43b677bbbf5b3589563e7f3d5406db68604fdb635dc10fdd8f55f51bc92521",
+            "v2/components/blip_wasm/include/blip/wasm/utf8.hpp": "91fe3a932ca9eae4fd233447695d51dcdecec42ef7c94d86d74ef0251e224ca9",
+            "v2/components/blip_wasm/include/blip/wasm/wamr_runtime.hpp": "acf8ab868c6ba8e2b87f54659a423a5f6f32639bb311f60c5affb1531685a20c",
+            "v2/components/blip_wasm/src/capability.cpp": "1a439d770791527a857f1233ffb6139267dd96ced722179978e4071348ce5721",
+            "v2/components/blip_wasm/src/esp_wasm_component.cpp": "2cfa58953b06068367546f02e763ce4870bf88937391d79d3fd740e698ff25ca",
+            "v2/components/blip_wasm/src/linear_arena.h": "f60014390989c433124fb1d4552aba17dbb69facd8fba32c03f75a884e6c634c",
+            "v2/components/blip_wasm/src/module_policy.cpp": "5ddef0be3c0020063db677a74c761663d503817bda96bd4f85ac6faf3a006db9",
+            "v2/components/blip_wasm/src/module_upload.cpp": "e3078a616d20be8ad30d7327f357e0ea07646625a04e3568fba9b340df691ab2",
+            "v2/components/blip_wasm/src/pool_memory.c": "6f2761057d056f2127279c0bf4b49c011e877dadc8e5720a33e30130b907abf5",
+            "v2/components/blip_wasm/src/script_controls.cpp": "e5bb33a2e91e5ecc23bfd42af991c40cf0ad6c231fc5a3699e5c55809650abe7",
+            "v2/components/blip_wasm/src/script_manifest.cpp": "5ca47a259beeefdc26eac2c382472b376d82476e3156e2530a7a9731a6afa4a8",
+            "v2/components/blip_wasm/src/service.cpp": "f6fa95a2747185b1e85d506ded0927b15de71a567c88e5865a19336933bcd008",
+            "v2/components/blip_wasm/src/utf8.cpp": "cf86a37b8a1f9418df44defa6e2b96e30354dce8c80a6db70c5f9831cd437a6a",
+            "v2/components/blip_wasm/src/wamr_runtime.cpp": "5a0af77010ef71262ebacd1f4819b145e4585489874d00ad6e617ba9b3261b88",
+            "v2/firmware/CMakeLists.txt": "38ccf7b7834a246c880ecc56b0bf62f4f72c1955384e53cb1779979ab1c2aef8",
+            "v2/firmware/main/CMakeLists.txt": "79b4a85dd1cb2377f2429f225945430fd9ca85c902ad6202de18726b852d2da2",
+            "v2/firmware/main/main.cpp": "2f12031ce39254282a8a71ed9998da99a969f52d433a49f6195e4620b21ca851",
+            "v2/firmware/sdkconfig.wasm.defaults": "4c0e5faf9a03415c0336a34534acb9826e19c9c04432d790fa112e34d7793064",
+            "v2/firmware/sdkconfig.wasm.esp32.defaults": "067f83ebd6988d2cad4f365f10f9e9a9e2550535571eca9c6300ed7278e4cc7b",
+            "v2/qualification/wasm-service/main/fixtures.hpp": "6a980d7c7d6854b0e84afb6c73a100fdeef08c598b569bd8879987bc1ff67642",
+            "v2/qualification/wasm-worker/generate_fixtures.py": "b892f03a121a3c47a764d01b043a70cac9aca04089ba3045a2e316a946ea54a1",
+            "v2/qualification/wasm-worker/main/fixtures.hpp": "2ce94bc6255831322d027bd39bf94292b0f7d024a65500203ca90f0dc1b91c4d",
+            "v2/tools/control/blip_serial_control.py": "5646d006d65d0182757210afe2017844713692bc70d0ef17b2effa0ed888d5d2",
+            "v2/tools/control/blip_wasm_hil.py": "dc26514be8d9893a18c401ebee268fe7a7933fa26c85975262ce5a28f0afd736",
+            "v2/tools/control/blip_wasm_network_hil.ps1": "b596de58718e92fa1bf23ee5a031bc9906978d2dde5a8f7cb27d03809791e3be",
+            "v2/tools/wifi/blip_wifi_guard.ps1": "3edc575bc0dc20041ed52a9ec2d5ae6577a5b89d8991827c73938dd212f22c7b",
+            "v2/tools/wifi/blip_wifi_recovery.ps1": "34cfce5048430bb55860c9f15e9ae08c3bdbd84748b754636ffe86cc3510b9ba"
+          }
+        },
+        "checker_sha256": "84e487cf5ffa4780efa0d829d4a5721ce08ca9f7a2f5078bac85925826ebff76",
+        "flashed_mac": "30:ae:a4:f2:d1:84",
+        "flash_log_sha256": "7ea39094522bf974b8794dacd48c1c82c03febd23c6613f6fee79ef03d9e9fea",
+        "artifacts": {
+          "blip-v2.bin": "9046b2e36d240ec1a553e592051c1d45edf612130efaaf53f71b63f84438944e",
+          "blip-v2.elf": "3a09c51a31617b416ccec8f1e85c5cdd66023732cdb4b489502c79c1e060fc39",
+          "sdkconfig": "2990d3edc0d5083b56d2a37844c84d589a71b0e1228417d3ff5664aa6e838ea1"
+        },
+        "heap_samples": [
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848,
+          32848
+        ],
+        "worker_stack_headroom": 4928
+      }
+    },
+    {
+      "profile": "m5dial",
+      "report_sha256": "52d2952d84fb1901f09438b6147180b19eca52aca813fca366d01bad03bcb986",
+      "trial": {
+        "board": "m5stack-m5dial",
+        "port": "COM9",
+        "passed": true,
+        "checks": [
+          {
+            "name": "initial-unload",
+            "passed": true
+          },
+          {
+            "name": "publish",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 0,
+              "elapsed_us": 16326
+            }
+          },
+          {
+            "name": "default-value",
+            "passed": true
+          },
+          {
+            "name": "dynamic-write-read",
+            "passed": true
+          },
+          {
+            "name": "action-admitted",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "none",
+              "error_code": "none",
+              "detail": "",
+              "values": [
+                {
+                  "type": "integer",
+                  "value": 11
+                }
+              ]
+            }
+          },
+          {
+            "name": "action-completed",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 0,
+              "elapsed_us": 2178
+            }
+          },
+          {
+            "name": "export-armed",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 2421
+            }
+          },
+          {
+            "name": "export-count",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 1279
+            }
+          },
+          {
+            "name": "export-rate",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 1192
+            }
+          },
+          {
+            "name": "export-length",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 1222
+            }
+          },
+          {
+            "name": "export-text_word",
+            "passed": true,
+            "completion": {
+              "error": "none",
+              "count": 1,
+              "elapsed_us": 1226
+            }
+          },
+          {
+            "name": "copied-typed-callback",
+            "passed": true
+          },
+          {
+            "name": "live-oscquery-schema",
+            "passed": true
+          },
+          {
+            "name": "unload",
+            "passed": true
+          },
+          {
+            "name": "retired-schema-hidden",
+            "passed": true
+          },
+          {
+            "name": "bad-signature",
+            "passed": true,
+            "completion": {
+              "error": "validation_failed",
+              "count": 0,
+              "elapsed_us": 15353
+            }
+          },
+          {
+            "name": "bad-signature-hidden",
+            "passed": true
+          },
+          {
+            "name": "reserved-id",
+            "passed": true,
+            "completion": {
+              "error": "duplicate_id",
+              "count": 0,
+              "elapsed_us": 1048
+            }
+          },
+          {
+            "name": "reserved-id-hidden",
+            "passed": true
+          },
+          {
+            "name": "reload-after-failure",
+            "passed": true
+          },
+          {
+            "name": "fault",
+            "passed": true
+          },
+          {
+            "name": "fault-schema-hidden",
+            "passed": true
+          },
+          {
+            "name": "loop-load",
+            "passed": true
+          },
+          {
+            "name": "bounded-action-refusal",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "action-queue-full",
+              "values": []
+            }
+          },
+          {
+            "name": "bounded-action-refusal",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "action-queue-full",
+              "values": []
+            }
+          },
+          {
+            "name": "bounded-action-refusal",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "queue_full",
+              "detail": "action-queue-full",
+              "values": []
+            }
+          },
+          {
+            "name": "cancel-admitted",
+            "passed": true
+          },
+          {
+            "name": "action-tickets-ordered",
+            "passed": true,
+            "tickets": [
+              55,
+              56,
+              57,
+              58,
+              59
+            ]
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 6301
+            }
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 565
+            }
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 787
+            }
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 1004
+            }
+          },
+          {
+            "name": "cancelled-action-completed",
+            "passed": true,
+            "completion": {
+              "error": "cancelled",
+              "count": 0,
+              "elapsed_us": 1750
+            }
+          },
+          {
+            "name": "reload-before-unload-barrier",
+            "passed": true
+          },
+          {
+            "name": "unload-barrier-admitted",
+            "passed": true
+          },
+          {
+            "name": "old-action-admission-closed",
+            "passed": true,
+            "response": {
+              "operation": "action",
+              "component": "blip.wasm",
+              "control": "fire",
+              "error_domain": "control",
+              "error_code": "not_found",
+              "detail": "inactive-schema",
+              "values": []
+            }
+          },
+          {
+            "name": "unload-barrier-completed",
+            "passed": true
+          },
+          {
+            "name": "reload-0",
+            "passed": true
+          },
+          {
+            "name": "defaults-0",
+            "passed": true
+          },
+          {
+            "name": "retire-0",
+            "passed": true
+          },
+          {
+            "name": "reload-1",
+            "passed": true
+          },
+          {
+            "name": "defaults-1",
+            "passed": true
+          },
+          {
+            "name": "retire-1",
+            "passed": true
+          },
+          {
+            "name": "reload-2",
+            "passed": true
+          },
+          {
+            "name": "defaults-2",
+            "passed": true
+          },
+          {
+            "name": "retire-2",
+            "passed": true
+          },
+          {
+            "name": "reload-3",
+            "passed": true
+          },
+          {
+            "name": "defaults-3",
+            "passed": true
+          },
+          {
+            "name": "retire-3",
+            "passed": true
+          },
+          {
+            "name": "reload-4",
+            "passed": true
+          },
+          {
+            "name": "defaults-4",
+            "passed": true
+          },
+          {
+            "name": "retire-4",
+            "passed": true
+          },
+          {
+            "name": "reload-5",
+            "passed": true
+          },
+          {
+            "name": "defaults-5",
+            "passed": true
+          },
+          {
+            "name": "retire-5",
+            "passed": true
+          },
+          {
+            "name": "reload-6",
+            "passed": true
+          },
+          {
+            "name": "defaults-6",
+            "passed": true
+          },
+          {
+            "name": "retire-6",
+            "passed": true
+          },
+          {
+            "name": "reload-7",
+            "passed": true
+          },
+          {
+            "name": "defaults-7",
+            "passed": true
+          },
+          {
+            "name": "retire-7",
+            "passed": true
+          },
+          {
+            "name": "reload-8",
+            "passed": true
+          },
+          {
+            "name": "defaults-8",
+            "passed": true
+          },
+          {
+            "name": "retire-8",
+            "passed": true
+          },
+          {
+            "name": "reload-9",
+            "passed": true
+          },
+          {
+            "name": "defaults-9",
+            "passed": true
+          },
+          {
+            "name": "retire-9",
+            "passed": true
+          },
+          {
+            "name": "reload-10",
+            "passed": true
+          },
+          {
+            "name": "defaults-10",
+            "passed": true
+          },
+          {
+            "name": "retire-10",
+            "passed": true
+          },
+          {
+            "name": "reload-11",
+            "passed": true
+          },
+          {
+            "name": "defaults-11",
+            "passed": true
+          },
+          {
+            "name": "retire-11",
+            "passed": true
+          },
+          {
+            "name": "reload-12",
+            "passed": true
+          },
+          {
+            "name": "defaults-12",
+            "passed": true
+          },
+          {
+            "name": "retire-12",
+            "passed": true
+          },
+          {
+            "name": "reload-13",
+            "passed": true
+          },
+          {
+            "name": "defaults-13",
+            "passed": true
+          },
+          {
+            "name": "retire-13",
+            "passed": true
+          },
+          {
+            "name": "reload-14",
+            "passed": true
+          },
+          {
+            "name": "defaults-14",
+            "passed": true
+          },
+          {
+            "name": "retire-14",
+            "passed": true
+          },
+          {
+            "name": "reload-15",
+            "passed": true
+          },
+          {
+            "name": "defaults-15",
+            "passed": true
+          },
+          {
+            "name": "retire-15",
+            "passed": true
+          },
+          {
+            "name": "reload-16",
+            "passed": true
+          },
+          {
+            "name": "defaults-16",
+            "passed": true
+          },
+          {
+            "name": "retire-16",
+            "passed": true
+          },
+          {
+            "name": "reload-17",
+            "passed": true
+          },
+          {
+            "name": "defaults-17",
+            "passed": true
+          },
+          {
+            "name": "retire-17",
+            "passed": true
+          },
+          {
+            "name": "reload-18",
+            "passed": true
+          },
+          {
+            "name": "defaults-18",
+            "passed": true
+          },
+          {
+            "name": "retire-18",
+            "passed": true
+          },
+          {
+            "name": "reload-19",
+            "passed": true
+          },
+          {
+            "name": "defaults-19",
+            "passed": true
+          },
+          {
+            "name": "retire-19",
+            "passed": true
+          },
+          {
+            "name": "worker-stack-reserve",
+            "passed": true
+          },
+          {
+            "name": "warmed-heap-stable",
+            "passed": true
+          }
+        ],
+        "pc_network_changed": false,
+        "production_script_owner_exercised": true,
+        "source_snapshot": {
+          "sha256": "5709e70046cefa0aadef575a3e6001ad87b9ead981a85ad976af33a3d1a2ef26",
+          "files": {
+            "v2/components/blip_transport/src/esp_serial_transport_component.cpp": "79619a09811848fd1a7396225002beef488509cf01bfc81712f23df36e40e217",
+            "v2/components/blip_wasm/CMakeLists.txt": "988e51480c5a3f0a768b4c882dbeba4e5d25d6c79ad0c3d43e37e46deaa4c7d2",
+            "v2/components/blip_wasm/include/blip/wasm/capability.hpp": "27cc003c98dad7697c118efbe1e273df0f7a3a33b998969efbd7b9f826599ab5",
+            "v2/components/blip_wasm/include/blip/wasm/esp_wasm_component.hpp": "b0f2b671da0b5688d9b342a3b7b5e545d5fda232dc496f04b68d5ba76a691d73",
+            "v2/components/blip_wasm/include/blip/wasm/module_policy.hpp": "efdf4bfad389816d3fb60f911fc86f0880fad64a65d6b24d126663306e09d5e0",
+            "v2/components/blip_wasm/include/blip/wasm/module_upload.hpp": "6a9e315dd3e95a41353e6db17e2fe249124aa621e810d133f6e81c27f0863d72",
+            "v2/components/blip_wasm/include/blip/wasm/runtime.hpp": "4b02fd92565568b8c82b0450ec72e7ca1bee5ddae5dad784cd8117e6f681c8ed",
+            "v2/components/blip_wasm/include/blip/wasm/script_controls.hpp": "480462d089dd3c60cbce0afb259c56dd0aa7fcabcef3baf9d6f34b80bb631422",
+            "v2/components/blip_wasm/include/blip/wasm/script_manifest.hpp": "839586b22398201a03e6a11a18ce91e67f26730d37c59f2172aad5b82c330f2d",
+            "v2/components/blip_wasm/include/blip/wasm/service.hpp": "9e43b677bbbf5b3589563e7f3d5406db68604fdb635dc10fdd8f55f51bc92521",
+            "v2/components/blip_wasm/include/blip/wasm/utf8.hpp": "91fe3a932ca9eae4fd233447695d51dcdecec42ef7c94d86d74ef0251e224ca9",
+            "v2/components/blip_wasm/include/blip/wasm/wamr_runtime.hpp": "acf8ab868c6ba8e2b87f54659a423a5f6f32639bb311f60c5affb1531685a20c",
+            "v2/components/blip_wasm/src/capability.cpp": "1a439d770791527a857f1233ffb6139267dd96ced722179978e4071348ce5721",
+            "v2/components/blip_wasm/src/esp_wasm_component.cpp": "2cfa58953b06068367546f02e763ce4870bf88937391d79d3fd740e698ff25ca",
+            "v2/components/blip_wasm/src/linear_arena.h": "f60014390989c433124fb1d4552aba17dbb69facd8fba32c03f75a884e6c634c",
+            "v2/components/blip_wasm/src/module_policy.cpp": "5ddef0be3c0020063db677a74c761663d503817bda96bd4f85ac6faf3a006db9",
+            "v2/components/blip_wasm/src/module_upload.cpp": "e3078a616d20be8ad30d7327f357e0ea07646625a04e3568fba9b340df691ab2",
+            "v2/components/blip_wasm/src/pool_memory.c": "6f2761057d056f2127279c0bf4b49c011e877dadc8e5720a33e30130b907abf5",
+            "v2/components/blip_wasm/src/script_controls.cpp": "e5bb33a2e91e5ecc23bfd42af991c40cf0ad6c231fc5a3699e5c55809650abe7",
+            "v2/components/blip_wasm/src/script_manifest.cpp": "5ca47a259beeefdc26eac2c382472b376d82476e3156e2530a7a9731a6afa4a8",
+            "v2/components/blip_wasm/src/service.cpp": "f6fa95a2747185b1e85d506ded0927b15de71a567c88e5865a19336933bcd008",
+            "v2/components/blip_wasm/src/utf8.cpp": "cf86a37b8a1f9418df44defa6e2b96e30354dce8c80a6db70c5f9831cd437a6a",
+            "v2/components/blip_wasm/src/wamr_runtime.cpp": "5a0af77010ef71262ebacd1f4819b145e4585489874d00ad6e617ba9b3261b88",
+            "v2/firmware/CMakeLists.txt": "38ccf7b7834a246c880ecc56b0bf62f4f72c1955384e53cb1779979ab1c2aef8",
+            "v2/firmware/main/CMakeLists.txt": "79b4a85dd1cb2377f2429f225945430fd9ca85c902ad6202de18726b852d2da2",
+            "v2/firmware/main/main.cpp": "2f12031ce39254282a8a71ed9998da99a969f52d433a49f6195e4620b21ca851",
+            "v2/firmware/sdkconfig.wasm.defaults": "4c0e5faf9a03415c0336a34534acb9826e19c9c04432d790fa112e34d7793064",
+            "v2/firmware/sdkconfig.wasm.esp32.defaults": "067f83ebd6988d2cad4f365f10f9e9a9e2550535571eca9c6300ed7278e4cc7b",
+            "v2/qualification/wasm-service/main/fixtures.hpp": "6a980d7c7d6854b0e84afb6c73a100fdeef08c598b569bd8879987bc1ff67642",
+            "v2/qualification/wasm-worker/generate_fixtures.py": "b892f03a121a3c47a764d01b043a70cac9aca04089ba3045a2e316a946ea54a1",
+            "v2/qualification/wasm-worker/main/fixtures.hpp": "2ce94bc6255831322d027bd39bf94292b0f7d024a65500203ca90f0dc1b91c4d",
+            "v2/tools/control/blip_serial_control.py": "5646d006d65d0182757210afe2017844713692bc70d0ef17b2effa0ed888d5d2",
+            "v2/tools/control/blip_wasm_hil.py": "dc26514be8d9893a18c401ebee268fe7a7933fa26c85975262ce5a28f0afd736",
+            "v2/tools/control/blip_wasm_network_hil.ps1": "b596de58718e92fa1bf23ee5a031bc9906978d2dde5a8f7cb27d03809791e3be",
+            "v2/tools/wifi/blip_wifi_guard.ps1": "3edc575bc0dc20041ed52a9ec2d5ae6577a5b89d8991827c73938dd212f22c7b",
+            "v2/tools/wifi/blip_wifi_recovery.ps1": "34cfce5048430bb55860c9f15e9ae08c3bdbd84748b754636ffe86cc3510b9ba"
+          }
+        },
+        "checker_sha256": "84e487cf5ffa4780efa0d829d4a5721ce08ca9f7a2f5078bac85925826ebff76",
+        "flashed_mac": "b0:81:84:96:83:74",
+        "flash_log_sha256": "b71c516920476338e54ecea8468dd27a128e45cb56a9d02d9fa9900c86b45060",
+        "artifacts": {
+          "blip-v2.bin": "cbb28b83aebd55c9ebafcecebaa521be2e26551045a37da1031a33259fa12dd2",
+          "blip-v2.elf": "767382d7b878df1014b775b78f1b3ec3e1d95f86aa60cb239da0777747f4139b",
+          "sdkconfig": "dd2d88c9f99d30076102d5ea61bb34fdcb64f9cafed14362e333e79ed3bc3d4e"
+        },
+        "heap_samples": [
+          35156,
+          35156,
+          35156,
+          35120,
+          35156,
+          35156,
+          35156,
+          35156,
+          35156,
+          35156,
+          35156,
+          35156,
+          35156,
+          35156,
+          35120,
+          35156,
+          35156,
+          35156,
+          35156,
+          35156
+        ],
+        "worker_stack_headroom": 4712
+      }
+    }
+  ],
+  "provider_regressions": [
+    {
+      "profile": "ball",
+      "report_sha256": "4560a8f4d30b458fbdd9426d38d623d5c9cc228e39f8cc97d84a4bfa260629f2",
+      "checks": 95,
+      "metrics": {
+        "native_calls": 40,
+        "native_failures": 5,
+        "native_maximum_us": 1814,
+        "native_task_maximum_us": 236,
+        "buffer_reserved": 82754,
+        "pool_reserved": 81920,
+        "pool_used": 3960,
+        "pool_peak": 78008,
+        "worker_stack_headroom": 2816,
+        "supervisor_stack_headroom": 3716
+      }
+    },
+    {
+      "profile": "m5dial",
+      "report_sha256": "a3be4d37ae25ab58388069256acbce4738a464e5a807899408132ab2def0143e",
+      "checks": 95,
+      "metrics": {
+        "native_calls": 39,
+        "native_failures": 5,
+        "native_maximum_us": 996,
+        "native_task_maximum_us": 379,
+        "buffer_reserved": 82754,
+        "pool_reserved": 81920,
+        "pool_used": 3960,
+        "pool_peak": 78008,
+        "worker_stack_headroom": 2488,
+        "supervisor_stack_headroom": 3220
+      }
+    }
+  ],
+  "failed_trials": [
+    {
+      "report_sha256": "9ff80ab317247e7194ab13c2031db4640fa1e0a04a0aad8d322573c0bbecd5e3",
+      "error": "timed out",
+      "explanation": "Full fixed upload buffer left insufficient combined BLE/WASM HTTP heap; replaced with bounded upload-sized storage."
+    },
+    {
+      "report_sha256": "896eff8075e1f996798761c2b429dd5d179cb586a86e681a87531df7354f122c",
+      "error": "serial request 1 timed out",
+      "explanation": "Aligned pool allocation after Wi-Fi startup failed; lifecycle owner now reserves the pool before service startup."
+    },
+    {
+      "report_sha256": "f585ea9a7f54ea4e82550d11f9a5a0098c107178b3d3927631d45a60e93f272f",
+      "error": "serial request 1 timed out",
+      "explanation": "HIL request preceded application readiness after native USB download mode; captured ready boot and reran."
+    }
+  ],
+  "host_suites_passed": 28,
+  "host_log_sha256": "0d8b5e8caba5ea428583cbced68b9000f6002b30eca945ffb30bb9b539726ad5",
+  "no_wasm_build_log_sha256": "06e100e7bb48bf7d1523dc8933dab0492f5356b9d7e5d01e5ef11219c7bac947",
+  "evidence_collector_sha256": "52bedef418d85d600d995408be2d3a7f993281b6c1fe4beb4dd0d32e1f76f8fd",
+  "full_work_package_complete": false,
+  "full_plan_complete": false,
+  "remaining": [
+    "guest parameter/event imports",
+    "copied external event delivery",
+    "transport schema tokens and lossless i64",
+    "web schema refresh and browser HIL",
+    "SDK",
+    "Gate C/D and endurance"
+  ]
+}

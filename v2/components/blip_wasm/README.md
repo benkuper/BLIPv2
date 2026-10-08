@@ -55,8 +55,11 @@ compile WAMR or claim interpreter validation coverage.
 
 [ADR-0010](../../../docs/v2/adr/0010-wasm-production-worker.md) declares the
 priority-2 worker (8 KiB native stack) and priority-6 supervisor (4 KiB stack).
-Startup reserves 80 KiB for the engine and guest memory, plus a 16 KiB module
-buffer. On the original ESP32, [ADR-0011](../../../docs/v2/adr/0011-esp32-wasm-linear-arena.md)
+The lifecycle owner reserves 80 KiB for the engine and guest memory before
+network startup. Upload storage is allocated on the worker to the accepted
+module size, bounded by 16 KiB, after unloading/detaching previous storage.
+[ADR-0017](../../../docs/v2/adr/0017-wasm-live-controls-upload-storage.md) records
+the ownership and heap constraints. On the original ESP32, [ADR-0011](../../../docs/v2/adr/0011-esp32-wasm-linear-arena.md)
 places the 64 KiB guest page in byte-accessible IRAM and keeps the 16 KiB engine
 pool, module buffer and stacks in DRAM. That profile requires single-core mode;
 C6/S3 retain the contiguous aligned pool. The optional runtime-neutral borrowed
@@ -87,8 +90,8 @@ callbacks use immediate bounded admission/queries and checked guest-memory
 copies. Their task-time budgets require 64-bit ESP timer runtime statistics;
 the supervisor separately bounds the whole guest call in wall-clock time.
 The control path never invokes guest code inline. Stop disables admission,
-cancels and joins the worker. Routine stop/suspend retains the fixed 96 KiB
-buffer reservation; permanent retirement releases it after quiescence.
+cancels and joins the worker. Routine stop/suspend retains the 80 KiB pool and
+current upload buffer; permanent retirement releases them after quiescence.
 
 The HIL driver is `v2/tools/control/blip_wasm_hil.py`. Optional `--ip` traffic
 requires an already reachable board. `blip_wasm_network_hil.ps1` temporarily
@@ -105,7 +108,16 @@ per action/event, and a 2 KiB text arena. Descriptor projections use the existin
 core types. The complete format and loading/publication requirements are in
 [ADR-0015](../../../docs/v2/adr/0015-wasm-script-control-declarations.md).
 
-This is a passive declaration foundation. Production loading does not yet
-consume it or publish live script controls. The independent
+Production loading prepares declarations before engine load and publishes them
+after callback/arena validation. Leased schema reads and owned parameter values
+use the registry's dynamic hooks. Copied typed actions run on the supervised
+worker with the existing ordered request IDs/completions; unload/replacement
+closes admission immediately. Fault, unload and stop retire the schema. The
+store and message scratch live outside the worker stack. The production HIL
+driver is `v2/tools/control/blip_script_controls_hil.py`.
+
+Guest parameter/event imports, transport generation tokens, lossless external
+i64 support, automatic web schema refresh and SDK bindings remain pending.
+The independent
 `v2/qualification/wasm-controls/` project runs the same parser cases on all three
 chip families without an interpreter or production services.

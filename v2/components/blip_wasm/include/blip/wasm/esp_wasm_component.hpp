@@ -2,6 +2,7 @@
 #include "blip/core/component.hpp"
 #include "blip/wasm/service.hpp"
 #include "blip/wasm/capability.hpp"
+#include "blip/wasm/script_controls.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
@@ -26,6 +27,9 @@ class EspWasmComponent final : public core::Component {
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
     // Once, after all components are added and before Registry::validate.
     [[nodiscard]] core::Status bind_capabilities(const core::RegistryView&) noexcept;
+    // Lifecycle owner may reserve the fixed pool before other startup services
+    // fragment internal RAM. No engine or task starts until start().
+    [[nodiscard]] core::Status reserve_buffers() noexcept;
     [[nodiscard]] core::Status start(const core::StartContext&) noexcept override;
     [[nodiscard]] core::Status stop() noexcept override;
     [[nodiscard]] core::Status suspend() noexcept override { return stop(); }
@@ -33,6 +37,13 @@ class EspWasmComponent final : public core::Component {
     // Routine stops retain fixed reservations to avoid restart fragmentation.
     [[nodiscard]] core::Status release_reservation() noexcept;
     [[nodiscard]] bool callbacks_quiesced() const noexcept override;
+    [[nodiscard]] const core::DynamicSchemaSource* dynamic_schema() const noexcept override { return &controls_; }
+    [[nodiscard]] core::Status read_dynamic_parameter(std::uint32_t, std::string_view,
+        core::ScalarValue&, std::span<char>) noexcept override;
+    [[nodiscard]] core::Status write_dynamic_parameter(std::uint32_t, std::string_view,
+        const core::ScalarValue&) noexcept override;
+    [[nodiscard]] core::Status invoke_dynamic_action(std::uint32_t, std::string_view,
+        std::span<const core::ScalarValue>, std::span<core::ScalarValue>, std::span<char>, std::size_t&) noexcept override;
     [[nodiscard]] core::Status read_parameter(std::string_view, core::ScalarValue&) noexcept override;
     [[nodiscard]] core::Status write_parameter(std::string_view, const core::ScalarValue&) noexcept override;
     [[nodiscard]] core::Status invoke_action(std::string_view, std::span<const core::ScalarValue>,
@@ -41,7 +52,7 @@ class EspWasmComponent final : public core::Component {
     // Full typed entry point for future component-owned providers/SDK bindings.
     [[nodiscard]] core::Result<std::uint32_t> call(std::string_view, std::span<const Value>) noexcept;
   private:
-    enum class Kind : std::uint8_t { begin, chunk, commit, call, unload };
+    enum class Kind : std::uint8_t { begin, chunk, commit, call, unload, script_action };
     enum class Cancellation : std::uint8_t { none, requested, deadline };
     struct Request {
         std::uint32_t id{}, epoch{}, generation{}, number{}, crc{}, instructions{}, deadline_ms{};
@@ -66,6 +77,7 @@ class EspWasmComponent final : public core::Component {
     Runtime* runtime_;
     std::byte* pool_{};
     std::byte* module_{};
+    std::size_t module_capacity_{}; // Worker owns it while running.
     std::byte* linear_{};
     StaticSemaphore_t admission_storage_{}, snapshot_storage_{}, monitor_storage_{}, ready_storage_{};
     SemaphoreHandle_t admission_{}, snapshot_mutex_{}, monitor_mutex_{}, ready_{};
@@ -92,6 +104,10 @@ class EspWasmComponent final : public core::Component {
     Cancellation cancellation_{Cancellation::none};
     std::atomic<bool> call_cancelled_{};
     CapabilityRegistry capabilities_{};
+    ScriptControlStore controls_{};
+    ScriptControlMessage action_scratch_{}; // Worker only; outside its bounded stack.
+    bool script_admission_{}; // Admission mutex. Replacement closes it at submission.
+    std::uint32_t closed_through_{}; // Last accepted replacement/unload request.
     std::array<std::string_view, 1 + kMaximumCapabilityProviders> required_services_{};
     core::ComponentDescriptor descriptor_{}; // Stable address borrowed by registry.
     static const core::ComponentDescriptor base_descriptor_;

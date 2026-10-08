@@ -20,8 +20,8 @@ void increment(std::uint32_t& value) noexcept {
 core::Status Service::start(Limits limits) noexcept {
     if (snapshot_.state != State::stopped)
         return failure(core::ErrorCode::invalid_state, "start", "already-started");
-    if (pool_.empty() || module_storage_.empty() || limits.maximum_module_bytes < 8 ||
-        limits.maximum_module_bytes > module_storage_.size() || !limits.linear_memory_bytes ||
+    if (pool_.empty() || limits.maximum_module_bytes < 8 ||
+        (!module_storage_.empty() && module_storage_.size() < 8) || !limits.linear_memory_bytes ||
         !limits.wasm_stack_bytes)
         return failure(core::ErrorCode::invalid_argument, "start", "invalid-limits");
     if (!linear_memory_.empty() && linear_memory_.size() < limits.linear_memory_bytes)
@@ -35,6 +35,14 @@ core::Status Service::start(Limits limits) noexcept {
     return core::Status::success();
 }
 
+core::Status Service::replace_module_storage(std::span<std::byte> storage) noexcept {
+    if (snapshot_.state != State::ready)
+        return failure(core::ErrorCode::invalid_state, "storage", "unload-before-replacement");
+    if ((!storage.empty() && storage.size() < 8) || storage.size() > limits_.maximum_module_bytes)
+        return failure(core::ErrorCode::capacity_exceeded, "storage", "module-storage-size");
+    module_storage_ = storage;
+    return core::Status::success();
+}
 core::Status Service::load(std::span<const std::byte> bytes) noexcept {
     if (snapshot_.state == State::stopped)
         return failure(core::ErrorCode::invalid_state, "load", "not-started");
@@ -42,7 +50,7 @@ core::Status Service::load(std::span<const std::byte> bytes) noexcept {
                                 std::byte{1}, std::byte{0}, std::byte{0}, std::byte{0}};
     // Validate request-level bounds before replacing the current module. Full
     // binary validation belongs to the engine and can still reject the module.
-    if (bytes.size() < header.size() || bytes.size() > limits_.maximum_module_bytes)
+    if (bytes.size() < header.size() || bytes.size() > limits_.maximum_module_bytes || bytes.size() > module_storage_.size())
         return failure(core::ErrorCode::capacity_exceeded, "load", "module-size");
     if (!std::equal(header.begin(), header.end(), bytes.begin()))
         return failure(core::ErrorCode::corrupt_data, "load", "wasm-version-or-magic");

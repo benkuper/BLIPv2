@@ -13,6 +13,8 @@ core::Status fail(core::ErrorCode code, std::string_view detail) noexcept {
 }
 bool valid_scalar(const core::ScalarValue& value, core::ValueType expected) noexcept {
     if (value.type != expected) return false;
+    if (expected != core::ValueType::boolean && expected != core::ValueType::integer &&
+        expected != core::ValueType::number && expected != core::ValueType::string) return false;
     if (expected == core::ValueType::number) return std::isfinite(value.number);
     if (expected == core::ValueType::string)
         return value.string.size() <= kScriptValueStringBytes && valid_utf8(std::as_bytes(std::span(value.string.data(), value.string.size())));
@@ -59,6 +61,15 @@ class ScriptControlStore::DataGuard {
   private:
     const ScriptControlStore* store_;
 };
+class ScriptControlStore::ActionGuard {
+  public:
+    explicit ActionGuard(const ScriptControlStore& store) noexcept
+        : held(!store.action_data_.test_and_set(std::memory_order_acquire)), store_(&store) {}
+    ~ActionGuard() { if (held) store_->action_data_.clear(std::memory_order_release); }
+    bool held;
+  private:
+    const ScriptControlStore* store_;
+};
 core::ScalarValue OwnedScriptValue::scalar() const noexcept {
     switch (type) {
     case core::ValueType::boolean: return core::ScalarValue::from_bool(bits != 0);
@@ -67,6 +78,39 @@ core::ScalarValue OwnedScriptValue::scalar() const noexcept {
     case core::ValueType::string: return core::ScalarValue::from_string({text.data(), bytes});
     }
     return {};
+}
+core::Status copy_script_action_arguments(GuestMemory& memory, std::uint32_t buffer,
+    const ScriptControlMessage& message, std::span<Value> output, std::size_t& count) noexcept {
+    count = 0;
+    if (message.count > message.values.size()) return fail(core::ErrorCode::invalid_argument, "action-field-count");
+    std::size_t needed{};
+    for (std::size_t i = 0; i < message.count; ++i) {
+        const auto& value = message.values[i];
+        if (value.type == core::ValueType::string && value.bytes > value.text.size())
+            return fail(core::ErrorCode::invalid_argument, "action-string-size");
+        if (!valid_scalar(value.scalar(), value.type) || (value.type == core::ValueType::boolean && value.bits > 1))
+            return fail(core::ErrorCode::validation_failed, "action-field-value");
+        needed += value.type == core::ValueType::string ? 2 : 1;
+    }
+    if (needed > output.size()) return fail(core::ErrorCode::capacity_exceeded, "action-argument-storage");
+    std::size_t cursor{};
+    for (std::size_t i = 0; i < message.count; ++i) {
+        const auto& value = message.values[i];
+        switch (value.type) {
+        case core::ValueType::boolean: output[cursor++] = Value::i32(static_cast<std::uint32_t>(value.bits)); break;
+        case core::ValueType::integer: output[cursor++] = Value::i64(value.bits); break;
+        case core::ValueType::number: output[cursor++] = {ValueType::f64, value.bits}; break;
+        case core::ValueType::string: {
+            const auto delta = static_cast<std::uint32_t>(i * kScriptValueStringBytes);
+            if (buffer > UINT32_MAX - delta) return fail(core::ErrorCode::invalid_argument, "action-buffer-overflow");
+            const auto offset = buffer + delta;
+            const auto status = write_utf8(memory, offset, value.scalar().string);
+            if (!status) return status;
+            output[cursor++] = Value::i32(offset); output[cursor++] = Value::i32(value.bytes); break;
+        }
+        }
+    }
+    count = cursor; return core::Status::success();
 }
 void OwnedScriptValue::assign(const core::ScalarValue& input) noexcept {
     type = input.type; bytes = 0; bits = 0;
@@ -110,7 +154,8 @@ void ScriptControlStore::retire() noexcept {
     active_.store(0, std::memory_order_release); end_invocation();
 }
 bool ScriptControlStore::quiescent() const noexcept {
-    return !active_.load(std::memory_order_acquire) && !gate_.load(std::memory_order_acquire) && !data_.test(std::memory_order_acquire);
+    return !active_.load(std::memory_order_acquire) && !gate_.load(std::memory_order_acquire) &&
+        !data_.test(std::memory_order_acquire) && !action_data_.test(std::memory_order_acquire);
 }
 std::string_view ScriptControlStore::id(std::size_t index) const noexcept { return schema_.text(schema_.control(index).id); }
 core::DynamicControlKind ScriptControlStore::kind(std::size_t index) const noexcept { return schema_.control(index).kind; }
@@ -125,6 +170,7 @@ core::Status ScriptControlStore::prepare(std::span<const std::byte> module, cons
     if (generation()) return fail(core::ErrorCode::invalid_state, "retire-before-prepare");
     WriteGuard write(*this); if (!write.held) return fail(core::ErrorCode::resource_unavailable, "schema-leased");
     DataGuard data(*this); if (!data.held) return fail(core::ErrorCode::resource_unavailable, "values-busy");
+    ActionGuard actions(*this); if (!actions.held) return fail(core::ErrorCode::resource_unavailable, "actions-busy");
     if (action_count_) return fail(core::ErrorCode::resource_unavailable, "actions-awaiting-completion");
     prepared_ = false;
     auto status = parse_script_manifest(module, schema_); if (!status) return status;
@@ -140,6 +186,7 @@ core::Status ScriptControlStore::prepare(std::span<const std::byte> module, cons
 core::Status ScriptControlStore::publish(Runtime& runtime, std::uint32_t module_generation) noexcept {
     WriteGuard write(*this); if (!write.held) return fail(core::ErrorCode::resource_unavailable, "schema-leased");
     DataGuard data(*this); if (!data.held) return fail(core::ErrorCode::resource_unavailable, "values-busy");
+    ActionGuard actions(*this); if (!actions.held) return fail(core::ErrorCode::resource_unavailable, "actions-busy");
     if (!prepared_ || generation() || !module_generation || action_count_) return fail(core::ErrorCode::invalid_state, "publication-state");
     if (sequence_ == std::numeric_limits<std::uint32_t>::max()) return fail(core::ErrorCode::generation_exhausted, "schema-generation");
     bool needs_buffer = false;
@@ -213,7 +260,7 @@ core::Status ScriptControlStore::enqueue_action(std::uint32_t generation, std::s
     if (!ticket || !epoch || input.size() != control.field_count) return fail(core::ErrorCode::invalid_argument, "action-arguments");
     for (std::size_t i = 0; i < input.size(); ++i)
         if (!valid_scalar(input[i], control.fields[i].type)) return fail(core::ErrorCode::validation_failed, "action-field-value");
-    DataGuard data(*this); if (!data.held) return fail(core::ErrorCode::resource_unavailable, "actions-busy");
+    ActionGuard data(*this); if (!data.held) return fail(core::ErrorCode::resource_unavailable, "actions-busy");
     if (generation != active_.load(std::memory_order_acquire)) return fail(core::ErrorCode::cancelled, "retired-generation");
     if (action_count_ == actions_.size()) return fail(core::ErrorCode::queue_full, "action-queue-full");
     auto& item = actions_[(action_head_ + action_count_) % actions_.size()];
@@ -223,7 +270,7 @@ core::Status ScriptControlStore::enqueue_action(std::uint32_t generation, std::s
     ++action_count_; return core::Status::success();
 }
 core::Status ScriptControlStore::take_action(ScriptControlMessage& output) noexcept {
-    DataGuard data(*this); if (!data.held) return fail(core::ErrorCode::resource_unavailable, "actions-busy");
+    ActionGuard data(*this); if (!data.held) return fail(core::ErrorCode::resource_unavailable, "actions-busy");
     if (!action_count_) return fail(core::ErrorCode::not_found, "no-action");
     output = actions_[action_head_]; action_head_ = static_cast<std::uint8_t>((action_head_ + 1) % actions_.size()); --action_count_;
     return core::Status::success();

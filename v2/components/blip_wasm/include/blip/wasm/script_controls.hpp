@@ -27,6 +27,10 @@ struct ScriptControlMessage {
     std::uint8_t index{}, count{};
 };
 static_assert(sizeof(ScriptControlMessage) <= 704);
+// Worker-only conversion of a copied action. No guest pointers escape. Failure
+// sets count to zero so the caller cannot execute a partially prepared callback.
+[[nodiscard]] core::Status copy_script_action_arguments(GuestMemory&, std::uint32_t buffer,
+    const ScriptControlMessage&, std::span<Value>, std::size_t& count) noexcept;
 
 // Owned by the production worker component. prepare/publish run on the worker;
 // control/value/queue operations use immediate bounded admission from any task.
@@ -64,6 +68,7 @@ class ScriptControlStore final : public core::DynamicSchemaSource {
   private:
     class WriteGuard;
     class DataGuard;
+    class ActionGuard;
     [[nodiscard]] core::Status pin(std::uint32_t, core::DynamicSchemaLease&) const noexcept;
     [[nodiscard]] std::size_t find(std::string_view) const noexcept; // Leased or exclusive.
     ScriptManifest schema_{};
@@ -72,6 +77,7 @@ class ScriptControlStore final : public core::DynamicSchemaSource {
     ScriptControlMessage builder_{};
     mutable std::atomic<std::uint32_t> gate_{};
     mutable std::atomic_flag data_{};
+    mutable std::atomic_flag action_data_{};
     std::atomic<std::uint32_t> active_{}, builder_token_{};
     std::uint32_t sequence_{}, module_generation_{}, action_buffer_{}, event_sequence_{};
     std::uint8_t action_head_{}, action_count_{}, event_head_{}, event_count_{}, field_mask_{};

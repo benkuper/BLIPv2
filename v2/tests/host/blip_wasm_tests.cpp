@@ -250,6 +250,25 @@ bool string_copies_check_module_generation_and_lifecycle() {
     f.service.stop(); CHECK(!f.service.read_utf8({0,5}, f.service.snapshot().generation, output, count));
     return true;
 }
+bool module_storage_replacement_requires_unloaded_engine() {
+    Fixture f; std::array<std::byte, 16> smaller{}; std::array<std::byte, 129> too_large{};
+    CHECK(!f.service.replace_module_storage(smaller));
+    CHECK(f.service.start(f.limits)); CHECK(f.service.load(binary));
+    CHECK(!f.service.replace_module_storage(smaller));
+    CHECK(f.runtime.module.data() == f.bytes.data());
+    f.service.unload(); CHECK(f.service.replace_module_storage({}));
+    CHECK(!f.service.load(binary) && f.runtime.module.empty());
+    CHECK(!f.service.replace_module_storage(too_large));
+    CHECK(f.service.replace_module_storage(smaller)); CHECK(f.service.load(binary));
+    CHECK(f.runtime.module.data() == smaller.data());
+    f.service.unload(); CHECK(f.service.replace_module_storage(std::span<std::byte>(smaller).first(8)));
+    CHECK(!f.service.load(binary));
+    f.service.stop();
+    Service unallocated{f.runtime, f.pool, {}};
+    CHECK(unallocated.start(f.limits)); CHECK(!unallocated.load(binary));
+    CHECK(unallocated.replace_module_storage(smaller)); CHECK(unallocated.load(binary));
+    unallocated.stop(); return true;
+}
 }
 
 int main() {
@@ -257,7 +276,7 @@ int main() {
         !invalid_calls_never_enter_engine() || !fault_requires_reload_and_retains_diagnostic() ||
         !engine_failures_and_idempotent_cleanup() || !backend_contract_violations_are_faults() ||
         !bounded_upload_crc_and_lifecycle() || !separately_borrowed_linear_memory() ||
-        !string_copies_check_module_generation_and_lifecycle()) return 1;
-    std::cout << "WASM service: 9 lifecycle, ownership, replacement, signature, upload and string cases passed\n";
+        !string_copies_check_module_generation_and_lifecycle() || !module_storage_replacement_requires_unloaded_engine()) return 1;
+    std::cout << "WASM service: 10 lifecycle, ownership, replacement, signature, upload and string cases passed\n";
     return 0;
 }

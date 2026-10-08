@@ -42,11 +42,12 @@ struct ProviderLifecycle {
         std::printf("PROVIDERS {\"type\":\"start\",\"chip\":\"%s\",\"idf\":\"%s\"}\n",
             CONFIG_IDF_TARGET, esp_get_idf_version());
         if (!check(!worker.release_reservation(), "live-reservation-cannot-be-retired")) return;
+        if (!check(!worker.reserve_buffers(), "live-reservation-cannot-be-reconfigured")) return;
         // Lifecycle operations join the actual script worker before another
         // exclusive qualification worker makes callbacks or retires owners.
         if (!check(worker.suspend().ok() && worker.callbacks_quiesced(), "consumer-quiesced-before-owners")) return;
         core::ScalarValue reserved;
-        if (!check(worker.read_parameter("buffer_reserved", reserved).ok() && reserved.integer == 98304,
+        if (!check(worker.read_parameter("buffer_reserved", reserved).ok() && reserved.integer == wasm::EspWasmComponent::kPoolBytes,
                    "fixed-reservation-retained-after-join")) return;
         wasm::CapabilityRegistry catalog;
         if (!check(catalog.bind(registry, true).ok() && catalog.size() == 9, "production-catalog-bound")) return;
