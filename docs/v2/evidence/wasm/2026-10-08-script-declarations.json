@@ -1,0 +1,670 @@
+{
+  "created_utc": "2026-10-08T11:15:18.365517+00:00",
+  "passed": true,
+  "scope": "Portable script declaration decoding/projection; production publication is not implemented",
+  "collector_sha256": "3cd0adc67248320bb0a9f7a60b7c0a89551a1f8b988e127145648afdc2f407c6",
+  "source_snapshot": {
+    "v2/cmake/blip_component.cmake": "49a4c5166eb83852f8da7332030e6eba47fb0568674e433cf6d3a8d364e89b43",
+    "v2/components/blip_core/include/blip/core/descriptor.hpp": "a031bac69099ff1640a992cfbd3444070fae145e87332b65b8d9bb52f112e3d9",
+    "v2/components/blip_core/include/blip/core/error.hpp": "6a38eadb3f1cdf00dc58e5b2830bccde605890b811dfd2e12242b3be745b2678",
+    "v2/components/blip_core/include/blip/core/wasm_descriptor.hpp": "e6c080b6466b17fad5cdab181d1299620096990b4cbc401d06c61898abec43b3",
+    "v2/components/blip_wasm/include/blip/wasm/script_manifest.hpp": "839586b22398201a03e6a11a18ce91e67f26730d37c59f2172aad5b82c330f2d",
+    "v2/components/blip_wasm/include/blip/wasm/utf8.hpp": "91fe3a932ca9eae4fd233447695d51dcdecec42ef7c94d86d74ef0251e224ca9",
+    "v2/components/blip_wasm/src/script_manifest.cpp": "5ca47a259beeefdc26eac2c382472b376d82476e3156e2530a7a9731a6afa4a8",
+    "v2/components/blip_wasm/src/utf8.cpp": "cf86a37b8a1f9418df44defa6e2b96e30354dce8c80a6db70c5f9831cd437a6a",
+    "v2/firmware/partitions.csv": "a5b6a4beba7ca2f2564a5f1e3e5b8cd4e8f51e1593854a3e590f4caa7589cd23",
+    "v2/qualification/wasm-controls/CMakeLists.txt": "ae9e12db28551f2778f6fac5fbe6318a221b636b20f9051405067cf52b769193",
+    "v2/qualification/wasm-controls/main/CMakeLists.txt": "16644942baefb9c2c80cb824e1f2d45e1972267a348102008aa60ae7d5be1ad8",
+    "v2/qualification/wasm-controls/main/main.cpp": "cb54fda67678a440fd1c87ce6d5f430da4a3abbe0a0a525c8025baa45cc70b5c",
+    "v2/qualification/wasm-controls/run_controls.py": "1459853a6bdb66b37f5a8e1f19716c2503c2839ab05f49f1f9d4f01260337185",
+    "v2/qualification/wasm-worker/sdkconfig.defaults": "83d4015bc730237e1655be044b6301da9cc508437344274dca654f57e218d69f",
+    "v2/qualification/wasm-worker/sdkconfig.defaults.esp32c6": "7f77e03af68467d0ccf09cf4c0665dc9627cacf77a4d8208f7329d098f9fbe35",
+    "v2/qualification/wasm-worker/sdkconfig.defaults.esp32s3": "a2ef5d350e457c52898a8dd9c02b1e4f017abb13b3c4510e49ed28adae418e7e",
+    "v2/tests/host/blip_wasm_manifest_tests.cpp": "4548221964abd2b413d97cd0a02057fbeec292d96d76d54757c5838cd2b459c1",
+    "v2/tests/host/test_harness.hpp": "57ddfc61cc684eed503fe4deaafcb9b570b146b4038078f5498b020dbf2bddae"
+  },
+  "host": {
+    "suites": 25,
+    "manifest_cases": 12,
+    "ctest_log_sha256": "6a9e9ea398bdf595741b83d627936a38228494f2e6ddfe0965089032df178412",
+    "red_build_log_sha256": "a4ac6fe56029d9cf9a71e698bf5c1f569efc9065d5937fc7e807b407ed7fb29b"
+  },
+  "fixture": {
+    "bytes": 50,
+    "sha256": "5ce2b10cac94368421b34d76e7270c0d1abde5f01eeeb4c8c1c5eb9fd4705203",
+    "validator": "wasmtime 36.0.0",
+    "valid_wasm_framing": true
+  },
+  "native": {
+    "xiao": {
+      "report_sha256": "66663918675e9608828b65bf38bdd6b251029484fed76f2055fd16a15693f4f0",
+      "build_log_sha256": "13e19c0726cc59dd55a827bbc16b0a223ccbdc3d3917d1291595dec8585b5c70",
+      "compiler_frames": [
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:23:8:blip::core::Status blip::wasm::{anonymous}::failure(blip::core::ErrorCode, std::string_view)",
+          "frame_bytes": 128,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:83:6:bool blip::wasm::{anonymous}::integer_bound(double)",
+          "frame_bytes": 16,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:29:10:constprop(unsigned int&)",
+          "frame_bytes": 0,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:33:10:constprop(uint32_t&)",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:60:10:bool blip::wasm::{anonymous}::Reader::number(double&)",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:69:6:bool blip::wasm::{anonymous}::public_id(std::string_view)",
+          "frame_bytes": 16,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:47:10:bool blip::wasm::{anonymous}::Reader::text(std::string_view&)",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:154:10:bool blip::wasm::ScriptManifestDecoder::read_text(blip::wasm::{anonymous}::Reader&, std::string_view&, blip::wasm::ScriptTextRef&, std::size_t, bool)",
+          "frame_bytes": 32,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:233:18:std::string_view blip::wasm::ScriptManifest::text(blip::wasm::ScriptTextRef) const",
+          "frame_bytes": 32,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:237:19:blip::core::ScalarValue blip::wasm::ScriptManifest::default_value(std::size_t) const",
+          "frame_bytes": 32,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:248:8:blip::core::Status blip::wasm::ScriptManifest::parameter(std::size_t, blip::core::ParameterDescriptor&) const",
+          "frame_bytes": 160,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:256:8:blip::core::Status blip::wasm::ScriptManifest::action(std::size_t, std::span<blip::core::FieldDescriptor>, blip::core::ActionDescriptor&) const",
+          "frame_bytes": 96,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:265:8:blip::core::Status blip::wasm::ScriptManifest::event(std::size_t, std::span<blip::core::FieldDescriptor>, blip::core::EventDescriptor&) const",
+          "frame_bytes": 80,
+          "kind": "static"
+        },
+        {
+          "function": "/TOOLCHAIN/riscv32-esp-elf/include/c++/15.2.0/string_view:616:5:constexpr bool std::operator==(basic_string_view<_CharT, _Traits>, type_identity_t<basic_string_view<_CharT, _Traits> >) [with _CharT = char; _Traits = char_traits<char>]",
+          "frame_bytes": 32,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:91:12:blip::core::Status blip::wasm::ScriptManifestDecoder::decode(std::span<const std::byte>, blip::wasm::ScriptManifest*)",
+          "frame_bytes": 480,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:224:8:blip::core::Status blip::wasm::parse_script_manifest(std::span<const std::byte>, ScriptManifest&)",
+          "frame_bytes": 112,
+          "kind": "static"
+        }
+      ],
+      "qualification": {
+        "board": "xiao",
+        "chip": "esp32c6",
+        "port": "COM13",
+        "source_snapshot": {
+          "v2/cmake/blip_component.cmake": "49a4c5166eb83852f8da7332030e6eba47fb0568674e433cf6d3a8d364e89b43",
+          "v2/components/blip_core/include/blip/core/descriptor.hpp": "a031bac69099ff1640a992cfbd3444070fae145e87332b65b8d9bb52f112e3d9",
+          "v2/components/blip_core/include/blip/core/error.hpp": "6a38eadb3f1cdf00dc58e5b2830bccde605890b811dfd2e12242b3be745b2678",
+          "v2/components/blip_core/include/blip/core/wasm_descriptor.hpp": "e6c080b6466b17fad5cdab181d1299620096990b4cbc401d06c61898abec43b3",
+          "v2/components/blip_wasm/include/blip/wasm/script_manifest.hpp": "839586b22398201a03e6a11a18ce91e67f26730d37c59f2172aad5b82c330f2d",
+          "v2/components/blip_wasm/include/blip/wasm/utf8.hpp": "91fe3a932ca9eae4fd233447695d51dcdecec42ef7c94d86d74ef0251e224ca9",
+          "v2/components/blip_wasm/src/script_manifest.cpp": "5ca47a259beeefdc26eac2c382472b376d82476e3156e2530a7a9731a6afa4a8",
+          "v2/components/blip_wasm/src/utf8.cpp": "cf86a37b8a1f9418df44defa6e2b96e30354dce8c80a6db70c5f9831cd437a6a",
+          "v2/firmware/partitions.csv": "a5b6a4beba7ca2f2564a5f1e3e5b8cd4e8f51e1593854a3e590f4caa7589cd23",
+          "v2/qualification/wasm-controls/CMakeLists.txt": "ae9e12db28551f2778f6fac5fbe6318a221b636b20f9051405067cf52b769193",
+          "v2/qualification/wasm-controls/main/CMakeLists.txt": "16644942baefb9c2c80cb824e1f2d45e1972267a348102008aa60ae7d5be1ad8",
+          "v2/qualification/wasm-controls/main/main.cpp": "cb54fda67678a440fd1c87ce6d5f430da4a3abbe0a0a525c8025baa45cc70b5c",
+          "v2/qualification/wasm-controls/run_controls.py": "1459853a6bdb66b37f5a8e1f19716c2503c2839ab05f49f1f9d4f01260337185",
+          "v2/qualification/wasm-worker/sdkconfig.defaults": "83d4015bc730237e1655be044b6301da9cc508437344274dca654f57e218d69f",
+          "v2/qualification/wasm-worker/sdkconfig.defaults.esp32c6": "7f77e03af68467d0ccf09cf4c0665dc9627cacf77a4d8208f7329d098f9fbe35",
+          "v2/qualification/wasm-worker/sdkconfig.defaults.esp32s3": "a2ef5d350e457c52898a8dd9c02b1e4f017abb13b3c4510e49ed28adae418e7e",
+          "v2/tests/host/blip_wasm_manifest_tests.cpp": "4548221964abd2b413d97cd0a02057fbeec292d96d76d54757c5838cd2b459c1",
+          "v2/tests/host/test_harness.hpp": "57ddfc61cc684eed503fe4deaafcb9b570b146b4038078f5498b020dbf2bddae"
+        },
+        "inputs": {
+          "blip-wasm-controls.bin": {
+            "bytes": 157056,
+            "sha256": "d30a7ff26b2e82d7a7a2a61f6967ea03201a326dc5cc5b908422b341134b77a5"
+          },
+          "blip-wasm-controls.elf": {
+            "bytes": 4348188,
+            "sha256": "bfcdcba3eded6252e5138821b8b20d3d864dd434120927e43391241b4f2ef421"
+          },
+          "blip-wasm-controls.map": {
+            "bytes": 3323465,
+            "sha256": "394203b03ba7a7920352d97b1778d8f25d84d07882eef8240239c9a56d05531e"
+          },
+          "sdkconfig": {
+            "bytes": 57790,
+            "sha256": "b8cde6a18a78ad0dae7b5dc4fbb1f6768505912d9e87ecfb2531f98ce448054e"
+          },
+          "ota_data_initial.bin": {
+            "bytes": 8192,
+            "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+          },
+          "bootloader/bootloader.bin": {
+            "bytes": 22160,
+            "sha256": "4116473e2d7cfc8bee30a7e5b2df8f02ec0047f1dbb12767cf92eb1f0c3d9773"
+          },
+          "partition_table/partition-table.bin": {
+            "bytes": 3072,
+            "sha256": "50667a41d5dc9c22ef6896d8b1de7a04bfe68a91f17917ea2d0f85bd5762f417"
+          },
+          "flasher_args.json": {
+            "bytes": 1095,
+            "sha256": "f45058c56fe245ddfbb0229b26ea9ef7de94e77df0e6625e999b74b488c40872"
+          }
+        },
+        "pc_network_changed": false,
+        "firmware_restore_requested": false,
+        "test_firmware_left_installed": true,
+        "interpreter_exercised": false,
+        "live_control_publication_exercised": false,
+        "records": [
+          {
+            "type": "start",
+            "chip": "esp32c6",
+            "idf": "v6.0.2",
+            "stack_bytes": 20480,
+            "schema_bytes": 3464
+          },
+          {
+            "type": "complete",
+            "cases": 12,
+            "parse_cycles": 1000,
+            "maximum_parse_us": 51,
+            "heap_baseline": 449508,
+            "heap_min": 449508,
+            "heap_max": 449508,
+            "stack_headroom": 8500,
+            "failures": 0
+          }
+        ],
+        "console": [
+          "CONTROLS {\"type\":\"start\",\"chip\":\"esp32c6\",\"idf\":\"v6.0.2\",\"stack_bytes\":20480,\"schema_bytes\":3464}",
+          "PASS all scalar types and descriptor projection",
+          "PASS owned text survives module overwrite and schema copy",
+          "PASS absent and unknown sections",
+          "PASS all truncations leave schema unchanged",
+          "PASS names duplicate controls fields and versions",
+          "PASS bounded schema text and wire capacity",
+          "PASS invalid scalar bounds UTF-8 and metadata",
+          "PASS malformed module and declaration framing",
+          "PASS projection failure preserves descriptors and fields",
+          "PASS full int64 precision exact bounds and signed zero",
+          "PASS exact text arena and UTF-8 byte limits",
+          "PASS all scalar and field tags are checked",
+          "Host suite passed (12 tests)",
+          "CONTROLS {\"type\":\"complete\",\"cases\":12,\"parse_cycles\":1000,\"maximum_parse_us\":51,\"heap_baseline\":449508,\"heap_min\":449508,\"heap_max\":449508,\"stack_headroom\":8500,\"failures\":0}"
+        ],
+        "passed": true,
+        "flash_log": "esptool v5.3.1\nSerial port COM13:\nConnecting...\nConnected to ESP32-C6 on COM13:\nChip type:          ESP32-C6FH4 (QFN32) (revision v0.2)\nFeatures:           Wi-Fi 6, BT 5 (LE), IEEE802.15.4, Single Core + LP Core, 160MHz, Embedded Flash 4MB\nCrystal frequency:  40MHz\nUSB mode:           USB-Serial/JTAG\nMAC:                10:51:db:ff:fe:1a:a6:68\nBASE MAC:           10:51:db:1a:a6:68\nMAC_EXT:            ff:fe\n\nUploading stub flasher...\nRunning stub flasher...\nStub flasher running.\nChanging baud rate to 460800...\nChanged.\n\nConfiguring flash size...\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-xiao\\bootloader\\bootloader.bin' at 0x00000000...\nSHA digest in image updated.\nFlash will be erased from 0x00000000 to 0x00005fff...\nCompressed 22160 bytes to 13887...\n\nWriting at 0x00000000 [                              ]   0.0% 0/13887 bytes... \n\nWriting at 0x00005690 [==============================] 100.0% 13887/13887 bytes... \nWrote 22160 bytes (13887 compressed) at 0x00000000 in 0.2 seconds (1068.8 kbit/s).\nVerifying written data...\nHash of data verified.\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-xiao\\partition_table\\partition-table.bin' at 0x00008000...\nFlash will be erased from 0x00008000 to 0x00008fff...\nCompressed 3072 bytes to 160...\n\nWriting at 0x00008000 [                              ]   0.0% 0/160 bytes... \n\nWriting at 0x00008c00 [==============================] 100.0% 160/160 bytes... \nWrote 3072 bytes (160 compressed) at 0x00008000 in 0.0 seconds (3275.8 kbit/s).\nVerifying written data...\nHash of data verified.\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-xiao\\ota_data_initial.bin' at 0x00018000...\nFlash will be erased from 0x00018000 to 0x00019fff...\nCompressed 8192 bytes to 31...\n\nWriting at 0x00018000 [                              ]   0.0% 0/31 bytes... \n\nWriting at 0x0001a000 [==============================] 100.0% 31/31 bytes... \nWrote 8192 bytes (31 compressed) at 0x00018000 in 0.0 seconds (4132.6 kbit/s).\nVerifying written data...\nHash of data verified.\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-xiao\\blip-wasm-controls.bin' at 0x00020000...\nFlash will be erased from 0x00020000 to 0x00046fff...\nCompressed 157056 bytes to 92352...\n\nWriting at 0x00020000 [                              ]   0.0% 0/92352 bytes... \n\nWriting at 0x00028fdd [====>                         ]  17.7% 16384/92352 bytes... \n\nWriting at 0x0002eb6e [=========>                    ]  35.5% 32768/92352 bytes... \n\nWriting at 0x000356e8 [==============>               ]  53.2% 49152/92352 bytes... \n\nWriting at 0x0003b556 [====================>         ]  71.0% 65536/92352 bytes... \n\nWriting at 0x000413d5 [=========================>    ]  88.7% 81920/92352 bytes... \n\nWriting at 0x00046580 [==============================] 100.0% 92352/92352 bytes... \nWrote 157056 bytes (92352 compressed) at 0x00020000 in 0.6 seconds (2237.9 kbit/s).\nVerifying written data...\nHash of data verified.\n\nHard resetting via RTS pin...\n",
+        "flashed_mac": "10:51:db:1a:a6:68"
+      }
+    },
+    "huzzah32": {
+      "report_sha256": "4dfc07503fcacad133bd62136ebc0342872a2cb9c6ecdd559a5511a2c511b534",
+      "build_log_sha256": "3c42f10ec65ca26b58d4c040dc8aabc3db441431746e65909333bf7d5d3152ac",
+      "compiler_frames": [
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:23:8:blip::core::Status blip::wasm::{anonymous}::failure(blip::core::ErrorCode, std::string_view)",
+          "frame_bytes": 144,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:83:6:bool blip::wasm::{anonymous}::integer_bound(double)",
+          "frame_bytes": 32,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:29:10:constprop(unsigned int&)",
+          "frame_bytes": 32,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:33:10:constprop(uint32_t&)",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:60:10:bool blip::wasm::{anonymous}::Reader::number(double&)",
+          "frame_bytes": 64,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:69:6:bool blip::wasm::{anonymous}::public_id(std::string_view)",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:47:10:bool blip::wasm::{anonymous}::Reader::text(std::string_view&)",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:154:10:bool blip::wasm::ScriptManifestDecoder::read_text(blip::wasm::{anonymous}::Reader&, std::string_view&, blip::wasm::ScriptTextRef&, std::size_t, bool)",
+          "frame_bytes": 32,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:233:18:std::string_view blip::wasm::ScriptManifest::text(blip::wasm::ScriptTextRef) const",
+          "frame_bytes": 64,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:237:19:blip::core::ScalarValue blip::wasm::ScriptManifest::default_value(std::size_t) const",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:248:8:blip::core::Status blip::wasm::ScriptManifest::parameter(std::size_t, blip::core::ParameterDescriptor&) const",
+          "frame_bytes": 160,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:256:8:blip::core::Status blip::wasm::ScriptManifest::action(std::size_t, std::span<blip::core::FieldDescriptor>, blip::core::ActionDescriptor&) const",
+          "frame_bytes": 96,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:265:8:blip::core::Status blip::wasm::ScriptManifest::event(std::size_t, std::span<blip::core::FieldDescriptor>, blip::core::EventDescriptor&) const",
+          "frame_bytes": 80,
+          "kind": "static"
+        },
+        {
+          "function": "/TOOLCHAIN/xtensa-esp-elf/include/c++/15.2.0/string_view:616:5:constexpr bool std::operator==(basic_string_view<_CharT, _Traits>, type_identity_t<basic_string_view<_CharT, _Traits> >) [with _CharT = char; _Traits = char_traits<char>]",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:91:12:blip::core::Status blip::wasm::ScriptManifestDecoder::decode(std::span<const std::byte>, blip::wasm::ScriptManifest*)",
+          "frame_bytes": 448,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:224:8:blip::core::Status blip::wasm::parse_script_manifest(std::span<const std::byte>, ScriptManifest&)",
+          "frame_bytes": 128,
+          "kind": "static"
+        }
+      ],
+      "qualification": {
+        "board": "huzzah32",
+        "chip": "esp32",
+        "port": "COM5",
+        "source_snapshot": {
+          "v2/cmake/blip_component.cmake": "49a4c5166eb83852f8da7332030e6eba47fb0568674e433cf6d3a8d364e89b43",
+          "v2/components/blip_core/include/blip/core/descriptor.hpp": "a031bac69099ff1640a992cfbd3444070fae145e87332b65b8d9bb52f112e3d9",
+          "v2/components/blip_core/include/blip/core/error.hpp": "6a38eadb3f1cdf00dc58e5b2830bccde605890b811dfd2e12242b3be745b2678",
+          "v2/components/blip_core/include/blip/core/wasm_descriptor.hpp": "e6c080b6466b17fad5cdab181d1299620096990b4cbc401d06c61898abec43b3",
+          "v2/components/blip_wasm/include/blip/wasm/script_manifest.hpp": "839586b22398201a03e6a11a18ce91e67f26730d37c59f2172aad5b82c330f2d",
+          "v2/components/blip_wasm/include/blip/wasm/utf8.hpp": "91fe3a932ca9eae4fd233447695d51dcdecec42ef7c94d86d74ef0251e224ca9",
+          "v2/components/blip_wasm/src/script_manifest.cpp": "5ca47a259beeefdc26eac2c382472b376d82476e3156e2530a7a9731a6afa4a8",
+          "v2/components/blip_wasm/src/utf8.cpp": "cf86a37b8a1f9418df44defa6e2b96e30354dce8c80a6db70c5f9831cd437a6a",
+          "v2/firmware/partitions.csv": "a5b6a4beba7ca2f2564a5f1e3e5b8cd4e8f51e1593854a3e590f4caa7589cd23",
+          "v2/qualification/wasm-controls/CMakeLists.txt": "ae9e12db28551f2778f6fac5fbe6318a221b636b20f9051405067cf52b769193",
+          "v2/qualification/wasm-controls/main/CMakeLists.txt": "16644942baefb9c2c80cb824e1f2d45e1972267a348102008aa60ae7d5be1ad8",
+          "v2/qualification/wasm-controls/main/main.cpp": "cb54fda67678a440fd1c87ce6d5f430da4a3abbe0a0a525c8025baa45cc70b5c",
+          "v2/qualification/wasm-controls/run_controls.py": "1459853a6bdb66b37f5a8e1f19716c2503c2839ab05f49f1f9d4f01260337185",
+          "v2/qualification/wasm-worker/sdkconfig.defaults": "83d4015bc730237e1655be044b6301da9cc508437344274dca654f57e218d69f",
+          "v2/qualification/wasm-worker/sdkconfig.defaults.esp32c6": "7f77e03af68467d0ccf09cf4c0665dc9627cacf77a4d8208f7329d098f9fbe35",
+          "v2/qualification/wasm-worker/sdkconfig.defaults.esp32s3": "a2ef5d350e457c52898a8dd9c02b1e4f017abb13b3c4510e49ed28adae418e7e",
+          "v2/tests/host/blip_wasm_manifest_tests.cpp": "4548221964abd2b413d97cd0a02057fbeec292d96d76d54757c5838cd2b459c1",
+          "v2/tests/host/test_harness.hpp": "57ddfc61cc684eed503fe4deaafcb9b570b146b4038078f5498b020dbf2bddae"
+        },
+        "inputs": {
+          "blip-wasm-controls.bin": {
+            "bytes": 157232,
+            "sha256": "7069354b5e31d801f0325d3c80948e45d256a8a900aac4d7296b660ba55f06d6"
+          },
+          "blip-wasm-controls.elf": {
+            "bytes": 3586100,
+            "sha256": "503d04805e29472a571e9a86a3ca05147eee0ae2ee7314cd637f7f13f4a54b3a"
+          },
+          "blip-wasm-controls.map": {
+            "bytes": 3887148,
+            "sha256": "d540bbf797244e492f1c03f585f7e2f6a1a9757ab9612096ceba39abcff04ef0"
+          },
+          "sdkconfig": {
+            "bytes": 50332,
+            "sha256": "a5a02d0d84082594bbe52cf2c99a61049567a3786d29430e6cad4bad93c872e0"
+          },
+          "ota_data_initial.bin": {
+            "bytes": 8192,
+            "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+          },
+          "bootloader/bootloader.bin": {
+            "bytes": 26048,
+            "sha256": "0341f2329d731b40ce53ce88ced13505b9a75c8c46b0e5a8aa7a4d5136fcbe38"
+          },
+          "partition_table/partition-table.bin": {
+            "bytes": 3072,
+            "sha256": "50667a41d5dc9c22ef6896d8b1de7a04bfe68a91f17917ea2d0f85bd5762f417"
+          },
+          "flasher_args.json": {
+            "bytes": 1099,
+            "sha256": "0e50e2102155a002122ad257043e159abf275846f2f9b51c07475e10974c8d17"
+          }
+        },
+        "pc_network_changed": false,
+        "firmware_restore_requested": false,
+        "test_firmware_left_installed": true,
+        "interpreter_exercised": false,
+        "live_control_publication_exercised": false,
+        "records": [
+          {
+            "type": "start",
+            "chip": "esp32",
+            "idf": "v6.0.2",
+            "stack_bytes": 20480,
+            "schema_bytes": 3464
+          },
+          {
+            "type": "complete",
+            "cases": 12,
+            "parse_cycles": 1000,
+            "maximum_parse_us": 91,
+            "heap_baseline": 270940,
+            "heap_min": 270940,
+            "heap_max": 270940,
+            "stack_headroom": 8324,
+            "failures": 0
+          }
+        ],
+        "console": [
+          "oad:0x40080400,len:3896",
+          "entry 0x40080640",
+          "I (27) boot: ESP-IDF v6.0.2 2nd stage bootloader",
+          "I (27) boot: Multicore bootloader",
+          "I (27) boot: chip revision: v1.0",
+          "I (27) boot.esp32: SPI Speed      : 40MHz",
+          "I (30) boot.esp32: SPI Mode       : DIO",
+          "I (34) boot.esp32: SPI Flash Size : 4MB",
+          "I (38) boot: Enabling RNG early entropy source...",
+          "I (42) boot: Partition Table:",
+          "I (45) boot: ## Label            Usage          Type ST Offset   Length",
+          "I (51) boot:  0 nvs              WiFi data        01 02 00009000 0000f000",
+          "I (58) boot:  1 otadata          OTA data         01 00 00018000 00002000",
+          "I (64) boot:  2 phy_init         RF data          01 01 0001a000 00001000",
+          "I (71) boot:  3 ota_0            OTA app          00 10 00020000 00190000",
+          "I (77) boot:  4 ota_1            OTA app          00 11 001b0000 00190000",
+          "I (84) boot:  5 storage          Unknown data     01 83 00340000 000a0000",
+          "I (90) boot:  6 coredump         Unknown data     01 03 003e0000 00020000",
+          "I (97) boot: End of partition table",
+          "I (100) boot: No factory image, trying OTA 0",
+          "I (104) esp_image: segment 0: paddr=00020020 vaddr=3f400020 size=08248h ( 33352) map",
+          "I (123) esp_image: segment 1: paddr=00028270 vaddr=3ffb0000 size=03958h ( 14680) load",
+          "I (129) esp_image: segment 2: paddr=0002bbd0 vaddr=40080000 size=04448h ( 17480) load",
+          "I (137) esp_image: segment 3: paddr=00030020 vaddr=400d0020 size=11160h ( 69984) map",
+          "I (162) esp_image: segment 4: paddr=00041188 vaddr=40084448 size=05450h ( 21584) load",
+          "I (171) esp_image: segment 5: paddr=000465e0 vaddr=50000000 size=00028h (    40) load",
+          "I (177) boot: Loaded app from partition at offset 0x20000",
+          "I (222) boot: Set actual ota_seq=1 in otadata[0]",
+          "I (222) boot: Disabling RNG early entropy source...",
+          "I (232) cpu_start: Multicore app",
+          "I (240) cpu_start: GPIO 3 and 1 are used as console UART I/O pins",
+          "I (240) cpu_start: Pro cpu start user code",
+          "I (240) cpu_start: cpu freq: 160000000 Hz",
+          "I (242) app_init: Application information:",
+          "I (246) app_init: Project name:     blip-wasm-controls",
+          "I (251) app_init: App version:      e0ff2a7-dirty",
+          "I (255) app_init: ELF file SHA256:  503d04805...",
+          "I (260) app_init: ESP-IDF:          v6.0.2",
+          "I (263) efuse_init: Min chip rev:     v0.0",
+          "I (267) efuse_init: Max chip rev:     v3.99",
+          "I (271) efuse_init: Chip rev:         v1.0",
+          "I (275) heap_init: Initializing. RAM available for dynamic allocation:",
+          "I (281) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM",
+          "I (287) heap_init: At 3FFB4EA0 len 0002B160 (172 KiB): DRAM",
+          "I (292) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM",
+          "I (297) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM",
+          "I (303) heap_init: At 40089898 len 00016768 (89 KiB): IRAM",
+          "I (309) spi_flash: detected chip: generic",
+          "I (312) spi_flash: flash io: dio",
+          "I (344) main_task: Started on CPU0",
+          "I (345) main_task: Calling app_main()",
+          "CONTROLS {\"type\":\"start\",\"chip\":\"esp32\",\"idf\":\"v6.0.2\",\"stack_bytes\":20480,\"schema_bytes\":3464}",
+          "PASS all scalar types and descriptor projection",
+          "PASS owned text survives module overwrite and schema copy",
+          "PASS absent and unknown sections",
+          "PASS all truncations leave schema unchanged",
+          "PASS names duplicate controls fields and versions",
+          "PASS bounded schema text and wire capacity",
+          "PASS invalid scalar bounds UTF-8 and metadata",
+          "PASS malformed module and declaration framing",
+          "PASS projection failure preserves descriptors and fields",
+          "PASS full int64 precision exact bounds and signed zero",
+          "PASS exact text arena and UTF-8 byte limits",
+          "PASS all scalar and field tags are checked",
+          "Host suite passed (12 tests)",
+          "CONTROLS {\"type\":\"complete\",\"cases\":12,\"parse_cycles\":1000,\"maximum_parse_us\":91,\"heap_baseline\":270940,\"heap_min\":270940,\"heap_max\":270940,\"stack_headroom\":8324,\"failures\":0}"
+        ],
+        "passed": true,
+        "flash_log": "esptool v5.3.1\nSerial port COM5:\nConnecting.......\nConnected to ESP32 on COM5:\nChip type:          ESP32-D0WDQ6 (revision v1.0)\nFeatures:           Wi-Fi, BT, Dual Core + LP Core, 240MHz, Vref calibration in eFuse, Coding Scheme None\nCrystal frequency:  40MHz\nMAC:                30:ae:a4:f2:d1:84\n\nUploading stub flasher...\nRunning stub flasher...\nStub flasher running.\nChanging baud rate to 460800...\nChanged.\n\nConfiguring flash size...\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-huzzah32\\bootloader\\bootloader.bin' at 0x00001000...\nSHA digest in image updated.\nFlash will be erased from 0x00001000 to 0x00007fff...\nCompressed 26048 bytes to 16489...\n\nWriting at 0x00001000 [                              ]   0.0% 0/16489 bytes... \n\nWriting at 0x00007533 [============================> ]  99.4% 16384/16489 bytes... \n\nWriting at 0x000075c0 [==============================] 100.0% 16489/16489 bytes... \nWrote 26048 bytes (16489 compressed) at 0x00001000 in 0.8 seconds (277.5 kbit/s).\nVerifying written data...\nHash of data verified.\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-huzzah32\\partition_table\\partition-table.bin' at 0x00008000...\nFlash will be erased from 0x00008000 to 0x00008fff...\nCompressed 3072 bytes to 160...\n\nWriting at 0x00008000 [                              ]   0.0% 0/160 bytes... \n\nWriting at 0x00008c00 [==============================] 100.0% 160/160 bytes... \nWrote 3072 bytes (160 compressed) at 0x00008000 in 0.1 seconds (422.4 kbit/s).\nVerifying written data...\nHash of data verified.\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-huzzah32\\ota_data_initial.bin' at 0x00018000...\nFlash will be erased from 0x00018000 to 0x00019fff...\nCompressed 8192 bytes to 31...\n\nWriting at 0x00018000 [                              ]   0.0% 0/31 bytes... \n\nWriting at 0x0001a000 [==============================] 100.0% 31/31 bytes... \nWrote 8192 bytes (31 compressed) at 0x00018000 in 0.1 seconds (559.3 kbit/s).\nVerifying written data...\nHash of data verified.\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-huzzah32\\blip-wasm-controls.bin' at 0x00020000...\nFlash will be erased from 0x00020000 to 0x00046fff...\nCompressed 157232 bytes to 95462...\n\nWriting at 0x00020000 [                              ]   0.0% 0/95462 bytes... \n\nWriting at 0x0002c2cb [====>                         ]  17.2% 16384/95462 bytes... \n\nWriting at 0x00031f40 [=========>                    ]  34.3% 32768/95462 bytes... \n\nWriting at 0x00036de1 [==============>               ]  51.5% 49152/95462 bytes... \n\nWriting at 0x0003c1d0 [===================>          ]  68.7% 65536/95462 bytes... \n\nWriting at 0x0004199b [========================>     ]  85.8% 81920/95462 bytes... \n\nWriting at 0x00046630 [==============================] 100.0% 95462/95462 bytes... \nWrote 157232 bytes (95462 compressed) at 0x00020000 in 2.4 seconds (522.0 kbit/s).\nVerifying written data...\nHash of data verified.\n\nHard resetting via RTS pin...\n",
+        "flashed_mac": "30:ae:a4:f2:d1:84"
+      }
+    },
+    "m5dial": {
+      "report_sha256": "6ffd1aa399b07421c6acc548415f60d8235ec919e4dcd0f51055b318f7a5b752",
+      "build_log_sha256": "b49854700768cc0d05a24783cd3f1faaee1d380d5801d3caf7b0e8f5162fc7d2",
+      "compiler_frames": [
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:23:8:blip::core::Status blip::wasm::{anonymous}::failure(blip::core::ErrorCode, std::string_view)",
+          "frame_bytes": 144,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:83:6:bool blip::wasm::{anonymous}::integer_bound(double)",
+          "frame_bytes": 32,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:29:10:constprop(unsigned int&)",
+          "frame_bytes": 32,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:33:10:constprop(uint32_t&)",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:60:10:bool blip::wasm::{anonymous}::Reader::number(double&)",
+          "frame_bytes": 64,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:69:6:bool blip::wasm::{anonymous}::public_id(std::string_view)",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:47:10:bool blip::wasm::{anonymous}::Reader::text(std::string_view&)",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:154:10:bool blip::wasm::ScriptManifestDecoder::read_text(blip::wasm::{anonymous}::Reader&, std::string_view&, blip::wasm::ScriptTextRef&, std::size_t, bool)",
+          "frame_bytes": 32,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:233:18:std::string_view blip::wasm::ScriptManifest::text(blip::wasm::ScriptTextRef) const",
+          "frame_bytes": 64,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:237:19:blip::core::ScalarValue blip::wasm::ScriptManifest::default_value(std::size_t) const",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:248:8:blip::core::Status blip::wasm::ScriptManifest::parameter(std::size_t, blip::core::ParameterDescriptor&) const",
+          "frame_bytes": 160,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:256:8:blip::core::Status blip::wasm::ScriptManifest::action(std::size_t, std::span<blip::core::FieldDescriptor>, blip::core::ActionDescriptor&) const",
+          "frame_bytes": 96,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:265:8:blip::core::Status blip::wasm::ScriptManifest::event(std::size_t, std::span<blip::core::FieldDescriptor>, blip::core::EventDescriptor&) const",
+          "frame_bytes": 80,
+          "kind": "static"
+        },
+        {
+          "function": "/TOOLCHAIN/xtensa-esp-elf/include/c++/15.2.0/string_view:616:5:constexpr bool std::operator==(basic_string_view<_CharT, _Traits>, type_identity_t<basic_string_view<_CharT, _Traits> >) [with _CharT = char; _Traits = char_traits<char>]",
+          "frame_bytes": 48,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:91:12:blip::core::Status blip::wasm::ScriptManifestDecoder::decode(std::span<const std::byte>, blip::wasm::ScriptManifest*)",
+          "frame_bytes": 448,
+          "kind": "static"
+        },
+        {
+          "function": "/BLIP/v2/components/blip_wasm/src/script_manifest.cpp:224:8:blip::core::Status blip::wasm::parse_script_manifest(std::span<const std::byte>, ScriptManifest&)",
+          "frame_bytes": 128,
+          "kind": "static"
+        }
+      ],
+      "qualification": {
+        "board": "m5dial",
+        "chip": "esp32s3",
+        "port": "COM9",
+        "source_snapshot": {
+          "v2/cmake/blip_component.cmake": "49a4c5166eb83852f8da7332030e6eba47fb0568674e433cf6d3a8d364e89b43",
+          "v2/components/blip_core/include/blip/core/descriptor.hpp": "a031bac69099ff1640a992cfbd3444070fae145e87332b65b8d9bb52f112e3d9",
+          "v2/components/blip_core/include/blip/core/error.hpp": "6a38eadb3f1cdf00dc58e5b2830bccde605890b811dfd2e12242b3be745b2678",
+          "v2/components/blip_core/include/blip/core/wasm_descriptor.hpp": "e6c080b6466b17fad5cdab181d1299620096990b4cbc401d06c61898abec43b3",
+          "v2/components/blip_wasm/include/blip/wasm/script_manifest.hpp": "839586b22398201a03e6a11a18ce91e67f26730d37c59f2172aad5b82c330f2d",
+          "v2/components/blip_wasm/include/blip/wasm/utf8.hpp": "91fe3a932ca9eae4fd233447695d51dcdecec42ef7c94d86d74ef0251e224ca9",
+          "v2/components/blip_wasm/src/script_manifest.cpp": "5ca47a259beeefdc26eac2c382472b376d82476e3156e2530a7a9731a6afa4a8",
+          "v2/components/blip_wasm/src/utf8.cpp": "cf86a37b8a1f9418df44defa6e2b96e30354dce8c80a6db70c5f9831cd437a6a",
+          "v2/firmware/partitions.csv": "a5b6a4beba7ca2f2564a5f1e3e5b8cd4e8f51e1593854a3e590f4caa7589cd23",
+          "v2/qualification/wasm-controls/CMakeLists.txt": "ae9e12db28551f2778f6fac5fbe6318a221b636b20f9051405067cf52b769193",
+          "v2/qualification/wasm-controls/main/CMakeLists.txt": "16644942baefb9c2c80cb824e1f2d45e1972267a348102008aa60ae7d5be1ad8",
+          "v2/qualification/wasm-controls/main/main.cpp": "cb54fda67678a440fd1c87ce6d5f430da4a3abbe0a0a525c8025baa45cc70b5c",
+          "v2/qualification/wasm-controls/run_controls.py": "1459853a6bdb66b37f5a8e1f19716c2503c2839ab05f49f1f9d4f01260337185",
+          "v2/qualification/wasm-worker/sdkconfig.defaults": "83d4015bc730237e1655be044b6301da9cc508437344274dca654f57e218d69f",
+          "v2/qualification/wasm-worker/sdkconfig.defaults.esp32c6": "7f77e03af68467d0ccf09cf4c0665dc9627cacf77a4d8208f7329d098f9fbe35",
+          "v2/qualification/wasm-worker/sdkconfig.defaults.esp32s3": "a2ef5d350e457c52898a8dd9c02b1e4f017abb13b3c4510e49ed28adae418e7e",
+          "v2/tests/host/blip_wasm_manifest_tests.cpp": "4548221964abd2b413d97cd0a02057fbeec292d96d76d54757c5838cd2b459c1",
+          "v2/tests/host/test_harness.hpp": "57ddfc61cc684eed503fe4deaafcb9b570b146b4038078f5498b020dbf2bddae"
+        },
+        "inputs": {
+          "blip-wasm-controls.bin": {
+            "bytes": 172272,
+            "sha256": "d013cdf99489432c36dafb0938f9fab83ac125413f848d7117da55dee0ab444f"
+          },
+          "blip-wasm-controls.elf": {
+            "bytes": 4184312,
+            "sha256": "ca80e53631ebca800cad1cf110f030524c192e3a2685fdb4c46721febe4f0b1d"
+          },
+          "blip-wasm-controls.map": {
+            "bytes": 4121054,
+            "sha256": "f913e0b1f1afb1d3f19e32a8c29958ce43a89d22ed9e435c93667cf507217a67"
+          },
+          "sdkconfig": {
+            "bytes": 58636,
+            "sha256": "e24a10db13cdf110693a24e30981ab9681c8fcacc4ef95a07f202f1cfc359ef3"
+          },
+          "ota_data_initial.bin": {
+            "bytes": 8192,
+            "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+          },
+          "bootloader/bootloader.bin": {
+            "bytes": 21040,
+            "sha256": "00cdbf2a153d81bba4129520aad42f473266c8c38616d057a08b680bac4c7746"
+          },
+          "partition_table/partition-table.bin": {
+            "bytes": 3072,
+            "sha256": "50667a41d5dc9c22ef6896d8b1de7a04bfe68a91f17917ea2d0f85bd5762f417"
+          },
+          "flasher_args.json": {
+            "bytes": 1095,
+            "sha256": "2848124eb6ce701c5c19de25f6e60e265659678ad3bd65e408f2dafd70e4353a"
+          }
+        },
+        "pc_network_changed": false,
+        "firmware_restore_requested": false,
+        "test_firmware_left_installed": true,
+        "interpreter_exercised": false,
+        "live_control_publication_exercised": false,
+        "records": [
+          {
+            "type": "start",
+            "chip": "esp32s3",
+            "idf": "v6.0.2",
+            "stack_bytes": 20480,
+            "schema_bytes": 3464
+          },
+          {
+            "type": "complete",
+            "cases": 12,
+            "parse_cycles": 1000,
+            "maximum_parse_us": 43,
+            "heap_baseline": 370812,
+            "heap_min": 370812,
+            "heap_max": 370812,
+            "stack_headroom": 8028,
+            "failures": 0
+          }
+        ],
+        "console": [
+          "CONTROLS {\"type\":\"start\",\"chip\":\"esp32s3\",\"idf\":\"v6.0.2\",\"stack_bytes\":20480,\"schema_bytes\":3464}",
+          "PASS all scalar types and descriptor projection",
+          "PASS owned text survives module overwrite and schema copy",
+          "PASS absent and unknown sections",
+          "PASS all truncations leave schema unchanged",
+          "PASS names duplicate controls fields and versions",
+          "PASS bounded schema text and wire capacity",
+          "PASS invalid scalar bounds UTF-8 and metadata",
+          "PASS malformed module and declaration framing",
+          "PASS projection failure preserves descriptors and fields",
+          "PASS full int64 precision exact bounds and signed zero",
+          "PASS exact text arena and UTF-8 byte limits",
+          "PASS all scalar and field tags are checked",
+          "Host suite passed (12 tests)",
+          "CONTROLS {\"type\":\"complete\",\"cases\":12,\"parse_cycles\":1000,\"maximum_parse_us\":43,\"heap_baseline\":370812,\"heap_min\":370812,\"heap_max\":370812,\"stack_headroom\":8028,\"failures\":0}"
+        ],
+        "passed": true,
+        "flash_log": "esptool v5.3.1\nSerial port COM9:\nConnecting...\nConnected to ESP32-S3 on COM9:\nChip type:          ESP32-S3 (QFN56) (revision v0.2)\nFeatures:           Wi-Fi, BT 5 (LE), Dual Core + LP Core, 240MHz, Embedded Flash 8MB (GD)\nCrystal frequency:  40MHz\nUSB mode:           USB-Serial/JTAG\nMAC:                b0:81:84:96:83:74\n\nUploading stub flasher...\nRunning stub flasher...\nStub flasher running.\nChanging baud rate to 460800...\nChanged.\n\nConfiguring flash size...\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-m5dial\\bootloader\\bootloader.bin' at 0x00000000...\nSHA digest in image updated.\nFlash will be erased from 0x00000000 to 0x00005fff...\nCompressed 21040 bytes to 13500...\n\nWriting at 0x00000000 [                              ]   0.0% 0/13500 bytes... \n\nWriting at 0x00005230 [==============================] 100.0% 13500/13500 bytes... \nWrote 21040 bytes (13500 compressed) at 0x00000000 in 0.3 seconds (498.4 kbit/s).\nVerifying written data...\nHash of data verified.\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-m5dial\\partition_table\\partition-table.bin' at 0x00008000...\nFlash will be erased from 0x00008000 to 0x00008fff...\nCompressed 3072 bytes to 160...\n\nWriting at 0x00008000 [                              ]   0.0% 0/160 bytes... \n\nWriting at 0x00008c00 [==============================] 100.0% 160/160 bytes... \nWrote 3072 bytes (160 compressed) at 0x00008000 in 0.0 seconds (571.3 kbit/s).\nVerifying written data...\nHash of data verified.\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-m5dial\\ota_data_initial.bin' at 0x00018000...\nFlash will be erased from 0x00018000 to 0x00019fff...\nCompressed 8192 bytes to 31...\n\nWriting at 0x00018000 [                              ]   0.0% 0/31 bytes... \n\nWriting at 0x0001a000 [==============================] 100.0% 31/31 bytes... \nWrote 8192 bytes (31 compressed) at 0x00018000 in 0.1 seconds (859.1 kbit/s).\nVerifying written data...\nHash of data verified.\n\nWriting 'D:\\Projects\\Dev\\BLIPv2\\build\\m6-controls-m5dial\\blip-wasm-controls.bin' at 0x00020000...\nFlash will be erased from 0x00020000 to 0x0004afff...\nCompressed 172272 bytes to 101534...\n\nWriting at 0x00020000 [                              ]   0.0% 0/101534 bytes... \n\nWriting at 0x0002c96d [===>                          ]  16.1% 16384/101534 bytes... \n\nWriting at 0x00032738 [========>                     ]  32.3% 32768/101534 bytes... \n\nWriting at 0x00037a92 [=============>                ]  48.4% 49152/101534 bytes... \n\nWriting at 0x0003cfa5 [==================>           ]  64.5% 65536/101534 bytes... \n\nWriting at 0x00042b13 [=======================>      ]  80.7% 81920/101534 bytes... \n\nWriting at 0x000488a5 [============================> ]  96.8% 98304/101534 bytes... \n\nWriting at 0x0004a0f0 [==============================] 100.0% 101534/101534 bytes... \nWrote 172272 bytes (101534 compressed) at 0x00020000 in 1.3 seconds (1026.2 kbit/s).\nVerifying written data...\nHash of data verified.\n\nHard resetting via RTS pin...\n",
+        "flashed_mac": "b0:81:84:96:83:74",
+        "run_log": "esptool v5.3.1\nSerial port COM9:\nConnecting...\nConnected to ESP32-S3 on COM9:\nChip type:          ESP32-S3 (QFN56) (revision v0.2)\nFeatures:           Wi-Fi, BT 5 (LE), Dual Core + LP Core, 240MHz, Embedded Flash 8MB (GD)\nCrystal frequency:  40MHz\nUSB mode:           USB-Serial/JTAG\nMAC:                b0:81:84:96:83:74\n\nUploading stub flasher...\nRunning stub flasher...\nStub flasher running.\n\n\nHard resetting via RTS pin...\n"
+      }
+    }
+  },
+  "limitations": [
+    "No interpreter, production worker, dynamic registry publication, live control dispatch or event delivery in this qualifier",
+    "Repeated parse duration uses a one-control fixture, not a worst-case schema or deadline guarantee",
+    "The 20 KiB qualification stack accommodates allocating host fixtures and schema copies; it is not a production stack requirement",
+    "Compiler frame sizes are individual functions, not a complete call-chain measurement",
+    "Production code does not yet instantiate or consume the owned declaration schema; seven production profiles will be renewed when live integration is enabled",
+    "Full 6.6/6.7, Gate C/D, concurrency/lifecycle stress and multi-day soaks remain open"
+  ]
+}

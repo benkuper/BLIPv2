@@ -1,7 +1,7 @@
 # blip_wasm
 
 Runtime-neutral lifecycle service and the selected WAMR adapter. Component
-providers depend on `runtime.hpp` and `service.hpp`, which expose no engine
+providers depend on `capability.hpp`, which exposes no engine
 headers, handles or allocator. The platform supplies pool/module buffers and
 owns the worker. It must explicitly stop the service before destroying them.
 
@@ -14,8 +14,10 @@ implementation on all three processor families. The opt-in production worker
 has Ball C6 and selected ESP32 coexistence evidence. The
 [profile memory follow-up](../../../docs/v2/work-packages/6.3-wasm-profile-memory.md)
 records seven builds and their declared hardware checks, with two large UART
-burst checks omitted on the M5StickC after damaged replies. Native task lifecycle,
-that serial issue, provider/SDK work and full Gate D remain open.
+burst checks omitted on the M5StickC after damaged replies. The
+[production provider checkpoint](../../../docs/v2/work-packages/6.5-production-providers.md)
+qualifies LED/fleet imports, worker reservations and three-family lifecycle/fault
+tests. The serial issue, script controls/SDK and full Gate D remain open.
 
 ## Current contract
 
@@ -31,8 +33,8 @@ that serial issue, provider/SDK work and full Gate D remain open.
 - The default WAMR profile permits at most one 64 KiB linear memory, a 4 KiB
   Wasm stack and 16 KiB module input. The caller's fixed pool also bounds decoded
   code/tables/engine allocations. Unsupported limits fail explicitly.
-- WAMR global ownership is exclusive. Imports remain unavailable until the
-  capability-provider boundary is implemented. WASI, AOT/JIT and guest threads
+- WAMR global ownership is exclusive. Imports resolve only through immutable,
+  component-owned capability descriptors. WASI, AOT/JIT and guest threads
   are disabled. The internal thread manager enables synchronized termination on
   loop backedges, without exposing guest threading.
 - Load cannot run guest code: start sections and automatic constructor exports
@@ -80,9 +82,13 @@ instructions and 10 ms; maxima are 1,000,000 and 50 ms. The WASM SDK profile use
 1 ms ticks, bounds Wi-Fi buffers and places optional Wi-Fi fast paths in flash.
 Use a fresh build directory when enabling this SDK profile: defaults do not
 replace values in an existing `sdkconfig`. The recipe refuses other tick rates.
-No guest imports are available yet. The control path never invokes guest code
-inline. Stop disables admission, cancels and joins the worker before freeing
-its buffers, retaining resources if quiescence fails.
+Production LED/fleet providers expose their own versioned imports. Native
+callbacks use immediate bounded admission/queries and checked guest-memory
+copies. Their task-time budgets require 64-bit ESP timer runtime statistics;
+the supervisor separately bounds the whole guest call in wall-clock time.
+The control path never invokes guest code inline. Stop disables admission,
+cancels and joins the worker. Routine stop/suspend retains the fixed 96 KiB
+buffer reservation; permanent retirement releases it after quiescence.
 
 The HIL driver is `v2/tools/control/blip_wasm_hil.py`. Optional `--ip` traffic
 requires an already reachable board. `blip_wasm_network_hil.ps1` temporarily
@@ -90,3 +96,16 @@ joins a saved network using an independent, verified recovery process and a
 temporary profile clone, then verifies the original Internet connection.
 Use `-CoexistenceOnly` after separate serial qualification to keep slow UART
 checks out of the independent recovery window.
+
+## Script control declarations
+
+`script_manifest.hpp` decodes an optional `blip.controls.v1` custom section into
+owned, relocatable metadata: at most 16 parameters/actions/events, four fields
+per action/event, and a 2 KiB text arena. Descriptor projections use the existing
+core types. The complete format and loading/publication requirements are in
+[ADR-0015](../../../docs/v2/adr/0015-wasm-script-control-declarations.md).
+
+This is a passive declaration foundation. Production loading does not yet
+consume it or publish live script controls. The independent
+`v2/qualification/wasm-controls/` project runs the same parser cases on all three
+chip families without an interpreter or production services.

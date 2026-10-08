@@ -106,7 +106,7 @@ else()
 endif()
 add_test(NAME blip_fleet_tests COMMAND blip_fleet_tests)
 
-add_library(blip_wasm_host STATIC ../../components/blip_wasm/src/service.cpp ../../components/blip_wasm/src/module_upload.cpp ../../components/blip_wasm/src/utf8.cpp ../../components/blip_wasm/src/capability.cpp ../../components/blip_wasm/src/module_policy.cpp)
+add_library(blip_wasm_host STATIC ../../components/blip_wasm/src/service.cpp ../../components/blip_wasm/src/module_upload.cpp ../../components/blip_wasm/src/utf8.cpp ../../components/blip_wasm/src/capability.cpp ../../components/blip_wasm/src/module_policy.cpp ../../components/blip_wasm/src/script_manifest.cpp)
 target_include_directories(blip_wasm_host PUBLIC ../../components/blip_wasm/include)
 target_link_libraries(blip_wasm_host PUBLIC blip_core_host)
 target_compile_features(blip_wasm_host PUBLIC cxx_std_20)
@@ -136,6 +136,14 @@ else()
     target_compile_options(blip_wasm_capability_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_wasm_capability_tests COMMAND blip_wasm_capability_tests)
+add_executable(blip_wasm_manifest_tests blip_wasm_manifest_tests.cpp)
+target_link_libraries(blip_wasm_manifest_tests PRIVATE blip_wasm_host)
+if(MSVC)
+    target_compile_options(blip_wasm_manifest_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_wasm_manifest_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_wasm_manifest_tests COMMAND blip_wasm_manifest_tests)
 add_test(
     NAME blip_serial_control_self_test
     COMMAND ${Python3_EXECUTABLE}
