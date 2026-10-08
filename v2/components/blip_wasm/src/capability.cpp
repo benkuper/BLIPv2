@@ -22,7 +22,7 @@ core::Status CallContext::write_utf8(std::uint32_t offset, std::string_view inpu
     if (cancelled()) return failure(core::ErrorCode::cancelled, "cancelled-copy");
     return blip::wasm::write_utf8(*memory_, offset, input);
 }
-core::Status CapabilityRegistry::bind(const core::RegistryView& registry) noexcept {
+core::Status CapabilityRegistry::bind(const core::RegistryView& registry, bool require_lifecycle_services) noexcept {
     if (bound_) return failure(core::ErrorCode::invalid_state, "already-bound");
     if (registry.component_count() > kMaximumCapabilityComponents)
         return failure(core::ErrorCode::capacity_exceeded, "component-limit");
@@ -36,6 +36,9 @@ core::Status CapabilityRegistry::bind(const core::RegistryView& registry) noexce
             (component.wasm.functions.empty() != (provider == nullptr)))
             return failure(core::ErrorCode::validation_failed, "provider-descriptor", component.id);
         if (!provider) continue;
+        if (require_lifecycle_services && std::find(component.provided_services.begin(), component.provided_services.end(),
+                component.wasm.import_module) == component.provided_services.end())
+            return failure(core::ErrorCode::missing_dependency, "provider-lifecycle-service", component.id);
         if (++providers > kMaximumCapabilityProviders ||
             component.wasm.functions.size() > kMaximumCapabilityFunctions - functions)
             return failure(core::ErrorCode::capacity_exceeded, "provider-or-function-limit", component.id);

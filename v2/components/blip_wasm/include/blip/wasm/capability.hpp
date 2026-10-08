@@ -49,7 +49,9 @@ class CapabilityRegistry final {
         const core::WasmFunctionDescriptor* function{};
         CapabilityProvider* provider{};
     };
-    [[nodiscard]] core::Status bind(const core::RegistryView&) noexcept;
+    // Production composition requires each owner to advertise its namespace
+    // as a service, so consumers can derive safe lifecycle dependencies.
+    [[nodiscard]] core::Status bind(const core::RegistryView&, bool require_lifecycle_services = false) noexcept;
     [[nodiscard]] bool bound() const noexcept { return bound_; }
     [[nodiscard]] std::size_t size() const noexcept { return bindings_.size(); }
     [[nodiscard]] const Binding& binding(std::size_t index) const noexcept { return bindings_[index]; }

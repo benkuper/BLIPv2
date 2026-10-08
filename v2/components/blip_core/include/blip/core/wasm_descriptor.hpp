@@ -23,6 +23,8 @@ struct WasmFunctionDescriptor {
     std::span<const WasmArgumentDescriptor> arguments{};
     // Native imports have at most one numeric result. UTF-8 uses checked memory.
     std::span<const WasmValueType> results{};
+    // Maximum scheduled task execution time, including timing overhead and
+    // interrupts. Whole guest calls also need a separate wall-clock supervisor.
     std::uint32_t maximum_call_us{};
 };
 struct WasmCapabilityDescriptor {

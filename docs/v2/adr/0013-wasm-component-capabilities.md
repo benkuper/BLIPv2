@@ -17,7 +17,9 @@ The import module is exactly `<component ID>.v<canonical decimal ABI version>`.
 There is no implicit `env` alias or cross-component namespace. Breaking function
 semantics or signatures require a new namespace version. Functions have named
 numeric arguments (i32/i64/f32/f64), zero or one numeric result, descriptions and
-a declared maximum callback duration of 1–2,000 microseconds. Paired i32 argument
+a declared maximum scheduled task execution time of 1–2,000 microseconds,
+including interrupt service and measurement overhead. The script supervisor
+separately enforces the whole call's absolute wall-clock deadline. Paired i32 argument
 roles describe UTF-8 offset/byte length for future generated bindings. They
 describe the ABI; providers still validate all inputs before effects and use the
 checked UTF-8 context for actual copies.

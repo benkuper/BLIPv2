@@ -9,3 +9,7 @@ CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM=8
 CONFIG_ESP_WIFI_RX_BA_WIN=6
 # One supervisor tick is one millisecond; retain the declared 2 ms guard bound.
 CONFIG_FREERTOS_HZ=1000
+# Task accounting distinguishes callback work from radio/render preemption.
+CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y
+CONFIG_FREERTOS_RUN_TIME_COUNTER_TYPE_U64=y
+CONFIG_FREERTOS_RUN_TIME_STATS_USING_ESP_TIMER=y

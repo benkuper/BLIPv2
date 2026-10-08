@@ -10,6 +10,11 @@ if(NOT CMAKE_BUILD_EARLY_EXPANSION)
     if(NOT CONFIG_FREERTOS_HZ EQUAL 1000)
         message(FATAL_ERROR "BLIP WASM requires CONFIG_FREERTOS_HZ=1000. Apply sdkconfig.wasm.defaults in a fresh firmware build directory or update the existing sdkconfig.")
     endif()
+    if(NOT CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS OR
+       NOT CONFIG_FREERTOS_RUN_TIME_COUNTER_TYPE_U64 OR
+       NOT CONFIG_FREERTOS_RUN_TIME_STATS_USING_ESP_TIMER)
+        message(FATAL_ERROR "BLIP WASM callback budgets require 64-bit ESP timer task statistics. Apply sdkconfig.wasm.defaults or the qualification defaults to the build sdkconfig.")
+    endif()
     if(NOT deps)
         message(FATAL_ERROR "BLIP_WASM_DEPS must point to pinned runtime checkouts")
     endif()

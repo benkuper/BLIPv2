@@ -13,7 +13,28 @@
 namespace blip::fleet {
 namespace {
 constexpr std::uint8_t kBroadcast[6]{255, 255, 255, 255, 255, 255};
+#if defined(BLIP_FLEET_WASM)
+constexpr std::array<std::string_view, 2> kProvided{"fleet.coordination", "blip.fleet.v1"};
+using WT = core::WasmValueType;
+using WR = core::WasmArgumentRole;
+constexpr std::array kScheduleArguments{
+    core::WasmArgumentDescriptor{"component_offset", WT::i32, WR::utf8_offset}, core::WasmArgumentDescriptor{"component_bytes", WT::i32, WR::utf8_length},
+    core::WasmArgumentDescriptor{"control_offset", WT::i32, WR::utf8_offset}, core::WasmArgumentDescriptor{"control_bytes", WT::i32, WR::utf8_length},
+    core::WasmArgumentDescriptor{"value", WT::i32}, core::WasmArgumentDescriptor{"delay_ms", WT::i32}};
+constexpr std::array kActionArguments{
+    core::WasmArgumentDescriptor{"component_offset", WT::i32, WR::utf8_offset}, core::WasmArgumentDescriptor{"component_bytes", WT::i32, WR::utf8_length},
+    core::WasmArgumentDescriptor{"control_offset", WT::i32, WR::utf8_offset}, core::WasmArgumentDescriptor{"control_bytes", WT::i32, WR::utf8_length},
+    core::WasmArgumentDescriptor{"delay_ms", WT::i32}};
+constexpr std::array kI32{WT::i32}, kI64{WT::i64};
+constexpr std::array kScriptFunctions{
+    core::WasmFunctionDescriptor{"ready", "Read active synchronized fleet clock readiness", {}, kI32, 2000},
+    core::WasmFunctionDescriptor{"time_us", "Read synchronized fleet time; unavailable without clock lock", {}, kI64, 2000},
+    core::WasmFunctionDescriptor{"leader", "Read leader node identifier (zero when inactive)", {}, kI64, 2000},
+    core::WasmFunctionDescriptor{"schedule_i32", "Leader queues a signed i32 parameter write after 100..60000 ms; copied IDs at most 64 ASCII bytes; returns cue ID", kScheduleArguments, kI32, 2000},
+    core::WasmFunctionDescriptor{"schedule_action", "Leader queues an action without arguments after 100..60000 ms; copied IDs at most 64 ASCII bytes; returns cue ID", kActionArguments, kI32, 2000}};
+#else
 constexpr std::array<std::string_view, 1> kProvided{"fleet.coordination"};
+#endif
 constexpr std::array<std::string_view, 3> kRequired{
     "control.dispatch", "storage.settings", "transport.wifi"};
 constexpr auto integer(std::string_view id, std::string_view label, std::string_view unit = "") {
@@ -81,6 +102,10 @@ constexpr core::ComponentDescriptor make_descriptor() {
     result.disable_policy = core::DisablePolicy::live;
     result.supports_restart = true;
     result.cost = {32768, sizeof(EspFleetComponent), 14336};
+#if defined(BLIP_FLEET_WASM)
+    result.wasm = {1, "blip.fleet.v1", kScriptFunctions};
+    result.cost.flash_bytes += 6144;
+#endif
     return result;
 }
 core::Error error(core::ErrorCode code, std::string_view operation, std::string_view detail) {
@@ -127,7 +152,7 @@ core::Status EspFleetComponent::save_settings(bool enabled, std::uint32_t id, st
 }
 
 core::Status EspFleetComponent::start(const core::StartContext&) noexcept {
-    if (started_.load()) return failure(core::ErrorCode::invalid_state, "start", "already-started");
+    if (started_.load() || !callbacks_quiesced()) return failure(core::ErrorCode::invalid_state, "start", "worker-active");
     const auto loaded = load_settings();
     if (!loaded) return loaded;
     std::array<std::uint8_t, 6> mac{};
@@ -162,9 +187,16 @@ core::Status EspFleetComponent::start(const core::StartContext&) noexcept {
 }
 
 core::Status EspFleetComponent::stop() noexcept {
+#if defined(BLIP_FLEET_WASM)
+    if (!script_admission_ || xSemaphoreTake(script_admission_, pdMS_TO_TICKS(2)) != pdTRUE)
+        return failure(core::ErrorCode::stop_failed, "stop", "script-admission-busy");
+#endif
     control_ready_.store(false);
     started_.store(false);
     active_.store(false);
+#if defined(BLIP_FLEET_WASM)
+    xSemaphoreGive(script_admission_);
+#endif
     epoch_.fetch_add(1U);
     for (std::size_t i = 0; i < 50 && !callbacks_quiesced(); ++i) vTaskDelay(pdMS_TO_TICKS(10));
     if (!callbacks_quiesced()) return failure(core::ErrorCode::stop_failed, "stop", "worker-active");
@@ -180,6 +212,72 @@ core::Status EspFleetComponent::stop() noexcept {
 bool EspFleetComponent::callbacks_quiesced() const noexcept {
     return network_quiesced_.load() && executor_quiesced_.load();
 }
+
+#if defined(BLIP_FLEET_WASM)
+core::Status EspFleetComponent::invoke(std::string_view name, wasm::CallContext& context,
+    std::span<const wasm::Value> arguments, std::span<wasm::Value> output, std::size_t& count) noexcept {
+    count = 0;
+    const bool write = name == "schedule_i32", action = name == "schedule_action";
+    const bool query = name == "ready" || name == "time_us" || name == "leader";
+    if (!write && !action && !query) return failure(core::ErrorCode::not_found, "script", "unknown-function");
+    if (arguments.size() != (write ? 6U : action ? 5U : 0U) || output.empty())
+        return failure(core::ErrorCode::invalid_argument, "script", "signature");
+    for (const auto& value : arguments)
+        if (value.type != wasm::ValueType::i32 || value.bits > UINT32_MAX)
+            return failure(core::ErrorCode::invalid_argument, "script", "argument-type");
+    std::array<char, 64> component{}, control{}; std::size_t component_bytes{}, control_bytes{};
+    core::ScalarValue value{};
+    std::array<std::byte, kMaximumCueBytes> payload{}; std::size_t payload_bytes{};
+    std::uint32_t delay{};
+    if (!query) {
+        const auto identifier = [](std::string_view id, bool dotted) {
+            if (id.empty() || id[0] < 'a' || id[0] > 'z' || (dotted && id.find('.') == id.npos)) return false;
+            for (const char c : id)
+                if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == '-' || (dotted && c == '.'))) return false;
+            return true;
+        };
+        auto status = context.read_utf8({static_cast<std::uint32_t>(arguments[0].bits), static_cast<std::uint32_t>(arguments[1].bits)}, component, component_bytes);
+        if (!status) return status;
+        status = context.read_utf8({static_cast<std::uint32_t>(arguments[2].bits), static_cast<std::uint32_t>(arguments[3].bits)}, control, control_bytes);
+        if (!status) return status;
+        const std::string_view component_id(component.data(), component_bytes), control_id(control.data(), control_bytes);
+        delay = static_cast<std::uint32_t>(arguments.back().bits);
+        if (!identifier(component_id, true) || !identifier(control_id, false) || component_id == descriptor_.id || delay < 100 || delay > 60000)
+            return failure(core::ErrorCode::invalid_argument, "script", "cue-fields");
+        if (write) value = core::ScalarValue::from_integer(std::bit_cast<std::int32_t>(static_cast<std::uint32_t>(arguments[4].bits)));
+        const transport::ControlMessage message{write ? core::ControlOperation::write_parameter : core::ControlOperation::invoke_action,
+            core::ErrorDomain::none, core::ErrorCode::none, component_id, control_id, {},
+            write ? std::span<const core::ScalarValue>{&value, 1} : std::span<const core::ScalarValue>{}};
+        const auto encoded = transport::encode_control_message(message, payload);
+        if (!encoded) return core::Status::failure(encoded.error());
+        payload_bytes = encoded.value();
+    }
+    if (context.cancelled()) return failure(core::ErrorCode::cancelled, "script", "cancelled-admission");
+    if (!script_admission_ || xSemaphoreTake(script_admission_, 0) != pdTRUE)
+        return failure(core::ErrorCode::resource_unavailable, "script", "admission-busy");
+    auto status = core::Status::success(); wasm::Value result{};
+    if (!started_.load() || !control_ready_.load()) status = failure(core::ErrorCode::resource_unavailable, "script", "not-started");
+    else if (!engine_mutex_ || xSemaphoreTake(engine_mutex_, 0) != pdTRUE) status = failure(core::ErrorCode::resource_unavailable, "script", "engine-busy");
+    else {
+        const bool ready = active_.load() && !reconfigure_.load() && engine_.synchronized();
+        if (context.cancelled()) status = failure(core::ErrorCode::cancelled, "script", "cancelled-admission");
+        else if (name == "ready") result = wasm::Value::i32(ready ? 1 : 0);
+        else if (name == "leader") result = wasm::Value::i64(active_.load() ? engine_.leader() : 0);
+        else if (!ready) status = failure(core::ErrorCode::resource_unavailable, "script", "clock-unavailable");
+        else if (name == "time_us") result = wasm::Value::i64(engine_.time_us(now_us()));
+        else {
+            const auto scheduled = engine_.schedule(std::span<const std::byte>(payload).first(payload_bytes), static_cast<std::uint64_t>(delay) * 1000U, now_us());
+            status = scheduled ? core::Status::success() : core::Status::failure(scheduled.error());
+            if (scheduled) result = wasm::Value::i32(scheduled.value());
+            update_epoch();
+        }
+        xSemaphoreGive(engine_mutex_);
+    }
+    xSemaphoreGive(script_admission_);
+    if (!status) return status;
+    output[0] = result; count = 1; return status;
+}
+#endif
 
 core::Status EspFleetComponent::write_parameter(std::string_view id, const core::ScalarValue& value) noexcept {
     if (!started_.load()) return failure(core::ErrorCode::invalid_state, "write", "not-started");

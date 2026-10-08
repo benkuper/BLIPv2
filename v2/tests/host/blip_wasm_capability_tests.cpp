@@ -340,6 +340,16 @@ bool exact_import_policy() {
     BLIP_CHECK(!catalog.check_import("test.alpha.v1", "echo", signature));
     return true;
 }
+bool production_lifecycle_service_binding() {
+    blip::core::Registry<1> r; TestComponent owner; BLIP_CHECK(r.add(owner));
+    CapabilityRegistry catalog; const auto missing = catalog.bind(r, true);
+    BLIP_CHECK(!missing && missing.error().code == ErrorCode::missing_dependency && !catalog.bound() && catalog.size() == 0);
+    const std::array<std::string_view, 1> services{"test.alpha.v1"};
+    owner.data.provided_services = services;
+    BLIP_CHECK(catalog.bind(r, true)); BLIP_CHECK(!catalog.bind(r, true));
+    BLIP_CHECK(r.validate());
+    return true;
+}
 bool original_module_name_policy() {
     blip::core::Registry<1> r; TestComponent owner; BLIP_CHECK(r.add(owner)); BLIP_CHECK(r.validate());
     CapabilityRegistry catalog; BLIP_CHECK(catalog.bind(r));
@@ -395,6 +405,7 @@ int main() {
         {"catalog bounds and atomic registration", catalog_bounds_and_atomic_binding},
         {"registry-generated capability manifest", manifest_from_registry},
         {"exact version/name/typed import policy", exact_import_policy},
+        {"production providers declare lifecycle services before binding", production_lifecycle_service_binding},
         {"original module names, truncation and C-string aliases", original_module_name_policy}};
     return run_tests(tests);
 }

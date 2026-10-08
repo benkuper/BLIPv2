@@ -15,6 +15,9 @@
 #if WASM_ENABLE_THREAD_MGR == 0 || WASM_ENABLE_INSTRUCTION_METERING == 0
 #error "BLIP WAMR requires instruction metering and the internal cancellation manager"
 #endif
+#if !configGENERATE_RUN_TIME_STATS || !defined(CONFIG_FREERTOS_RUN_TIME_COUNTER_TYPE_U64) || !defined(CONFIG_FREERTOS_RUN_TIME_STATS_USING_ESP_TIMER)
+#error "BLIP WAMR requires 64-bit ESP timer task runtime statistics for callback budgets"
+#endif
 
 namespace blip::wasm {
 namespace {
@@ -144,14 +147,27 @@ void WamrRuntime::raw_capability(void* environment, std::size_t index, std::uint
     if (invocation_cancellation_ && invocation_cancellation_->load()) provider_cancelled_.store(true);
     std::array<Value, 1> result{}; std::size_t count{};
     increment(native_calls_);
+    // Flush unfinished scheduler accounting on both sides. The difference
+    // measures this task's running time (including interrupts and this meter's
+    // overhead), excluding other tasks and blocked time. Never scan stacks.
+    taskYIELD();
+    TaskStatus_t before{};
+    vTaskGetInfo(nullptr, &before, pdFALSE, eRunning);
     const auto began = esp_timer_get_time();
     auto status = capabilities_->invoke(index, *this, std::span<const Value>(arguments).first(function.arguments.size()),
         result, count, &provider_cancelled_);
     const auto duration = static_cast<std::uint32_t>(std::min<std::uint64_t>(esp_timer_get_time() - began, UINT32_MAX));
     native_maximum_us_ = std::max(native_maximum_us_, duration);
+    native_last_us_ = duration;
+    taskYIELD();
+    TaskStatus_t after{};
+    vTaskGetInfo(nullptr, &after, pdFALSE, eRunning);
+    native_task_last_us_ = static_cast<std::uint32_t>(std::min<std::uint64_t>(
+        after.ulRunTimeCounter - before.ulRunTimeCounter, UINT32_MAX));
+    native_task_maximum_us_ = std::max(native_task_maximum_us_, native_task_last_us_);
     if (invocation_cancellation_ && invocation_cancellation_->load()) provider_cancelled_.store(true);
     if (provider_cancelled_.load()) status = failure(core::ErrorCode::cancelled, "capabilities", "cancelled-provider");
-    else if (duration > function.maximum_call_us) status = failure(core::ErrorCode::budget_exceeded, "capabilities", "provider-time-budget");
+    else if (native_task_last_us_ > function.maximum_call_us) status = failure(core::ErrorCode::budget_exceeded, "capabilities", "provider-task-time-budget");
     if (!status) {
         increment(native_failures_); provider_error_ = status.error().code;
         std::snprintf(fault_.data(), fault_.size(), "capability %.*s:%.*s status=%u",
@@ -197,6 +213,7 @@ core::Status WamrRuntime::initialize(std::span<std::byte> pool, Limits limits,
     limits_ = limits;
     fault_.fill(0);
     native_calls_ = native_failures_ = native_maximum_us_ = 0;
+    native_last_us_ = native_task_last_us_ = native_task_maximum_us_ = 0;
     const auto registered = install_capabilities();
     if (!registered) { shutdown(); return registered; }
     return core::Status::success();
@@ -413,6 +430,8 @@ RuntimeSnapshot WamrRuntime::snapshot() const noexcept {
     out.reserved_bytes = pool_bytes_;
     out.fault = fault_;
     out.native_calls = native_calls_; out.native_failures = native_failures_; out.native_maximum_us = native_maximum_us_;
+    out.native_last_us = native_last_us_; out.native_task_last_us = native_task_last_us_;
+    out.native_task_maximum_us = native_task_maximum_us_;
     mem_alloc_info_t info{};
     if (initialized_ && wasm_runtime_get_mem_alloc_info(&info)) {
         out.used_bytes = info.total_size - info.total_free_size + blip_wasm_linear_used();

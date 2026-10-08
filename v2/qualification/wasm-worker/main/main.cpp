@@ -174,10 +174,12 @@ void stop() {
     check(status.ok() && component.callbacks_quiesced() && !runtime.active.load() && state("stopped"), "native-stop-quiesced");
     check(duration < 1000000, "stop-bounded");
     check(read("pool_reserved") == 0 && read("pool_used") == 0 && read("upload_received") == 0, "stop-releases-state");
+    check(read("buffer_reserved") == EspWasmComponent::kPoolBytes + EspWasmComponent::kModuleBytes, "stop-retains-fixed-reservation");
     check(!component.call("echo", {}), "stop-denies-work");
     check(component.stop().ok(), "stop-idempotent");
 }
 void injected_start(qualification::Fault fault, const char* name, ErrorCode expected, std::string_view detail) {
+    check(component.release_reservation().ok() && read("buffer_reserved") == 0, "cold-injection-releases-reservation");
     const auto before = heap();
     qualification::arm(fault);
     const auto status = component.start({});
@@ -191,6 +193,7 @@ void injected_start(qualification::Fault fault, const char* name, ErrorCode expe
     const bool recovered = start() && load() && echo(0xfedcba98);
     check(recovered, "failed-start-recovery");
     stop();
+    check(component.release_reservation().ok(), "recovery-reservation-retired");
     const auto recovered_heap = heap();
     check(recovered_heap == before, "recovery-releases-heap-and-tasks");
     ++fault_count;
@@ -241,6 +244,7 @@ extern "C" void app_main() {
     check(!rejected && rejected.error().code == ErrorCode::resource_unavailable && rejected.error().detail == "worker-initialization", "backend-init-rejected");
     check(component.callbacks_quiesced() && heap() == before_backend, "backend-init-cleanup");
     check(start() && load() && echo(42), "backend-init-recovery"); stop();
+    check(component.release_reservation().ok(), "backend-recovery-reservation-retired");
     check(heap() == before_backend, "backend-recovery-cleanup");
 
     check(start() && load(), "active-stop-load");

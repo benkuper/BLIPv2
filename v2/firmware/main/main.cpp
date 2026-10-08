@@ -40,6 +40,9 @@
 #include "esp_system.h"
 #include "esp_timer.h"
 #include "sdkconfig.h"
+#if defined(BLIP_QUALIFY_WASM_PROVIDERS)
+#include "../../qualification/wasm-providers/lifecycle.hpp"
+#endif
 
 #include <array>
 #include <atomic>
@@ -420,6 +423,16 @@ void reject_pending_update() noexcept {
             return false;
         }
     }
+#if defined(BLIP_ENABLE_WASM)
+    if (!safe_mode) {
+        const auto bound = wasm_component.bind_capabilities(registry);
+        if (!bound) {
+            ESP_LOGE(kTag, "WASM provider binding failed code=%u detail=%.*s", static_cast<unsigned>(bound.error().code),
+                static_cast<int>(bound.error().detail.size()), bound.error().detail.data());
+            return false;
+        }
+    }
+#endif
     const auto validation_status = registry.validate();
     if (!validation_status) {
         const auto& error = validation_status.error();
@@ -511,6 +524,12 @@ extern "C" void app_main() {
         reject_pending_update();
         return;
     }
+#if defined(BLIP_QUALIFY_WASM_PROVIDERS)
+    if (!safe_mode && !blip::qualification::qualify_provider_lifecycle(wasm_component, *led_component, fleet_component, registry)) {
+        ESP_LOGE(kTag, "BLIP_V2_PROVIDER_QUALIFICATION_FAILED");
+        return;
+    }
+#endif
 #if defined(BLIP_OTA_HIL_ABORT_BEFORE_CONFIRM)
     if (!safe_mode && ota_component.pending_confirmation()) {
         ESP_LOGE(kTag, "BLIP_OTA_HIL_ABORT_BEFORE_CONFIRM");

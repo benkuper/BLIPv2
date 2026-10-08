@@ -61,6 +61,7 @@ struct RuntimeSnapshot {
     std::uint32_t peak_bytes{};
     std::array<char, kMaximumDiagnosticBytes> fault{};
     std::uint32_t native_calls{}, native_failures{}, native_maximum_us{};
+    std::uint32_t native_last_us{}, native_task_last_us{}, native_task_maximum_us{};
 };
 
 // Engine boundary. All operations except request_cancel are worker-confined.

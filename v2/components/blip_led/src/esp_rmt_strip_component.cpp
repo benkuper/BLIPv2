@@ -75,7 +75,21 @@ constexpr std::string_view kPinOwner{"blip.output.strip0:pin"};
 constexpr std::string_view kClockOwner{"blip.output.strip0:clock"};
 constexpr std::string_view kSpiOwner{"blip.output.strip0:spi"};
 #endif
+#if defined(BLIP_LED_WASM)
+constexpr std::array<std::string_view, 2> kProvidedServices{"output.pixel-strip", "blip.output.strip0.v1"};
+constexpr std::array kFillArguments{
+    core::WasmArgumentDescriptor{"red", core::WasmValueType::i32}, core::WasmArgumentDescriptor{"green", core::WasmValueType::i32},
+    core::WasmArgumentDescriptor{"blue", core::WasmValueType::i32}, core::WasmArgumentDescriptor{"white", core::WasmValueType::i32},
+    core::WasmArgumentDescriptor{"alpha", core::WasmValueType::i32}};
+constexpr std::array kScriptI32{core::WasmValueType::i32};
+constexpr std::array kScriptFunctions{
+    core::WasmFunctionDescriptor{"fill", "Queue a transient uniform script layer; five unsigned linear 16-bit channels; returns 1 on admission; render task polls every 10 ms", kFillArguments, kScriptI32, 2000},
+    core::WasmFunctionDescriptor{"clear", "Queue script layer removal; returns 1 on admission; settings unchanged", {}, kScriptI32, 2000},
+    core::WasmFunctionDescriptor{"frames", "Read successful output frame count", {}, kScriptI32, 2000},
+    core::WasmFunctionDescriptor{"pending", "Read queued script commands (capacity four; overflow rejects new command)", {}, kScriptI32, 2000}};
+#else
 constexpr std::array<std::string_view, 1> kProvidedServices{"output.pixel-strip"};
+#endif
 constexpr std::array<std::string_view, 2> kRequiredServices{"storage.settings", "power.cpu"};
 #if !defined(BLIP_BOARD_CREATORS_BALL_V2) && !defined(BLIP_BOARD_CREATORS_CLUB)
 constexpr std::array<std::string_view, 4> kRmtAlternatives{"rmt.tx0", "rmt.tx1", "rmt.tx2",
@@ -283,6 +297,10 @@ constexpr std::array<core::DiagnosticDescriptor, 5> kDiagnostics{{
     descriptor.supports_restart = true;
     descriptor.cost = {32768U, kClockedBoard ? 12288U : 24576U,
                        EspRmtStripComponent::kTaskStackBytes};
+#if defined(BLIP_LED_WASM)
+    descriptor.wasm = {1, "blip.output.strip0.v1", kScriptFunctions};
+    descriptor.cost.flash_bytes += 7168;
+#endif
     return descriptor;
 }
 
@@ -305,7 +323,12 @@ const core::ComponentDescriptor EspRmtStripComponent::descriptor_{strip_descript
 EspRmtStripComponent::EspRmtStripComponent(storage::SettingsStore& settings,
                                            resources::DeviceBroker& resources,
                                            pm::EspPowerManagerComponent& power_manager) noexcept
-    : settings_(&settings), resources_(&resources), power_manager_(&power_manager) {}
+    : settings_(&settings), resources_(&resources), power_manager_(&power_manager) {
+#if defined(BLIP_LED_WASM)
+    script_admission_ = xSemaphoreCreateMutexStatic(&script_admission_storage_);
+    script_queue_ = xQueueCreateStatic(4, sizeof(ScriptCommand), script_queue_bytes_.data(), &script_queue_storage_);
+#endif
+}
 
 const core::ComponentDescriptor& EspRmtStripComponent::descriptor() const noexcept {
     return descriptor_;
@@ -559,6 +582,16 @@ EspRmtStripComponent::render_one_wire(const StripConfig& config) noexcept {
         rgbw ? static_cast<std::uint16_t>(config.blue * 257U) : rgb_channel(config.blue),
         rgbw ? static_cast<std::uint16_t>(config.white * 257U) : std::uint16_t{0U},
         65535U};
+#if defined(BLIP_LED_WASM)
+    auto script_pixel = script_color_;
+    if (!rgbw) {
+        const auto add_white = [white = script_pixel.white](std::uint16_t value) {
+            return static_cast<std::uint16_t>(std::min<std::uint32_t>(65535U, static_cast<std::uint32_t>(value) + white));
+        };
+        script_pixel.red = add_white(script_pixel.red); script_pixel.green = add_white(script_pixel.green);
+        script_pixel.blue = add_white(script_pixel.blue); script_pixel.white = 0;
+    }
+#endif
     ColorTransform color{};
     color.transfer = TransferFunction::linear;
     color.brightness = static_cast<std::uint16_t>(config.brightness * 257U);
@@ -580,6 +613,10 @@ EspRmtStripComponent::render_one_wire(const StripConfig& config) noexcept {
                 return core::Result<std::size_t>::failure(layer.error());
             }
         }
+#if defined(BLIP_LED_WASM)
+        const auto script = compositor.set_layer({LayerId::script, {&script_pixel, 1}, BlendMode::alpha_over, 65535U, script_enabled_});
+        if (!script) { release(); return core::Result<std::size_t>::failure(script.error()); }
+#endif
         const auto layer = compositor.set_layer(
             {LayerId::system, std::span<const LinearPixel>{&system_pixel, 1U},
              BlendMode::replace, 65535U, system_active});
@@ -619,6 +656,15 @@ core::Status EspRmtStripComponent::transmit(const StripConfig& config,
     const LinearPixel color{channel(config.red), channel(config.green),
                             channel(config.blue), 0U, 65535U};
     system_pixels.fill(color);
+#if defined(BLIP_LED_WASM)
+    const bool system_active = config.red != 0U || config.green != 0U || config.blue != 0U || config.white != 0U;
+    if (!system_active && script_enabled_) {
+        const auto add_white = [white = script_color_.white](std::uint16_t value) {
+            return static_cast<std::uint16_t>(std::min<std::uint32_t>(65535U, static_cast<std::uint32_t>(value) + white));
+        };
+        system_pixels.fill({add_white(script_color_.red), add_white(script_color_.green), add_white(script_color_.blue), 0U, script_color_.alpha});
+    }
+#endif
     std::array<LinearPixel, kDefaultPixels> stream_pixels{};
     bool stream_active{};
     if (stream_mutex_ != nullptr && xSemaphoreTake(stream_mutex_, portMAX_DELAY) == pdTRUE) {
@@ -637,9 +683,16 @@ core::Status EspRmtStripComponent::transmit(const StripConfig& config,
             return layer;
         }
     }
+#if defined(BLIP_LED_WASM)
+    // The opaque system layer replaces everything below it. Reuse its scratch
+    // for the uniform script layer when no system color is active.
+    const auto layer = compositor.set_layer({system_active ? LayerId::system : LayerId::script, system_pixels,
+        system_active ? BlendMode::replace : BlendMode::alpha_over, 65535U, system_active || script_enabled_});
+#else
     const auto layer = compositor.set_layer(
         {LayerId::system, system_pixels, BlendMode::replace, 65535U,
          config.red != 0U || config.green != 0U || config.blue != 0U || config.white != 0U});
+#endif
     if (!layer) {
         return layer;
     }
@@ -751,6 +804,11 @@ core::Status EspRmtStripComponent::start(const core::StartContext&) noexcept {
     if (started_.load()) {
         return core::Status::success();
     }
+    if (!task_quiesced_.load()) return core::Status::failure(output_error(core::ErrorCode::invalid_state, "start", "render-worker-active"));
+#if defined(BLIP_LED_WASM)
+    if (!script_admission_ || !script_queue_) return core::Status::failure(output_error(core::ErrorCode::start_failed, "start", "script-resources"));
+    xQueueReset(script_queue_); script_enabled_ = false; script_color_ = {};
+#endif
     config_mutex_ = xSemaphoreCreateMutexStatic(&config_mutex_storage_);
     request_mutex_ = xSemaphoreCreateMutexStatic(&request_mutex_storage_);
     completion_ = xSemaphoreCreateBinaryStatic(&completion_storage_);
@@ -812,24 +870,31 @@ core::Status EspRmtStripComponent::start(const core::StartContext&) noexcept {
 }
 
 core::Status EspRmtStripComponent::stop() noexcept {
+#if defined(BLIP_LED_WASM)
+    if (xSemaphoreTake(script_admission_, pdMS_TO_TICKS(2)) != pdTRUE)
+        return core::Status::failure(output_error(core::ErrorCode::stop_failed, "stop", "script-admission-busy"));
+    const bool was_started = started_.exchange(false);
+    xSemaphoreGive(script_admission_);
+    if (!was_started && task_quiesced_.load()) return core::Status::success();
+#else
     if (!started_.exchange(false) && task_quiesced_.load()) {
         return core::Status::success();
     }
+#endif
     if (task_ != nullptr) {
         xTaskNotifyGive(task_);
     }
     for (std::size_t attempt = 0; attempt < 200U && !task_quiesced_.load(); ++attempt) {
         vTaskDelay(pdMS_TO_TICKS(5));
     }
+    if (!task_quiesced_.load()) return core::Status::failure(output_error(core::ErrorCode::stop_failed, "stop", "task-active"));
     task_ = nullptr;
     deinitialize_output();
     pin_lease_.release();
     config_mutex_ = nullptr;
     request_mutex_ = nullptr;
     completion_ = nullptr;
-    return task_quiesced_.load() ? core::Status::success()
-                                 : core::Status::failure(output_error(core::ErrorCode::stop_failed,
-                                                                      "stop", "task-active"));
+    return core::Status::success();
 }
 
 bool EspRmtStripComponent::callbacks_quiesced() const noexcept { return task_quiesced_.load(); }
@@ -1172,6 +1237,17 @@ core::Status EspRmtStripComponent::invoke_action(std::string_view id,
         stream_layer_.clear();
         static_cast<void>(xSemaphoreGive(stream_mutex_));
     }
+#if defined(BLIP_LED_WASM)
+    if (script_admission_ && xSemaphoreTake(script_admission_, pdMS_TO_TICKS(2)) == pdTRUE) {
+        const ScriptCommand clear{};
+        xQueueReset(script_queue_);
+        static_cast<void>(xQueueSend(script_queue_, &clear, 0));
+        xSemaphoreGive(script_admission_);
+    } else {
+        static_cast<void>(xSemaphoreGive(request_mutex_));
+        return core::Status::failure(output_error(core::ErrorCode::resource_unavailable, "blackout", "script-admission-busy"));
+    }
+#endif
     const auto status = apply_config_locked(candidate);
     if (status && task_ != nullptr) {
         xTaskNotifyGive(task_);
@@ -1182,10 +1258,19 @@ core::Status EspRmtStripComponent::invoke_action(std::string_view id,
 
 void EspRmtStripComponent::run() noexcept {
     while (started_.load()) {
+#if defined(BLIP_LED_WASM)
+        const auto notifications = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(10));
+#else
         const auto notifications = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
+#endif
         if (!started_.load()) {
             break;
         }
+#if defined(BLIP_LED_WASM)
+        const bool script_changed = process_script_commands();
+#else
+        constexpr bool script_changed = false;
+#endif
         bool stream_expired{};
         if (stream_mutex_ != nullptr && xSemaphoreTake(stream_mutex_, portMAX_DELAY) == pdTRUE) {
             stream_expired = stream_layer_.active();
@@ -1194,7 +1279,7 @@ void EspRmtStripComponent::run() noexcept {
             stream_expired = stream_expired && !stream_layer_.active();
             static_cast<void>(xSemaphoreGive(stream_mutex_));
         }
-        if (notifications == 0U && !stream_expired) {
+        if (notifications == 0U && !stream_expired && !script_changed) {
             continue;
         }
         process_pending_config();
@@ -1241,5 +1326,43 @@ void EspRmtStripComponent::run() noexcept {
 void EspRmtStripComponent::task_entry(void* context) noexcept {
     static_cast<EspRmtStripComponent*>(context)->run();
 }
+
+#if defined(BLIP_LED_WASM)
+core::Status EspRmtStripComponent::invoke(std::string_view name, wasm::CallContext& context,
+    std::span<const wasm::Value> arguments, std::span<wasm::Value> output, std::size_t& count) noexcept {
+    count = 0;
+    const auto fail = [](core::ErrorCode code, std::string_view detail) { return core::Status::failure(output_error(code, "script", detail)); };
+    const bool fill = name == "fill";
+    if (!fill && name != "clear" && name != "frames" && name != "pending") return fail(core::ErrorCode::not_found, "unknown-function");
+    if (arguments.size() != (fill ? 5U : 0U) || output.empty()) return fail(core::ErrorCode::invalid_argument, "signature");
+    ScriptCommand command{}; command.enabled = fill;
+    if (fill) {
+        for (const auto& value : arguments)
+            if (value.type != wasm::ValueType::i32 || value.bits > 65535U) return fail(core::ErrorCode::invalid_argument, "channel-range");
+        command.pixel = {static_cast<std::uint16_t>(arguments[0].bits), static_cast<std::uint16_t>(arguments[1].bits),
+            static_cast<std::uint16_t>(arguments[2].bits), static_cast<std::uint16_t>(arguments[3].bits), static_cast<std::uint16_t>(arguments[4].bits)};
+    }
+    if (context.cancelled()) return fail(core::ErrorCode::cancelled, "cancelled-admission");
+    if (!script_admission_ || xSemaphoreTake(script_admission_, 0) != pdTRUE) return fail(core::ErrorCode::resource_unavailable, "admission-busy");
+    std::uint32_t result{}; auto status = core::Status::success();
+    if (!started_.load()) status = fail(core::ErrorCode::resource_unavailable, "not-started");
+    else if (name == "frames") result = applied_frames_.load();
+    else if (name == "pending") result = uxQueueMessagesWaiting(script_queue_);
+    else if (context.cancelled()) status = fail(core::ErrorCode::cancelled, "cancelled-admission");
+    else if (xQueueSend(script_queue_, &command, 0) != pdTRUE) status = fail(core::ErrorCode::queue_full, "script-queue-full");
+    else result = 1; // Never wake a higher-priority render task inside the callback.
+    xSemaphoreGive(script_admission_);
+    if (!status) return status;
+    output[0] = wasm::Value::i32(result); count = 1; return status;
+}
+bool EspRmtStripComponent::process_script_commands() noexcept {
+    ScriptCommand command{};
+    bool changed{};
+    for (unsigned i = 0; i < 4 && xQueueReceive(script_queue_, &command, 0) == pdTRUE; ++i) {
+        script_color_ = command.pixel; script_enabled_ = command.enabled; changed = true;
+    }
+    return changed;
+}
+#endif
 
 } // namespace blip::led

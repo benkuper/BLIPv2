@@ -11,20 +11,32 @@
 #include "freertos/semphr.h"
 #include "freertos/task.h"
 #include "esp_now.h"
+#if defined(BLIP_FLEET_WASM)
+#include "blip/wasm/capability.hpp"
+#endif
 
 #include <array>
 #include <atomic>
 
 namespace blip::fleet {
 
-class EspFleetComponent final : public core::Component {
+class EspFleetComponent final : public core::Component
+#if defined(BLIP_FLEET_WASM)
+    , public wasm::CapabilityProvider
+#endif
+{
   public:
     EspFleetComponent(core::ControlService& controls, storage::SettingsStore& settings,
                       network::EspWifiComponent& wifi) noexcept
-        : controls_(&controls), settings_(&settings), wifi_(&wifi) {}
+        : controls_(&controls), settings_(&settings), wifi_(&wifi) {
+#if defined(BLIP_FLEET_WASM)
+        script_admission_ = xSemaphoreCreateMutexStatic(&script_admission_storage_);
+#endif
+    }
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
     [[nodiscard]] core::Status start(const core::StartContext&) noexcept override;
     [[nodiscard]] core::Status stop() noexcept override;
+    [[nodiscard]] core::Status suspend() noexcept override { return stop(); }
     [[nodiscard]] bool callbacks_quiesced() const noexcept override;
     [[nodiscard]] core::Status read_parameter(std::string_view, core::ScalarValue&) noexcept override;
     [[nodiscard]] core::Status write_parameter(std::string_view, const core::ScalarValue&) noexcept override;
@@ -33,6 +45,12 @@ class EspFleetComponent final : public core::Component {
     [[nodiscard]] core::Result<std::uint32_t> schedule(const core::ControlRequest&,
                                                       std::uint32_t delay_ms) noexcept;
     void enable_control() noexcept { control_ready_.store(true); }
+#if defined(BLIP_FLEET_WASM)
+    wasm::CapabilityProvider* wasm_provider() noexcept override { return this; }
+    bool available() const noexcept override { return started_.load() && control_ready_.load(); }
+    core::Status invoke(std::string_view, wasm::CallContext&, std::span<const wasm::Value>,
+        std::span<wasm::Value>, std::size_t&) noexcept override;
+#endif
 
   private:
     struct Received {
@@ -87,6 +105,10 @@ class EspFleetComponent final : public core::Component {
     std::atomic<std::uint32_t> send_failed_{};
     std::atomic<std::uint64_t> last_execution_us_{};
     std::atomic<std::uint32_t> maximum_lateness_us_{};
+#if defined(BLIP_FLEET_WASM)
+    StaticSemaphore_t script_admission_storage_{};
+    SemaphoreHandle_t script_admission_{}; // Permanent gate protects admission vs resource teardown.
+#endif
 };
 
 } // namespace blip::fleet

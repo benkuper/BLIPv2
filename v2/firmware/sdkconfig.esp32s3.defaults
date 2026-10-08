@@ -1,0 +1,6 @@
+# Production S3 control uses the native USB Serial/JTAG endpoint.
+# Keep console input/output on that endpoint rather than the unused UART.
+CONFIG_ESP_CONSOLE_UART_DEFAULT=n
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG=n
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y

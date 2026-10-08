@@ -12,3 +12,4 @@
 ## Connected test boards
 
 - The user authorizes flashing the connected boards and does not require backups or restoration of their previous firmware. Leave validated test firmware installed unless a particular test or a later user instruction requires another image.
+- The M5Dial's native USB can remain in download mode after a flash/reset. Use esptool's default stub-assisted `run` and verify application readiness over serial. `--no-stub run` did not reliably start this test board. Production S3 builds use `sdkconfig.esp32s3.defaults` to select the native USB console; flash the matching bootloader when changing console configuration.

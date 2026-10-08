@@ -42,6 +42,7 @@ class WamrRuntime final : public Runtime {
     bool provider_active_{};
     core::ErrorCode provider_error_{core::ErrorCode::none};
     std::uint32_t native_calls_{}, native_failures_{}, native_maximum_us_{};
+    std::uint32_t native_last_us_{}, native_task_last_us_{}, native_task_maximum_us_{};
     // Only this implementation casts opaque handles to WAMR types.
     void* module_{};
     void* instance_{};

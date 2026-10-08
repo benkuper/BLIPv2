@@ -17,8 +17,15 @@ entry point selects the WAMR implementation.
 | Script supervisor | 6 | 4 KiB | none | 1-tick deadline/epoch observation and active cancellation |
 
 The worker borrows an 80 KiB engine pool and 16 KiB module scratch, allocated once
-at component start in internal RAM. Allocation/initialization failure rejects
-startup. The 4 KiB Wasm stack is inside the engine pool. No module input, queue
+at the first component start in internal RAM. Routine stop/suspend retains these
+fixed buffers: production radio/render allocations can fragment a freed module
+buffer's space and prevent restart. `buffer_reserved` exposes the 96 KiB
+reservation independently of the stopped engine's zero `pool_reserved`.
+Cold-start failure rolls back new reservations after quiescence; a failed warm
+start retains existing reservations. Permanent retirement calls
+`release_reservation` after stop/join; destruction requires that quiescence and
+releases the reservation. Live retirement is refused.
+Allocation/initialization failure rejects startup. The 4 KiB Wasm stack is inside the engine pool. No module input, queue
 payload or completion points into a transport/producer stack frame.
 
 The standalone service qualifier used a 16 KiB native stack with at least
@@ -64,7 +71,7 @@ the module becomes non-runnable until reload. The supervisor's short guard is
 not held across guest execution. Control admission/snapshot guards wait at most
 2 ms. Worker/maintenance synchronization may block. Stop disables admission,
 invalidates the epoch, cancels execution, waits at most 1 s for quiescence and
-joins the worker before releasing buffers. Failure to quiesce retains resources
+joins the worker before permitting permanent buffer retirement. Failure to quiesce retains resources
 and reports an error, rather than freeing live interpreter memory.
 
 The deadline starts cancellation; it is not a guarantee that a completion is

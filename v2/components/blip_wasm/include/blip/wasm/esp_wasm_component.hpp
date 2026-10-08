@@ -1,6 +1,7 @@
 #pragma once
 #include "blip/core/component.hpp"
 #include "blip/wasm/service.hpp"
+#include "blip/wasm/capability.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
@@ -21,9 +22,16 @@ class EspWasmComponent final : public core::Component {
     static constexpr std::size_t kWorkerStackBytes = 8192, kSupervisorStackBytes = 4096;
     static constexpr std::size_t kQueueCapacity = 8, kCompletionCapacity = 16, kChunkBytes = 64;
     explicit EspWasmComponent(Runtime& runtime) noexcept;
+    ~EspWasmComponent() override;
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
+    // Once, after all components are added and before Registry::validate.
+    [[nodiscard]] core::Status bind_capabilities(const core::RegistryView&) noexcept;
     [[nodiscard]] core::Status start(const core::StartContext&) noexcept override;
     [[nodiscard]] core::Status stop() noexcept override;
+    [[nodiscard]] core::Status suspend() noexcept override { return stop(); }
+    // Lifecycle-owner operation after stop/join, for permanent retirement.
+    // Routine stops retain fixed reservations to avoid restart fragmentation.
+    [[nodiscard]] core::Status release_reservation() noexcept;
     [[nodiscard]] bool callbacks_quiesced() const noexcept override;
     [[nodiscard]] core::Status read_parameter(std::string_view, core::ScalarValue&) noexcept override;
     [[nodiscard]] core::Status write_parameter(std::string_view, const core::ScalarValue&) noexcept override;
@@ -69,6 +77,7 @@ class EspWasmComponent final : public core::Component {
     bool worker_created_{};
     std::atomic<bool> started_{}, control_ready_{}, worker_quiesced_{true}, supervisor_quiesced_{true};
     std::atomic<std::uint32_t> epoch_{1}, instruction_budget_{10000}, deadline_ms_{10};
+    std::atomic<std::uint32_t> buffer_reserved_{};
     std::atomic<core::ErrorCode> start_error_{core::ErrorCode::none};
     std::atomic<std::uint32_t> rejected_{}, completed_{}, failed_{}, deadlines_{}, cancelled_{}, worker_headroom_{}, supervisor_headroom_{};
     std::uint32_t next_id_{}; // Admission mutex; never reset or reuse IDs.
@@ -82,6 +91,9 @@ class EspWasmComponent final : public core::Component {
     std::uint64_t active_deadline_{};
     Cancellation cancellation_{Cancellation::none};
     std::atomic<bool> call_cancelled_{};
-    static const core::ComponentDescriptor descriptor_;
+    CapabilityRegistry capabilities_{};
+    std::array<std::string_view, 1 + kMaximumCapabilityProviders> required_services_{};
+    core::ComponentDescriptor descriptor_{}; // Stable address borrowed by registry.
+    static const core::ComponentDescriptor base_descriptor_;
 };
 } // namespace blip::wasm

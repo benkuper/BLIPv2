@@ -42,6 +42,12 @@ constexpr std::array parameters{
     integer("last_error_code", "Last request error code"), integer("last_elapsed_us", "Last request duration", "us"),
     integer("pool_reserved", "Reserved engine pool", "bytes"), integer("pool_used", "Used engine pool", "bytes"),
     integer("pool_peak", "Peak engine pool use", "bytes"),
+    integer("buffer_reserved", "Fixed script buffer reservation", "bytes"),
+    integer("native_calls", "Native capability calls"), integer("native_failures", "Native capability failures"),
+    integer("native_maximum_us", "Largest native callback wall duration", "us"),
+    integer("native_last_us", "Last native callback wall duration", "us"),
+    integer("native_task_last_us", "Last native callback task duration", "us"),
+    integer("native_task_maximum_us", "Largest native callback task duration", "us"),
     integer("worker_stack_headroom", "Worker stack headroom", "bytes"),
     integer("supervisor_stack_headroom", "Supervisor stack headroom", "bytes")};
 constexpr std::array<core::FieldDescriptor, 2> begin_fields{{{"bytes", core::ValueType::integer, true}, {"crc32", core::ValueType::integer, true}}};
@@ -84,28 +90,60 @@ int nibble(char value) {
     return -1;
 }
 }
-const core::ComponentDescriptor EspWasmComponent::descriptor_{make_descriptor()};
+const core::ComponentDescriptor EspWasmComponent::base_descriptor_{make_descriptor()};
 const core::ComponentDescriptor& EspWasmComponent::descriptor() const noexcept { return descriptor_; }
 
-EspWasmComponent::EspWasmComponent(Runtime& runtime) noexcept : runtime_(&runtime) {
+EspWasmComponent::EspWasmComponent(Runtime& runtime) noexcept : runtime_(&runtime), descriptor_(base_descriptor_) {
     admission_ = xSemaphoreCreateMutexStatic(&admission_storage_);
     snapshot_mutex_ = xSemaphoreCreateMutexStatic(&snapshot_storage_);
     monitor_mutex_ = xSemaphoreCreateMutexStatic(&monitor_storage_);
     ready_ = xSemaphoreCreateBinaryStatic(&ready_storage_);
     queue_ = xQueueCreateStatic(kQueueCapacity, sizeof(Request), queue_bytes_.data(), &queue_storage_);
 }
+EspWasmComponent::~EspWasmComponent() {
+    const auto released = release_reservation();
+    configASSERT(released.ok());
+}
+core::Status EspWasmComponent::release_reservation() noexcept {
+    Guard guard(admission_);
+    if (!guard.held || started_.load() || worker_created_ || !callbacks_quiesced())
+        return failure(ErrorCode::invalid_state, "release", "worker-not-retired");
+    heap_caps_free(pool_); pool_ = nullptr;
+    heap_caps_free(module_); module_ = nullptr;
+    heap_caps_free(linear_); linear_ = nullptr;
+    buffer_reserved_.store(0);
+    return core::Status::success();
+}
+core::Status EspWasmComponent::bind_capabilities(const core::RegistryView& registry) noexcept {
+    if (started_.load() || worker_created_ || !callbacks_quiesced()) return failure(ErrorCode::invalid_state, "bind", "worker-active");
+    const auto bound = capabilities_.bind(registry, true);
+    if (!bound) return bound;
+    std::size_t count = 1;
+    required_services_[0] = required[0];
+    std::string_view previous;
+    for (std::size_t i = 0; i < capabilities_.size(); ++i) {
+        const auto module = capabilities_.binding(i).component->wasm.import_module;
+        if (module != previous) required_services_[count++] = module;
+        previous = module;
+    }
+    descriptor_.required_services = std::span<const std::string_view>(required_services_).first(count);
+    return core::Status::success();
+}
 core::Status EspWasmComponent::start(const core::StartContext&) noexcept {
     if (started_.load() || worker_created_ || !callbacks_quiesced()) return failure(ErrorCode::invalid_state, "start", "worker-state");
     if (epoch_.load() == 0xffffffffU || !admission_ || !snapshot_mutex_ || !monitor_mutex_ || !ready_ || !queue_)
         return failure(ErrorCode::resource_unavailable, "start", "runtime-resources");
-    pool_ = static_cast<std::byte*>(heap_caps_aligned_alloc(8, kEnginePoolBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
-    module_ = static_cast<std::byte*>(heap_caps_malloc(kModuleBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+    const bool retained = buffer_reserved_.load() != 0;
+    if (!retained) {
+        pool_ = static_cast<std::byte*>(heap_caps_aligned_alloc(8, kEnginePoolBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+        module_ = static_cast<std::byte*>(heap_caps_malloc(kModuleBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
 #if defined(CONFIG_IDF_TARGET_ESP32)
-    // Guest memory permits unaligned integer accesses. Unlike the engine pool,
-    // it needs only malloc's four-byte base alignment; requesting additional
-    // alignment makes TLSF skip the available 64 KiB size class on ESP32.
-    linear_ = static_cast<std::byte*>(heap_caps_malloc(kLinearBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_IRAM_8BIT));
+        // Guest memory permits unaligned integer accesses. Unlike the engine pool,
+        // it needs only malloc's four-byte base alignment; requesting additional
+        // alignment makes TLSF skip the available 64 KiB size class on ESP32.
+        linear_ = static_cast<std::byte*>(heap_caps_malloc(kLinearBytes, MALLOC_CAP_INTERNAL | MALLOC_CAP_IRAM_8BIT));
 #endif
+    }
     if (!pool_ || !module_ || (kLinearBytes && !linear_)) {
         ESP_LOGE("blip_wasm", "startup buffers unavailable pool=%u module=%u linear=%u free=%u largest=%u iram_free=%u iram_largest=%u",
             static_cast<unsigned>(pool_ != nullptr), static_cast<unsigned>(module_ != nullptr),
@@ -114,8 +152,11 @@ core::Status EspWasmComponent::start(const core::StartContext&) noexcept {
             static_cast<unsigned>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT)),
             static_cast<unsigned>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_IRAM_8BIT)),
             static_cast<unsigned>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_IRAM_8BIT)));
-        static_cast<void>(stop()); return failure(ErrorCode::resource_unavailable, "start", "runtime-buffers");
+        static_cast<void>(stop());
+        static_cast<void>(release_reservation());
+        return failure(ErrorCode::resource_unavailable, "start", "runtime-buffers");
     }
+    buffer_reserved_.store(kPoolBytes + kModuleBytes);
     xQueueReset(queue_);
     static_cast<void>(xSemaphoreTake(ready_, 0));
     control_ready_.store(false);
@@ -123,7 +164,9 @@ core::Status EspWasmComponent::start(const core::StartContext&) noexcept {
     started_.store(true);
     supervisor_quiesced_.store(false);
     if (xTaskCreate(supervisor_entry, "blip_wasm_guard", kSupervisorStackBytes, this, 6, &supervisor_) != pdPASS) {
-        supervisor_quiesced_.store(true); static_cast<void>(stop()); return failure(ErrorCode::start_failed, "start", "supervisor-task");
+        supervisor_quiesced_.store(true); static_cast<void>(stop());
+        if (!retained) static_cast<void>(release_reservation());
+        return failure(ErrorCode::start_failed, "start", "supervisor-task");
     }
     auto config = esp_pthread_get_default_config();
     esp_pthread_cfg_t previous{};
@@ -138,12 +181,15 @@ core::Status EspWasmComponent::start(const core::StartContext&) noexcept {
             static_cast<unsigned>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT)),
             static_cast<unsigned>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT)),
             static_cast<unsigned>(kWorkerStackBytes));
-        worker_quiesced_.store(true); static_cast<void>(stop()); return failure(ErrorCode::start_failed, "start", "worker-task");
+        worker_quiesced_.store(true); static_cast<void>(stop());
+        if (!retained) static_cast<void>(release_reservation());
+        return failure(ErrorCode::start_failed, "start", "worker-task");
     }
     worker_created_ = true;
     if (xSemaphoreTake(ready_, pdMS_TO_TICKS(1000)) != pdTRUE || start_error_.load() != ErrorCode::none) {
         const auto code = start_error_.load();
         static_cast<void>(stop());
+        if (!retained) static_cast<void>(release_reservation());
         return failure(code == ErrorCode::none ? ErrorCode::start_failed : code, "start", "worker-initialization");
     }
     return core::Status::success();
@@ -162,9 +208,6 @@ core::Status EspWasmComponent::stop() noexcept {
     if (!callbacks_quiesced()) return failure(ErrorCode::stop_failed, "stop", "worker-active");
     if (worker_created_) { pthread_join(worker_, nullptr); worker_created_ = false; }
     supervisor_ = nullptr;
-    heap_caps_free(pool_); pool_ = nullptr;
-    heap_caps_free(module_); module_ = nullptr;
-    heap_caps_free(linear_); linear_ = nullptr;
     return core::Status::success();
 }
 bool EspWasmComponent::callbacks_quiesced() const noexcept { return worker_quiesced_.load() && supervisor_quiesced_.load(); }
@@ -223,7 +266,8 @@ void EspWasmComponent::supervisor_entry(void* context) noexcept {
 void EspWasmComponent::run_worker() noexcept {
     Service service(*runtime_, {pool_, kEnginePoolBytes}, {module_, kModuleBytes}, {linear_, kLinearBytes});
     ModuleUpload upload({module_, kModuleBytes});
-    const auto initialized = service.start();
+    auto initialized = runtime_->configure_capabilities(capabilities_.size() ? &capabilities_ : nullptr);
+    if (initialized) initialized = service.start();
     if (!initialized) {
         const auto& error = initialized.error();
         ESP_LOGE("blip_wasm", "runtime initialization failed code=%u detail=%.*s",
@@ -328,6 +372,7 @@ core::Status EspWasmComponent::read_parameter(std::string_view id, core::ScalarV
     if (id == "instruction_budget") value = instruction_budget_.load();
     else if (id == "deadline_ms") value = deadline_ms_.load();
     else if (id == "epoch") value = epoch_.load();
+    else if (id == "buffer_reserved") value = buffer_reserved_.load();
     else if (id == "completed") value = completed_.load();
     else if (id == "failed") value = failed_.load();
     else if (id == "rejected") value = rejected_.load();
@@ -354,6 +399,12 @@ core::Status EspWasmComponent::read_parameter(std::string_view id, core::ScalarV
         else if (id == "pool_reserved") value = snapshot_.runtime.reserved_bytes;
         else if (id == "pool_used") value = snapshot_.runtime.used_bytes;
         else if (id == "pool_peak") value = snapshot_.runtime.peak_bytes;
+        else if (id == "native_calls") value = snapshot_.runtime.native_calls;
+        else if (id == "native_failures") value = snapshot_.runtime.native_failures;
+        else if (id == "native_maximum_us") value = snapshot_.runtime.native_maximum_us;
+        else if (id == "native_last_us") value = snapshot_.runtime.native_last_us;
+        else if (id == "native_task_last_us") value = snapshot_.runtime.native_task_last_us;
+        else if (id == "native_task_maximum_us") value = snapshot_.runtime.native_task_maximum_us;
         else return failure(ErrorCode::not_found, "read", "unknown-parameter");
     }
     output = core::ScalarValue::from_integer(value); return core::Status::success();

@@ -44,6 +44,8 @@ def validate(report):
         raise RuntimeError(f"Portable provider qualification failed: {end}")
     if end["reload_cycles"] != 100 or end["heap_baseline"] != end["heap_min"] or end["heap_min"] != end["heap_max"] or end["worker_headroom"] < 1024:
         raise RuntimeError("Heap stability, reload count or stack margin failed")
+    if end["native_task_maximum_us"] <= 2000:
+        raise RuntimeError("Injected callback task-time overrun was not observed")
 
 
 def capture(port, report):

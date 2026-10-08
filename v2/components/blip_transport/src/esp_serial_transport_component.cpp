@@ -7,6 +7,7 @@
 
 #if SOC_USB_SERIAL_JTAG_SUPPORTED
 #include "driver/usb_serial_jtag.h"
+#include "driver/usb_serial_jtag_vfs.h"
 #endif
 
 #include <array>
@@ -68,6 +69,7 @@ core::Status EspSerialTransportComponent::install_driver() noexcept {
 #if SOC_USB_SERIAL_JTAG_SUPPORTED
     if (usb_serial_jtag_is_driver_installed()) {
         driver_owned_ = false;
+        usb_serial_jtag_vfs_use_driver();
         return core::Status::success();
     }
     usb_serial_jtag_driver_config_t configuration{
@@ -78,6 +80,9 @@ core::Status EspSerialTransportComponent::install_driver() noexcept {
         return core::Status::failure(
             serial_error(core::ErrorCode::start_failed, "install-driver", "usb-jtag-failed"));
     }
+    // Console polling bypasses the driver's TX lock, including a secondary
+    // USB console. Share the driver with framed control replies.
+    usb_serial_jtag_vfs_use_driver();
 #else
     if (uart_is_driver_installed(UART_NUM_0)) {
         driver_owned_ = false;
@@ -109,6 +114,7 @@ core::Status EspSerialTransportComponent::uninstall_driver() noexcept {
         return core::Status::success();
     }
 #if SOC_USB_SERIAL_JTAG_SUPPORTED
+    usb_serial_jtag_vfs_use_nonblocking();
     const esp_err_t result = usb_serial_jtag_driver_uninstall();
 #else
     uart_vfs_dev_use_nonblocking(UART_NUM_0);

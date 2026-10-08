@@ -85,7 +85,12 @@ class Provider final : public blip::core::Component, public CapabilityProvider {
                 while (!context.cancelled() && esp_timer_get_time() < until) vTaskDelay(1);
                 entered.store(false);
                 if (context.cancelled()) return failure(ErrorCode::cancelled);
-            } else vTaskDelay(pdMS_TO_TICKS(10));
+            } else {
+                // Exercise task-time enforcement; a sleep primarily consumes
+                // wall time and belongs to the production supervisor tests.
+                const auto until = esp_timer_get_time() + 6000;
+                while (esp_timer_get_time() < until) {}
+            }
             output[0] = Value::i32(1);
         } else if (name == "mixed" || name == "wide8") {
             std::uint64_t bits{};
@@ -224,10 +229,11 @@ void* worker(void*) {
         check(heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT) == stopped_heap, "repeat-engine-sdk-heap-stable");
     }
     check(registry.stop_all().ok(), "stop-providers-after-runtime"); check(heap_caps_check_integrity_all(true), "heap-integrity");
-    std::printf("IMPORTS {\"type\":\"complete\",\"checks\":%u,\"failures\":%u,\"reload_cycles\":100,\"engine_cycles\":20,\"heap_baseline\":%u,\"heap_min\":%u,\"heap_max\":%u,\"pool_peak\":%u,\"idle_pool_used\":%u,\"worker_headroom\":%u,\"native_calls\":%u,\"native_failures\":%u,\"native_maximum_us\":%u,\"native_imports_exercised\":true}\n",
+    std::printf("IMPORTS {\"type\":\"complete\",\"checks\":%u,\"failures\":%u,\"reload_cycles\":100,\"engine_cycles\":20,\"heap_baseline\":%u,\"heap_min\":%u,\"heap_max\":%u,\"pool_peak\":%u,\"idle_pool_used\":%u,\"worker_headroom\":%u,\"native_calls\":%u,\"native_failures\":%u,\"native_maximum_us\":%u,\"native_task_maximum_us\":%u,\"native_imports_exercised\":true}\n",
         checks, failures, static_cast<unsigned>(baseline), static_cast<unsigned>(minimum), static_cast<unsigned>(maximum),
         static_cast<unsigned>(peak), static_cast<unsigned>(idle_pool), static_cast<unsigned>(uxTaskGetStackHighWaterMark(nullptr)),
-        static_cast<unsigned>(measured.native_calls), static_cast<unsigned>(measured.native_failures), static_cast<unsigned>(measured.native_maximum_us));
+        static_cast<unsigned>(measured.native_calls), static_cast<unsigned>(measured.native_failures), static_cast<unsigned>(measured.native_maximum_us),
+        static_cast<unsigned>(measured.native_task_maximum_us));
     done.store(true); return nullptr;
 }
 } // namespace

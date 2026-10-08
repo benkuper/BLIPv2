@@ -1,3 +1,8 @@
+idf_build_get_property(blip_led_wasm BLIP_ENABLE_WASM)
+set(blip_led_optional_requires "")
+if(blip_led_wasm)
+    list(APPEND blip_led_optional_requires blip_wasm)
+endif()
 idf_component_register(
     SRCS
         "src/backend_selector.cpp"
@@ -14,10 +19,13 @@ idf_component_register(
         "src/strip_config.cpp"
         "src/stream.cpp"
     INCLUDE_DIRS "include"
-    REQUIRES blip_core blip_pm blip_resources blip_storage esp_driver_gpio esp_driver_rmt esp_driver_spi esp_timer freertos)
+    REQUIRES blip_core blip_pm blip_resources blip_storage esp_driver_gpio esp_driver_rmt esp_driver_spi esp_timer freertos ${blip_led_optional_requires})
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/blip_component.cmake)
 blip_configure_component(${COMPONENT_LIB})
+if(blip_led_wasm)
+    target_compile_definitions(${COMPONENT_LIB} PUBLIC BLIP_LED_WASM=1)
+endif()
 
 if(DEFINED BLIP_LED_DEFAULT_GPIO)
     target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_LED_DEFAULT_GPIO=${BLIP_LED_DEFAULT_GPIO})

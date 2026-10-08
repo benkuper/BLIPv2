@@ -57,13 +57,26 @@ perform I/O or wait unboundedly. The supervisor's `request_cancel` sets an atomi
 callback token and terminates guest execution; cooperative providers observe
 that token. Guest instruction fuel continues to bound loops around callbacks.
 
-The bridge measures each callback. A declared-bound overrun faults the script
+The bridge measures each callback's scheduled task execution time. ESP-IDF's
+64-bit ESP timer runtime statistics exclude time spent running other tasks or
+blocked; interrupt service and bounded measurement overhead remain included.
+Yields flush the worker's unfinished accounting slice before and after each
+callback. `vTaskGetInfo` reads only that task without allocation or stack scans.
+The counter clock does not depend on CPU frequency. Builds require this accounting
+configuration; there is no silent wall-time fallback.
+
+Production BLE/radio preemption previously made short validation failures exceed
+their 2 ms wall-time declaration. The callback budget now measures its own work;
+the existing supervisor still enforces the whole guest call's absolute wall-time
+deadline. This distinction does not permit providers to block or perform I/O.
+A declared task-time overrun faults the script
 after the callback returns. Native callbacks are trusted code; this does not
 forcibly preempt a hung provider. Cancellation and overruns do not undo effects.
 Provider failures become guest exceptions and stable error codes. Caller results
 remain untouched with count zero. Bounded fault text contains namespace,
 function and status, without guest argument text. Runtime snapshots expose
-saturating native call/failure counts and maximum observed callback time.
+saturating native call/failure counts, last/maximum callback wall time and
+last/maximum scheduled task execution time.
 
 ## Qualification and remaining composition
 

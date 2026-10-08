@@ -14,6 +14,10 @@
 #include "driver/rmt_tx.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
+#if defined(BLIP_LED_WASM)
+#include "blip/wasm/capability.hpp"
+#include "freertos/queue.h"
+#endif
 #include "freertos/task.h"
 
 #include <array>
@@ -23,7 +27,11 @@
 
 namespace blip::led {
 
-class EspRmtStripComponent final : public core::Component {
+class EspRmtStripComponent final : public core::Component
+#if defined(BLIP_LED_WASM)
+    , public wasm::CapabilityProvider
+#endif
+{
   public:
     static constexpr std::size_t kTaskStackBytes = 6144U;
     static constexpr std::size_t kTaskStackWords = kTaskStackBytes / sizeof(StackType_t);
@@ -35,6 +43,7 @@ class EspRmtStripComponent final : public core::Component {
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
     [[nodiscard]] core::Status start(const core::StartContext&) noexcept override;
     [[nodiscard]] core::Status stop() noexcept override;
+    [[nodiscard]] core::Status suspend() noexcept override { return stop(); }
     [[nodiscard]] bool callbacks_quiesced() const noexcept override;
     [[nodiscard]] core::Status read_parameter(std::string_view id,
                                               core::ScalarValue& output) noexcept override;
@@ -48,6 +57,12 @@ class EspRmtStripComponent final : public core::Component {
                                              std::span<const std::byte> channels,
                                              std::uint8_t channels_per_pixel, bool sixteen_bit,
                                              std::uint64_t received_at_us) noexcept;
+#if defined(BLIP_LED_WASM)
+    wasm::CapabilityProvider* wasm_provider() noexcept override { return this; }
+    bool available() const noexcept override { return started_.load(); }
+    core::Status invoke(std::string_view, wasm::CallContext&, std::span<const wasm::Value>,
+        std::span<wasm::Value>, std::size_t&) noexcept override;
+#endif
 
   private:
     [[nodiscard]] core::Status load_config() noexcept;
@@ -124,6 +139,17 @@ class EspRmtStripComponent final : public core::Component {
     std::uint32_t completed_update_id_{};
     core::Status completed_update_status_{core::Status::success()};
     bool reconfigure_pending_{};
+#if defined(BLIP_LED_WASM)
+    struct ScriptCommand { LinearPixel pixel{}; bool enabled{}; };
+    StaticSemaphore_t script_admission_storage_{};
+    SemaphoreHandle_t script_admission_{}; // Persistent; stop cannot retire it under a callback.
+    StaticQueue_t script_queue_storage_{};
+    alignas(8) std::array<std::uint8_t, 4 * sizeof(ScriptCommand)> script_queue_bytes_{};
+    QueueHandle_t script_queue_{};
+    LinearPixel script_color_{}; // Render-task confined.
+    bool script_enabled_{};
+    bool process_script_commands() noexcept;
+#endif
 };
 
 static_assert(sizeof(EspRmtStripComponent) <= 24576U,
