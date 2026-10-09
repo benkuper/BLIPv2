@@ -3,6 +3,7 @@
 #include "blip/ota/release_image.hpp"
 #include "blip/ota/sha256.hpp"
 #include "esp_heap_caps.h"
+#include "esp_log.h"
 #include "sdkconfig.h"
 #include "esp_netif_sntp.h"
 #include "esp_ota_ops.h"
@@ -390,6 +391,10 @@ void EspReleaseComponent::install(bool firmware) noexcept {
     }
     delete scratch;
     if (!status) {
+        const auto& error = status.error();
+        ESP_LOGW("blip.updates", "%s install failed: %.*s: %.*s", firmware ? "firmware" : "web",
+                 static_cast<int>(error.operation.size()), error.operation.data(),
+                 static_cast<int>(error.detail.size()), error.detail.data());
         result(cancelled_.load() ? "cancelled" : "error", cancelled_.load() ? "" : "artifact-transfer-or-validation", connection.http_status());
         return;
     }

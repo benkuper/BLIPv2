@@ -8,6 +8,18 @@
 #include <unistd.h>
 
 namespace blip::storage {
+namespace {
+std::FILE* open_unbuffered(const char* path, const char* mode) noexcept {
+    auto* file = std::fopen(path, mode);
+    if (!file) return nullptr;
+    // Transfers already provide bounded chunks; FAT/LittleFS cache sectors.
+    // Avoid a second lazily allocated stdio buffer on every reader and writer.
+    if (std::setvbuf(file, nullptr, _IONBF, 0) == 0) return file;
+    static_cast<void>(std::fclose(file));
+    errno = ENOMEM;
+    return nullptr;
+}
+} // namespace
 
 PosixFileBackend::PosixFileBackend(std::string_view root) noexcept {
     if (root.empty() || root.size() > kMaxRootBytes || root.front() != '/' || root.ends_with('/')) {
@@ -32,6 +44,15 @@ core::Error PosixFileBackend::errno_error(std::string_view operation, int value)
     case ENOSPC:
         code = core::ErrorCode::storage_full;
         detail = "filesystem-full";
+        break;
+    case ENOMEM:
+        code = core::ErrorCode::resource_unavailable;
+        detail = "filesystem-memory";
+        break;
+    case EMFILE:
+    case ENFILE:
+        code = core::ErrorCode::resource_unavailable;
+        detail = "filesystem-open-file-limit";
         break;
     case ENAMETOOLONG:
     case EINVAL:
@@ -86,7 +107,7 @@ core::Result<std::size_t> PosixFileBackend::read(std::string_view path,
                                                    "file-read",
                                                    "path-too-long"});
     }
-    std::FILE* file = std::fopen(resolved.data(), "rb");
+    std::FILE* file = open_unbuffered(resolved.data(), "rb");
     if (file == nullptr) {
         return core::Result<std::size_t>::failure(errno_error("file-open-read", errno));
     }
@@ -128,7 +149,7 @@ core::Status PosixFileBackend::write_durable(std::string_view path,
     if (!status) {
         return status;
     }
-    std::FILE* file = std::fopen(resolved.data(), "wb");
+    std::FILE* file = open_unbuffered(resolved.data(), "wb");
     if (file == nullptr) {
         return core::Status::failure(errno_error("file-open-write", errno));
     }
@@ -210,7 +231,7 @@ core::Result<std::size_t> PosixFileBackend::read_at(std::string_view path, std::
                                                    "file-read-at",
                                                    "path-or-offset"});
     }
-    std::FILE* file = std::fopen(resolved.data(), "rb");
+    std::FILE* file = open_unbuffered(resolved.data(), "rb");
     if (file == nullptr) {
         return core::Result<std::size_t>::failure(errno_error("file-open-read-at", errno));
     }
@@ -252,7 +273,7 @@ core::Status PosixFileBackend::begin_write(std::string_view path) noexcept {
     if (!directory_status) {
         return directory_status;
     }
-    write_file_ = std::fopen(resolved.data(), "wb");
+    write_file_ = open_unbuffered(resolved.data(), "wb");
     return write_file_ == nullptr
                ? core::Status::failure(errno_error("file-open-stream-write", errno))
                : core::Status::success();
@@ -281,7 +302,7 @@ core::Status PosixFileBackend::resume_write(std::string_view path) noexcept {
         return core::Status::failure(errno_error("file-resume", EINVAL));
     }
     // Do not create a missing staging generation while attempting a commit.
-    write_file_ = std::fopen(resolved.data(), "r+b");
+    write_file_ = open_unbuffered(resolved.data(), "r+b");
     if (write_file_ == nullptr) return core::Status::failure(errno_error("file-resume", errno));
     if (std::fseek(write_file_, 0, SEEK_END) != 0) {
         const auto value = errno;

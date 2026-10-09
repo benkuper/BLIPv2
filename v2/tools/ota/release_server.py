@@ -1,7 +1,7 @@
 """Public HTTP release handler, with optional TLS, for catalogs and artifacts."""
 from __future__ import annotations
 import argparse
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
 import re
@@ -197,6 +197,22 @@ def handler(index_path, artifact_root):
     return Handler
 
 
+def create_server(address, index_path, artifact_root, context=None):
+    # Flash writes can make a device consume its artifact slowly. Other devices
+    # must still be able to check their catalogs and start downloads.
+    class ReleaseServer(ThreadingHTTPServer):
+        def get_request(self):
+            connection, peer = super().get_request()
+            connection.settimeout(10)
+            if context is None: return connection, peer
+            try:
+                return context.wrap_socket(connection, server_side=True), peer
+            except Exception:
+                connection.close()
+                raise
+    return ReleaseServer(address, handler(index_path, artifact_root))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--catalog", type=Path, required=True)
@@ -213,17 +229,7 @@ def main():
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         context.minimum_version = ssl.TLSVersion.TLSv1_2
         context.load_cert_chain(args.cert, args.key)
-    class HttpsServer(HTTPServer):
-        def get_request(self):
-            connection, address = super().get_request()
-            connection.settimeout(10)
-            if context is None: return connection, address
-            try:
-                return context.wrap_socket(connection, server_side=True), address
-            except Exception:
-                connection.close()
-                raise
-    server = HttpsServer((args.listen, args.port), handler(args.catalog, args.artifacts))
+    server = create_server((args.listen, args.port), args.catalog, args.artifacts, context)
     print(f"Release endpoint listening on {args.listen}:{args.port}", flush=True)
     server.serve_forever()
 

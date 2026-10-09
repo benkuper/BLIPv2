@@ -12,7 +12,7 @@
 namespace blip::ota {
 namespace {
 core::Status failure(core::ErrorCode code, std::string_view detail) noexcept {
-    return core::Status::failure({core::ErrorDomain::transport, code, "blip.updates", "https", detail});
+    return core::Status::failure({core::ErrorDomain::transport, code, "blip.updates", "http", detail});
 }
 }
 EspReleaseHttp::~EspReleaseHttp() { close(); }
@@ -61,7 +61,7 @@ core::Status EspReleaseHttp::open(const char* url, std::uint32_t maximum_bytes,
     if (esp_http_client_set_header(client_, "Accept-Encoding", "identity") != ESP_OK ||
         esp_http_client_set_header(client_, "User-Agent", "BLIPv2") != ESP_OK ||
         esp_http_client_open(client_, 0) != ESP_OK) {
-        close(); return failure(core::ErrorCode::io_failed, "https-connect");
+        close(); return failure(core::ErrorCode::io_failed, "http-connect");
     }
     const auto content_length = esp_http_client_fetch_headers(client_);
     body_length_ = content_length;

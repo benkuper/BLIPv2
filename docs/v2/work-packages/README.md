@@ -41,6 +41,7 @@ wire protocols, or public OSC paths.
 | [3.7 browser foundation](3.7-simple-advanced-foundation.md) | Simple/Advanced modes, real graphs and automatic script-schema refresh; seven builds and three-family device-served browser trials passed; remaining diagnostic/scalar surfaces and self-updates open |
 | [3.7 device identity](3.7-device-identity.md) | Editable saved names, board type, live name-based mDNS and web identity; six-board identity trials passed, Tab access and full milestone qualification open |
 | [3.8/3.9 native updates and first run](3.8-native-update-and-first-run.md) | Independent website updates, filesystem-only full UI and automatic first run; HUZZAH32 browser/native OTA and mismatch checks passed, seven-board/recovery/coexistence qualification open |
+| [3.8 update recovery](3.8-update-recovery.md) | Socket capacity, automatic browser reconnection, bounded file buffering and fault-injected update trials; seven-board/coexistence qualification open |
 
 ## Milestone 4
 

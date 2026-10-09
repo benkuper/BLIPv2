@@ -158,6 +158,9 @@ idf_build_set_property(
     "${CMAKE_CURRENT_LIST_DIR}/dependencies.lock.${IDF_TARGET}")
 
 project(blip-v2 VERSION 0.1.0)
+if(CONFIG_LWIP_MAX_SOCKETS LESS 16)
+    message(FATAL_ERROR "Native updates with four HTTP sessions require CONFIG_LWIP_MAX_SOCKETS=16. Update the existing sdkconfig or use a fresh build directory.")
+endif()
 if(BLIP_ENABLE_RELEASE_TLS AND NOT CONFIG_ESP_HTTP_CLIENT_ENABLE_HTTPS)
     message(FATAL_ERROR "HTTPS build requires CONFIG_ESP_HTTP_CLIENT_ENABLE_HTTPS=y in the existing sdkconfig")
 elseif(NOT BLIP_ENABLE_RELEASE_TLS AND CONFIG_ESP_HTTP_CLIENT_ENABLE_HTTPS)

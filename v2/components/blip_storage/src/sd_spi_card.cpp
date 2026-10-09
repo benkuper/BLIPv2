@@ -167,9 +167,8 @@ bool SdSpiCard::write(std::uint32_t sector, std::span<const std::byte> bytes) no
         static_cast<void>(bus_->exchange(std::uint8_t(crc >> 8U)));
         static_cast<void>(bus_->exchange(std::uint8_t(crc)));
         const auto response = bus_->exchange(0xff);
-        if ((response & 0x1fU) != 5 || !ready(2000)) {
-            error_ = "card-write-rejected-or-timeout"; release(); return false;
-        }
+        if ((response & 0x1fU) != 5) { error_ = "card-write-rejected"; release(); return false; }
+        if (!ready(2000)) { release(); return false; }
         if (command(13, 0) != 0 || bus_->exchange(0xff) != 0) {
             error_ = "card-write-status"; release(); return false;
         }

@@ -277,7 +277,7 @@ bool web_uses_external_bulk_store_and_retains_factory_and_previous_bundle() {
     AutomaticWebBackend backend(files, internal);
     WebAssetStore assets(backend, web_scratch);
     BLIP_CHECK(assets.load_active());
-    BLIP_CHECK(backend.using_factory() && assets.info().bundle_version == 3004);
+    BLIP_CHECK(backend.using_factory() && assets.info().bundle_version == 3005);
     BLIP_CHECK(assets.begin_install(bundle.size()));
     for (std::size_t offset = 0; offset < bundle.size(); offset += 17)
         BLIP_CHECK(assets.append_install(std::span(bundle).subspan(offset, std::min<std::size_t>(17, bundle.size() - offset))));
@@ -290,7 +290,7 @@ bool web_uses_external_bulk_store_and_retains_factory_and_previous_bundle() {
     corrupt.back() ^= std::byte{1};
     BLIP_CHECK(assets.begin_install(corrupt.size()) && assets.append_install(corrupt));
     BLIP_CHECK(!assets.finish_install());
-    BLIP_CHECK(assets.active() && assets.info().bundle_version == 3004);
+    BLIP_CHECK(assets.active() && assets.info().bundle_version == 3005);
     BLIP_CHECK(!external.files.contains("server/assets.bundle.b1"));
     // Repeat to ensure the web reader releases the old generation on commit.
     for (unsigned i = 0; i < 4; ++i) {

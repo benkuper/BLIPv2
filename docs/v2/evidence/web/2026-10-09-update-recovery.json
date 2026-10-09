@@ -1,0 +1,466 @@
+{
+  "date": "2026-10-09",
+  "milestone_complete": false,
+  "pc_network_changed": false,
+  "ui": {
+    "version": "0.3.5",
+    "code": 3005,
+    "bytes": 26475,
+    "sha256": "217f22ee91c77dfef53fc8503d82baad7886b4d659b46ed9cee57200436d8df0"
+  },
+  "host_suites_passed": 33,
+  "javascript_tests_passed": 32,
+  "release_server_tests_passed": 10,
+  "foundation_checks_passed": 10,
+  "reports": [
+    {
+      "report_path": "build/m42-huzzah32-recovery-final.json",
+      "report_sha256": "6bdad297075ddb5e69c70e36601ea3ef9624115e736af63882b9eae4e0bae175",
+      "passed": true,
+      "checks_passed": 128,
+      "checks_total": 128,
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "initial_web": 3103,
+      "initial_medium": "internal",
+      "fault_matrix_passed": true,
+      "policy_restored": true,
+      "firmware_sha256": "9f8060dc587ef7e3674b1f14d6711bfb5a59862573e867578c7ee97d0b6c3324",
+      "initial_firmware_sha256": "3571e9ccae16abb500dd926ea1dc43e6f8d28e4c9cb83f7f627bc99d4528821d",
+      "tool_sha256": "9ca854e2cfd5b0dbbd982676b3dffb7b80c7cd911932175eaacfeb0f16da3141",
+      "serial_capture_sha256": "1872cd13d1bf96050677a98f0385beeaff9fd0a11f76b11c9021903246dc95f6",
+      "browser_report_sha256": "6691c6e4b8df57f13f1cacd50c3024dfc796f6b342abefe56c316ca2f0908457",
+      "successful_web_result": {
+        "state": "web-installed",
+        "error": "",
+        "received": 26475,
+        "expected": 26475,
+        "worker_stack_headroom": 1244
+      },
+      "cancel_seconds": {
+        "web": 0.4458038999873679,
+        "firmware": 0.4650794000044698
+      },
+      "browser": {
+        "passed": true,
+        "checker_sha256": "087857f13e793a48abcc271a5a7f21df89693623bd0636ad8d040a468cba6e69",
+        "navigations": 2,
+        "longest_transition_ms": 3515,
+        "errors": [],
+        "samples": 36
+      }
+    },
+    {
+      "report_path": "build/m42-m5dial-recovery-final.json",
+      "report_sha256": "4d7b2b3d31f8cff863108b33dafc295506b692839f8c7fd5cfbc0ad19664b1fc",
+      "passed": true,
+      "checks_passed": 128,
+      "checks_total": 128,
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "initial_web": 3103,
+      "initial_medium": "internal",
+      "fault_matrix_passed": true,
+      "policy_restored": true,
+      "firmware_sha256": "69ef870a90d42836bdf5b59989f9125eef39951f4b83854f714beaba9b5916c6",
+      "initial_firmware_sha256": "2df7561d0715c121d472828bbabc44a769fd7fedd8179f230873077057d72b12",
+      "tool_sha256": "9ca854e2cfd5b0dbbd982676b3dffb7b80c7cd911932175eaacfeb0f16da3141",
+      "serial_capture_sha256": "731142843d7722272a9bff2e4099ab6e11f6813db50e0b9c3bfeb948c567806c",
+      "browser_report_sha256": "6e3c13813039083e7bfea3e734999f35ebc625ac0869b95fa501479f076c39c9",
+      "successful_web_result": {
+        "state": "web-installed",
+        "error": "",
+        "received": 26475,
+        "expected": 26475,
+        "worker_stack_headroom": 884
+      },
+      "cancel_seconds": {
+        "web": 0.309502700009034,
+        "firmware": 0.20818480000889394
+      },
+      "browser": {
+        "passed": true,
+        "checker_sha256": "087857f13e793a48abcc271a5a7f21df89693623bd0636ad8d040a468cba6e69",
+        "navigations": 2,
+        "longest_transition_ms": 1004,
+        "errors": [],
+        "samples": 33
+      }
+    },
+    {
+      "report_path": "build/m42-ball-recovery-final.json",
+      "report_sha256": "faa87357b9ada07029675263b3d46beb6bb348f7478bc840108ae128b557fea9",
+      "passed": false,
+      "checks_passed": 70,
+      "checks_total": 70,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "initial_web": 3106,
+      "initial_medium": "sd-spi",
+      "error": "TimeoutError: web-reset transfer readiness",
+      "policy_restored": true,
+      "firmware_sha256": "545b3c19b43c596e55e55ade1003ed2e3c0ccb55d336fe68fc55b8ecc6b9a017",
+      "initial_firmware_sha256": "cfd2c9f9b8cb24c9e35d0b800fafdc964469293ed9a52b7e0d405ed17f4921d2",
+      "tool_sha256": "9ca854e2cfd5b0dbbd982676b3dffb7b80c7cd911932175eaacfeb0f16da3141",
+      "cancel_seconds": {
+        "web": 0.7145625999983167
+      }
+    },
+    {
+      "report_path": "build/m42-ball-recovery-diagnostic.json",
+      "report_sha256": "e25f59a18c67933cafa76945252d4bb9754349b354c545aa349ddbf1f7ea9c29",
+      "passed": false,
+      "checks_passed": 85,
+      "checks_total": 85,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "initial_web": 3106,
+      "initial_medium": "sd-spi",
+      "error": "ProtocolError: {'operation': 'action', 'component': 'blip.updates', 'control': 'check', 'error_domain': 'transport', 'error_code': 'resource_unavailable', 'detail': 'worker-memory', 'values': []}",
+      "policy_restored": true,
+      "firmware_sha256": "545b3c19b43c596e55e55ade1003ed2e3c0ccb55d336fe68fc55b8ecc6b9a017",
+      "initial_firmware_sha256": "cfd2c9f9b8cb24c9e35d0b800fafdc964469293ed9a52b7e0d405ed17f4921d2",
+      "tool_sha256": "e034ce566b3748d976c973f0b837fb6433279195880a78c153e33dcf591e4ff1",
+      "serial_capture_sha256": "180fdbafe6f0c120af55d58d8413b6e164dd56474bbc38499edbb60912b32292",
+      "cancel_seconds": {
+        "web": 0.4078326000017114
+      }
+    },
+    {
+      "report_path": "build/m42-ball-unbuffered-web.json",
+      "report_sha256": "e29cfbeee7d07301b02973777915b00add2a66636207135d35bc8459cc5b56db",
+      "passed": true,
+      "checks_passed": 13,
+      "checks_total": 13,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "initial_web": 3105,
+      "initial_medium": "sd-spi",
+      "policy_restored": true,
+      "firmware_sha256": "cfd2c9f9b8cb24c9e35d0b800fafdc964469293ed9a52b7e0d405ed17f4921d2",
+      "initial_firmware_sha256": "cfd2c9f9b8cb24c9e35d0b800fafdc964469293ed9a52b7e0d405ed17f4921d2",
+      "tool_sha256": "9ca854e2cfd5b0dbbd982676b3dffb7b80c7cd911932175eaacfeb0f16da3141",
+      "serial_capture_sha256": "8d7da182d93f580c8efca37daa3728f5faed80284f635ce2482330ac9a4beb65",
+      "successful_web_result": {
+        "state": "web-installed",
+        "error": "",
+        "received": 26475,
+        "expected": 26475,
+        "worker_stack_headroom": 2004
+      }
+    },
+    {
+      "report_path": "build/m42-ball-unbuffered-browser.json",
+      "report_sha256": "cf75fc2bdbe4d7d01c3bf6cce68bc8215b269cbce8d057c02acdd2afbe483851",
+      "passed": false,
+      "checks_passed": 8,
+      "checks_total": 8,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "initial_web": 3106,
+      "initial_medium": "sd-spi",
+      "error": "ProtocolError: {'operation': 'action', 'component': 'blip.updates', 'control': 'check', 'error_domain': 'transport', 'error_code': 'resource_unavailable', 'detail': 'worker-memory', 'values': []}",
+      "policy_restored": true,
+      "firmware_sha256": "cfd2c9f9b8cb24c9e35d0b800fafdc964469293ed9a52b7e0d405ed17f4921d2",
+      "initial_firmware_sha256": "cfd2c9f9b8cb24c9e35d0b800fafdc964469293ed9a52b7e0d405ed17f4921d2",
+      "tool_sha256": "9ca854e2cfd5b0dbbd982676b3dffb7b80c7cd911932175eaacfeb0f16da3141",
+      "serial_capture_sha256": "82bdfd5f2be495556eb64eb6e513ba7dc5cb3f7c0bc004a7651806d723097b43",
+      "browser": {
+        "passed": false,
+        "checker_sha256": "087857f13e793a48abcc271a5a7f21df89693623bd0636ad8d040a468cba6e69",
+        "navigations": 1,
+        "longest_transition_ms": 0,
+        "errors": [],
+        "samples": 1
+      }
+    },
+    {
+      "report_path": "build/m42-huzzah32-native-firmware-threaded.json",
+      "report_sha256": "01da897fd239e8130d127b5c164fba8cd4df43670d3e91cfc3764dc4619e1764",
+      "passed": true,
+      "checks_passed": 12,
+      "checks_total": 12,
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "policy_restored": true,
+      "firmware_sha256": "9f8060dc587ef7e3674b1f14d6711bfb5a59862573e867578c7ee97d0b6c3324",
+      "tool_sha256": "d41970d2766791b369e6887dab9f2f39c7dc6729a0d9a00bf209f096a31c0d7e",
+      "before_code": 7,
+      "expected_code": 10,
+      "web_before": 3110
+    },
+    {
+      "report_path": "build/m42-m5dial-native-firmware-final.json",
+      "report_sha256": "3db9ced329e7d4a32bcf9ac91dd3472caadd2511b22ffcdbc66be97ae691dd46",
+      "passed": true,
+      "checks_passed": 12,
+      "checks_total": 12,
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "policy_restored": true,
+      "firmware_sha256": "69ef870a90d42836bdf5b59989f9125eef39951f4b83854f714beaba9b5916c6",
+      "tool_sha256": "d41970d2766791b369e6887dab9f2f39c7dc6729a0d9a00bf209f096a31c0d7e",
+      "before_code": 5,
+      "expected_code": 10,
+      "web_before": 3110
+    },
+    {
+      "report_path": "build/m42-ball-unbuffered-storage.json",
+      "report_sha256": "04bc306309f5d832e79612e0e5263846867d516ffc2c794ced3fda0f3dc506eb",
+      "passed": true,
+      "checks_passed": 51,
+      "checks_total": 51,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "medium": "sd-spi",
+      "external_state": "mounted",
+      "tool_sha256": "9e5ea8d44bb3ce4eb150dfa1dc4fa0c69711adc64a1d56c4e1762f93f62a59f1"
+    },
+    {
+      "report_path": "build/m42-huzzah32-unbuffered-storage.json",
+      "report_sha256": "01e544441b48882f70c11e2344c34abd76f992df05c03ccc432765e874fc4ea0",
+      "passed": true,
+      "checks_passed": 51,
+      "checks_total": 51,
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "medium": "internal",
+      "external_state": "not-fitted",
+      "tool_sha256": "9e5ea8d44bb3ce4eb150dfa1dc4fa0c69711adc64a1d56c4e1762f93f62a59f1"
+    },
+    {
+      "report_path": "build/m42-m5dial-unbuffered-storage.json",
+      "report_sha256": "5de74781df5e19c11ee46d6f25dbf1c1cc8ee4f341a30725bd81204ca62d5c21",
+      "passed": true,
+      "checks_passed": 51,
+      "checks_total": 51,
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "medium": "internal",
+      "external_state": "not-fitted",
+      "tool_sha256": "9e5ea8d44bb3ce4eb150dfa1dc4fa0c69711adc64a1d56c4e1762f93f62a59f1"
+    },
+    {
+      "report_path": "build/m42-ball-native-firmware-final.json",
+      "report_sha256": "bf170b944e4a562d3224db4ad86cdfef1beb966f717a660aae5cad9369ef598a",
+      "passed": false,
+      "checks_passed": 6,
+      "checks_total": 6,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "error": "SerialTimeoutException: Write timeout",
+      "firmware_sha256": "545b3c19b43c596e55e55ade1003ed2e3c0ccb55d336fe68fc55b8ecc6b9a017",
+      "before_code": 9,
+      "expected_code": 10,
+      "boot_before": 55,
+      "web_before": 3106,
+      "policy_restore_error": "Write timeout"
+    },
+    {
+      "report_path": "build/m42-ball-native-firmware-confirmation.json",
+      "report_sha256": "b035ddf1b9a5ce65635c53000a5397474f1e46b8b89e27f47a50cdef2dae7c71",
+      "passed": true,
+      "checks_passed": 8,
+      "checks_total": 8,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "firmware_sha256": "545b3c19b43c596e55e55ade1003ed2e3c0ccb55d336fe68fc55b8ecc6b9a017"
+    },
+    {
+      "report_path": "build/m42-ball-native-firmware-usb-reconnect.json",
+      "report_sha256": "441e6a02d40228b753687cf818b6c4de5ef12c0b024048ac1851d35d14fc6951",
+      "passed": true,
+      "checks_passed": 12,
+      "checks_total": 12,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "firmware_sha256": "6e893d803ae9d0cfacd54ee0619d56c3a1e4fbefd415a8b014fb616ea5340475",
+      "before_code": 10,
+      "expected_code": 11,
+      "boot_before": 56,
+      "boot_after": 57,
+      "web_before": 3106,
+      "policy_restored": true,
+      "serial_reconnects": 6,
+      "tool_sha256": "016cd7bafc788c3ab7388127f407fb4a6b0b8aee0c5b06b436e2f64cd2446681",
+      "catalog_result": {
+        "state": "updates-available",
+        "error": "",
+        "http": 200
+      }
+    }
+  ],
+  "builds": [
+    {
+      "profile": "club",
+      "board": "creators-club",
+      "release_code": 10,
+      "firmware_bytes": 1515312,
+      "firmware_sha256": "24f682dafe4c9e5976d60a2ce5966060d78c85b63dd864eefae81a92510f8fcb",
+      "sdkconfig_sha256": "a8bda3843b5484b91bbf53e8309939b49de05d54a1ab590288b1d72fefb549bc",
+      "factory_storage_sha256": "4528049a440c7bde86b11d6f1489b14345e5283503a7a46b2844fc3a3b4db2b6",
+      "factory_ui_enabled": true,
+      "sockets": 16,
+      "build_log_sha256": "f13f6aba333784e2e484139158df1c9b72c79836ba915e456042be41a6fa2cb8",
+      "milestone_hardware_qualified": false
+    },
+    {
+      "profile": "tab",
+      "board": "creators-tab",
+      "release_code": 10,
+      "firmware_bytes": 1521344,
+      "firmware_sha256": "51107fc9e14db9db50554f759927ee5e5039148823caacc1eb71fa3461c85c16",
+      "sdkconfig_sha256": "a8bda3843b5484b91bbf53e8309939b49de05d54a1ab590288b1d72fefb549bc",
+      "factory_storage_sha256": "4528049a440c7bde86b11d6f1489b14345e5283503a7a46b2844fc3a3b4db2b6",
+      "factory_ui_enabled": true,
+      "sockets": 16,
+      "build_log_sha256": "6f3c75141e18d9107d03c1ebc1dd82e27ea55db8eb8b1e24680e480bb77a19b1",
+      "milestone_hardware_qualified": false
+    },
+    {
+      "profile": "ball",
+      "board": "creators-ball-v2",
+      "release_code": 11,
+      "firmware_bytes": 2042112,
+      "firmware_sha256": "6e893d803ae9d0cfacd54ee0619d56c3a1e4fbefd415a8b014fb616ea5340475",
+      "sdkconfig_sha256": "92b38d869aa2a671b15c83b60ce010383a5939fcfbead9c8816bc5e9ee8789d5",
+      "factory_storage_sha256": "45b88679797c6af3bc5a78191d08d5fcdfc7a200d8f02ac65e5ad91fa7bcac24",
+      "factory_ui_enabled": true,
+      "sockets": 16,
+      "build_log_sha256": "876dde4786234a2774f3ac5618f629d53fd11e3e86517eda50b855a65a839990",
+      "milestone_hardware_qualified": false
+    },
+    {
+      "profile": "huzzah32",
+      "board": "adafruit-huzzah32",
+      "release_code": 10,
+      "firmware_bytes": 1456784,
+      "firmware_sha256": "9f8060dc587ef7e3674b1f14d6711bfb5a59862573e867578c7ee97d0b6c3324",
+      "sdkconfig_sha256": "b2bbe36dfb94f6f2bfeda1788f8e192005960de5b3c0b5fe5b889b4aa85eb8f3",
+      "factory_storage_sha256": "4528049a440c7bde86b11d6f1489b14345e5283503a7a46b2844fc3a3b4db2b6",
+      "factory_ui_enabled": true,
+      "sockets": 16,
+      "build_log_sha256": "70b93fd7ba4b2a987dfe2e48bb10833ce8b6d44ae5d91fc49b275327571c2383",
+      "milestone_hardware_qualified": false
+    },
+    {
+      "profile": "xiao",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "release_code": 10,
+      "firmware_bytes": 1616256,
+      "firmware_sha256": "51de6c774c24c1cd7bc154b79502f25623cafa9549d06fe159d178b3846f5db3",
+      "sdkconfig_sha256": "0c3fc6948d7e75128bb72324c4211a3fcba10ee9cdde580ab0134c520fd77f8f",
+      "factory_storage_sha256": "4528049a440c7bde86b11d6f1489b14345e5283503a7a46b2844fc3a3b4db2b6",
+      "factory_ui_enabled": true,
+      "sockets": 16,
+      "build_log_sha256": "73ddd15af264205aedbe9992b11773a5acde6bb9ac4505cf6f3a3b0e15f28489",
+      "milestone_hardware_qualified": false
+    },
+    {
+      "profile": "m5stickc",
+      "board": "m5stack-m5stickc",
+      "release_code": 10,
+      "firmware_bytes": 1432912,
+      "firmware_sha256": "a15ad1df430baf9a4de5e5f17521434de27af8308418698d6074a719b21b3180",
+      "sdkconfig_sha256": "2533dd067b92712fd9aba5c2c2a432f08391f468ae16cdc3f3bf8afb45472714",
+      "factory_storage_sha256": "4528049a440c7bde86b11d6f1489b14345e5283503a7a46b2844fc3a3b4db2b6",
+      "factory_ui_enabled": true,
+      "sockets": 16,
+      "build_log_sha256": "f5df5cdaad16dc4a90c2338e16e93d7eee11f966827114ee72ead5cbb31bb818",
+      "milestone_hardware_qualified": false
+    },
+    {
+      "profile": "m5dial",
+      "board": "m5stack-m5dial",
+      "release_code": 10,
+      "firmware_bytes": 1437728,
+      "firmware_sha256": "69ef870a90d42836bdf5b59989f9125eef39951f4b83854f714beaba9b5916c6",
+      "sdkconfig_sha256": "5be68ca07b088ddca9cf3f629c6a4065117bb072a582f014363c6bdae82001fd",
+      "factory_storage_sha256": "4528049a440c7bde86b11d6f1489b14345e5283503a7a46b2844fc3a3b4db2b6",
+      "factory_ui_enabled": true,
+      "sockets": 16,
+      "build_log_sha256": "874a85e3a410d62b56987dafbba16c7f1ccea6e40c23253bcbc2600f9943dcda",
+      "milestone_hardware_qualified": false
+    }
+  ],
+  "socket_budget": {
+    "old": 10,
+    "new": 16,
+    "huzzah32_static_bss_before": 143448,
+    "huzzah32_static_bss_after": 143808,
+    "static_bss_growth_bytes": 360,
+    "static_data_bytes": 23932,
+    "reproduction_log": "build/m42-huzzah32-full-sockets-debug.serial.bin",
+    "reproduction_log_sha256": "648ceafa375c2e2ed5fdcce011a1dbb0f4d98f9791e36e08c5fa694ee60d75e2"
+  },
+  "limitations": [
+    "Creators Tab flash ID ffffff/boot flash read error remains unqualified; no blind reflash repeated.",
+    "C6 external SD browser/update and repeated-fault qualification remains incomplete: worker-memory and transfer-readiness failures.",
+    "Earlier Ball code-4 full catalog/download fault portion passed, but the report did not record physical medium; it does not qualify the current external-SD matrix.",
+    "No lighting/BLE/fleet traffic coexistence, endurance, physical calibration or all-seven-board milestone qualification is claimed.",
+    "A stopped, unresponsive manual-upload helper has no successful completion log; code-9 Ball presence and subsequent tests are observed through serial and their recorded artifact hashes.",
+    "The server is a local public simulator; online deployment remains the user's later step."
+  ],
+  "final_policy_restoration": {
+    "path": "build/m42-final-policy-restoration.json",
+    "sha256": "a4e9ef5225908531f2acc70e454f10fdd178bba63f210c1f11c43c3ecc456f9c",
+    "results": {
+      "ball": {
+        "restored": true,
+        "policy": {
+          "endpoint": "http://192.168.27.176:8088/blip/update",
+          "channel": "stable",
+          "interval_hours": 24,
+          "automatic_web": false,
+          "automatic_firmware": false
+        }
+      },
+      "huzzah32": {
+        "restored": true,
+        "policy": {
+          "endpoint": "http://www.goldengeek.org/blip/update",
+          "channel": "stable",
+          "interval_hours": 24,
+          "automatic_web": false,
+          "automatic_firmware": false
+        }
+      },
+      "m5dial": {
+        "restored": true,
+        "policy": {
+          "endpoint": "http://www.goldengeek.org/blip/update",
+          "channel": "stable",
+          "interval_hours": 24,
+          "automatic_web": false,
+          "automatic_firmware": false
+        }
+      }
+    }
+  },
+  "test_logs": {
+    "build\\m42-final-host-tests.log": "381477ac4846247393872004bba50b17c17de785b43728b15c1fe0490192766b",
+    "build\\m42-final-web-tests.log": "6e5ab89cd1d44b6094fd1fc639d577e4398585b83eb7b42b24a0011225e0bbb6",
+    "build\\m42-final-release-tests.log": "71350a16e154a2d9e00784b4ea02884da6c6ed8683a6c05491eafed02f8a62a1",
+    "build\\m42-foundation-validation.log": "58b0eafd31582df7815514c8674c2407d79b0359d4e54485d09a95eb9714245f",
+    "build/m42-foundation-validation.log": "58b0eafd31582df7815514c8674c2407d79b0359d4e54485d09a95eb9714245f"
+  },
+  "installed_reference_firmware_codes": {
+    "creators-ball-v2": 11,
+    "adafruit-huzzah32": 10,
+    "m5stack-m5dial": 10
+  }
+}

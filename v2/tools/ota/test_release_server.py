@@ -5,12 +5,13 @@ import os
 import subprocess
 import tempfile
 import threading
+import socket
 from http.server import HTTPServer
 from pathlib import Path
 from urllib.request import urlopen
 from urllib.error import HTTPError
 from urllib.parse import urlencode
-from release_server import ReleaseIndex, unique_object, release_url, handler
+from release_server import ReleaseIndex, unique_object, release_url, handler, create_server
 
 IDENTITY = {"project": "blip-v2", "board": "creators-ball-v2", "target": "esp32c6", "layout": "ota-8mb-v1",
             "profile": "minimal", "channel": "stable", "flash_bytes": 8388608, "features": 123, "api": 1}
@@ -61,6 +62,37 @@ class ReleaseServerTests(unittest.TestCase):
         self.assertEqual(release_url("https://127.0.0.1:8443/artifact%20one.bin"), "https://127.0.0.1:8443/artifact%20one.bin")
         self.assertEqual(release_url("http://127.0.0.1:8088/artifact.bin"), "http://127.0.0.1:8088/artifact.bin")
         self.index(firmware={**ARTIFACT, "url": "http://example/app"})
+
+    def test_catalog_remains_responsive_while_artifact_reader_stalls(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            payload = root / "app.bin"
+            with payload.open("wb") as stream:
+                stream.truncate(8 * 1024 * 1024)
+            artifact = {**ARTIFACT, "bytes": payload.stat().st_size}
+            catalog = root / "catalog.json"
+            catalog.write_text(json.dumps({"schema": 1, "releases": [
+                {**IDENTITY, "firmware": artifact, "web": None}]}), encoding="utf8")
+            server = create_server(("127.0.0.1", 0), catalog, root)
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            slow = socket.socket()
+            slow.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024)
+            slow.settimeout(2)
+            try:
+                slow.connect(server.server_address)
+                slow.sendall(b"GET /blip/releases/app.bin HTTP/1.1\r\nHost: localhost\r\n\r\n")
+                self.assertIn(b"200", slow.recv(1024))
+                # Deliberately stop reading the multi-megabyte response. Its
+                # worker cannot finish before this independent catalog request.
+                url = f"http://127.0.0.1:{server.server_port}/blip/update?" + urlencode(QUERY)
+                with urlopen(url, timeout=2) as response:
+                    self.assertEqual(json.load(response)["firmware"], artifact)
+            finally:
+                slow.close()
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=2)
 
     def test_handler_files_errors_and_cpp_contract(self):
         with tempfile.TemporaryDirectory() as directory:

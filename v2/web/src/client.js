@@ -91,36 +91,43 @@ export class DeviceClient {
 
   open({ onMessage, onState, onError } = {}) {
     this.close();
+    const generation = this.socketGeneration;
+    let failures = 0;
     const url = new URL(this.root);
     url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
-    const socket = new this.WebSocketImpl(url);
-    socket.binaryType = "arraybuffer";
-    socket.addEventListener("open", () => {
-      if (this.socket === socket) onState?.("online");
-    });
-    socket.addEventListener("close", () => {
-      if (this.socket === socket) {
-        this.socket = null;
-        onState?.("offline");
-      }
-    });
-    socket.addEventListener("error", () => {
-      if (this.socket === socket) onError?.(new Error("WebSocket connection failed"));
-    });
-    socket.addEventListener("message", (event) => {
-      if (this.socket !== socket) return;
-      try {
-        if (typeof event.data === "string") {
-          const diagnostic = JSON.parse(event.data);
-          if (diagnostic.ok === false) throw new Error(diagnostic.error || "Device rejected control");
-          return;
+    const connect = () => {
+      if (this.socketGeneration !== generation) return;
+      const socket = new this.WebSocketImpl(url);
+      socket.binaryType = "arraybuffer";
+      socket.addEventListener("open", () => {
+        if (this.socket === socket) { failures = 0; onState?.("online"); }
+      });
+      socket.addEventListener("close", () => {
+        if (this.socket === socket) {
+          this.socket = null;
+          onState?.("reconnecting");
+          this.reconnectTimer = setTimeout(connect, Math.min(10000, 500 * 2 ** Math.min(failures++, 5)));
         }
-        onMessage?.(decodeOscMessage(event.data));
-      } catch (error) {
-        onError?.(error);
-      }
-    });
-    this.socket = socket;
+      });
+      socket.addEventListener("error", () => {
+        if (this.socket === socket) onError?.(new Error("WebSocket connection failed"));
+      });
+      socket.addEventListener("message", (event) => {
+        if (this.socket !== socket) return;
+        try {
+          if (typeof event.data === "string") {
+            const diagnostic = JSON.parse(event.data);
+            if (diagnostic.ok === false) throw new Error(diagnostic.error || "Device rejected control");
+            return;
+          }
+          onMessage?.(decodeOscMessage(event.data));
+        } catch (error) {
+          onError?.(error);
+        }
+      });
+      this.socket = socket;
+    };
+    connect();
   }
 
   send(path, values = []) {
@@ -131,10 +138,11 @@ export class DeviceClient {
   }
 
   close() {
-    if (this.socket !== null) {
-      this.socket.close();
-      this.socket = null;
-    }
+    this.socketGeneration = (this.socketGeneration ?? 0) + 1;
+    clearTimeout(this.reconnectTimer);
+    const socket = this.socket;
+    this.socket = null;
+    socket?.close();
   }
 }
 

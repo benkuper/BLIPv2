@@ -158,7 +158,8 @@ async function connect() {
     current.open({
       onMessage: receive,
       onState: (state) => {
-        setConnection(state, state === "online" ? "Live" : "Offline");
+        setConnection(state, state === "online" ? "Live" : "Reconnecting");
+        if (state === "online") notice.hidden = true;
         connectButton.textContent = state === "online" ? "Reconnect" : "Connect";
       },
       onError: showError,

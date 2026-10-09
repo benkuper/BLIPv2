@@ -1,9 +1,8 @@
 """Run the public release handler locally on the PC's existing network."""
 import argparse
-from http.server import HTTPServer
 import json
 from pathlib import Path
-from release_server import handler, load_index
+from release_server import create_server, load_index
 
 
 def main():
@@ -21,7 +20,7 @@ def main():
     load_index(catalog)
     print(f"Public local endpoint: http://{args.listen}:{args.port}/blip/update", flush=True)
     if args.prepare_only: return
-    server = HTTPServer((args.listen, args.port), handler(catalog, artifacts))
+    server = create_server((args.listen, args.port), catalog, artifacts)
     server.serve_forever()
 
 

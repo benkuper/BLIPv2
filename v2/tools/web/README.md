@@ -26,3 +26,9 @@ For an already installed UI, pass `--existing-ui true` and omit
 prefixes before uploading the valid full image. Both modes leave the validated
 firmware and interface installed. Reports capture binary, tool and source hashes.
 The example invokes an actual firmware update and requires flashing authorization.
+
+`blip_web_update_observer.mjs` observes the actual device UI while the native
+recovery tool operates over serial. It verifies live identity, bounded automatic
+WebSocket reconnection, one intentional asset-refresh navigation and final live
+control. The parent tool starts/stops it and stores linked source/report hashes;
+normal page loading during the refresh is allowed for at most five seconds.

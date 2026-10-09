@@ -18,6 +18,9 @@ CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
 CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
 CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y
 CONFIG_HTTPD_WS_SUPPORT=y
+# Four HTTP sessions share sockets with server/control, OSC and lighting UDP.
+# Leave room for an outbound release connection while those services are live.
+CONFIG_LWIP_MAX_SOCKETS=16
 CONFIG_PM_ENABLE=y
 # This firmware advertises two services on STA/AP; it does not browse peers.
 CONFIG_MDNS_MAX_INTERFACES=2

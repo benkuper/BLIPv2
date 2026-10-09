@@ -11,6 +11,38 @@ class ClosedSocket {
   close() {}
 }
 
+test("control sockets reconnect with bounded backoff and explicit close cancels retries", t => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const sockets = [], states = [], messages = [];
+  class Socket {
+    constructor() { this.listeners = {}; this.readyState = 0; this.sent = []; sockets.push(this); }
+    addEventListener(name, listener) { this.listeners[name] = listener; }
+    emit(name, data) { this.listeners[name]?.(data); }
+    close() { this.readyState = 3; this.emit("close"); }
+    send(data) { this.sent.push(data); }
+  }
+  const client = new DeviceClient({ baseUrl: "http://192.0.2.8", WebSocketImpl: Socket });
+  client.open({ onState: state => states.push(state), onMessage: message => messages.push(message) });
+  sockets[0].close();
+  assert.equal(states.at(-1), "reconnecting");
+  for (const delay of [500, 1000, 2000, 4000, 8000, 10000, 10000]) {
+    const count = sockets.length;
+    t.mock.timers.tick(delay - 1); assert.equal(sockets.length, count);
+    t.mock.timers.tick(1); assert.equal(sockets.length, count + 1);
+    if (delay !== 10000 || sockets.length < 8) sockets.at(-1).close();
+  }
+  const current = sockets.at(-1); current.readyState = 1; current.emit("open");
+  assert.equal(states.at(-1), "online");
+  sockets[0].emit("message", { data: new ArrayBuffer(0) }); sockets[0].emit("open");
+  assert.equal(messages.length, 0);
+  client.send("/test", []); assert.equal(current.sent.length, 1);
+  current.close();
+  const count = sockets.length;
+  t.mock.timers.tick(500); assert.equal(sockets.length, count + 1, "success resets retry backoff");
+  sockets.at(-1).close(); client.close();
+  t.mock.timers.tick(30000); assert.equal(sockets.length, count + 1);
+});
+
 test("release checks and independent installations use bounded same-device endpoints", async () => {
   const calls = [];
   const client = new DeviceClient({ baseUrl: "http://192.0.2.8", WebSocketImpl: ClosedSocket,

@@ -7,6 +7,7 @@ import re
 import sys
 import time
 import urllib.request
+from serial import SerialException
 from release_publish import firmware_metadata
 from blip_release_identity_hil import snapshot
 
@@ -41,8 +42,11 @@ def main():
         report["boot_before"] = get("boot_sequence", "blip.diagnostics")
         report["name_before"] = get("name", "blip.device.identity")
         report["web_before"] = get("web_bundle_version", "blip.storage.files.internal")
-        for key in ("endpoint", "interval_hours", "automatic_web", "automatic_firmware"): saved[key] = get(key)
-        for key, value in {"endpoint": args.endpoint, "interval_hours": 0,
+        for key in ("endpoint", "channel", "interval_hours", "automatic_web", "automatic_firmware"): saved[key] = get(key)
+        report["original_policy"] = dict(saved)
+        args.report.parent.mkdir(parents=True, exist_ok=True)
+        args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf8")
+        for key, value in {"endpoint": args.endpoint, "channel": "stable", "interval_hours": 0,
                            "automatic_web": False, "automatic_firmware": False}.items():
             client.request("set", updates, key, value)
         client.request("action", updates, "check")
@@ -50,6 +54,7 @@ def main():
         while get("state") == "checking":
             if time.monotonic() >= deadline: raise TimeoutError("catalog check")
             time.sleep(.25)
+        report["catalog_result"] = {"state": get("state"), "error": get("last_error"), "http": get("http_status")}
         check("public catalog HTTP 200", get("http_status") == 200)
         check("eligible firmware update", get("firmware_available"))
         check("published firmware version", get("firmware_candidate") == version)
@@ -58,6 +63,7 @@ def main():
         progress = []; confirmed = False
         while time.monotonic() < deadline:
             try:
+                if client is None: client = Client(args.port)
                 installed_code = get("release_code", "blip.ota")
                 if installed_code == code:
                     if get("state", "blip.ota") == "confirmed": confirmed = True; break
@@ -66,8 +72,12 @@ def main():
                     if state in ("error", "cancelled"): raise RuntimeError(f"{state}: {get('last_error')}")
                     received = get("received_bytes")
                     if not progress or received != progress[-1]: progress.append(received)
-            except TimeoutError:
-                pass  # Software reboot briefly interrupts the existing serial connection.
+            except (TimeoutError, OSError, SerialException):
+                # Native USB may disappear or keep a stale handle across OTA.
+                # Reopen without toggling DTR/RTS or causing another reset.
+                if client: client.connection.close()
+                client = None
+                report["serial_reconnects"] = report.get("serial_reconnects", 0) + 1
             time.sleep(.25)
         report["download_progress"] = progress
         check("website firmware boots and confirms", confirmed)
@@ -87,6 +97,9 @@ def main():
         report["passed"] = True
     except Exception as error: report["error"] = f"{type(error).__name__}: {error}"
     finally:
+        if client is None and saved:
+            try: client = Client(args.port)
+            except (OSError, SerialException) as error: report["policy_restore_error"] = str(error)
         if client:
             try:
                 for key, value in saved.items(): client.request("set", updates, key, value)

@@ -12,6 +12,7 @@
 #include "sdmmc_cmd.h"
 #include "esp_flash_spi_init.h"
 #include "esp_littlefs.h"
+#include "esp_log.h"
 #include "esp_timer.h"
 #include "esp_rom_sys.h"
 #include "esp_vfs_fat.h"
@@ -36,14 +37,18 @@ DSTATUS disk_status(BYTE drive) {
 DRESULT disk_read(BYTE drive, BYTE* bytes, DWORD sector, UINT count) {
     if (disk_status(drive) || !bytes || !count) return RES_PARERR;
     std::lock_guard guard(software_volume->disk_mutex());
-    return software_volume->software_card().read(sector,
-        {reinterpret_cast<std::byte*>(bytes), std::size_t(count) * 512U}) ? RES_OK : RES_ERROR;
+    if (software_volume->software_card().read(sector,
+        {reinterpret_cast<std::byte*>(bytes), std::size_t(count) * 512U})) return RES_OK;
+    ESP_LOGW("blip.media", "SD read failed: %s", software_volume->software_card().error());
+    return RES_ERROR;
 }
 DRESULT disk_write(BYTE drive, const BYTE* bytes, DWORD sector, UINT count) {
     if (disk_status(drive) || !bytes || !count) return RES_PARERR;
     std::lock_guard guard(software_volume->disk_mutex());
-    return software_volume->software_card().write(sector,
-        {reinterpret_cast<const std::byte*>(bytes), std::size_t(count) * 512U}) ? RES_OK : RES_ERROR;
+    if (software_volume->software_card().write(sector,
+        {reinterpret_cast<const std::byte*>(bytes), std::size_t(count) * 512U})) return RES_OK;
+    ESP_LOGW("blip.media", "SD write failed: %s", software_volume->software_card().error());
+    return RES_ERROR;
 }
 DRESULT disk_ioctl(BYTE drive, BYTE command, void* output) {
     if (disk_status(drive)) return RES_NOTRDY;
