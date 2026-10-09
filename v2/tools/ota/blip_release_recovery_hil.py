@@ -36,6 +36,8 @@ class FaultServer(ThreadingHTTPServer):
         self.catalog = catalog; self.firmware = firmware; self.web = web
         self.mode = "valid"; self.artifact_started = threading.Event()
         self.sent = 0; self.requests = []
+        self.artifact_pause_seconds = 0
+        self.artifact_pauses = 0
 
     def select(self, mode):
         self.mode = mode; self.artifact_started.clear(); self.sent = 0
@@ -78,6 +80,11 @@ class FaultHandler(BaseHTTPRequestHandler):
         self.end_headers()
         try:
             for offset in range(0, len(body), 512):
+                if mode.endswith("-stalled") and offset == 4096:
+                    time.sleep(40)
+                if mode == "web-browser" and offset == 4096 and server.artifact_pause_seconds:
+                    server.artifact_pauses += 1
+                    time.sleep(server.artifact_pause_seconds)
                 self.wfile.write(body[offset:offset + 512]); self.wfile.flush()
                 if path.startswith("/blip/releases/"):
                     server.sent = offset + len(body[offset:offset + 512])
@@ -96,7 +103,13 @@ def main():
     parser.add_argument("--browser", type=Path)
     parser.add_argument("--skip-faults", action="store_true", help="Isolate the successful browser/native-update trial")
     parser.add_argument("--hold-http-sessions", type=int, default=0, choices=range(4), help="Exercise the remaining HTTP session capacity alongside the browser")
+    parser.add_argument("--artifact-pause-seconds", type=float, default=0, help="Pause the successful web response once after 4 KiB to exercise transient read timeouts (0..20)")
+    parser.add_argument("--require-script-controls", action="store_true", help="Require the standard production script fixture to stay loaded through the successful web update")
+    parser.add_argument("--require-ble", action="store_true", help="Require the NimBLE transport to remain active through the successful web update")
+    parser.add_argument("--sample-dma", action="store_true", help="Record DMA heap metrics exposed by the installed firmware")
     args = parser.parse_args()
+    if not 0 <= args.artifact_pause_seconds <= 20:
+        parser.error("artifact pause must be 0..20 seconds")
     if bool(args.playwright) != bool(args.browser): parser.error("browser and playwright must be supplied together")
     identity, code, version = firmware_metadata(args.build / "blip-v2.bin")
     initial_identity, initial_code, _ = firmware_metadata(args.initial_build / "blip-v2.bin")
@@ -129,10 +142,21 @@ def main():
     def get(name, component=updates): return client.get(name, component)
     def settled(timeout=30):
         deadline = time.monotonic() + timeout
-        while get("state") in ("checking", "downloading-web", "downloading-firmware", "restarting"):
+        next_sample = 0
+        while (state := get("state")) in ("checking", "downloading-web", "downloading-firmware", "restarting"):
             if time.monotonic() >= deadline: raise TimeoutError("worker did not settle")
+            if time.monotonic() >= next_sample:
+                report.setdefault("worker_samples", []).append({"state": state,
+                    "received": get("received_bytes"),
+                    "heap": get("heap_free_internal", "blip.diagnostics"),
+                    "largest": get("heap_largest_internal", "blip.diagnostics")})
+                if args.sample_dma:
+                    report["worker_samples"][-1].update({
+                        "dma_heap": get("heap_free_dma", "blip.diagnostics"),
+                        "dma_largest": get("heap_largest_dma", "blip.diagnostics")})
+                next_sample = time.monotonic() + .5
             time.sleep(.1)
-        # Idle task frees a deleted worker's stack after its busy flag clears.
+        # Allow the worker to finish releasing transaction resources.
         time.sleep(.1)
         return get("state")
     def healthy(label, expected_web):
@@ -195,11 +219,12 @@ def main():
             check(mode + " clears eligibility", not get("web_available") and not get("firmware_available"))
             healthy(mode, report["initial_web"])
         for kind in (() if args.skip_faults else ("web", "firmware")):
-            faults = ("identity", "sha", "truncated", "crc", "cancel", "reset") if kind == "web" else ("identity", "sha", "truncated", "cancel", "reset")
+            faults = ("identity", "sha", "truncated", "crc", "stalled", "cancel", "reset") if kind == "web" else ("identity", "sha", "truncated", "stalled", "cancel", "reset")
             for fault in faults:
                 mode = kind + "-" + fault
                 check(mode + " catalog valid", catalog_check(mode) == "updates-available")
                 client.request("action", updates, "install_" + kind)
+                transfer_started = time.monotonic()
                 if fault in ("cancel", "reset"):
                     deadline = time.monotonic() + 20
                     while get("received_bytes") < 2048:
@@ -221,6 +246,9 @@ def main():
                         check(mode + " returns to confirmed firmware", get("state", "blip.ota") == "confirmed")
                         state = get("state")
                 else: state = settled(150)
+                if fault == "stalled":
+                    elapsed = time.monotonic() - transfer_started
+                    check(mode + " hits bounded idle deadline", 25 <= elapsed <= 40 and get("http_read_retries") >= 4)
                 report["trials"].append({"mode": mode, "state": state, "received": get("received_bytes"),
                     "error": get("last_error"), "worker_stack_headroom": get("worker_stack_headroom"),
                     "heap": get("heap_free_internal", "blip.diagnostics")})
@@ -247,14 +275,35 @@ def main():
             check("held HTTP session accepted", response.status == 200)
             holds.append(connection)
         report["held_http_sessions"] = len(holds)
+        if args.require_script_controls:
+            report["script_before_web"] = {name: get(name, "blip.wasm") for name in ("state", "control_text_reserved", "level", "note")}
+            check("script loaded before update", report["script_before_web"]["state"] == "loaded" and
+                  report["script_before_web"]["control_text_reserved"] == 640)
+        if args.require_ble:
+            check("BLE active before update", get("active", "blip.transport.ble"))
         check("successful web catalog", catalog_check("web-browser") == "updates-available")
+        server.artifact_pause_seconds = args.artifact_pause_seconds
         client.request("action", updates, "install_web")
         final_state = settled(150)
         report["successful_web_result"] = {"state": final_state, "error": get("last_error"),
             "received": get("received_bytes"), "expected": get("expected_bytes"),
-            "worker_stack_headroom": get("worker_stack_headroom")}
+            "worker_stack_headroom": get("worker_stack_headroom"), "http_read_retries": get("http_read_retries")}
         check("successful web installation", final_state == "web-installed")
+        report["artifact_pause_seconds"] = args.artifact_pause_seconds
+        report["artifact_pauses"] = server.artifact_pauses
+        if args.artifact_pause_seconds:
+            check("transient artifact pause exercised", server.artifact_pauses == 1)
+            if args.artifact_pause_seconds >= 15:
+                check("transient HTTP read timeout recovered", get("http_read_retries") > 0)
         healthy("successful web update", web_code)
+        if args.require_script_controls:
+            check("loaded script and controls retained", report["script_before_web"] ==
+                  {name: get(name, "blip.wasm") for name in report["script_before_web"]})
+            token = client.action("call0", "armed")[0]
+            check("loaded script executes after web update", client.completion(token)["error"] == "none" and
+                  client.action("result", token, 0) in ([0, 0, 0], [0, 1, 0]))
+        if args.require_ble:
+            check("BLE retained after update", get("active", "blip.transport.ble"))
         if observer:
             time.sleep(12)  # Include the UI's normal 10-second installed-version poll.
             observer_stop_sent = True

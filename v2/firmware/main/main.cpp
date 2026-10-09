@@ -45,6 +45,9 @@
 #if defined(BLIP_QUALIFY_WASM_PROVIDERS)
 #include "../../qualification/wasm-providers/lifecycle.hpp"
 #endif
+#if defined(BLIP_QUALIFY_RELEASE_WORKER)
+#include "../../qualification/release-worker/lifecycle.hpp"
+#endif
 
 #include <array>
 #include <atomic>
@@ -544,6 +547,12 @@ extern "C" void app_main() {
 #if defined(BLIP_QUALIFY_WASM_PROVIDERS)
     if (!safe_mode && !blip::qualification::qualify_provider_lifecycle(wasm_component, *led_component, fleet_component, registry)) {
         ESP_LOGE(kTag, "BLIP_V2_PROVIDER_QUALIFICATION_FAILED");
+        return;
+    }
+#endif
+#if defined(BLIP_QUALIFY_RELEASE_WORKER)
+    if (!safe_mode && !blip::qualification::qualify_release_worker(release_component)) {
+        ESP_LOGE(kTag, "BLIP_V2_RELEASE_WORKER_QUALIFICATION_FAILED");
         return;
     }
 #endif

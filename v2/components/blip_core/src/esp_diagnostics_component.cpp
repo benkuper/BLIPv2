@@ -22,7 +22,7 @@ constexpr char kTag[] = "blip_diagnostics";
 constexpr std::array<std::string_view, 1> kProvidedServices{"diagnostics.runtime"};
 constexpr std::array<MetadataEntry, 2> kMetadata{{
     {"ui_topic", "System"}, {"ui_primary", "heap_free_internal"}}};
-constexpr std::array<ParameterDescriptor, 6> kParameters{{
+constexpr std::array<ParameterDescriptor, 8> kParameters{{
     {"log_level",
      "Default log level",
      ValueType::integer,
@@ -37,6 +37,10 @@ constexpr std::array<ParameterDescriptor, 6> kParameters{{
      Access::read_only, false, ScalarValue::from_integer(0), {}, "bytes"},
     {"heap_largest_internal", "Largest free internal block", ValueType::integer,
      Access::read_only, false, ScalarValue::from_integer(0), {}, "bytes"},
+    {"heap_free_dma", "Free DMA heap", ValueType::integer, Access::read_only,
+     false, ScalarValue::from_integer(0), {}, "bytes"},
+    {"heap_largest_dma", "Largest free DMA block", ValueType::integer, Access::read_only,
+     false, ScalarValue::from_integer(0), {}, "bytes"},
     {"boot_sequence", "Boot sequence", ValueType::integer, Access::read_only,
      false, ScalarValue::from_integer(0), {}, "boots"},
     {"reset_cause", "Reset cause", ValueType::integer, Access::read_only,
@@ -358,6 +362,10 @@ Status EspDiagnosticsComponent::read_parameter(std::string_view id, ScalarValue&
     } else if (id == "heap_largest_internal") {
         output = ScalarValue::from_integer(
             heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+    } else if (id == "heap_free_dma") {
+        output = ScalarValue::from_integer(heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA));
+    } else if (id == "heap_largest_dma") {
+        output = ScalarValue::from_integer(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA));
     } else if (id == "boot_sequence") {
         output = ScalarValue::from_integer(snapshot_.boot.boot_sequence);
     } else if (id == "reset_cause") {

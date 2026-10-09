@@ -133,7 +133,8 @@ void record_minimum(std::atomic<std::uint32_t>& value, std::uint32_t sample) noe
 
 class HttpChunkSink final : public TextSink, public resources::SnapshotSink {
   public:
-    explicit HttpChunkSink(httpd_req_t* request) noexcept : request_(request) {}
+    HttpChunkSink(httpd_req_t* request, std::span<std::byte> scratch) noexcept
+        : request_(request), buffer_(reinterpret_cast<char*>(scratch.data()), scratch.size()) {}
 
     [[nodiscard]] bool write(std::string_view text) noexcept override {
         while (ok_ && !text.empty()) {
@@ -163,7 +164,7 @@ class HttpChunkSink final : public TextSink, public resources::SnapshotSink {
     }
 
     httpd_req_t* request_{};
-    std::array<char, 512> buffer_{};
+    std::span<char> buffer_;
     std::size_t size_{};
     bool ok_{true};
 };
@@ -545,7 +546,7 @@ esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     httpd_resp_set_hdr(request, "Access-Control-Allow-Origin", "*");
-    HttpChunkSink sink{request};
+    HttpChunkSink sink{request, http_asset_buffer_};
     core::Status status = core::Status::success();
     if (query_text == "HOST_INFO") {
         const auto name = wifi_->device_name();
@@ -563,7 +564,7 @@ esp_err_t EspOscQueryComponent::handle_resource_status(httpd_req_t* request) noe
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     httpd_resp_set_hdr(request, "Access-Control-Allow-Origin", "*");
-    HttpChunkSink sink{request};
+    HttpChunkSink sink{request, http_asset_buffer_};
     const auto status = resources::write_resource_snapshot(*resources_, board_, sink);
     return status ? sink.finish() : ESP_FAIL;
 }
@@ -572,7 +573,7 @@ esp_err_t EspOscQueryComponent::handle_release_status(httpd_req_t* request) noex
     const auto progress = releases_->progress();
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
-    HttpChunkSink sink{request};
+    HttpChunkSink sink{request, http_asset_buffer_};
     std::array<char, 384> numbers{};
     const auto count = std::snprintf(numbers.data(), numbers.size(),
         "{\"busy\":%s,\"firmware_available\":%s,\"web_available\":%s,\"web_ready\":%s,"
@@ -912,10 +913,10 @@ esp_err_t EspOscQueryComponent::handle_asset_upload(httpd_req_t* request) noexce
 
 esp_err_t EspOscQueryComponent::handle_websocket(httpd_req_t* request) noexcept {
     httpd_ws_frame_t frame{};
-    if (httpd_ws_recv_frame(request, &frame, 0) != ESP_OK || frame.len > websocket_packet_.size()) {
+    if (httpd_ws_recv_frame(request, &frame, 0) != ESP_OK || frame.len > http_asset_buffer_.size()) {
         return ESP_FAIL;
     }
-    frame.payload = reinterpret_cast<std::uint8_t*>(websocket_packet_.data());
+    frame.payload = reinterpret_cast<std::uint8_t*>(http_asset_buffer_.data());
     if (frame.len != 0U && httpd_ws_recv_frame(request, &frame, frame.len) != ESP_OK) {
         return ESP_FAIL;
     }
@@ -934,7 +935,7 @@ esp_err_t EspOscQueryComponent::handle_websocket(httpd_req_t* request) noexcept 
         return ESP_OK;
     }
     const auto decoded =
-        decode_osc_message({websocket_packet_.data(), static_cast<std::size_t>(frame.len)});
+        decode_osc_message({http_asset_buffer_.data(), static_cast<std::size_t>(frame.len)});
     OscMessage response{};
     bool should_reply{};
     const auto name = wifi_->device_name();

@@ -138,6 +138,8 @@ def run(client, modules, report, cycles, check_overflow=True):
     client.action("cancel_all")
     check("initial-unload", client.work("unload")["error"] == "none")
     check("worker-ready", client.get("state") == "ready")
+    ready_pool_used = client.get("pool_used")
+    report["ready_pool_used"] = ready_pool_used
     memory_checks(client, modules, check)
     load()
     token = client.action("call_i32", "echo", 0xffffffff)[0]
@@ -244,7 +246,10 @@ def run(client, modules, report, cycles, check_overflow=True):
         for _ in range(cycles):
             load()
             check("cycle-call", client.work("call_i32", "echo", 42)["error"] == "none")
-            check("cycle-unload", client.work("unload")["error"] == "none" and client.get("pool_used") == 0)
+            unloaded = client.work("unload")
+            pool_used = client.get("pool_used")
+            check("cycle-unload", unloaded["error"] == "none" and pool_used == ready_pool_used,
+                  expected_pool_used=ready_pool_used, actual_pool_used=pool_used)
         after = client.get("heap_free_internal", "blip.diagnostics")
         windows.append({"before": before, "after": after, "cycles": cycles})
         if after >= before:
@@ -259,6 +264,9 @@ def run(client, modules, report, cycles, check_overflow=True):
 
 
 def memory_checks(client, modules, check):
+    # Registered native provider tables live for the runtime's whole lifetime.
+    # Unloading a guest must return to that ready-state baseline.
+    ready_pool_used = client.get("pool_used")
     loaded = client.upload(modules["memory_access"])
     check("memory-load", loaded["error"] == "none", **loaded)
     for export, expected in (
@@ -295,7 +303,10 @@ def memory_checks(client, modules, check):
             check(f"memory-growth-{export}", result["error"] == "none" and bits == [0, expected, 0],
                   cycle=cycle, expected=expected, bits=bits, **result)
         check("memory-dirty-page", client.work("call0", "dirty")["error"] == "none")
-        check("memory-unmap", client.work("unload")["error"] == "none" and client.get("pool_used") == 0)
+        unloaded = client.work("unload")
+        pool_used = client.get("pool_used")
+        check("memory-unmap", unloaded["error"] == "none" and pool_used == ready_pool_used,
+              expected_pool_used=ready_pool_used, actual_pool_used=pool_used)
 
 
 def coexist(client, modules, report, ip, pixels):
@@ -341,12 +352,14 @@ def coexist(client, modules, report, ip, pixels):
 
     before = metrics()
     original_red = client.get("red", "blip.output.strip0")
+    original_enabled = client.get("enabled", "blip.output.strip0")
     threads = [threading.Thread(target=ddp), threading.Thread(target=http)]
     for thread in threads:
         thread.start()
     calls = []
     settings_writes = 0
     try:
+        client.request("set", "blip.output.strip0", "enabled", True)
         client.request("set", "blip.wasm", "instruction_budget", 1000000)
         client.request("set", "blip.wasm", "deadline_ms", 50)
         for index in range(20):
@@ -364,9 +377,6 @@ def coexist(client, modules, report, ip, pixels):
             calls.append(result)
             if result["error"] != "budget_exceeded" or result["count"] != 0:
                 raise AssertionError(f"coexistence deadline failed: {result}")
-        client.request("set", "blip.output.strip0", "red", original_red)
-        if client.get("red", "blip.output.strip0") != original_red:
-            raise AssertionError("persisted settings control did not recover")
         if client.work("unload")["error"] != "none":
             raise AssertionError("coexistence unload failed")
         time.sleep(0.1)
@@ -374,6 +384,11 @@ def coexist(client, modules, report, ip, pixels):
         stop.set()
         for thread in threads:
             thread.join(timeout=3)
+        client.request("set", "blip.output.strip0", "red", original_red)
+        client.request("set", "blip.output.strip0", "enabled", original_enabled)
+        if client.get("red", "blip.output.strip0") != original_red or \
+                client.get("enabled", "blip.output.strip0") != original_enabled:
+            raise AssertionError("persisted settings control did not recover")
     after = metrics()
     passed = after["led_frames"] > before["led_frames"] and \
         after["led_failures"] == before["led_failures"] and \
@@ -386,11 +401,19 @@ def coexist(client, modules, report, ip, pixels):
         "worker_state_after": client.get("state"),
         "worker_stack_headroom_after": client.get("worker_stack_headroom"),
         "supervisor_stack_headroom_after": client.get("supervisor_stack_headroom"),
+        "led_stack_headroom_after": client.get("worker_stack_headroom", "blip.output.strip0"),
+        "ddp_stack_headroom_after": client.get("worker_stack_headroom", "blip.input.ddp"),
         "heap_free_after": client.get("heap_free_internal", "blip.diagnostics"),
         "heap_minimum": client.get("heap_minimum_internal", "blip.diagnostics")}
     report["checks"].append({"name": "led-network-settings-coexistence", "passed": passed})
     if not passed:
         raise AssertionError("LED/network/settings coexistence counters failed; inspect the report")
+    for name in ("worker", "supervisor", "led", "ddp"):
+        margin = report["coexistence"][name + "_stack_headroom_after"]
+        check_passed = margin >= 1024
+        report["checks"].append({"name": name + "-coexistence-stack-reserve", "passed": check_passed, "bytes": margin})
+        if not check_passed:
+            raise AssertionError(name + " coexistence stack reserve is below 1024 bytes")
 
 
 def source_snapshot(root):

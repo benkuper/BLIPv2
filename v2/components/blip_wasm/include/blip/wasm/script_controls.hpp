@@ -3,11 +3,14 @@
 #include "blip/wasm/runtime.hpp"
 #include "blip/wasm/script_manifest.hpp"
 #include <atomic>
+#include <memory>
 
 namespace blip::wasm {
 inline constexpr std::size_t kScriptValueStringBytes = 128;
 inline constexpr std::size_t kScriptControlQueueCapacity = 4;
 inline constexpr std::size_t kScriptActionBufferBytes = kMaximumScriptFields * kScriptValueStringBytes;
+inline constexpr std::size_t kMaximumControlTextBytes =
+    (kMaximumScriptControls + 2 * kScriptControlQueueCapacity * kMaximumScriptFields) * kScriptValueStringBytes;
 inline constexpr std::string_view kScriptActionBufferGlobal = "blip_controls_buffer_v1";
 
 // Relocatable payloads. Views are constructed only while the owning value/message
@@ -20,11 +23,13 @@ struct OwnedScriptValue {
     [[nodiscard]] core::ScalarValue scalar() const noexcept;
     void assign(const core::ScalarValue&) noexcept; // Caller validates type/length first.
 };
-struct ScriptControlMessage {
-    std::array<OwnedScriptValue, kMaximumScriptFields> values{};
+struct ScriptControlMessageHeader {
     std::array<char, kMaximumExportNameBytes + 1> name{};
     std::uint32_t generation{}, module_generation{}, epoch{}, ticket{};
     std::uint8_t index{}, count{};
+};
+struct ScriptControlMessage : ScriptControlMessageHeader {
+    std::array<OwnedScriptValue, kMaximumScriptFields> values{};
 };
 static_assert(sizeof(ScriptControlMessage) <= 704);
 // Worker-only conversion of a copied action. No guest pointers escape. Failure
@@ -40,9 +45,12 @@ class ScriptControlStore final : public core::DynamicSchemaSource {
     [[nodiscard]] core::Status prepare(std::span<const std::byte>, const core::ComponentDescriptor&) noexcept;
     [[nodiscard]] core::Status publish(Runtime&, std::uint32_t module_generation) noexcept;
     void retire() noexcept;
+    // Worker-only: retry after retired readers and queued actions have drained.
+    [[nodiscard]] bool release_retired_text() noexcept;
     [[nodiscard]] bool quiescent() const noexcept;
     [[nodiscard]] std::uint32_t generation() const noexcept { return active_.load(std::memory_order_acquire); }
     [[nodiscard]] std::uint32_t action_buffer() const noexcept { return action_buffer_; } // Worker only.
+    [[nodiscard]] std::uint32_t text_reserved_bytes() const noexcept { return text_reserved_.load(); }
     [[nodiscard]] core::Status acquire(core::DynamicSchemaLease&) const noexcept override;
     void release(std::uint32_t) const noexcept override;
     [[nodiscard]] std::string_view id(std::size_t) const noexcept override;
@@ -69,11 +77,25 @@ class ScriptControlStore final : public core::DynamicSchemaSource {
     class WriteGuard;
     class DataGuard;
     class ActionGuard;
+    struct PackedValue {
+        std::uint64_t bits{};
+        std::uint16_t offset{}, bytes{};
+        core::ValueType type{core::ValueType::integer};
+        void assign(const core::ScalarValue&, char* text) noexcept;
+        [[nodiscard]] core::ScalarValue scalar(const char* text) const noexcept;
+    };
+    struct PackedMessage : ScriptControlMessageHeader {
+        std::array<PackedValue, kMaximumScriptFields> values{};
+    };
+    void expand(const PackedMessage&, ScriptControlMessage&) const noexcept;
     [[nodiscard]] core::Status pin(std::uint32_t, core::DynamicSchemaLease&) const noexcept;
     [[nodiscard]] std::size_t find(std::string_view) const noexcept; // Leased or exclusive.
     ScriptManifest schema_{};
-    std::array<OwnedScriptValue, kMaximumScriptControls> values_{};
-    std::array<ScriptControlMessage, kScriptControlQueueCapacity> actions_{}, events_{};
+    std::array<PackedValue, kMaximumScriptControls> values_{};
+    std::array<PackedMessage, kScriptControlQueueCapacity> actions_{}, events_{};
+    std::unique_ptr<char[]> text_{}; // Reserved once per schema, never in transport admission.
+    std::atomic<std::uint32_t> text_reserved_{};
+    std::uint16_t actions_offset_{}, events_offset_{}, action_text_stride_{}, event_text_stride_{};
     ScriptControlMessage builder_{};
     mutable std::atomic<std::uint32_t> gate_{};
     mutable std::atomic_flag data_{};

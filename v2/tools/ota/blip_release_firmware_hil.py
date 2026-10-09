@@ -32,7 +32,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("port", "mac", "endpoint"): parser.add_argument("--" + name, required=True)
     for name in ("build", "flash-log", "report"): parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--minimum-transfer-seconds", type=float, default=0,
+                        help="Require a deliberately throttled transfer to exceed this duration")
     args = parser.parse_args()
+    if not 0 <= args.minimum_transfer_seconds < 600: parser.error("minimum transfer must be 0..<600 seconds")
     identity, code, version = firmware_metadata(args.build / "blip-v2.bin")
     sha = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
     report = {"passed": False, "board": identity["board"], "port": args.port, "mac": args.mac,
@@ -55,6 +58,10 @@ def main():
         check("initial flashed MAC", args.mac.lower() in re.findall(r"mac:\s*([0-9a-f:]+)", log.lower()))
         client = open_client()
         check("installed board identity", get("board", "blip.ota") == identity["board"])
+        report["installed_identity"] = {key: get(key, "blip.ota")
+            for key in ("board", "target", "layout", "profile", "flash_bytes", "features")}
+        check("installed firmware compatibility identity", all(
+            value == identity[key] for key, value in report["installed_identity"].items()))
         report["before_code"] = get("release_code", "blip.ota")
         check("candidate advances firmware release", code > report["before_code"])
         report["memory_before"] = {key: get(key, "blip.diagnostics")
@@ -79,7 +86,8 @@ def main():
         check("eligible firmware update", get("firmware_available"))
         check("published firmware version", get("firmware_candidate") == version)
         client.request("action", updates, "install_firmware")
-        deadline = time.monotonic() + 210
+        deadline = time.monotonic() + 660
+        transfer_started = time.monotonic()
         progress = []; confirmed = False
         report["download_progress"] = progress  # Retain partial progress on failure too.
         while time.monotonic() < deadline:
@@ -102,6 +110,9 @@ def main():
             time.sleep(.25)
         report["download_progress"] = progress
         check("website firmware boots and confirms", confirmed)
+        report["transfer_and_boot_seconds"] = time.monotonic() - transfer_started
+        if args.minimum_transfer_seconds:
+            check("slow transfer exercised", report["transfer_and_boot_seconds"] >= args.minimum_transfer_seconds)
         report["boot_after"] = get("boot_sequence", "blip.diagnostics")
         check("upgrade has one software reboot", report["boot_after"] == report["boot_before"] + 1)
         check("installed firmware version", get("version", "blip.ota") == version)

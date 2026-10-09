@@ -8,6 +8,13 @@
 #include <cstdio>
 #include <cstring>
 #include <fstream>
+#include <functional>
+#include <future>
+#include <semaphore>
+#include <thread>
+#include <optional>
+#include <chrono>
+#include <atomic>
 #include <iterator>
 #include <span>
 #include <string_view>
@@ -26,6 +33,7 @@ using blip::storage::WebContentEncoding;
 
 class FakeAssetBackend final : public WebAssetBackend {
   public:
+    std::function<void(std::string_view)> on_read{};
     enum class ReplaceFailure : std::uint8_t { none, before_mutation, after_mutation };
 
     [[nodiscard]] Result<std::size_t> file_size(std::string_view path) noexcept override {
@@ -38,6 +46,7 @@ class FakeAssetBackend final : public WebAssetBackend {
 
     [[nodiscard]] Result<std::size_t> read_at(std::string_view path, std::size_t offset,
                                               std::span<std::byte> output) noexcept override {
+        if (on_read) on_read(path);
         const auto* file = find(path);
         if (file == nullptr) {
             return Result<std::size_t>::failure(
@@ -217,7 +226,7 @@ bool factory_bundle_loads_and_streams() {
     }
     BLIP_CHECK(factory_status);
     BLIP_CHECK(store.active());
-    BLIP_CHECK(store.info().bundle_version == 3005U);
+    BLIP_CHECK(store.info().bundle_version == 3006U);
     BLIP_CHECK(store.info().asset_count == 11U);
 
     const auto* index = store.find("/");
@@ -240,19 +249,19 @@ bool factory_bundle_loads_and_streams() {
 
 bool corrupt_update_retains_active_bundle() {
     const auto factory = factory_bundle();
-    auto corrupt = versioned_bundle(3006U);
+    auto corrupt = versioned_bundle(3007U);
     corrupt.back() ^= std::byte{0x55};
     FakeAssetBackend backend{};
     std::array<std::byte, 131> scratch{};
     WebAssetStore store{backend, scratch};
     BLIP_CHECK(store.ensure_factory(factory));
     BLIP_CHECK(!install(store, corrupt));
-    BLIP_CHECK(store.active() && store.info().bundle_version == 3005U);
+    BLIP_CHECK(store.active() && store.info().bundle_version == 3006U);
 
     std::array<std::byte, 137> reboot_scratch{};
     WebAssetStore rebooted{backend, reboot_scratch};
     const auto loaded = rebooted.load_active();
-    BLIP_CHECK(loaded && loaded.value().bundle_version == 3005U);
+    BLIP_CHECK(loaded && loaded.value().bundle_version == 3006U);
     return true;
 }
 
@@ -269,14 +278,14 @@ bool boot_cleans_staging_and_recovers_corrupt_active() {
     std::array<std::byte, 149> scratch{};
     WebAssetStore store{backend, scratch};
     BLIP_CHECK(store.ensure_factory(factory));
-    BLIP_CHECK(store.active() && store.info().bundle_version == 3005U);
+    BLIP_CHECK(store.active() && store.info().bundle_version == 3006U);
     BLIP_CHECK(!backend.upload_present());
     return true;
 }
 
 bool interrupted_and_complete_updates_are_atomic() {
     const auto factory = factory_bundle();
-    const auto update = versioned_bundle(3006U);
+    const auto update = versioned_bundle(3007U);
     FakeAssetBackend backend{};
     std::array<std::byte, 193> scratch{};
     WebAssetStore store{backend, scratch};
@@ -288,16 +297,16 @@ bool interrupted_and_complete_updates_are_atomic() {
     std::array<std::byte, 197> reboot_scratch{};
     WebAssetStore rebooted{backend, reboot_scratch};
     auto loaded = rebooted.load_active();
-    BLIP_CHECK(loaded && loaded.value().bundle_version == 3005U);
+    BLIP_CHECK(loaded && loaded.value().bundle_version == 3006U);
     BLIP_CHECK(install(rebooted, update));
     loaded = rebooted.load_active();
-    BLIP_CHECK(loaded && loaded.value().bundle_version == 3006U);
+    BLIP_CHECK(loaded && loaded.value().bundle_version == 3007U);
     return true;
 }
 
 bool rename_failures_recover_old_or_new_bundle() {
     const auto factory = factory_bundle();
-    const auto update = versioned_bundle(3006U);
+    const auto update = versioned_bundle(3007U);
     for (const auto scenario : {FakeAssetBackend::ReplaceFailure::before_mutation,
                                 FakeAssetBackend::ReplaceFailure::after_mutation}) {
         FakeAssetBackend backend{};
@@ -315,8 +324,43 @@ bool rename_failures_recover_old_or_new_bundle() {
         WebAssetStore rebooted{backend, reboot_scratch};
         const auto loaded = rebooted.load_active();
         const std::uint32_t expected =
-            scenario == FakeAssetBackend::ReplaceFailure::before_mutation ? 3005U : 3006U;
+            scenario == FakeAssetBackend::ReplaceFailure::before_mutation ? 3006U : 3007U;
         BLIP_CHECK(loaded && loaded.value().bundle_version == expected);
+    }
+    return true;
+}
+
+bool published_status_does_not_wait_for_validation_io() {
+    using namespace std::chrono_literals;
+    for (const bool corrupt : {false, true}) {
+        FakeAssetBackend backend;
+        std::array<std::byte, 193> scratch{};
+        WebAssetStore store(backend, scratch);
+        BLIP_CHECK(store.ensure_factory(factory_bundle()));
+        const auto previous = store.info();
+        auto candidate = versioned_bundle(previous.bundle_version + 1);
+        if (corrupt) candidate.back() ^= std::byte{1};
+        BLIP_CHECK(store.begin_install(candidate.size()) && store.append_install(candidate));
+        std::binary_semaphore entered(0), proceed(0);
+        std::atomic<bool> paused{};
+        backend.on_read = [&](std::string_view path) {
+            if (path == WebAssetStore::kUploadPath && !paused.exchange(true)) {
+                entered.release(); proceed.acquire();
+            }
+        };
+        std::optional<Result<blip::storage::WebAssetBundleInfo>> installed;
+        std::jthread writer([&] { installed = store.finish_install(); });
+        const bool validating = entered.try_acquire_for(3s);
+        auto snapshot = std::async(std::launch::async, [&] { return std::pair(store.active(), store.info()); });
+        const bool responsive = snapshot.wait_for(500ms) == std::future_status::ready;
+        proceed.release(); writer.join();
+        const auto observed = snapshot.get();
+        BLIP_CHECK(validating && responsive && observed.first);
+        BLIP_CHECK(observed.second.bundle_version == previous.bundle_version &&
+                   observed.second.bundle_crc32 == previous.bundle_crc32 &&
+                   observed.second.total_size == previous.total_size);
+        BLIP_CHECK(installed && installed->ok() == !corrupt);
+        BLIP_CHECK(store.active() && store.info().bundle_version == previous.bundle_version + (corrupt ? 0 : 1));
     }
     return true;
 }
@@ -346,6 +390,7 @@ constexpr TestCase kTests[]{
     {"boot recovery", boot_cleans_staging_and_recovers_corrupt_active},
     {"interrupted web update", interrupted_and_complete_updates_are_atomic},
     {"rename recovery", rename_failures_recover_old_or_new_bundle},
+    {"published status during validation I/O", published_status_does_not_wait_for_validation_io},
     {"web bundle bounds", install_and_read_bounds_fail_closed},
 };
 

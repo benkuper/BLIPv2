@@ -20,7 +20,7 @@ class EspWasmComponent final : public core::Component {
 #else
     static constexpr std::size_t kEnginePoolBytes = kPoolBytes, kLinearBytes = 0;
 #endif
-    static constexpr std::size_t kWorkerStackBytes = 8192, kSupervisorStackBytes = 4096;
+    static constexpr std::size_t kWorkerStackBytes = 8192, kSupervisorStackBytes = 3072;
     static constexpr std::size_t kQueueCapacity = 8, kCompletionCapacity = 16, kChunkBytes = 64;
     explicit EspWasmComponent(Runtime& runtime) noexcept;
     ~EspWasmComponent() override;

@@ -21,6 +21,12 @@ CONFIG_HTTPD_WS_SUPPORT=y
 # Four HTTP sessions share sockets with server/control, OSC and lighting UDP.
 # Leave room for an outbound release connection while those services are live.
 CONFIG_LWIP_MAX_SOCKETS=16
+# Fit incoming TCP packets into the small free blocks left by simultaneous
+# BLE, script, SD and browser traffic; retain IPv6's 1220-byte minimum.
+CONFIG_LWIP_TCP_MSS=1220
+# Control and sensor messages are small. Limit speculative TCP send padding
+# while retaining coalescing for browser assets and release transfers.
+CONFIG_LWIP_TCP_OVERSIZE_QUARTER_MSS=y
 CONFIG_PM_ENABLE=y
 # This firmware advertises two services on STA/AP; it does not browse peers.
 CONFIG_MDNS_MAX_INTERFACES=2

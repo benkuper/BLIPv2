@@ -15,7 +15,7 @@ namespace blip::ddp {
 
 class EspDdpComponent final : public core::Component {
   public:
-    static constexpr std::size_t kTaskStackBytes = 4096U;
+    static constexpr std::size_t kTaskStackBytes = 3072U;
     static constexpr std::size_t kTaskStackWords = kTaskStackBytes / sizeof(StackType_t);
 
     explicit EspDdpComponent(led::EspRmtStripComponent& output) noexcept : output_(&output) {}

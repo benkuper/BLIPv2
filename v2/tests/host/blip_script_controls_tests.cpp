@@ -45,10 +45,11 @@ class Backend final : public Runtime {
     void unload() noexcept override {}
     void shutdown() noexcept override {}
     Result<Signature> signature(std::string_view name) noexcept override {
-        if (missing || name != "on_fire") return Result<Signature>::failure(error(ErrorCode::not_found).error());
+        if (missing || (name != "on_fire" && name != "on_text")) return Result<Signature>::failure(error(ErrorCode::not_found).error());
         Signature s{}; s.argument_count = 5;
         s.arguments = {blip::wasm::ValueType::i32, blip::wasm::ValueType::i64, blip::wasm::ValueType::f64,
                        blip::wasm::ValueType::i32, blip::wasm::ValueType::i32};
+        if (name == "on_text") { s.argument_count = 8; s.arguments.fill(blip::wasm::ValueType::i32); }
         if (wrong_signature) s.result_count = 1;
         return Result<Signature>::success(s);
     }
@@ -211,6 +212,78 @@ bool copied_action_arguments_use_checked_memory() {
     BLIP_CHECK(!copy_script_action_arguments(backend, 512, message, values, count) && count == 0);
     store.retire(); return true;
 }
+Bytes text_fixture() {
+    Bytes data; for (char c : std::string_view("BCM1")) byte(data, c); u32(data, 4);
+    byte(data, 0); text(data, "note"); text(data, "Note"); byte(data, 3); byte(data, 2); text(data, ""); text(data, "init"); byte(data, 0);
+    for (unsigned kind = 0; kind < 3; ++kind) {
+        byte(data, kind == 2 ? 2 : 1); text(data, kind == 0 ? "text_fire" : kind == 1 ? "fire" : "changed"); text(data, "Label");
+        if (kind < 2) text(data, kind == 0 ? "on_text" : "on_fire");
+        u32(data, 4);
+        for (unsigned i = 0; i < 4; ++i) { text(data, "field" + std::to_string(i)); byte(data, kind == 1 ? i : 3); }
+    }
+    Bytes body; text(body, kScriptControlsSection); body.insert(body.end(), data.begin(), data.end());
+    Bytes result{std::byte{0}, std::byte{0x61}, std::byte{0x73}, std::byte{0x6d}, std::byte{1}, std::byte{0}, std::byte{0}, std::byte{0}};
+    byte(result, 0); u32(result, static_cast<unsigned>(body.size())); result.insert(result.end(), body.begin(), body.end()); return result;
+}
+bool compact_text_queues_keep_full_capacity_and_ownership() {
+    ScriptControlStore store; Backend backend;
+    BLIP_CHECK(store.text_reserved_bytes() == 0);
+    BLIP_CHECK(store.prepare(text_fixture(), {}) && store.publish(backend, 1));
+    BLIP_CHECK(store.text_reserved_bytes() == 128 + 2 * 4 * 4 * 128);
+    std::array<std::string, 4> text;
+    ScriptControlMessage action, event;
+    std::array<char, 128> readback{}; ScalarValue value;
+    for (unsigned cycle = 0; cycle < 3; ++cycle) {
+        for (unsigned slot = 0; slot < 4; ++slot) {
+            for (unsigned field = 0; field < 4; ++field) text[field].assign(128, static_cast<char>('a' + slot * 4 + field));
+            const std::array args{ScalarValue::from_string(text[0]), ScalarValue::from_string(text[1]),
+                ScalarValue::from_string(text[2]), ScalarValue::from_string(text[3])};
+            BLIP_CHECK(store.enqueue_action(store.generation(), "text_fire", args, slot + 1, cycle + 1));
+            const auto token = store.begin_event(store.generation(), 3); BLIP_CHECK(token);
+            for (unsigned field = 0; field < 4; ++field) BLIP_CHECK(store.event_utf8(token.value(), field, text[field]));
+            BLIP_CHECK(store.commit_event(token.value()));
+        }
+        const std::array extra{ScalarValue::from_string(""), ScalarValue::from_string(""), ScalarValue::from_string(""), ScalarValue::from_string("")};
+        BLIP_CHECK(store.enqueue_action(store.generation(), "text_fire", extra, 9, 1).error().code == ErrorCode::queue_full);
+        for (auto& s : text) s.assign(128, 'z');
+        BLIP_CHECK(store.write(store.generation(), 0, ScalarValue::from_string(text[0])));
+        for (unsigned slot = 0; slot < 4; ++slot) {
+            BLIP_CHECK(store.take_action(action) && store.take_event(event));
+            BLIP_CHECK(action.ticket == slot + 1 && action.epoch == cycle + 1);
+            for (unsigned field = 0; field < 4; ++field) {
+                const std::string expected(128, static_cast<char>('a' + slot * 4 + field));
+                BLIP_CHECK(action.values[field].scalar().string == expected && event.values[field].scalar().string == expected);
+            }
+        }
+        // Reusing the slot with fewer strings must preserve numeric bits and
+        // the last expanded message independently of the packed queue.
+        const std::array mixed{ScalarValue::from_bool(true), ScalarValue::from_integer(-9007199254740993LL),
+            ScalarValue::from_number(2.5), ScalarValue::from_string("")};
+        BLIP_CHECK(store.enqueue_action(store.generation(), "fire", mixed, 77, 1));
+        ScriptControlMessage copied = action;
+        BLIP_CHECK(store.take_action(action));
+        BLIP_CHECK(action.values[0].scalar().boolean && action.values[1].scalar().integer == -9007199254740993LL &&
+            action.values[2].scalar().number == 2.5 && action.values[3].scalar().string.empty());
+        BLIP_CHECK(copied.values[3].scalar().string == std::string(128, 'p'));
+        BLIP_CHECK(store.read(store.generation(), 0, value, readback) && value.string == std::string(128, 'z'));
+    }
+    store.retire(); BLIP_CHECK(store.prepare(fixture(), {}) && store.publish(backend, 2));
+    BLIP_CHECK(store.text_reserved_bytes() == 128 + 2 * 4 * 128);
+    BLIP_CHECK(!store.release_retired_text());
+    const std::array pending{ScalarValue::from_bool(true), ScalarValue::from_integer(9),
+        ScalarValue::from_number(.5), ScalarValue::from_string("pending text")};
+    BLIP_CHECK(store.enqueue_action(store.generation(), "fire", pending, 88, 2));
+    DynamicSchemaLease lease; BLIP_CHECK(store.acquire(lease));
+    store.retire();
+    BLIP_CHECK(!store.release_retired_text()); // Old schema readers retain their generation.
+    lease.reset(); BLIP_CHECK(!store.release_retired_text()); // Accepted actions still own their text.
+    BLIP_CHECK(store.take_action(action) && action.ticket == 88 && action.values[3].scalar().string == "pending text");
+    BLIP_CHECK(store.release_retired_text() && store.text_reserved_bytes() == 0);
+    BLIP_CHECK(action.values[3].scalar().string == "pending text"); // Expanded copies survive reclamation.
+    const std::array empty{std::byte{0}, std::byte{0x61}, std::byte{0x73}, std::byte{0x6d}, std::byte{1}, std::byte{0}, std::byte{0}, std::byte{0}};
+    BLIP_CHECK(store.prepare(empty, {}) && store.publish(backend, 3) && store.text_reserved_bytes() == 0);
+    store.retire(); return true;
+}
 } // namespace
 int blip_script_controls_run_tests() {
     const TestCase tests[]{
@@ -220,7 +293,8 @@ int blip_script_controls_run_tests() {
         {"publication checks callback signatures string arena and reserved controls", publication_validates_callbacks_buffer_and_collisions},
         {"event builder requires all fields and delivers owned generation tagged payloads", event_builder_and_owned_delivery},
         {"concurrent reader pins retired metadata until safe replacement", concurrent_reader_retirement_and_replacement},
-        {"copied action arguments preserve bits and validate guest memory", copied_action_arguments_use_checked_memory}
+        {"copied action arguments preserve bits and validate guest memory", copied_action_arguments_use_checked_memory},
+        {"compact queues retain full strings all slots wraparound ownership and bits", compact_text_queues_keep_full_capacity_and_ownership}
     }; return run_tests(tests);
 }
 #ifndef ESP_PLATFORM

@@ -643,11 +643,26 @@ core::Status EspWifiComponent::start_portal_locked() noexcept {
     configuration.max_open_sockets = 4;
     configuration.lru_purge_enable = true;
     configuration.uri_match_fn = httpd_uri_match_wildcard;
-    if (httpd_start(&portal_, &configuration) != ESP_OK) {
+    const auto normal_stack_caps = configuration.task_caps;
+#if defined(CONFIG_IDF_TARGET_ESP32C6) && defined(CONFIG_ESP_SYSTEM_ALLOW_RTC_FAST_MEM_AS_HEAP)
+    // C6 RTC RAM is internal and byte-addressable, and ESP-IDF permits task
+    // stacks there. Use it for this long-lived non-DMA allocation before
+    // browsers fragment the DMA-capable heap needed by Wi-Fi receive buffers.
+    if (heap_caps_get_largest_free_block(MALLOC_CAP_RTCRAM | MALLOC_CAP_8BIT) >= kPortalTaskStackBytes + 1024)
+        configuration.task_caps = MALLOC_CAP_RTCRAM | MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT;
+#endif
+    auto started = httpd_start(&portal_, &configuration);
+    if (started != ESP_OK && configuration.task_caps != normal_stack_caps) {
+        configuration.task_caps = normal_stack_caps;
+        started = httpd_start(&portal_, &configuration);
+    }
+    if (started != ESP_OK) {
         portal_ = nullptr;
         return core::Status::failure(
             wifi_error(core::ErrorCode::start_failed, "start-portal", "http-server-failed"));
     }
+    ESP_LOGI(kTag, "HTTP stack=%u caps=0x%lx", static_cast<unsigned>(configuration.stack_size),
+             static_cast<unsigned long>(configuration.task_caps));
     const httpd_uri_t root{
         .uri = "/*",
         .method = HTTP_GET,

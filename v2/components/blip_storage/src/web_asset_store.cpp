@@ -264,14 +264,14 @@ core::Result<WebAssetBundleInfo> WebAssetStore::validate(std::string_view storag
 
 core::Result<WebAssetBundleInfo> WebAssetStore::load_active() noexcept {
     std::lock_guard guard(mutex_);
-    active_ = false;
-    info_ = {};
     const auto result = validate(kActivePath, true);
-    if (!result) {
-        return result;
+    {
+        std::lock_guard status_guard(info_mutex_);
+        // Keep the previous complete snapshot visible until validation ends.
+        // Readers of actual assets remain serialized by the transaction lock.
+        active_ = result.ok();
+        info_ = result ? result.value() : WebAssetBundleInfo{};
     }
-    info_ = result.value();
-    active_ = true;
     return result;
 }
 

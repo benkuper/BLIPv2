@@ -15,6 +15,13 @@ from blip_wasm_hil import Client, source_snapshot
 ROOT = Path(__file__).resolve().parents[3]
 
 
+class SerialCapture:
+    def __init__(self, connection, received): self.connection = connection; self.received = received
+    def __getattr__(self, name): return getattr(self.connection, name)
+    def read(self, count):
+        data = self.connection.read(count); self.received.extend(data); return data
+
+
 def u32(value):
     result = bytearray()
     while True:
@@ -84,6 +91,7 @@ def main():
               "artifacts": {name: hashlib.sha256((args.build / name).read_bytes()).hexdigest()
                             for name in ("blip-v2.bin", "blip-v2.elf", "sdkconfig")}}
     client = None
+    serial_received = bytearray()
 
     def check(name, condition, **details):
         report["checks"].append({"name": name, "passed": bool(condition), **details})
@@ -99,11 +107,15 @@ def main():
 
     try:
         client = Client(args.port)
+        client.connection = SerialCapture(client.connection, serial_received)
         client.action("cancel_all")
         check("initial-unload", client.work("unload")["error"] == "none")
+        time.sleep(.05)
+        check("empty-schema-has-no-text-reservation", client.get("control_text_reserved") == 0)
         valid = fixture()
         loaded = client.upload(valid)
         check("publish", loaded["error"] == "none", completion=loaded)
+        check("schema-sized-text-reservation", client.get("control_text_reserved") == 640)
         check("default-value", client.get("level") == 5 and client.get("note") == "hello")
         client.request("set", "blip.wasm", "level", 42)
         client.request("set", "blip.wasm", "note", "owned note")
@@ -183,7 +195,12 @@ def main():
             check(f"reload-{cycle}", client.upload(valid)["error"] == "none")
             check(f"defaults-{cycle}", client.get("level") == 5 and client.get("note") == "hello")
             check(f"retire-{cycle}", client.work("unload")["error"] == "none")
-            time.sleep(.05)
+            # An in-flight schema reader may still own the retired generation.
+            # The worker releases text after that lease drains.
+            release_deadline = time.monotonic() + 3
+            while client.get("control_text_reserved") != 0 and time.monotonic() < release_deadline:
+                time.sleep(.05)
+            check(f"retired-text-released-{cycle}", client.get("control_text_reserved") == 0)
             report["heap_samples"].append(client.get("heap_free_internal", "blip.diagnostics"))
         report["worker_stack_headroom"] = client.get("worker_stack_headroom")
         check("worker-stack-reserve", report["worker_stack_headroom"] >= 1639)
@@ -196,6 +213,9 @@ def main():
         if client:
             client.connection.close()
         args.report.parent.mkdir(parents=True, exist_ok=True)
+        serial_log = args.report.with_suffix(".serial.bin")
+        serial_log.write_bytes(serial_received)
+        report["serial_capture_sha256"] = hashlib.sha256(serial_received).hexdigest()
         args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
 
 

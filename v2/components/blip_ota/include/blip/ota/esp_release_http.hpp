@@ -23,10 +23,12 @@ class EspReleaseHttp final {
     [[nodiscard]] int http_status() const noexcept { return http_status_; }
     [[nodiscard]] std::int64_t body_length() const noexcept { return body_length_; }
     [[nodiscard]] std::uint32_t received() const noexcept { return received_; }
+    [[nodiscard]] std::uint32_t read_retries() const noexcept { return read_retries_; }
   private:
     esp_http_client_handle_t client_{};
     std::int64_t deadline_us_{};
-    std::uint32_t maximum_{}, expected_{}, received_{};
+    std::int64_t idle_deadline_us_{};
+    std::uint32_t maximum_{}, expected_{}, received_{}, read_retries_{};
     int http_status_{};
     std::int64_t body_length_{};
 };

@@ -9,6 +9,7 @@
 #include <mutex>
 #include "freertos/timers.h"
 #include "freertos/semphr.h"
+#include "freertos/task.h"
 
 namespace blip::ota {
 enum class ReleaseOperation : std::uint8_t { check, firmware, web, first_run };
@@ -23,6 +24,7 @@ struct ReleaseProgress {
 };
 class EspReleaseComponent final : public core::Component {
   public:
+    static constexpr std::size_t kWorkerStackBytes = 6144;
     EspReleaseComponent(ReleaseIdentity identity, network::EspWifiComponent& wifi,
                          storage::WebAssetStore& assets, storage::SettingsStore& settings,
                          UpdateService& updates) noexcept;
@@ -34,7 +36,9 @@ class EspReleaseComponent final : public core::Component {
     const core::ComponentDescriptor& descriptor() const noexcept override;
     core::Status start(const core::StartContext&) noexcept override;
     core::Status stop() noexcept override;
-    bool callbacks_quiesced() const noexcept override { return !busy_.load() && timer_quiesced_.load(); }
+    bool callbacks_quiesced() const noexcept override {
+        return !busy_.load() && timer_quiesced_.load() && worker_quiesced_.load();
+    }
     core::Status read_parameter_owned(std::string_view, core::ScalarValue&, std::span<char>) noexcept override;
     core::Status write_parameter(std::string_view, const core::ScalarValue&) noexcept override;
     core::Status invoke_action(std::string_view, std::span<const core::ScalarValue>,
@@ -58,6 +62,10 @@ class EspReleaseComponent final : public core::Component {
     std::mutex mutex_{};
     bool started_{};
     std::atomic<bool> busy_{}, cancelled_{};
+    std::atomic<bool> worker_stopping_{}, worker_quiesced_{true};
+    alignas(16) std::array<StackType_t, kWorkerStackBytes / sizeof(StackType_t)> worker_stack_{};
+    StaticTask_t worker_storage_{};
+    TaskHandle_t worker_task_{};
     unsigned manual_transfers_{}; // Component mutex; HTTP callbacks own scoped leases.
     std::atomic<bool> timer_quiesced_{true};
     StaticTimer_t timer_storage_{};
@@ -69,7 +77,7 @@ class EspReleaseComponent final : public core::Component {
     const char* error_{""};
     int http_status_{};
     ReleaseOperation operation_{ReleaseOperation::check};
-    std::uint32_t received_{}, expected_{};
+    std::uint32_t received_{}, expected_{}, http_read_retries_{};
     std::atomic<std::uint32_t> worker_headroom_{};
     ReleaseCatalog catalog_{};
     bool firmware_available_{}, web_available_{};

@@ -106,8 +106,9 @@ class WebAssetStore {
     // Hold this lock from find() through the last read() when using the borrowed
     // asset pointer, and across a complete upload to retain transaction ownership.
     [[nodiscard]] std::recursive_mutex& mutex() const noexcept { return mutex_; }
-    [[nodiscard]] bool active() const noexcept { std::lock_guard guard(mutex_); return active_; }
-    [[nodiscard]] WebAssetBundleInfo info() const noexcept { std::lock_guard guard(mutex_); return info_; }
+    // Published status never waits for file I/O or candidate validation.
+    [[nodiscard]] bool active() const noexcept { std::lock_guard guard(info_mutex_); return active_; }
+    [[nodiscard]] WebAssetBundleInfo info() const noexcept { std::lock_guard guard(info_mutex_); return info_; }
 
   private:
     [[nodiscard]] core::Result<WebAssetBundleInfo> validate(std::string_view storage_path,
@@ -121,6 +122,7 @@ class WebAssetStore {
 
     WebAssetBackend* backend_{};
     mutable std::recursive_mutex mutex_{};
+    mutable std::mutex info_mutex_{};
     std::span<std::byte> scratch_{};
     std::array<WebAsset, kMaxWebAssets> entries_{};
     WebAssetBundleInfo info_{};

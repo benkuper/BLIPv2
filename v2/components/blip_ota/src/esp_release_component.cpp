@@ -26,7 +26,7 @@ constexpr core::ParameterDescriptor text(std::string_view id, std::string_view l
 constexpr core::ParameterDescriptor boolean(std::string_view id, std::string_view label) {
     return {id, label, core::ValueType::boolean, core::Access::read_only, false, core::ScalarValue::from_bool(false), {}, ""};
 }
-constexpr std::array<core::ParameterDescriptor, 15> parameters{{
+constexpr std::array<core::ParameterDescriptor, 16> parameters{{
     {"worker_stack_headroom", "Update worker stack headroom", core::ValueType::integer,
      core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "bytes"},
     text("state", "Release check state"), text("last_error", "Release check error"),
@@ -35,6 +35,7 @@ constexpr std::array<core::ParameterDescriptor, 15> parameters{{
     text("firmware_candidate", "Published firmware version"), text("web_candidate", "Published interface version"),
     boolean("firmware_available", "Firmware update available"), boolean("web_available", "Interface update available"),
     {"http_status", "Release HTTP status", core::ValueType::integer, core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, ""},
+    {"http_read_retries", "Transient HTTP read retries", core::ValueType::integer, core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, ""},
     {"received_bytes", "Downloaded bytes", core::ValueType::integer, core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "bytes"},
     {"expected_bytes", "Download size", core::ValueType::integer, core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "bytes"},
     {"interval_hours", "Automatic check interval (0 disables)", core::ValueType::integer, core::Access::read_write, true, core::ScalarValue::from_integer(24), {true, 0, 168, 1}, "hours"},
@@ -51,7 +52,10 @@ core::ComponentDescriptor make_descriptor() {
     output.provided_services = provided; output.required_services = required;
     output.metadata = metadata; output.parameters = parameters; output.actions = actions;
     output.settings = {1, 1}; output.disable_policy = core::DisablePolicy::reboot_required;
-    output.cost = {262144, 2048, 6144};
+    // The static task's stack is charged separately from its control block and
+    // the component, so the declaration counts the complete reservation once.
+    output.cost = {262144, sizeof(EspReleaseComponent) - EspReleaseComponent::kWorkerStackBytes,
+                   EspReleaseComponent::kWorkerStackBytes};
     return output;
 }
 core::Status failure(core::ErrorCode code, std::string_view detail) {
@@ -66,7 +70,9 @@ EspReleaseComponent::EspReleaseComponent(ReleaseIdentity identity, network::EspW
 }
 const core::ComponentDescriptor& EspReleaseComponent::descriptor() const noexcept { return descriptor_; }
 core::Status EspReleaseComponent::start(const core::StartContext&) noexcept {
-    std::lock_guard guard(mutex_);
+    std::unique_lock guard(mutex_);
+    if (started_) return core::Status::success();
+    if (worker_task_) return failure(core::ErrorCode::invalid_state, "worker-not-stopped");
     std::array<std::byte, kReleasePolicyBytes> bytes{};
     const auto loaded = settings_->load(descriptor_, bytes);
     if (loaded) {
@@ -74,14 +80,30 @@ core::Status EspReleaseComponent::start(const core::StartContext&) noexcept {
             return failure(core::ErrorCode::corrupt_data, "release-settings");
     } else if (loaded.error().code != core::ErrorCode::not_found) return core::Status::failure(loaded.error());
     if (!timer_ || !barrier_) return failure(core::ErrorCode::resource_unavailable, "timer-resources");
-    started_ = true; next_check_us_ = esp_timer_get_time() + 60000000; timer_quiesced_.store(false);
-    if (xTimerStart(timer_, 0) != pdPASS) {
-        started_ = false; timer_quiesced_.store(true); return failure(core::ErrorCode::resource_unavailable, "timer-queue");
+    cancelled_.store(false); worker_stopping_.store(false); worker_quiesced_.store(false);
+    worker_task_ = xTaskCreateStatic(task_entry, "blip_release", sizeof(worker_stack_), this, 2,
+                                    worker_stack_.data(), &worker_storage_);
+    if (!worker_task_) {
+        worker_quiesced_.store(true);
+        return failure(core::ErrorCode::resource_unavailable, "worker-start");
     }
+    started_ = true; next_check_us_ = esp_timer_get_time() + 60000000;
+    if (xTimerStart(timer_, 0) != pdPASS) {
+        guard.unlock();
+        const auto cleanup = stop();
+        return cleanup ? failure(core::ErrorCode::resource_unavailable, "timer-queue") : cleanup;
+    }
+    timer_quiesced_.store(false);
     return core::Status::success();
 }
 core::Status EspReleaseComponent::stop() noexcept {
-    { std::lock_guard guard(mutex_); started_ = false; cancelled_.store(true); }
+    TaskHandle_t worker{};
+    {
+        std::lock_guard guard(mutex_);
+        started_ = false; cancelled_.store(true); worker_stopping_.store(true);
+        worker = worker_task_;
+        if (worker) xTaskNotifyGive(worker);
+    }
     if (!timer_quiesced_.load()) {
         static_cast<void>(xSemaphoreTake(barrier_, 0));
         if (xTimerStop(timer_, pdMS_TO_TICKS(100)) != pdPASS ||
@@ -90,8 +112,19 @@ core::Status EspReleaseComponent::stop() noexcept {
             return failure(core::ErrorCode::stop_failed, "timer-not-quiesced");
         timer_quiesced_.store(true);
     }
-    for (unsigned index = 0; index < 1500 && busy_.load(); ++index) vTaskDelay(pdMS_TO_TICKS(10));
-    if (busy_.load()) return failure(core::ErrorCode::stop_failed, "worker-active");
+    // Delete from this task only after the worker has returned all download
+    // resources and suspended. Its static control block is then safe to reuse
+    // on restart, without racing self-deletion and idle-task cleanup.
+    for (unsigned index = 0; worker && index < 1500 &&
+         (!worker_quiesced_.load() || eTaskGetState(worker) != eSuspended); ++index)
+        vTaskDelay(pdMS_TO_TICKS(10));
+    if (worker && (!worker_quiesced_.load() || eTaskGetState(worker) != eSuspended))
+        return failure(core::ErrorCode::stop_failed, "worker-active");
+    {
+        std::lock_guard guard(mutex_);
+        if (worker) vTaskDelete(worker);
+        worker_task_ = nullptr;
+    }
     return core::Status::success();
 }
 core::Status EspReleaseComponent::read_parameter_owned(std::string_view id, core::ScalarValue& output, std::span<char> storage) noexcept {
@@ -100,6 +133,7 @@ core::Status EspReleaseComponent::read_parameter_owned(std::string_view id, core
     if (id == "firmware_available") output = core::ScalarValue::from_bool(firmware_available_);
     else if (id == "web_available") output = core::ScalarValue::from_bool(web_available_);
     else if (id == "http_status") output = core::ScalarValue::from_integer(http_status_);
+    else if (id == "http_read_retries") output = core::ScalarValue::from_integer(http_read_retries_);
     else if (id == "received_bytes") output = core::ScalarValue::from_integer(received_);
     else if (id == "expected_bytes") output = core::ScalarValue::from_integer(expected_);
     else if (id == "worker_stack_headroom") output = core::ScalarValue::from_integer(worker_headroom_.load());
@@ -177,25 +211,24 @@ void EspReleaseComponent::end_manual_transfer() noexcept {
 }
 core::Status EspReleaseComponent::request_locked(ReleaseOperation operation) noexcept {
     if (!started_) return failure(core::ErrorCode::invalid_state, "not-started");
+    if (!worker_task_ || worker_stopping_.load())
+        return failure(core::ErrorCode::invalid_state, "worker-not-ready");
     if (busy_.load()) return failure(core::ErrorCode::resource_unavailable, "check-active");
     if (manual_transfers_) return failure(core::ErrorCode::resource_unavailable, "file-transfer-active");
     auto identity = identity_; identity.web_code = assets_->info().bundle_version;
     if ((operation == ReleaseOperation::firmware && !firmware_update_available(catalog_, identity)) ||
         (operation == ReleaseOperation::web && !web_update_available(catalog_, identity)))
         return failure(core::ErrorCode::invalid_state, "no-eligible-update");
-    busy_.store(true); cancelled_.store(false); operation_ = operation; received_ = expected_ = 0;
+    busy_.store(true); cancelled_.store(false); operation_ = operation; received_ = expected_ = http_read_retries_ = 0;
     if (operation == ReleaseOperation::check || operation == ReleaseOperation::first_run) {
         catalog_ = {}; firmware_available_ = web_available_ = false;
     }
     state_ = operation == ReleaseOperation::firmware ? "downloading-firmware" :
              operation == ReleaseOperation::web ? "downloading-web" : "checking";
     error_ = ""; http_status_ = 0;
-    // Final bundle validation reaches the filesystem's stat/open/CRC stack.
-    // A 4 KiB worker passes HTTP checks but overflows on actual external media.
-    if (xTaskCreate(task_entry, "blip_release", 6144, this, 2, nullptr) != pdPASS) {
-        busy_.store(false); state_ = "error"; error_ = "worker-memory";
-        return failure(core::ErrorCode::resource_unavailable, "worker-memory");
-    }
+    // The complete stack is reserved before browser sessions can fragment the
+    // heap. No task or stack allocation occurs on an update request.
+    xTaskNotifyGive(worker_task_);
     return core::Status::success();
 }
 void EspReleaseComponent::timer_entry(TimerHandle_t timer) noexcept {
@@ -222,9 +255,24 @@ void EspReleaseComponent::result(const char* state, const char* error, int http_
 }
 void EspReleaseComponent::task_entry(void* context) noexcept {
     auto* self = static_cast<EspReleaseComponent*>(context);
-    self->check();
+    for (;;) {
+        static_cast<void>(ulTaskNotifyTake(pdTRUE, portMAX_DELAY));
+        if (self->worker_stopping_.load()) break;
+        self->check();
+        self->worker_headroom_.store(uxTaskGetStackHighWaterMark(nullptr) * sizeof(StackType_t));
+        std::lock_guard guard(self->mutex_);
+        self->busy_.store(false);
+    }
     self->worker_headroom_.store(uxTaskGetStackHighWaterMark(nullptr) * sizeof(StackType_t));
-    self->busy_.store(false); vTaskDelete(nullptr);
+    {
+        std::lock_guard guard(self->mutex_);
+        // A stop can win before the queued operation starts. Do not leave a
+        // non-busy component reporting "checking" forever after restart.
+        if (self->busy_.load()) { self->state_ = "cancelled"; self->error_ = ""; }
+        self->busy_.store(false);
+    }
+    self->worker_quiesced_.store(true);
+    for (;;) vTaskSuspend(nullptr); // stop() owns deletion of this parked task.
 }
 void EspReleaseComponent::check() noexcept {
     if (wifi_->connection_state() != network::WifiConnectionState::connected) { result("error", "network-unavailable"); return; }
@@ -283,6 +331,7 @@ void EspReleaseComponent::fetch_catalog() noexcept {
         total += read.value();
     }
     connection.close();
+    { std::lock_guard guard(mutex_); http_read_retries_ = connection.read_retries(); }
     const auto* partition = esp_ota_get_next_update_partition(nullptr);
     if (status) {
         std::lock_guard guard(mutex_);
@@ -373,6 +422,7 @@ void EspReleaseComponent::install(bool firmware) noexcept {
         taskYIELD();
     }
     connection.close();
+    { std::lock_guard guard(mutex_); http_read_retries_ = connection.read_retries(); }
     if (status && (cancelled_.load() || scratch->hash.finish() != artifact.sha256))
         status = failure(core::ErrorCode::verification_failed, "cancelled-or-sha256");
     if (status) {

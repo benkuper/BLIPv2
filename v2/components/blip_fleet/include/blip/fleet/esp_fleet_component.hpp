@@ -26,6 +26,7 @@ class EspFleetComponent final : public core::Component
 #endif
 {
   public:
+    static constexpr std::size_t kNetworkStackBytes = 6144, kExecutorStackBytes = 6144;
     EspFleetComponent(core::ControlService& controls, storage::SettingsStore& settings,
                       network::EspWifiComponent& wifi) noexcept
         : controls_(&controls), settings_(&settings), wifi_(&wifi) {

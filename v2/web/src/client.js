@@ -100,10 +100,22 @@ export class DeviceClient {
       const socket = new this.WebSocketImpl(url);
       socket.binaryType = "arraybuffer";
       socket.addEventListener("open", () => {
-        if (this.socket === socket) { failures = 0; onState?.("online"); }
+        if (this.socket === socket) {
+          failures = 0; onState?.("online");
+          const heartbeat = () => {
+            if (this.socket !== socket || socket.readyState !== 1) return;
+            // Keep live control newer than idle HTTP sessions in the device's
+            // bounded LRU pool. Text diagnostics are acknowledged without
+            // changing parameters or entering the script worker.
+            socket.send('{"COMMAND":"BLIP_PING"}');
+            this.heartbeatTimer = setTimeout(heartbeat, 1500);
+          };
+          this.heartbeatTimer = setTimeout(heartbeat, 1500);
+        }
       });
       socket.addEventListener("close", () => {
         if (this.socket === socket) {
+          clearTimeout(this.heartbeatTimer);
           this.socket = null;
           onState?.("reconnecting");
           this.reconnectTimer = setTimeout(connect, Math.min(10000, 500 * 2 ** Math.min(failures++, 5)));
@@ -140,6 +152,7 @@ export class DeviceClient {
   close() {
     this.socketGeneration = (this.socketGeneration ?? 0) + 1;
     clearTimeout(this.reconnectTimer);
+    clearTimeout(this.heartbeatTimer);
     const socket = this.socket;
     this.socket = null;
     socket?.close();

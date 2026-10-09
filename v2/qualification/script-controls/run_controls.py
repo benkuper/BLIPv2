@@ -45,14 +45,14 @@ def validate(report):
     fixture = re.search(r'valid_sha256\[\] = "([0-9a-f]{64})";', header)
     if not fixture or start["fixture_sha256"] != fixture[1]:
         raise RuntimeError("Fixture hash differs from the generated source")
-    if end["cases"] != 7 or end["repeat_cycles"] != 20 or end["case_passes"] != 147 or end["failures"] or end["stack_headroom"] < 1024:
+    if end["cases"] != 8 or end["repeat_cycles"] != 20 or end["case_passes"] != 168 or end["failures"] or end["stack_headroom"] < 1024:
         raise RuntimeError("Shared cases/cycles/stack margin failed")
     if end["engine_checks"] != 32 or end["engine_cycles"] != 20 or not 0 < end["pool_peak"] <= 98304:
         raise RuntimeError("Real-engine cases/pool failed")
     for prefix in ("", "engine_"):
         if end[prefix + "heap_baseline"] != end[prefix + "heap_min"] or end[prefix + "heap_min"] != end[prefix + "heap_max"]:
             raise RuntimeError("Heap changed across repeated store/engine cases")
-    if sum(line.startswith("PASS ") for line in report["console"]) != 147:
+    if sum(line.startswith("PASS ") for line in report["console"]) != 168:
         raise RuntimeError("Shared cases did not all pass on this target")
 
 

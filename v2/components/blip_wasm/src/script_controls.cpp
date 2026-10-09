@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstring>
 #include <limits>
+#include <new>
 
 namespace blip::wasm {
 namespace {
@@ -41,6 +42,15 @@ Signature callback_signature(const ScriptControl& control) noexcept {
         }
     }
     return signature;
+}
+std::uint64_t scalar_bits(const core::ScalarValue& value) noexcept {
+    switch (value.type) {
+    case core::ValueType::boolean: return value.boolean;
+    case core::ValueType::integer: return std::bit_cast<std::uint64_t>(value.integer);
+    case core::ValueType::number: return std::bit_cast<std::uint64_t>(value.number);
+    case core::ValueType::string: return 0;
+    }
+    return 0;
 }
 } // namespace
 class ScriptControlStore::WriteGuard {
@@ -124,6 +134,26 @@ void OwnedScriptValue::assign(const core::ScalarValue& input) noexcept {
         break;
     }
 }
+void ScriptControlStore::PackedValue::assign(const core::ScalarValue& input, char* text) noexcept {
+    type = input.type; bits = scalar_bits(input); bytes = 0;
+    if (type == core::ValueType::string) {
+        bytes = static_cast<std::uint16_t>(input.string.size());
+        if (bytes) std::memmove(text + offset, input.string.data(), bytes);
+    }
+}
+core::ScalarValue ScriptControlStore::PackedValue::scalar(const char* text) const noexcept {
+    switch (type) {
+    case core::ValueType::boolean: return core::ScalarValue::from_bool(bits != 0);
+    case core::ValueType::integer: return core::ScalarValue::from_integer(std::bit_cast<std::int64_t>(bits));
+    case core::ValueType::number: return core::ScalarValue::from_number(std::bit_cast<double>(bits));
+    case core::ValueType::string: return core::ScalarValue::from_string(bytes ? std::string_view{text + offset, bytes} : std::string_view{});
+    }
+    return {};
+}
+void ScriptControlStore::expand(const PackedMessage& input, ScriptControlMessage& output) const noexcept {
+    static_cast<ScriptControlMessageHeader&>(output) = input;
+    for (std::size_t i = 0; i < input.count; ++i) output.values[i].assign(input.values[i].scalar(text_.get()));
+}
 core::Status ScriptControlStore::acquire(core::DynamicSchemaLease& lease) const noexcept {
     if (lease.held()) return fail(core::ErrorCode::invalid_state, "lease-already-held");
     if (!active_.load(std::memory_order_acquire)) return core::Status::success();
@@ -153,6 +183,15 @@ core::Status ScriptControlStore::pin(std::uint32_t generation, core::DynamicSche
 void ScriptControlStore::retire() noexcept {
     active_.store(0, std::memory_order_release); end_invocation();
 }
+bool ScriptControlStore::release_retired_text() noexcept {
+    if (generation()) return false;
+    WriteGuard write(*this); if (!write.held) return false;
+    DataGuard data(*this); if (!data.held) return false;
+    ActionGuard actions(*this); if (!actions.held || action_count_) return false;
+    text_.reset(); text_reserved_.store(0);
+    prepared_ = false; event_head_ = event_count_ = 0;
+    return true;
+}
 bool ScriptControlStore::quiescent() const noexcept {
     return !active_.load(std::memory_order_acquire) && !gate_.load(std::memory_order_acquire) &&
         !data_.test(std::memory_order_acquire) && !action_data_.test(std::memory_order_acquire);
@@ -180,6 +219,38 @@ core::Status ScriptControlStore::prepare(std::span<const std::byte> module, cons
         for (const auto& a : reserved.actions) if (a.id == control_id) return fail(core::ErrorCode::duplicate_id, "reserved-control-id");
         for (const auto& e : reserved.events) if (e.id == control_id) return fail(core::ErrorCode::duplicate_id, "reserved-control-id");
         for (const auto& p : reserved.legacy_parameters) if (p.id == control_id) return fail(core::ErrorCode::duplicate_id, "reserved-control-alias");
+    }
+    // Numeric fields need only bits. Reserve text for the schema's actual
+    // string parameters and the maximum strings in any action/event, keeping
+    // every queue slot and each field's complete 128-byte capacity.
+    values_.fill({});
+    std::size_t parameter_bytes{}, action_strings{}, event_strings{};
+    for (std::size_t i = 0; i < schema_.size(); ++i) {
+        const auto& control = schema_.control(i);
+        if (control.kind == core::DynamicControlKind::parameter) {
+            if (control.type == core::ValueType::string) {
+                values_[i].offset = static_cast<std::uint16_t>(parameter_bytes);
+                parameter_bytes += kScriptValueStringBytes;
+            }
+        } else {
+            std::size_t strings{};
+            for (std::size_t f = 0; f < control.field_count; ++f)
+                strings += control.fields[f].type == core::ValueType::string;
+            if (control.kind == core::DynamicControlKind::action) action_strings = std::max(action_strings, strings);
+            else event_strings = std::max(event_strings, strings);
+        }
+    }
+    actions_offset_ = static_cast<std::uint16_t>(parameter_bytes);
+    action_text_stride_ = static_cast<std::uint16_t>(action_strings * kScriptValueStringBytes);
+    event_text_stride_ = static_cast<std::uint16_t>(event_strings * kScriptValueStringBytes);
+    events_offset_ = static_cast<std::uint16_t>(parameter_bytes + action_text_stride_ * actions_.size());
+    const auto needed = events_offset_ + event_text_stride_ * events_.size();
+    static_assert(kMaximumControlTextBytes <= std::numeric_limits<std::uint16_t>::max());
+    text_.reset(); text_reserved_.store(0);
+    if (needed) {
+        text_.reset(new (std::nothrow) char[needed]);
+        if (!text_) return fail(core::ErrorCode::resource_unavailable, "control-text-memory");
+        text_reserved_.store(static_cast<std::uint32_t>(needed));
     }
     prepared_ = true; return core::Status::success();
 }
@@ -215,7 +286,7 @@ core::Status ScriptControlStore::publish(Runtime& runtime, std::uint32_t module_
         if (!checked) return checked;
     }
     for (std::size_t i = 0; i < schema_.size(); ++i)
-        if (schema_.control(i).kind == core::DynamicControlKind::parameter) values_[i].assign(schema_.default_value(i));
+        if (schema_.control(i).kind == core::DynamicControlKind::parameter) values_[i].assign(schema_.default_value(i), text_.get());
     action_buffer_ = buffer; module_generation_ = module_generation;
     event_head_ = event_count_ = 0; builder_token_.store(0, std::memory_order_release); prepared_ = false;
     ++sequence_; active_.store(sequence_, std::memory_order_release); return core::Status::success();
@@ -226,7 +297,7 @@ core::Status ScriptControlStore::read(std::uint32_t generation, std::size_t inde
     if (!guest && schema_.control(index).access == core::Access::write_only) return fail(core::ErrorCode::invalid_state, "write-only");
     DataGuard data(*this); if (!data.held) return fail(core::ErrorCode::resource_unavailable, "values-busy");
     if (generation != active_.load(std::memory_order_acquire)) return fail(core::ErrorCode::cancelled, "retired-generation");
-    const auto value = values_[index].scalar();
+    const auto value = values_[index].scalar(text_.get());
     if (value.type == core::ValueType::string) {
         if (strings.size() < value.string.size()) return fail(core::ErrorCode::capacity_exceeded, "read-string-storage");
         if (!value.string.empty()) std::memcpy(strings.data(), value.string.data(), value.string.size());
@@ -242,7 +313,7 @@ core::Status ScriptControlStore::write(std::uint32_t generation, std::size_t ind
     if (!valid_scalar(input, control.type) || !in_bounds(input, control.bounds)) return fail(core::ErrorCode::validation_failed, "parameter-value");
     DataGuard data(*this); if (!data.held) return fail(core::ErrorCode::resource_unavailable, "values-busy");
     if (generation != active_.load(std::memory_order_acquire)) return fail(core::ErrorCode::cancelled, "retired-generation");
-    values_[index].assign(input); return core::Status::success();
+    values_[index].assign(input, text_.get()); return core::Status::success();
 }
 core::Status ScriptControlStore::read_id(std::uint32_t generation, std::string_view name, core::ScalarValue& output, std::span<char> strings) noexcept {
     core::DynamicSchemaLease lease; auto status = pin(generation, lease); if (!status) return status;
@@ -263,16 +334,21 @@ core::Status ScriptControlStore::enqueue_action(std::uint32_t generation, std::s
     ActionGuard data(*this); if (!data.held) return fail(core::ErrorCode::resource_unavailable, "actions-busy");
     if (generation != active_.load(std::memory_order_acquire)) return fail(core::ErrorCode::cancelled, "retired-generation");
     if (action_count_ == actions_.size()) return fail(core::ErrorCode::queue_full, "action-queue-full");
-    auto& item = actions_[(action_head_ + action_count_) % actions_.size()];
+    const auto slot = (action_head_ + action_count_) % actions_.size();
+    auto& item = actions_[slot];
     item.generation = generation; item.module_generation = module_generation_; item.ticket = ticket; item.epoch = epoch;
     item.index = static_cast<std::uint8_t>(index); item.count = static_cast<std::uint8_t>(input.size()); name(item.name, schema_.text(control.callback));
-    for (std::size_t i = 0; i < input.size(); ++i) item.values[i].assign(input[i]);
+    auto offset = static_cast<std::uint16_t>(actions_offset_ + slot * action_text_stride_);
+    for (std::size_t i = 0; i < input.size(); ++i) {
+        item.values[i].offset = offset; item.values[i].assign(input[i], text_.get());
+        if (input[i].type == core::ValueType::string) offset += kScriptValueStringBytes;
+    }
     ++action_count_; return core::Status::success();
 }
 core::Status ScriptControlStore::take_action(ScriptControlMessage& output) noexcept {
     ActionGuard data(*this); if (!data.held) return fail(core::ErrorCode::resource_unavailable, "actions-busy");
     if (!action_count_) return fail(core::ErrorCode::not_found, "no-action");
-    output = actions_[action_head_]; action_head_ = static_cast<std::uint8_t>((action_head_ + 1) % actions_.size()); --action_count_;
+    expand(actions_[action_head_], output); action_head_ = static_cast<std::uint8_t>((action_head_ + 1) % actions_.size()); --action_count_;
     return core::Status::success();
 }
 core::Result<std::uint32_t> ScriptControlStore::begin_event(std::uint32_t generation, std::size_t index) noexcept {
@@ -313,7 +389,14 @@ core::Status ScriptControlStore::commit_event(std::uint32_t token) noexcept {
     if (field_mask_ != (1U << builder_.count) - 1) return fail(core::ErrorCode::invalid_state, "event-fields-incomplete");
     if (event_count_ == events_.size()) return fail(core::ErrorCode::queue_full, "event-queue-full");
     builder_.ticket = token; builder_.epoch = 0;
-    events_[(event_head_ + event_count_) % events_.size()] = builder_; ++event_count_;
+    const auto slot = (event_head_ + event_count_) % events_.size();
+    auto& item = events_[slot]; static_cast<ScriptControlMessageHeader&>(item) = builder_;
+    auto offset = static_cast<std::uint16_t>(events_offset_ + slot * event_text_stride_);
+    for (std::size_t i = 0; i < builder_.count; ++i) {
+        item.values[i].offset = offset; item.values[i].assign(builder_.values[i].scalar(), text_.get());
+        if (builder_.values[i].type == core::ValueType::string) offset += kScriptValueStringBytes;
+    }
+    ++event_count_;
     builder_token_.store(0, std::memory_order_release); return core::Status::success();
 }
 core::Status ScriptControlStore::take_event(ScriptControlMessage& output) noexcept {
@@ -321,7 +404,7 @@ core::Status ScriptControlStore::take_event(ScriptControlMessage& output) noexce
     // At most the fixed queue capacity can be discarded in one call.
     while (event_count_) {
         const auto& item = events_[event_head_]; const bool current = item.generation == generation();
-        if (current) output = item;
+        if (current) expand(item, output);
         event_head_ = static_cast<std::uint8_t>((event_head_ + 1) % events_.size()); --event_count_;
         if (current) return core::Status::success();
     }

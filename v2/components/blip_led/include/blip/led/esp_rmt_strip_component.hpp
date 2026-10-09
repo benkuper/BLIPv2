@@ -33,7 +33,7 @@ class EspRmtStripComponent final : public core::Component
 #endif
 {
   public:
-    static constexpr std::size_t kTaskStackBytes = 6144U;
+    static constexpr std::size_t kTaskStackBytes = 5120U;
     static constexpr std::size_t kTaskStackWords = kTaskStackBytes / sizeof(StackType_t);
 
     EspRmtStripComponent(storage::SettingsStore& settings,

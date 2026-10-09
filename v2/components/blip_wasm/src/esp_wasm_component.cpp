@@ -43,6 +43,7 @@ constexpr std::array parameters{
     integer("pool_reserved", "Reserved engine pool", "bytes"), integer("pool_used", "Used engine pool", "bytes"),
     integer("pool_peak", "Peak engine pool use", "bytes"),
     integer("buffer_reserved", "Current script buffer reservation", "bytes"),
+    integer("control_text_reserved", "Reserved script control text", "bytes"),
     integer("native_calls", "Native capability calls"), integer("native_failures", "Native capability failures"),
     integer("native_maximum_us", "Largest native callback wall duration", "us"),
     integer("native_last_us", "Last native callback wall duration", "us"),
@@ -66,7 +67,7 @@ constexpr std::array<core::MetadataEntry, 9> metadata{{
     {"ui_topic", "Scripts"}, {"ui_primary", "state"},
     {"worker_priority", "2"}, {"supervisor_priority", "6"}, {"core_affinity", "none"},
     {"queue_capacity", "8"}, {"completion_capacity", "16"}, {"overflow_policy", "reject-new"},
-    {"cost_ram_policy", "fixed pool plus bounded upload maximum and object; task stacks excluded"}}};
+    {"cost_ram_policy", "pool, upload maximum, control text maximum and object; task stacks excluded"}}};
 constexpr core::ComponentDescriptor make_descriptor() {
     core::ComponentDescriptor d{};
     d.schema_version = 1; d.id = "blip.wasm"; d.display_name = "WASM scripts";
@@ -77,7 +78,7 @@ constexpr core::ComponentDescriptor make_descriptor() {
     // Report the maximum admitted upload reservation; actual reserved bytes
     // track its bounded worker-owned allocation. Stacks are counted separately.
     d.cost = {131072, sizeof(EspWasmComponent) +
-        EspWasmComponent::kPoolBytes + EspWasmComponent::kModuleBytes,
+        EspWasmComponent::kPoolBytes + EspWasmComponent::kModuleBytes + kMaximumControlTextBytes,
         EspWasmComponent::kWorkerStackBytes + EspWasmComponent::kSupervisorStackBytes};
     return d;
 }
@@ -330,6 +331,7 @@ void EspWasmComponent::run_worker() noexcept {
             Guard guard(snapshot_mutex_, portMAX_DELAY); upload_received_ = 0;
         }
         Request request{};
+        if (!controls_.generation()) static_cast<void>(controls_.release_retired_text());
         if (xQueueReceive(queue_, &request, pdMS_TO_TICKS(20)) != pdTRUE) continue;
         const auto began = static_cast<std::uint64_t>(esp_timer_get_time());
         core::Status status = core::Status::success();
@@ -442,7 +444,7 @@ void EspWasmComponent::run_worker() noexcept {
         cancelled_.fetch_add(1);
         complete(pending, failure(ErrorCode::cancelled, "stop", "worker-stopped"), {}, 0, service.snapshot(), 0);
     }
-    controls_.retire(); service.stop();
+    controls_.retire(); static_cast<void>(controls_.release_retired_text()); service.stop();
     { Guard guard(snapshot_mutex_, portMAX_DELAY); snapshot_ = service.snapshot(); upload_received_ = 0; }
     worker_quiesced_.store(true);
 }
@@ -475,6 +477,7 @@ core::Status EspWasmComponent::read_parameter(std::string_view id, core::ScalarV
     if (id == "instruction_budget") value = instruction_budget_.load();
     else if (id == "deadline_ms") value = deadline_ms_.load();
     else if (id == "epoch") value = epoch_.load();
+    else if (id == "control_text_reserved") value = controls_.text_reserved_bytes();
     else if (id == "buffer_reserved") value = buffer_reserved_.load();
     else if (id == "completed") value = completed_.load();
     else if (id == "failed") value = failed_.load();

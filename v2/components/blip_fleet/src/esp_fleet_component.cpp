@@ -104,7 +104,8 @@ constexpr core::ComponentDescriptor make_descriptor() {
     result.settings = {2, 2};
     result.disable_policy = core::DisablePolicy::live;
     result.supports_restart = true;
-    result.cost = {32768, sizeof(EspFleetComponent), 14336};
+    result.cost = {32768, sizeof(EspFleetComponent),
+                   EspFleetComponent::kNetworkStackBytes + EspFleetComponent::kExecutorStackBytes};
 #if defined(BLIP_FLEET_WASM)
     result.wasm = {1, "blip.fleet.v1", kScriptFunctions};
     result.cost.flash_bytes += 6144;
@@ -175,13 +176,13 @@ core::Status EspFleetComponent::start(const core::StartContext&) noexcept {
     reconfigure_.store(true);
     started_.store(true);
     network_quiesced_.store(false);
-    if (xTaskCreate(network_entry, "blip_fleet_net", 8192, this, 4, &network_task_) != pdPASS) {
+    if (xTaskCreate(network_entry, "blip_fleet_net", kNetworkStackBytes, this, 4, &network_task_) != pdPASS) {
         network_quiesced_.store(true);
         static_cast<void>(stop());
         return failure(core::ErrorCode::start_failed, "start", "network-task");
     }
     executor_quiesced_.store(false);
-    if (xTaskCreate(executor_entry, "blip_fleet_exec", 6144, this, 4, &executor_task_) != pdPASS) {
+    if (xTaskCreate(executor_entry, "blip_fleet_exec", kExecutorStackBytes, this, 4, &executor_task_) != pdPASS) {
         executor_quiesced_.store(true);
         static_cast<void>(stop());
         return failure(core::ErrorCode::start_failed, "start", "executor-task");

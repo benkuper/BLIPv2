@@ -36,11 +36,14 @@ test("control sockets reconnect with bounded backoff and explicit close cancels 
   sockets[0].emit("message", { data: new ArrayBuffer(0) }); sockets[0].emit("open");
   assert.equal(messages.length, 0);
   client.send("/test", []); assert.equal(current.sent.length, 1);
+  t.mock.timers.tick(1500);
+  assert.equal(current.sent.at(-1), '{"COMMAND":"BLIP_PING"}', "idle live control keeps its HTTP session active");
   current.close();
   const count = sockets.length;
   t.mock.timers.tick(500); assert.equal(sockets.length, count + 1, "success resets retry backoff");
   sockets.at(-1).close(); client.close();
   t.mock.timers.tick(30000); assert.equal(sockets.length, count + 1);
+  assert.equal(current.sent.length, 2, "retired sockets stop sending heartbeats");
 });
 
 test("release checks and independent installations use bounded same-device endpoints", async () => {

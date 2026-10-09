@@ -11,7 +11,10 @@ def main():
     parser.add_argument("--listen", default="127.0.0.1", help="Existing LAN IP for device tests; never changes Wi-Fi")
     parser.add_argument("--port", type=int, default=8088)
     parser.add_argument("--prepare-only", action="store_true")
+    parser.add_argument("--artifact-bytes-per-second", type=int, default=0,
+                        help="Limit local artifact downloads for slow-transfer qualification (0 means unlimited)")
     args = parser.parse_args()
+    if args.artifact_bytes_per_second < 0: parser.error("artifact rate cannot be negative")
     args.directory.mkdir(parents=True, exist_ok=True)
     catalog = args.directory / "releases.json"
     if not catalog.exists(): catalog.write_text(json.dumps({"schema": 1, "releases": []}) + "\n", encoding="utf-8")
@@ -20,7 +23,8 @@ def main():
     load_index(catalog)
     print(f"Public local endpoint: http://{args.listen}:{args.port}/blip/update", flush=True)
     if args.prepare_only: return
-    server = create_server((args.listen, args.port), catalog, artifacts)
+    server = create_server((args.listen, args.port), catalog, artifacts,
+                           artifact_bytes_per_second=args.artifact_bytes_per_second)
     server.serve_forever()
 
 

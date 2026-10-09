@@ -91,6 +91,8 @@ def main():
                  "maximum_lateness_us", "network_stack_headroom", "executor_stack_headroom")
         report["after"] = {port: {name: fleet.get(port, name) for name in names} for port in args.ports}
         for port, state in report["after"].items():
+            if min(state["network_stack_headroom"], state["executor_stack_headroom"]) < 1024:
+                raise RuntimeError(f"fleet stack reserve below 1024 bytes on {port}")
             expected = 1 if port == leader else 2
             if state["executed"] - report["before_executed"][port] != expected or any(
                 state[name] != 0 for name in ("execution_failed", "execution_dropped", "late")):

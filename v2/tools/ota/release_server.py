@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import re
 import ssl
+import time
 from urllib.parse import parse_qsl, urlsplit, unquote
 
 QUERY_FIELDS = {"schema", "project", "board", "target", "layout", "profile", "channel",
@@ -135,7 +136,7 @@ def load_index(path):
     return ReleaseIndex(json.loads(source, object_pairs_hook=unique_object))
 
 
-def handler(index_path, artifact_root):
+def handler(index_path, artifact_root, artifact_bytes_per_second=0):
     class Handler(BaseHTTPRequestHandler):
         def setup(self):
             self.request.settimeout(10)
@@ -183,12 +184,23 @@ def handler(index_path, artifact_root):
                     self.json_response(404, {"error": "not found"})
                     return
                 with file.open("rb") as stream:
+                    # Firmware flash writes and TCP recovery can outlast the
+                    # short request-header timeout. Match the device's bounded
+                    # transfer lifetime while keeping each write bounded.
+                    self.connection.settimeout(60)
+                    deadline = time.monotonic() + 600
                     self.send_response(200)
                     self.send_header("Content-Type", "application/octet-stream")
                     self.send_header("Content-Length", str(file.stat().st_size))
                     self.end_headers()
                     while block := stream.read(4096):
+                        if time.monotonic() >= deadline:
+                            self.close_connection = True
+                            return
                         self.wfile.write(block)
+                        if artifact_bytes_per_second:
+                            self.wfile.flush()
+                            time.sleep(len(block) / artifact_bytes_per_second)
             except (OSError, ValueError, json.JSONDecodeError):
                 if self.response_started:
                     self.close_connection = True
@@ -197,7 +209,9 @@ def handler(index_path, artifact_root):
     return Handler
 
 
-def create_server(address, index_path, artifact_root, context=None):
+def create_server(address, index_path, artifact_root, context=None, *, artifact_bytes_per_second=0):
+    if artifact_bytes_per_second < 0:
+        raise ValueError("artifact rate cannot be negative")
     # Flash writes can make a device consume its artifact slowly. Other devices
     # must still be able to check their catalogs and start downloads.
     class ReleaseServer(ThreadingHTTPServer):
@@ -210,7 +224,7 @@ def create_server(address, index_path, artifact_root, context=None):
             except Exception:
                 connection.close()
                 raise
-    return ReleaseServer(address, handler(index_path, artifact_root))
+    return ReleaseServer(address, handler(index_path, artifact_root, artifact_bytes_per_second))
 
 
 def main():

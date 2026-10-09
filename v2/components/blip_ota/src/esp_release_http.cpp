@@ -4,6 +4,8 @@
 #include "esp_crt_bundle.h"
 #endif
 #include "esp_timer.h"
+#include "esp_heap_caps.h"
+#include "esp_log.h"
 #include <algorithm>
 #include <cstring>
 #include <ctime>
@@ -11,6 +13,8 @@
 
 namespace blip::ota {
 namespace {
+constexpr std::int64_t kTransferDeadlineUs = 600000000;
+constexpr std::int64_t kIdleDeadlineUs = 30000000;
 core::Status failure(core::ErrorCode code, std::string_view detail) noexcept {
     return core::Status::failure({core::ErrorDomain::transport, code, "blip.updates", "http", detail});
 }
@@ -25,7 +29,7 @@ void EspReleaseHttp::close() noexcept {
 }
 core::Status EspReleaseHttp::open(const char* url, std::uint32_t maximum_bytes,
                                  std::uint32_t expected_bytes, const char* trust_pem) noexcept {
-    close(); received_ = 0; http_status_ = 0; body_length_ = 0;
+    close(); received_ = read_retries_ = 0; http_status_ = 0; body_length_ = 0;
     const std::size_t length = url ? strnlen(url, 1024) : 0;
     if (!length || length >= 1024 || !maximum_bytes || expected_bytes > maximum_bytes)
         return failure(core::ErrorCode::invalid_argument, "request-bounds");
@@ -42,7 +46,9 @@ core::Status EspReleaseHttp::open(const char* url, std::uint32_t maximum_bytes,
     if (encrypted) return failure(core::ErrorCode::invalid_state, "https-not-included");
 #endif
     maximum_ = maximum_bytes; expected_ = expected_bytes;
-    deadline_us_ = esp_timer_get_time() + 120000000;
+    const auto started = esp_timer_get_time();
+    deadline_us_ = started + kTransferDeadlineUs;
+    idle_deadline_us_ = started + kIdleDeadlineUs;
     esp_http_client_config_t config{};
     config.url = url; config.method = HTTP_METHOD_GET;
     config.transport_type = encrypted ? HTTP_TRANSPORT_OVER_SSL : HTTP_TRANSPORT_OVER_TCP;
@@ -79,11 +85,27 @@ core::Result<std::size_t> EspReleaseHttp::read(std::span<std::byte> output, cons
         return core::Result<std::size_t>::failure(failure(code, detail).error());
     };
     if (!client_ || output.empty()) return fail(core::ErrorCode::invalid_state, "read-state");
-    if (cancelled.load()) return fail(core::ErrorCode::cancelled, "request-cancelled");
-    if (esp_timer_get_time() >= deadline_us_) return fail(core::ErrorCode::budget_exceeded, "request-deadline");
     const auto count = std::min<std::size_t>({output.size(), 1024, static_cast<std::size_t>(maximum_ - received_) + 1});
-    const int read = esp_http_client_read(client_, reinterpret_cast<char*>(output.data()), static_cast<int>(count));
-    if (read < 0) return fail(core::ErrorCode::io_failed, "body-read");
+    int read{};
+    for (;;) {
+        if (cancelled.load()) return fail(core::ErrorCode::cancelled, "request-cancelled");
+        const auto now = esp_timer_get_time();
+        if (now >= deadline_us_) return fail(core::ErrorCode::budget_exceeded, "request-deadline");
+        if (now >= idle_deadline_us_) return fail(core::ErrorCode::budget_exceeded, "request-idle-deadline");
+        read = esp_http_client_read(client_, reinterpret_cast<char*>(output.data()), static_cast<int>(count));
+        // ESP-IDF reports a socket read timeout as HTTP_EAGAIN, leaving the
+        // connection usable. Retry within the transfer deadline so TCP can
+        // recover under simultaneous browser/radio/storage traffic.
+        if (read != -ESP_ERR_HTTP_EAGAIN) break;
+        ++read_retries_;
+    }
+    if (read < 0) {
+        ESP_LOGW("blip.updates", "HTTP read failed: result=%d errno=%d received=%lu heap=%lu largest=%lu",
+            read, esp_http_client_get_errno(client_), static_cast<unsigned long>(received_),
+            static_cast<unsigned long>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT)),
+            static_cast<unsigned long>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT)));
+        return fail(core::ErrorCode::io_failed, "body-read");
+    }
     if (read == 0) {
         if (!esp_http_client_is_complete_data_received(client_) || (expected_ && received_ != expected_))
             return fail(core::ErrorCode::verification_failed, "truncated-body");
@@ -93,6 +115,9 @@ core::Result<std::size_t> EspReleaseHttp::read(std::span<std::byte> output, cons
         (expected_ && static_cast<std::uint32_t>(read) > expected_ - received_))
         return fail(core::ErrorCode::capacity_exceeded, "body-exceeds-bound");
     received_ += static_cast<std::uint32_t>(read);
+    // Slow flash writes and shared radio traffic can make a healthy multi-MiB
+    // transfer take several minutes. Bound both inactivity and total lifetime.
+    idle_deadline_us_ = esp_timer_get_time() + kIdleDeadlineUs;
     return core::Result<std::size_t>::success(static_cast<std::size_t>(read));
 }
 } // namespace blip::ota

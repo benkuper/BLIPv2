@@ -1,0 +1,3904 @@
+{
+  "date": "2026-10-09",
+  "milestone_complete": false,
+  "pc_network_changed": false,
+  "qualification_note": "Focused lifecycle, ownership, update and current-production trials; remaining gates are not waived. Original failed reports remain failed.",
+  "host_suites_passed": 33,
+  "javascript_tests_passed": 32,
+  "release_server_tests_passed": 10,
+  "ui": {
+    "version": "0.3.6",
+    "factory_code": 3006,
+    "bytes": 26680,
+    "sha256": "717bd107acf0e3cbbe42a42f528c5a6dafbf07bf44873a9e2be8c2290d0aa569"
+  },
+  "production_builds": [
+    {
+      "profile": "ball",
+      "release_code": 29,
+      "qualifier_enabled": false,
+      "passed": true,
+      "application_bytes": 2046368,
+      "static_sections": {
+        ".iram0.data": 4,
+        ".dram0.data": 24532,
+        ".dram0.bss": 131880
+      },
+      "artifacts": {
+        "blip-v2.bin": "d61a6f74a6bd071042a8268c13a4ee53ffbd28f666104a825cf5175356e7f890",
+        "blip-v2.elf": "95d16f16434a3e3260ca277e6076fdb6f250b0327bbb10847b2a1c4660776003",
+        "blip-v2.map": "4b66c882a4f468f99d01b76214167203693bdb2941850ce0de2cc3631e673f3d",
+        "sdkconfig": "7e3904e04425851be21110cb5c2531abe3245e3273852ed4cbe188717ee4ac24"
+      },
+      "build_log_sha256": "fa94931e3f375958d8a2a857fd4ddf672c7b760f02612a3f2419d69b92f5cb37"
+    },
+    {
+      "profile": "huzzah32",
+      "release_code": 29,
+      "qualifier_enabled": false,
+      "passed": true,
+      "application_bytes": 1460368,
+      "static_sections": {
+        ".dram0.data": 23932,
+        ".dram0.bss": 140896
+      },
+      "artifacts": {
+        "blip-v2.bin": "97f1961c2c640901fd4082e53dd1d7486c391e7f36b395a21906a14e18b17e07",
+        "blip-v2.elf": "c33aff8759340715fe9458b45bfbc6de0e3b002a12dc4fd073c7923e5de3abbd",
+        "blip-v2.map": "136a7abfb2315d1afcfe3e0fdb5bae856a5ccd6cafd2f0e98a7bf9094607d94d",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54"
+      },
+      "build_log_sha256": "d1a8bb759cb1883fe60605c33bec83fc860ecb4b36fc8363928dc3e3e6e1e25d"
+    },
+    {
+      "profile": "m5dial",
+      "release_code": 29,
+      "qualifier_enabled": false,
+      "passed": true,
+      "application_bytes": 1441424,
+      "static_sections": {
+        ".dram0.data": 29749,
+        ".dram0.bss": 136208
+      },
+      "artifacts": {
+        "blip-v2.bin": "8907c875be7b3e59c89a69cc16f1cea7ede9321cbca22cd236f0c73e677e840c",
+        "blip-v2.elf": "7487f75774e321a3d3b84b1d43a7e2bb8b9698c72a8214385ce23b2624148295",
+        "blip-v2.map": "8cbec2caa07bec7d3042570a73d8efc43799d40d7d9351d165017294d5eaadd5",
+        "sdkconfig": "15a8f1c085d83036e76ba1c59ac6e1e76d5fd8b84e17141c805bc3f9849f650e"
+      },
+      "build_log_sha256": "eb3b1f0e63cf3d6309e9841490c8349c6d892f068097f0320789fb3e6203e5b3"
+    },
+    {
+      "profile": "club",
+      "release_code": 29,
+      "qualifier_enabled": false,
+      "passed": true,
+      "application_bytes": 1518832,
+      "static_sections": {
+        ".dram0.data": 23966,
+        ".dram0.bss": 124408
+      },
+      "artifacts": {
+        "blip-v2.bin": "e8fd6bf23308976f2038988e2a65fe3f42075fb4766d3f12575015bab1980596",
+        "blip-v2.elf": "6f6f392d558521adab23cc237ac5a6170baae65b496f86d31e0f6be6d28d8a38",
+        "blip-v2.map": "20adf83e2dd9882104578f7a4f56c314ae60eae6ea645903e3829f2c72393297",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa"
+      },
+      "build_log_sha256": "ed9d786826ee35de9234bb4294f91e790684a2d73e1aadbefbdb640428d10aee"
+    },
+    {
+      "profile": "tab",
+      "release_code": 29,
+      "qualifier_enabled": false,
+      "passed": true,
+      "application_bytes": 1524928,
+      "static_sections": {
+        ".dram0.data": 24053,
+        ".dram0.bss": 137944
+      },
+      "artifacts": {
+        "blip-v2.bin": "aaa22ee8a6f317af834b421731e9f0965188986a893b7ca42beb8fcb3a791eac",
+        "blip-v2.elf": "0ef03ac38e60959630f4994e6660518841a4478d62ebe4765a3c9159935b05c1",
+        "blip-v2.map": "da6f116be116edb87f36f36742cd4bf3768860fbfbcc3dfdd5aa5f6a562d0a4f",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa"
+      },
+      "build_log_sha256": "6cddb3e2ec1d1853b69ce1913c06df3e74a91d26bce237e77f7bf2f5f6611a8b"
+    },
+    {
+      "profile": "m5stickc",
+      "release_code": 29,
+      "qualifier_enabled": false,
+      "passed": true,
+      "application_bytes": 1436528,
+      "static_sections": {
+        ".dram0.data": 23804,
+        ".dram0.bss": 137560
+      },
+      "artifacts": {
+        "blip-v2.bin": "46244617d94b67d2399f71875bc39e3d74f729330cdcacfe61891d0cd20cdc29",
+        "blip-v2.elf": "66a2e6d052527679f4031e3284b831a29c2e97eaf9a88b703de13bd238cd70d2",
+        "blip-v2.map": "23c41159c7bea7ea794f7e4788c818226a73c7e299e6410f2d543e0f90c0365c",
+        "sdkconfig": "120f4d9a39f4f45a7c99cf3e02188cf3a60db42ebbaaf4310ff79fa75437aff0"
+      },
+      "build_log_sha256": "d4252d7ba727110f0824103ca9b5678b85caf77d40889470e268aa4e834f137c"
+    },
+    {
+      "profile": "xiao",
+      "release_code": 29,
+      "qualifier_enabled": false,
+      "passed": true,
+      "application_bytes": 1620432,
+      "static_sections": {
+        ".iram0.data": 8,
+        ".dram0.data": 23372,
+        ".dram0.bss": 142160
+      },
+      "artifacts": {
+        "blip-v2.bin": "39a770c0b777eadfcb713e9ad891e67eca5f1efb77a561ae095dc780121435ac",
+        "blip-v2.elf": "f95cb6ed9ad3626817f6f5a35b5d9ba378401077184090e4f00406a984de9743",
+        "blip-v2.map": "a783541adfa813cfa09100e90dfd38f9344bcdb3b30afc69485b1869ee082a8a",
+        "sdkconfig": "b3aa9e358a8cd509c80fc7d186017bb2d85c79caa633244b352ba7d3a8ed5c9b"
+      },
+      "build_log_sha256": "e1b31591ac9eba6c7d818b7ced70e093800e130acd2ba4ec1fa645eb42902702"
+    }
+  ],
+  "final_production_builds": [
+    {
+      "profile": "ball",
+      "release_code": 31,
+      "passed": true,
+      "qualifier_enabled": false,
+      "identity": {
+        "project": "blip-v2",
+        "board": "creators-ball-v2",
+        "target": "esp32c6",
+        "layout": "ota-8mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 8388608,
+        "features": 123,
+        "api": 1
+      },
+      "application_bytes": 2046272,
+      "artifacts": {
+        "blip-v2.bin": "f25639badfe333375e0575c61815dcbdbbde1bd503062e88642761b23620e3b3",
+        "blip-v2.elf": "6e8bf97b04d714dcb930d34956598c092e6ab70646b3596e17191904db79a355",
+        "blip-v2.map": "b62821b720499b314829755d5107d7b704ea0ea947418aa4a96cabe6cc80227f",
+        "sdkconfig": "b056eea7aa6d48a5ce37b2dd803661936d4fbf5edcc2fd085e7f75cb53e615e9"
+      },
+      "build_log_sha256": "c97622b002ecb84e8623eda6ff40d89281cd74383b5d30a13eff25f6749f997d"
+    },
+    {
+      "profile": "huzzah32",
+      "release_code": 31,
+      "passed": true,
+      "qualifier_enabled": false,
+      "identity": {
+        "project": "blip-v2",
+        "board": "adafruit-huzzah32",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "application_bytes": 1460336,
+      "artifacts": {
+        "blip-v2.bin": "e1234964d2fecb746b2efa8bb1a97b79f00f65086c8d0ccac398ccdfff1ac4c4",
+        "blip-v2.elf": "a9891165c40dcef1deaccf8863e5c6415561e7e65fc00f527b49c22e1c5d41cf",
+        "blip-v2.map": "ba8fa99bdb11be5f3dbb00db2a2f01d19ac717833cd132338a9ba37e8a8dcb5e",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54"
+      },
+      "build_log_sha256": "7217a3e1239d68665ac531c56ea8baa14a571ac55b6eb3f7ae7b007752dfe48b"
+    },
+    {
+      "profile": "m5dial",
+      "release_code": 31,
+      "passed": true,
+      "qualifier_enabled": false,
+      "identity": {
+        "project": "blip-v2",
+        "board": "m5stack-m5dial",
+        "target": "esp32s3",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "application_bytes": 1441376,
+      "artifacts": {
+        "blip-v2.bin": "ad6d92f71ac29f8160705d3e741f5d51ef082bc32834f6f76a599c02a9509097",
+        "blip-v2.elf": "bd0827ab198ed1cec1e311f543580e36f10b149566f979169777ec16d4137178",
+        "blip-v2.map": "eb126a8eb37068f177c6f980e42fff73cc4515965b408cb02096b71561b5e273",
+        "sdkconfig": "15a8f1c085d83036e76ba1c59ac6e1e76d5fd8b84e17141c805bc3f9849f650e"
+      },
+      "build_log_sha256": "992f4aa239b955cae28458b6736d54100ed1b38ab4610bce5fcdf1a465c40c8d"
+    },
+    {
+      "profile": "club",
+      "release_code": 31,
+      "passed": true,
+      "qualifier_enabled": false,
+      "identity": {
+        "project": "blip-v2",
+        "board": "creators-club",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "application_bytes": 1518784,
+      "artifacts": {
+        "blip-v2.bin": "256b4d901ea702ac89bdfd6a2e7de0eb58dce026ae00523181c0daaa8f5c2318",
+        "blip-v2.elf": "718d666d587a45d5e5698e3f1f7935f975a5459864bf664ee453ea9b5be9e8e1",
+        "blip-v2.map": "bad4cb0383fae1f7d494b2c67ffdb7b6924e54500bc8c9dc09b56bb8e427ed00",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa"
+      },
+      "build_log_sha256": "b88de42acd779a19cee7017adf9eb4a602e1ccf8347edfaecd43cfbc7dafe98b"
+    },
+    {
+      "profile": "tab",
+      "release_code": 31,
+      "passed": true,
+      "qualifier_enabled": false,
+      "identity": {
+        "project": "blip-v2",
+        "board": "creators-tab",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "application_bytes": 1524880,
+      "artifacts": {
+        "blip-v2.bin": "9967ed11e062928bd87d67bc9a29d838c12e3efa24db09442da1c27e8b8f0fde",
+        "blip-v2.elf": "b56e354f26033605fd16e4ebb036e8be8e998b137af2bfef8f5c78ca56e9ed24",
+        "blip-v2.map": "4fe5410db2a6e24dd5d4e4b52eb9fbd58bfe1d1182867ecfeacdec5eeca65790",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa"
+      },
+      "build_log_sha256": "0eb4dd18fb20aa212148d811166927b1be555a5a275dc0c8d168f19e40637921"
+    },
+    {
+      "profile": "m5stickc",
+      "release_code": 31,
+      "passed": true,
+      "qualifier_enabled": false,
+      "identity": {
+        "project": "blip-v2",
+        "board": "m5stack-m5stickc",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "application_bytes": 1436480,
+      "artifacts": {
+        "blip-v2.bin": "ba8559ca2d29d2b4b1df07f1d95b68a8724819b6ffe7ced4d9ad2240b5687696",
+        "blip-v2.elf": "ff6c63a80c04e0861d83c7e96d759d9e73a45f7ee5a56d847ed0cc9e00489027",
+        "blip-v2.map": "abc9b5b32a3a58b4875664737b30cb143818febfbb366bd5910003c3487f6716",
+        "sdkconfig": "120f4d9a39f4f45a7c99cf3e02188cf3a60db42ebbaaf4310ff79fa75437aff0"
+      },
+      "build_log_sha256": "fba481ead558ceb72d4e86e2babc3db0b47a5846a38015c207f9155b5c0fe960"
+    },
+    {
+      "profile": "xiao",
+      "release_code": 31,
+      "passed": true,
+      "qualifier_enabled": false,
+      "identity": {
+        "project": "blip-v2",
+        "board": "seeed-xiao-esp32c6-chip-antenna",
+        "target": "esp32c6",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "application_bytes": 1620352,
+      "artifacts": {
+        "blip-v2.bin": "12e706d0c53bb2cea7d2b9d34ad38473c94d07762682d760366fb3274a3883d5",
+        "blip-v2.elf": "e2d91669ae53073905882eab336a7add59e67b3b63ac18dd67210072838d4e5a",
+        "blip-v2.map": "56efb64d036e06659966d7631d9af120ecf9d03659c82346f160d2a8cb09e08c",
+        "sdkconfig": "b3aa9e358a8cd509c80fc7d186017bb2d85c79caa633244b352ba7d3a8ed5c9b"
+      },
+      "build_log_sha256": "47a63eea7308c5a01c31000f4d15e9dcbb34dd5c23995c882ead0e9a0e6f05ed"
+    }
+  ],
+  "reports": [
+    {
+      "report_path": "build/m44-ball-worker21-connected-lifecycle.json",
+      "report_sha256": "039d4b5f1f526a46d6eb3197664473ba2d3d89ba150b328cf6260c382436ef43",
+      "flash_log_sha256": "2bd6f63f7a5f1b6e8210b5a59545d75d0fcc02d25a36df11a9e580d1464ee4de",
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": true,
+      "release_code": 21,
+      "checker_sha256": "86b7a852d443ff6bd66edc3d26b008778941e92b5863f8eb19690bb4697b33be",
+      "qualification_sha256": "f000be9d412f27fa529a499b605a2ce7b978508737f45fbb24def684c8448f98",
+      "artifacts": {
+        "CMakeCache.txt": "188e8a6869bd89ec3a2b2beb82f9984aa3b6aaaa4e5fe1050d876e7fcea8876f",
+        "blip-v2.bin": "95cabd1c3f9588ae55e9eab75ce06c428d5267c0502db414cbff54a8b1fefec1",
+        "blip-v2.elf": "a4d8df9f629309aa15471fb8586d6e3ed7789da0421e1e24671551666c16113a",
+        "bootloader/bootloader.bin": "ad2f65fa9e42ece65bbfaa5cfa96a10739482699823d9d79c7a2b8856e81bf64",
+        "flasher_args.json": "ccaeef190a9096cec04d0019b27a586e14ae305fabef83242b095b51aaa66fdf",
+        "ota_data_initial.bin": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f",
+        "partition_table/partition-table.bin": "6d0cbb904fdc16c18eae23b77cb04b14578a0bf2801fdc5fccf4edad6c3d05c0",
+        "sdkconfig": "2e9b642f1e9d30f84518d1be467b576852e35a10cf89acb1ec47924293dcaa49",
+        "storage.bin": "45b88679797c6af3bc5a78191d08d5fcdfc7a200d8f02ac65e5ad91fa7bcac24"
+      },
+      "records": [
+        {
+          "type": "start",
+          "chip": "esp32c6",
+          "idf": "v6.0.2",
+          "stack_bytes": 6144
+        },
+        {
+          "type": "complete",
+          "checks": 220,
+          "cycles": 30,
+          "queued_cancellations": 3,
+          "tasks_before": 24,
+          "tasks_after": 24,
+          "heap_before": 15352,
+          "heap_after": 15352,
+          "worker_headroom": 5744,
+          "main_headroom": 3700
+        }
+      ],
+      "source_snapshot_sha256": "dfa8f9b1f1cf9074b20575e6968e01f94eb9aedac481f627ea0835995c2d9998"
+    },
+    {
+      "report_path": "build/m44-huzzah32-worker21-fragmented-lifecycle.json",
+      "report_sha256": "fe812475452c42c8b47e67904c87ea6ac1b9e8469e9a10c9e9c999e62b177c93",
+      "flash_log_sha256": "e23a78fa823670bfab4459568be56d46db85f75aabe4d8e76424691397d91b71",
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "passed": true,
+      "release_code": 21,
+      "checker_sha256": "31d9be87f370e5a5639676c3414ace9e77f461ecbf5d9fea7aad0ac9b974285d",
+      "qualification_sha256": "f000be9d412f27fa529a499b605a2ce7b978508737f45fbb24def684c8448f98",
+      "artifacts": {
+        "CMakeCache.txt": "8534db254c794a9e1dd060437a9c57edb6f77820b26970e66746594868fa98df",
+        "blip-v2.bin": "557f002236b4f21316ba40e99c1e98038ca585d097b8e41a77592a1f85de38fa",
+        "blip-v2.elf": "08691336183e130ecaab806ba6ef0fe963913bfd073147aa03848d53cdc7ff65",
+        "bootloader/bootloader.bin": "8d8b5e4a9f5336dfeac62eac72bce5033797b1a06404b52ebd62362cd3574c58",
+        "flasher_args.json": "f47e029e6169e7a96931064a2bb311a56f9777e1c591b77c1e6f283583363d5e",
+        "ota_data_initial.bin": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f",
+        "partition_table/partition-table.bin": "50667a41d5dc9c22ef6896d8b1de7a04bfe68a91f17917ea2d0f85bd5762f417",
+        "sdkconfig": "3075cc70e729385c63a67218ed07b2ede6b12385ffdfc527017aee64d2940193",
+        "storage.bin": "4528049a440c7bde86b11d6f1489b14345e5283503a7a46b2844fc3a3b4db2b6"
+      },
+      "records": [
+        {
+          "type": "start",
+          "chip": "esp32",
+          "idf": "v6.0.2",
+          "stack_bytes": 6144
+        },
+        {
+          "type": "complete",
+          "checks": 220,
+          "cycles": 30,
+          "queued_cancellations": 3,
+          "tasks_before": 22,
+          "tasks_after": 22,
+          "heap_before": 24548,
+          "heap_after": 24548,
+          "worker_headroom": 5536,
+          "main_headroom": 3408
+        }
+      ],
+      "source_snapshot_sha256": "dfa8f9b1f1cf9074b20575e6968e01f94eb9aedac481f627ea0835995c2d9998"
+    },
+    {
+      "report_path": "build/m44-m5dial-worker21-connected-lifecycle.json",
+      "report_sha256": "fc9e0b2394d471470b4a82bdb26bcde5517415aacf0ca4a659d4d03a92596b4a",
+      "flash_log_sha256": "ce498e0420b4c88fb00eded715233590cc7503709f33596c630053a611ca745d",
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "passed": true,
+      "release_code": 21,
+      "checker_sha256": "86b7a852d443ff6bd66edc3d26b008778941e92b5863f8eb19690bb4697b33be",
+      "qualification_sha256": "f000be9d412f27fa529a499b605a2ce7b978508737f45fbb24def684c8448f98",
+      "artifacts": {
+        "CMakeCache.txt": "ed8a1b1c81f4d65fd3277bd7c9b0b61954cc82f137adc311444a0fa967afdfb2",
+        "blip-v2.bin": "52add4b974c17167c9ac06c068d003baebea6f151b3fc93151b9f6e54d03c3d7",
+        "blip-v2.elf": "dbb7961e164075d27eb445873715fd5c7954d494e1eb2a3f999707bee6adbcaf",
+        "bootloader/bootloader.bin": "99bb95b602ef615d965196c48da96e6fd51c337f27ce0c338104616e2379a6fa",
+        "flasher_args.json": "e77e0f6f3ee8be2b353e888a23a83e62abb4558e3d9f5ea93a727fb4ce9c19a5",
+        "ota_data_initial.bin": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f",
+        "partition_table/partition-table.bin": "50667a41d5dc9c22ef6896d8b1de7a04bfe68a91f17917ea2d0f85bd5762f417",
+        "sdkconfig": "7c6c1ce3ae2243112e01732c5fbd7a414149a1e0a8e978c31b0a332bed46c482",
+        "storage.bin": "4528049a440c7bde86b11d6f1489b14345e5283503a7a46b2844fc3a3b4db2b6"
+      },
+      "records": [
+        {
+          "type": "start",
+          "chip": "esp32s3",
+          "idf": "v6.0.2",
+          "stack_bytes": 6144
+        },
+        {
+          "type": "complete",
+          "checks": 220,
+          "cycles": 30,
+          "queued_cancellations": 3,
+          "tasks_before": 24,
+          "tasks_after": 24,
+          "heap_before": 26376,
+          "heap_after": 26376,
+          "worker_headroom": 5264,
+          "main_headroom": 3132
+        }
+      ],
+      "source_snapshot_sha256": "dfa8f9b1f1cf9074b20575e6968e01f94eb9aedac481f627ea0835995c2d9998"
+    },
+    {
+      "report_path": "build/m44-xiao-connected-compact-store.json",
+      "report_sha256": "045d24fcb0b43d45387e490c977df1682a7d6f1ee08db1cc18871e81b4385c07",
+      "board": "xiao",
+      "port": "COM13",
+      "flashed_mac": "10:51:db:1a:a6:68",
+      "passed": true,
+      "inputs": {
+        "blip-script-controls.bin": {
+          "bytes": 284864,
+          "sha256": "c041025509652873fc16d6910f33a97df29064de7e1e696f5f5ac61d63ccc5f1"
+        },
+        "blip-script-controls.elf": {
+          "bytes": 6710228,
+          "sha256": "16c33279a347000e41859bf0d3ebc9c90aa42f33dea059bb28d4042ddb66749b"
+        },
+        "blip-script-controls.map": {
+          "bytes": 4182252,
+          "sha256": "dd7adb04521066cfa2ac390c130e1d156dd2211960782ba181546ee20f69e568"
+        },
+        "sdkconfig": {
+          "bytes": 67847,
+          "sha256": "b4f37d67a089b8af494147a8cf331f4fc8cd341f278d633f2097dbc876b1ced2"
+        },
+        "ota_data_initial.bin": {
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        "bootloader/bootloader.bin": {
+          "bytes": 22160,
+          "sha256": "4116473e2d7cfc8bee30a7e5b2df8f02ec0047f1dbb12767cf92eb1f0c3d9773"
+        },
+        "partition_table/partition-table.bin": {
+          "bytes": 3072,
+          "sha256": "50667a41d5dc9c22ef6896d8b1de7a04bfe68a91f17917ea2d0f85bd5762f417"
+        },
+        "flasher_args.json": {
+          "bytes": 1099,
+          "sha256": "ec2e148ec3d851f80b9683168f00cad99ccc940f77a089a3c31201472b81453d"
+        }
+      },
+      "records": [
+        {
+          "type": "start",
+          "chip": "esp32c6",
+          "idf": "v6.0.2",
+          "stack_bytes": 24576,
+          "store_bytes": 5664,
+          "message_bytes": 664,
+          "value_bytes": 144,
+          "fixture_sha256": "92a38cd426e90f51caf0423268526329348aac8e2d5bec4e748fddff8bfcc730"
+        },
+        {
+          "type": "complete",
+          "cases": 8,
+          "repeat_cycles": 20,
+          "case_passes": 168,
+          "maximum_suite_us": 18436,
+          "heap_baseline": 324832,
+          "heap_min": 324832,
+          "heap_max": 324832,
+          "engine_checks": 32,
+          "engine_cycles": 20,
+          "engine_heap_baseline": 323228,
+          "engine_heap_min": 323228,
+          "engine_heap_max": 323228,
+          "pool_peak": 71072,
+          "stack_headroom": 13148,
+          "failures": 0
+        }
+      ],
+      "source_snapshot_sha256": "046a1102d826b00403a7c8ff1b17ca477269380f0e293ca6ee626f653b6e1c6f"
+    },
+    {
+      "report_path": "build/m44-huzzah32-connected-compact-store.json",
+      "report_sha256": "8d6d54475e471281061b3c2d84b8563966d6f5303bd5bbd3d30ca31703337ec6",
+      "board": "huzzah32",
+      "port": "COM5",
+      "flashed_mac": "30:ae:a4:f2:d1:84",
+      "passed": true,
+      "inputs": {
+        "blip-script-controls.bin": {
+          "bytes": 274960,
+          "sha256": "93b36b15a277b839f1c598d7fea9719e00be583be2a6f5cd27727b9369298cd3"
+        },
+        "blip-script-controls.elf": {
+          "bytes": 5810460,
+          "sha256": "72f0b02b918366044628ddb19d57689976115e45949f6e1b2e1974668f6f27f4"
+        },
+        "blip-script-controls.map": {
+          "bytes": 4834560,
+          "sha256": "d5e985f54cc140baa79676beb3205006d2ebdeca1c4b458c71a2ab0358393e2e"
+        },
+        "sdkconfig": {
+          "bytes": 60484,
+          "sha256": "22285a652d0f8ff3fde6a8d423aa0f8dc6c325bd0427daaa26c7c70fd703a84a"
+        },
+        "ota_data_initial.bin": {
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        "bootloader/bootloader.bin": {
+          "bytes": 26048,
+          "sha256": "0341f2329d731b40ce53ce88ced13505b9a75c8c46b0e5a8aa7a4d5136fcbe38"
+        },
+        "partition_table/partition-table.bin": {
+          "bytes": 3072,
+          "sha256": "50667a41d5dc9c22ef6896d8b1de7a04bfe68a91f17917ea2d0f85bd5762f417"
+        },
+        "flasher_args.json": {
+          "bytes": 1103,
+          "sha256": "c07aa58e9146540125491b68c71379c20b6d07ab1f1d877a7f0836eff8e9cf77"
+        }
+      },
+      "records": [
+        {
+          "type": "start",
+          "chip": "esp32",
+          "idf": "v6.0.2",
+          "stack_bytes": 24576,
+          "store_bytes": 5664,
+          "message_bytes": 664,
+          "value_bytes": 144,
+          "fixture_sha256": "92a38cd426e90f51caf0423268526329348aac8e2d5bec4e748fddff8bfcc730"
+        },
+        {
+          "type": "complete",
+          "cases": 8,
+          "repeat_cycles": 20,
+          "case_passes": 168,
+          "maximum_suite_us": 47168,
+          "heap_baseline": 146688,
+          "heap_min": 146688,
+          "heap_max": 146688,
+          "engine_checks": 32,
+          "engine_cycles": 20,
+          "engine_heap_baseline": 145084,
+          "engine_heap_min": 145084,
+          "engine_heap_max": 145084,
+          "pool_peak": 71072,
+          "stack_headroom": 12976,
+          "failures": 0
+        }
+      ],
+      "source_snapshot_sha256": "046a1102d826b00403a7c8ff1b17ca477269380f0e293ca6ee626f653b6e1c6f"
+    },
+    {
+      "report_path": "build/m44-m5dial-connected-compact-store.json",
+      "report_sha256": "c9b099eb485d812c0e58acef6f201e05ee075bf1c706eab9a5a061f94de49d67",
+      "board": "m5dial",
+      "port": "COM9",
+      "flashed_mac": "b0:81:84:96:83:74",
+      "passed": true,
+      "inputs": {
+        "blip-script-controls.bin": {
+          "bytes": 289776,
+          "sha256": "d851a6e115a8a74ff4ac982c611a8d4ac5d65e6b04a8a45ad9a40944aafbc8d2"
+        },
+        "blip-script-controls.elf": {
+          "bytes": 6392420,
+          "sha256": "890677d645c92f8fe9aef8d4e0f2d9997ff4d4b0f6f98db73f2931491b37b022"
+        },
+        "blip-script-controls.map": {
+          "bytes": 5058585,
+          "sha256": "d127a7bcd2284ae01a4f33bf7518744933b25f4cda7b44300f6d58b074b718f5"
+        },
+        "sdkconfig": {
+          "bytes": 68906,
+          "sha256": "dff1c5f4891768ad58648b94b3f24d82a1bf7e908d153f3a40fe8147880161bc"
+        },
+        "ota_data_initial.bin": {
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        "bootloader/bootloader.bin": {
+          "bytes": 21040,
+          "sha256": "00cdbf2a153d81bba4129520aad42f473266c8c38616d057a08b680bac4c7746"
+        },
+        "partition_table/partition-table.bin": {
+          "bytes": 3072,
+          "sha256": "50667a41d5dc9c22ef6896d8b1de7a04bfe68a91f17917ea2d0f85bd5762f417"
+        },
+        "flasher_args.json": {
+          "bytes": 1099,
+          "sha256": "e81f1fa3ccaa7f4d17993c9d4da11354e6149d6b3bbe269194ab0dda348cce52"
+        }
+      },
+      "records": [
+        {
+          "type": "start",
+          "chip": "esp32s3",
+          "idf": "v6.0.2",
+          "stack_bytes": 24576,
+          "store_bytes": 5664,
+          "message_bytes": 664,
+          "value_bytes": 144,
+          "fixture_sha256": "92a38cd426e90f51caf0423268526329348aac8e2d5bec4e748fddff8bfcc730"
+        },
+        {
+          "type": "complete",
+          "cases": 8,
+          "repeat_cycles": 20,
+          "case_passes": 168,
+          "maximum_suite_us": 19831,
+          "heap_baseline": 245768,
+          "heap_min": 245768,
+          "heap_max": 245768,
+          "engine_checks": 32,
+          "engine_cycles": 20,
+          "engine_heap_baseline": 244164,
+          "engine_heap_min": 244164,
+          "engine_heap_max": 244164,
+          "pool_peak": 71072,
+          "stack_headroom": 12792,
+          "failures": 0
+        }
+      ],
+      "source_snapshot_sha256": "046a1102d826b00403a7c8ff1b17ca477269380f0e293ca6ee626f653b6e1c6f"
+    },
+    {
+      "report_path": "build/m44-xiao-tcp25-slow-native-firmware.json",
+      "report_sha256": "8dbe5b1b5fb643c6dded3af45c6e36c5fe554e9712f70f3796b61df0853856d2",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "mac": "10:51:db:1a:a6:68",
+      "passed": true,
+      "policy_restored": true,
+      "expected_code": 25,
+      "before_code": 24,
+      "transfer_and_boot_seconds": 201.60639730001276,
+      "original_policy": {
+        "endpoint": "http://www.goldengeek.org/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "392837db980e8c5d1c956f32cc6989162516200e06c8fcd6e9cd6f7b06aa112f",
+      "serial_reconnects": 2,
+      "checks_total": 13,
+      "checks_passed": 13,
+      "source_snapshot_sha256": "9e7c0522229abdbf5ac0cc6d142cf8d8a8c6e1810e510f2aa3d1177c7a912acb"
+    },
+    {
+      "report_path": "build/m44-xiao-rtc28-native-firmware.json",
+      "report_sha256": "82969a826cfac11b5557dcf080e90dc30c9fa607ff95e07c55381efab0243f3f",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "mac": "10:51:db:1a:a6:68",
+      "passed": false,
+      "error": "RuntimeError: error: artifact-transfer-or-validation",
+      "policy_restored": true,
+      "expected_code": 28,
+      "before_code": 27,
+      "original_policy": {
+        "endpoint": "http://www.goldengeek.org/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "9505fbb4cceeda7906a103c906ac864f5778d8aaffdbf21b34f376a9ba6d2629",
+      "serial_reconnects": 1,
+      "checks_total": 6,
+      "checks_passed": 6,
+      "source_snapshot_sha256": "9ac93c8f1ae223b593ffb8c9907e0f28e9ea90bc1e63cc017efc87b75b6b7bab"
+    },
+    {
+      "report_path": "build/m44-ball-retries23-web-stall.json",
+      "report_sha256": "e6460cb3ce5ac2e7529e468d542b7c646211d8fba8ea3565ac71d7d4d61c40b0",
+      "trials": [],
+      "bundle_sha256": "8b4f83aa3b38506fe63a6f19d28ae230e5a3122679c59a8bcc1a36c58fc1a4be",
+      "flash_log_sha256": "e498f81446996905b002e1ea3cfb1917c4b1006f44cae39ac0542c529a896bd1",
+      "held_http_sessions": 3,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": false,
+      "error": "AssertionError: browser remains live during web update",
+      "policy_restored": true,
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "initial_medium": "sd-spi",
+      "initial_web": 3106,
+      "successful_web_result": {
+        "state": "web-installed",
+        "error": "",
+        "received": 26475,
+        "expected": 26475,
+        "worker_stack_headroom": 2000,
+        "http_read_retries": 2
+      },
+      "artifact_pause_seconds": 15.0,
+      "artifact_pauses": 1,
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Script retained through a delayed SD web update"
+      },
+      "tool_sha256": "8b588fabce559d9134004c4be9fce5e1a117320d30c2fd82f81fef2f6a7a223f",
+      "serial_capture_sha256": "c84f5c1a76d2b7668002109f6ac1193e016e6c72e442cab5a3b56772aa8891a8",
+      "browser_report_sha256": "6326160dd759b2a9c688c1a7b615e43bed843b5b8d87caca2107a04f78e15e57",
+      "firmware_sha256": "88f2baf6a31284d217c350218c4366ec5690c00680b1ef355d7fd841a87fd450",
+      "initial_firmware_sha256": "88f2baf6a31284d217c350218c4366ec5690c00680b1ef355d7fd841a87fd450",
+      "checks_total": 23,
+      "checks_passed": 22,
+      "source_snapshot_sha256": "5e9225dd9512f808ced2e2c67edaa51eb1998f3a1725c9b908d8d700f85b7298",
+      "sample_count": 112,
+      "sample_minima": {
+        "heap": 4176,
+        "largest": 1824
+      },
+      "browser": {
+        "report_sha256": "6326160dd759b2a9c688c1a7b615e43bed843b5b8d87caca2107a04f78e15e57",
+        "passed": false,
+        "navigations": 2,
+        "longest_transition_ms": 10539,
+        "errors": [],
+        "samples": 139
+      }
+    },
+    {
+      "report_path": "build/m44-ball-retries23-web3112.json",
+      "report_sha256": "1ad8246f27d9ac64c214dd016337819479e070ced97c2ec3ba60f54e73c718ff",
+      "trials": [],
+      "bundle_sha256": "36c4c47ce69baaee9a2e7ec0d5ca15271c56119fa8ca6020b30132975ae5eb63",
+      "flash_log_sha256": "e498f81446996905b002e1ea3cfb1917c4b1006f44cae39ac0542c529a896bd1",
+      "held_http_sessions": 3,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": false,
+      "error": "AssertionError: successful web installation",
+      "policy_restored": true,
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "initial_medium": "sd-spi",
+      "initial_web": 3111,
+      "successful_web_result": {
+        "state": "error",
+        "error": "artifact-transfer-or-validation",
+        "received": 5536,
+        "expected": 26680,
+        "worker_stack_headroom": 2000,
+        "http_read_retries": 21
+      },
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Script retained through a delayed SD web update"
+      },
+      "tool_sha256": "8b588fabce559d9134004c4be9fce5e1a117320d30c2fd82f81fef2f6a7a223f",
+      "serial_capture_sha256": "0d614492e703b3aae10aad65eb08374e3fb1e68da9549658325111b7ae700b28",
+      "firmware_sha256": "88f2baf6a31284d217c350218c4366ec5690c00680b1ef355d7fd841a87fd450",
+      "initial_firmware_sha256": "88f2baf6a31284d217c350218c4366ec5690c00680b1ef355d7fd841a87fd450",
+      "checks_total": 12,
+      "checks_passed": 11,
+      "source_snapshot_sha256": "1cc486ed1ac4ba5086bec88b8f81956f7e7ba82a4cde6fca21141966796a83df",
+      "sample_count": 241,
+      "sample_minima": {
+        "heap": 2400,
+        "largest": 1120
+      },
+      "browser": {
+        "report_sha256": "9af949fa910d0a07956a874831173953d6df81115bc6d0e74fc82c580d91b363",
+        "passed": false,
+        "navigations": 1,
+        "longest_transition_ms": 12544,
+        "longest_reconnect_ms": 12544,
+        "longest_refresh_ms": 0,
+        "errors": [],
+        "samples": 247
+      }
+    },
+    {
+      "report_path": "build/m44-ball-tcp25-web3113-stall.json",
+      "report_sha256": "1a7c4f9792ff3df6928b0206acb8a296ffa4c1921a7f3ecc3f25b6fafcd1cf88",
+      "trials": [],
+      "bundle_sha256": "4c72aa6e97db378becc08bd1282764f9713dd598f435716e9f34a46db8121d55",
+      "flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "held_http_sessions": 3,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": false,
+      "error": "AssertionError: successful web installation",
+      "policy_restored": true,
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "initial_medium": "sd-spi",
+      "initial_web": 3112,
+      "successful_web_result": {
+        "state": "error",
+        "error": "artifact-transfer-or-validation",
+        "received": 4096,
+        "expected": 26680,
+        "worker_stack_headroom": 2784,
+        "http_read_retries": 6
+      },
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Script retained through a delayed SD web update"
+      },
+      "tool_sha256": "40f1b92c342bd85c3cf9cc2b546801366be1c2039b9b5457ea8f37d054110441",
+      "serial_capture_sha256": "4e3a38c69afe355c413c52d86d0ea307c709d6975259e747cc8cd12a741b4c7b",
+      "firmware_sha256": "f62c3daff418c4ea1031519bde6a95cfa4a30b8801267c201ed5344964437604",
+      "initial_firmware_sha256": "f62c3daff418c4ea1031519bde6a95cfa4a30b8801267c201ed5344964437604",
+      "checks_total": 12,
+      "checks_passed": 11,
+      "source_snapshot_sha256": "9e7c0522229abdbf5ac0cc6d142cf8d8a8c6e1810e510f2aa3d1177c7a912acb",
+      "sample_count": 79,
+      "sample_minima": {
+        "heap": 1632,
+        "largest": 752
+      },
+      "browser": {
+        "report_sha256": "c9f61d42f08ac94fdd0ec2a53d06bb4707a46a313ba1925d8e26bcc8dbb5e166",
+        "passed": true,
+        "navigations": 1,
+        "longest_transition_ms": 0,
+        "longest_reconnect_ms": 0,
+        "longest_refresh_ms": 0,
+        "errors": [],
+        "samples": 81
+      }
+    },
+    {
+      "report_path": "build/m44-ball-scratch27-web3113-stall.json",
+      "report_sha256": "b13fd77bb53e04a6f20f6e5b9d64faeb6c55c7b8229b75f9ddfb7b5ab0e25667",
+      "trials": [],
+      "bundle_sha256": "4c72aa6e97db378becc08bd1282764f9713dd598f435716e9f34a46db8121d55",
+      "flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "held_http_sessions": 3,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": false,
+      "error": "AssertionError: successful web installation",
+      "policy_restored": true,
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "initial_medium": "sd-spi",
+      "initial_web": 3112,
+      "successful_web_result": {
+        "state": "error",
+        "error": "artifact-transfer-or-validation",
+        "received": 15752,
+        "expected": 26680,
+        "worker_stack_headroom": 2800,
+        "http_read_retries": 7
+      },
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Script retained through a delayed SD web update"
+      },
+      "tool_sha256": "40f1b92c342bd85c3cf9cc2b546801366be1c2039b9b5457ea8f37d054110441",
+      "serial_capture_sha256": "88daff811d8f670cc28601e2a9f5bc61ecb0e380d40edcdfcf9b759374892e44",
+      "firmware_sha256": "9648802f294c2d8f473b61bc21346f9bc432c9459d1e901923ab1a9542ade088",
+      "initial_firmware_sha256": "9648802f294c2d8f473b61bc21346f9bc432c9459d1e901923ab1a9542ade088",
+      "checks_total": 12,
+      "checks_passed": 11,
+      "source_snapshot_sha256": "c0b3f0ce36ecd3ad9c0403baeedfbf71b62e0edf98a35209be4f0a692fa41ea5",
+      "sample_count": 103,
+      "sample_minima": {
+        "heap": 5188,
+        "largest": 1824
+      }
+    },
+    {
+      "report_path": "build/m44-ball-rtc28-web3113-stall.json",
+      "report_sha256": "ea18a8e3d4e1c42fdaf4d889082195fb586309c5af28e5a0649049dfa1503418",
+      "trials": [],
+      "bundle_sha256": "4c72aa6e97db378becc08bd1282764f9713dd598f435716e9f34a46db8121d55",
+      "flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "held_http_sessions": 3,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": false,
+      "error": "TimeoutError: serial request 357 timed out",
+      "policy_restore_error": "serial request 358 timed out",
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "initial_medium": "sd-spi",
+      "initial_web": 3112,
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Script retained through a delayed SD web update"
+      },
+      "tool_sha256": "16dbce15c8c48a1a66dd4cfe9a833593848a7ea8f266e3f88119f4a44220daab",
+      "serial_capture_sha256": "4930b855bfd7f97fe3a74f947d667132990e32be9d8888f5fa8993c6e9ce218b",
+      "firmware_sha256": "590b06c70ff99a40962fff8dd09fe00d2b321a3684c813d20539f48d11edb985",
+      "initial_firmware_sha256": "590b06c70ff99a40962fff8dd09fe00d2b321a3684c813d20539f48d11edb985",
+      "checks_total": 11,
+      "checks_passed": 11,
+      "source_snapshot_sha256": "9ac93c8f1ae223b593ffb8c9907e0f28e9ea90bc1e63cc017efc87b75b6b7bab",
+      "sample_count": 33,
+      "sample_minima": {
+        "heap": 7952,
+        "largest": 5632,
+        "dma_heap": 1968,
+        "dma_largest": 1184
+      },
+      "browser": {
+        "report_sha256": "77c8173a88e51fe5f9edb85620853937e9a3b427b4b153ff7b2cd51afa3f43cf",
+        "passed": true,
+        "navigations": 1,
+        "longest_transition_ms": 0,
+        "longest_reconnect_ms": 0,
+        "longest_refresh_ms": 0,
+        "errors": [],
+        "samples": 39
+      }
+    },
+    {
+      "report_path": "build/m44-ball-rtc28-recovery-observation.json",
+      "report_sha256": "1597ccf864b43b4bf52e139f4949767955fc12637faeaf6071d3443fd8bc19c0",
+      "policy_restored": true
+    },
+    {
+      "report_path": "build/m44-m5stickc-tcp25-live-controls.json",
+      "report_sha256": "835d3ac8b4c0def049bb6691e5f9d87c1b8043ececcb221b92c7d05ec5f878fd",
+      "flash_log_sha256": "c40ef59c2d80b964440a269b75a8cfcfac2ea88d69a8ff5f05a8e9f27ad63353",
+      "board": "m5stack-m5stickc",
+      "port": "COM12",
+      "flashed_mac": "94:b9:7e:8b:b7:84",
+      "passed": false,
+      "error": "serial request 133 timed out",
+      "checker_sha256": "9687828d96016e98abd862e69304b26df98f7be6ce759a72eba9a50abb93de67",
+      "artifacts": {
+        "blip-v2.bin": "112e9a6d790285a6d0c42d91feaa60c15e9d78bb1601627b2d872584d442d1a6",
+        "blip-v2.elf": "a9f01eeab50efff4f9f495808636ae1e9ef2f2821715f4c3d216661c061ba80e",
+        "sdkconfig": "120f4d9a39f4f45a7c99cf3e02188cf3a60db42ebbaaf4310ff79fa75437aff0"
+      },
+      "checks_total": 25,
+      "checks_passed": 25,
+      "source_snapshot_sha256": "7a8170028766d1d639e9360d36f388cb8785db0c332e6ef497dfb51c5badd4ee"
+    },
+    {
+      "report_path": "build/m44-m5stickc-scratch27-wasm-final.json",
+      "report_sha256": "de063644a9143681d7bc53ab1b90169ea07187ec78b189791b5ca4efe27bec5f",
+      "board": "m5stack-m5stickc",
+      "port": "COM12",
+      "passed": false,
+      "failure": "serial request 470 timed out",
+      "artifacts": {
+        "blip-v2.bin": "8ae87c7019eb8a26e67a5ce38efeeb081048446b732fe382bb0bd87f524087a7",
+        "blip-v2.elf": "c536766611f744041ee412bba2defa4c8f4862dff67bea5030e78ccd50dc2670",
+        "blip-v2.map": "be3529f0f6956d4fae5987026fb8461aef5e81f5cc6548432ef32996db40d3d5",
+        "sdkconfig": "120f4d9a39f4f45a7c99cf3e02188cf3a60db42ebbaaf4310ff79fa75437aff0"
+      },
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "checks_total": 70,
+      "checks_passed": 70,
+      "source_snapshot_sha256": "773d278a13b8f4040c2b3491b87891f7ea839d83ad6f0b8a775e9a5c92bac808"
+    },
+    {
+      "report_path": "build/m44-huzzah32-rtc28-coexistence.json",
+      "report_sha256": "a9fd22439793d0833c29fd741fb64c186409c3d019b58866d03b28687c02dde6",
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "passed": false,
+      "failure": "LED/network/settings coexistence counters failed; inspect the report",
+      "artifacts": {
+        "blip-v2.bin": "3095ad5a746c53d397c334ea573e584cdb5e231d5fb784088a63d0c5ad13c7ef",
+        "blip-v2.elf": "acfc1881f20f7cf852f0e604441e946102a4daeefb10f17b9db2e04c41e94cfd",
+        "blip-v2.map": "751a0dd4e8c2e469c4f6a6d7fb971537608526682cacf225ef1736e4d19f18bf",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54"
+      },
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "coexistence": {
+        "passed": false,
+        "ip": "192.168.27.156",
+        "pixels": 1,
+        "ddp_rate_hz": 60,
+        "before": {
+          "led_frames": 1,
+          "led_failures": 0,
+          "ddp_accepted": 0,
+          "ddp_output_rejections": 0
+        },
+        "after": {
+          "led_frames": 224,
+          "led_failures": 0,
+          "ddp_accepted": 200,
+          "ddp_output_rejections": 0
+        },
+        "network": {
+          "ddp_sent": 820,
+          "ddp_failures": [],
+          "http_ok": 8,
+          "http_failures": [
+            "<urlopen error timed out>",
+            "<urlopen error timed out>",
+            "<urlopen error timed out>"
+          ],
+          "http_max_ms": 2709.014500011108
+        },
+        "script_calls": [
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51875,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52706,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52322,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51777,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52329,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52431,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52306,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 53278,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51801,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52586,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51881,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52275,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52057,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51691,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51685,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52170,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52003,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52150,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 100337,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51699,
+            "probe": 0
+          }
+        ],
+        "settings_writes": 20,
+        "settings_restored": true,
+        "worker_state_after": "ready",
+        "worker_stack_headroom_after": 4940,
+        "supervisor_stack_headroom_after": 2196,
+        "led_stack_headroom_after": 1632,
+        "ddp_stack_headroom_after": 1920,
+        "heap_free_after": 32428,
+        "heap_minimum": 21536
+      },
+      "checks_total": 1,
+      "checks_passed": 0,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-ball-status29-native-firmware.json",
+      "report_sha256": "5759a67d3eff3125de48e6607780c452f9e4938c03da1d7efd909d6adb7ffd26",
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": true,
+      "policy_restored": true,
+      "expected_code": 29,
+      "before_code": 28,
+      "transfer_and_boot_seconds": 67.27547410000989,
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "d61a6f74a6bd071042a8268c13a4ee53ffbd28f666104a825cf5175356e7f890",
+      "serial_reconnects": 7,
+      "checks_total": 12,
+      "checks_passed": 12,
+      "source_snapshot_sha256": "53018476ce5d893483104805900e1c926fd3d486bd5be988bb9340be8e03595a"
+    },
+    {
+      "report_path": "build/m44-huzzah32-status29-native-firmware.json",
+      "report_sha256": "76537c523948850dc9da20456308381e77f5a9f82cc6ece23193fc6b64563ffd",
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "passed": true,
+      "policy_restored": true,
+      "expected_code": 29,
+      "before_code": 28,
+      "transfer_and_boot_seconds": 35.3066858999955,
+      "original_policy": {
+        "endpoint": "http://www.goldengeek.org/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "97f1961c2c640901fd4082e53dd1d7486c391e7f36b395a21906a14e18b17e07",
+      "serial_reconnects": 2,
+      "checks_total": 12,
+      "checks_passed": 12,
+      "source_snapshot_sha256": "53018476ce5d893483104805900e1c926fd3d486bd5be988bb9340be8e03595a"
+    },
+    {
+      "report_path": "build/m44-m5dial-status29-native-firmware.json",
+      "report_sha256": "f290710a15e0c05da4290b5604fc75d235204a7e26a62020d0156e155f263194",
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "passed": true,
+      "policy_restored": true,
+      "expected_code": 29,
+      "before_code": 28,
+      "transfer_and_boot_seconds": 19.321818399999756,
+      "original_policy": {
+        "endpoint": "http://www.goldengeek.org/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "8907c875be7b3e59c89a69cc16f1cea7ede9321cbca22cd236f0c73e677e840c",
+      "serial_reconnects": 2,
+      "checks_total": 12,
+      "checks_passed": 12,
+      "source_snapshot_sha256": "53018476ce5d893483104805900e1c926fd3d486bd5be988bb9340be8e03595a"
+    },
+    {
+      "report_path": "build/m44-club-status29-native-firmware.json",
+      "report_sha256": "b2a4b601f153f8d6c998043e6dccd4c6bdcbaa5bd309eca4a25563d17516a7af",
+      "board": "creators-club",
+      "port": "COM15",
+      "mac": "30:ae:a4:f3:a3:88",
+      "passed": true,
+      "policy_restored": true,
+      "expected_code": 29,
+      "before_code": 28,
+      "transfer_and_boot_seconds": 39.43652160000056,
+      "original_policy": {
+        "endpoint": "http://www.goldengeek.org/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "e8fd6bf23308976f2038988e2a65fe3f42075fb4766d3f12575015bab1980596",
+      "serial_reconnects": 3,
+      "checks_total": 12,
+      "checks_passed": 12,
+      "source_snapshot_sha256": "53018476ce5d893483104805900e1c926fd3d486bd5be988bb9340be8e03595a"
+    },
+    {
+      "report_path": "build/m44-m5stickc-status29-native-firmware.json",
+      "report_sha256": "626e7c4015de1a0160e57113d589e6c7db0ff1d81b3a2e28eb3a0539ee9c3dfa",
+      "board": "m5stack-m5stickc",
+      "port": "COM12",
+      "mac": "94:b9:7e:8b:b7:84",
+      "passed": true,
+      "policy_restored": true,
+      "expected_code": 29,
+      "before_code": 28,
+      "transfer_and_boot_seconds": 32.847837499997695,
+      "original_policy": {
+        "endpoint": "http://www.goldengeek.org/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "46244617d94b67d2399f71875bc39e3d74f729330cdcacfe61891d0cd20cdc29",
+      "serial_reconnects": 2,
+      "checks_total": 12,
+      "checks_passed": 12,
+      "source_snapshot_sha256": "53018476ce5d893483104805900e1c926fd3d486bd5be988bb9340be8e03595a"
+    },
+    {
+      "report_path": "build/m44-xiao-status29-native-firmware.json",
+      "report_sha256": "97cd623c56085c5adc70da9835efadb570b67c0b8b497a01608591c6046ebf8c",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "mac": "10:51:db:1a:a6:68",
+      "passed": true,
+      "policy_restored": true,
+      "expected_code": 29,
+      "before_code": 27,
+      "transfer_and_boot_seconds": 27.688241699986975,
+      "original_policy": {
+        "endpoint": "http://www.goldengeek.org/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "39a770c0b777eadfcb713e9ad891e67eca5f1efb77a561ae095dc780121435ac",
+      "serial_reconnects": 1,
+      "checks_total": 12,
+      "checks_passed": 12,
+      "source_snapshot_sha256": "53018476ce5d893483104805900e1c926fd3d486bd5be988bb9340be8e03595a"
+    },
+    {
+      "report_path": "build/m44-ball-chunks31-network.json",
+      "report_sha256": "abb5ce84222370226d9bf1be5677e38ef49987f0756e328b44d4fc18f7d60de0",
+      "flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "stack_headroom": {
+        "http_bytes": 3184,
+        "udp_bytes": 4508
+      },
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "flashed_mac": "08:92:72:f6:4d:dc",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "f25639badfe333375e0575c61815dcbdbbde1bd503062e88642761b23620e3b3",
+        "blip-v2.elf": "6e8bf97b04d714dcb930d34956598c092e6ab70646b3596e17191904db79a355",
+        "blip-v2.map": "b62821b720499b314829755d5107d7b704ea0ea947418aa4a96cabe6cc80227f",
+        "sdkconfig": "b056eea7aa6d48a5ce37b2dd803661936d4fbf5edcc2fd085e7f75cb53e615e9"
+      },
+      "checks_total": 18,
+      "checks_passed": 18,
+      "source_snapshot_sha256": "ced89d1dcd12903ef8c1d73466bd1a92c51d0708575a0452c7615e35406c4c07"
+    },
+    {
+      "report_path": "build/m44-huzzah32-chunks31-network.json",
+      "report_sha256": "c7d9c0152637a8c7126fa3ac74c5b0e077574447263b504a1b171d892479551d",
+      "flash_log_sha256": "e23a78fa823670bfab4459568be56d46db85f75aabe4d8e76424691397d91b71",
+      "stack_headroom": {
+        "http_bytes": 2900,
+        "udp_bytes": 4356
+      },
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "flashed_mac": "30:ae:a4:f2:d1:84",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "e1234964d2fecb746b2efa8bb1a97b79f00f65086c8d0ccac398ccdfff1ac4c4",
+        "blip-v2.elf": "a9891165c40dcef1deaccf8863e5c6415561e7e65fc00f527b49c22e1c5d41cf",
+        "blip-v2.map": "ba8fa99bdb11be5f3dbb00db2a2f01d19ac717833cd132338a9ba37e8a8dcb5e",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54"
+      },
+      "checks_total": 18,
+      "checks_passed": 18,
+      "source_snapshot_sha256": "ced89d1dcd12903ef8c1d73466bd1a92c51d0708575a0452c7615e35406c4c07"
+    },
+    {
+      "report_path": "build/m44-m5dial-chunks31-network.json",
+      "report_sha256": "8fd66ec2685aaecad442a9f6387d95b9bf1262e7aeff187d99cad0a63f0e0c5f",
+      "flash_log_sha256": "ce498e0420b4c88fb00eded715233590cc7503709f33596c630053a611ca745d",
+      "stack_headroom": {
+        "http_bytes": 2680,
+        "udp_bytes": 4000
+      },
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "flashed_mac": "b0:81:84:96:83:74",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "ad6d92f71ac29f8160705d3e741f5d51ef082bc32834f6f76a599c02a9509097",
+        "blip-v2.elf": "bd0827ab198ed1cec1e311f543580e36f10b149566f979169777ec16d4137178",
+        "blip-v2.map": "eb126a8eb37068f177c6f980e42fff73cc4515965b408cb02096b71561b5e273",
+        "sdkconfig": "15a8f1c085d83036e76ba1c59ac6e1e76d5fd8b84e17141c805bc3f9849f650e"
+      },
+      "checks_total": 18,
+      "checks_passed": 18,
+      "source_snapshot_sha256": "ced89d1dcd12903ef8c1d73466bd1a92c51d0708575a0452c7615e35406c4c07"
+    },
+    {
+      "report_path": "build/m44-m5dial-chunks31-full-native-firmware.json",
+      "report_sha256": "73f9f5433687c1e435d99fb27f78d117a3a3419205c56a9ffb9509ca2d23d2b8",
+      "installed_identity": {
+        "board": "m5stack-m5dial",
+        "target": "esp32s3",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121
+      },
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "passed": true,
+      "policy_restored": true,
+      "expected_code": 31,
+      "before_code": 29,
+      "transfer_and_boot_seconds": 20.678788699995494,
+      "original_policy": {
+        "endpoint": "http://www.goldengeek.org/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "f5f8a08a5781e59a1f3241f43b8f94c0028991d38dc57163f4abd2979899a0bb",
+      "firmware_sha256": "ad6d92f71ac29f8160705d3e741f5d51ef082bc32834f6f76a599c02a9509097",
+      "serial_reconnects": 2,
+      "checks_total": 13,
+      "checks_passed": 13,
+      "source_snapshot_sha256": "028a5ac18e04d878fa1a5d280ffcafd647bdf1db0407951f379cd46ca843f70a"
+    },
+    {
+      "report_path": "build/m44-reserved-worker-fleet-group.json",
+      "report_sha256": "b4a1c4fc0f21dffe09768465209d38ab08daae52aff13f107f811417ff114701",
+      "ports": [
+        "COM10",
+        "COM5",
+        "COM9",
+        "COM15",
+        "COM13",
+        "COM12"
+      ],
+      "restoration_errors": [],
+      "restored": {
+        "COM10": {
+          "enabled": false,
+          "fleet_id": 1,
+          "channel": 1,
+          "probe_value": 0
+        },
+        "COM5": {
+          "enabled": false,
+          "fleet_id": 1,
+          "channel": 1,
+          "probe_value": 0
+        },
+        "COM9": {
+          "enabled": false,
+          "fleet_id": 1,
+          "channel": 1,
+          "probe_value": 0
+        },
+        "COM15": {
+          "enabled": false,
+          "fleet_id": 1,
+          "channel": 1,
+          "probe_value": 0
+        },
+        "COM13": {
+          "enabled": false,
+          "fleet_id": 1,
+          "channel": 1,
+          "probe_value": 0
+        },
+        "COM12": {
+          "enabled": false,
+          "fleet_id": 1,
+          "channel": 1,
+          "probe_value": 0
+        }
+      },
+      "after": {
+        "COM10": {
+          "executed": 1,
+          "execution_failed": 0,
+          "execution_dropped": 0,
+          "late": 0,
+          "duplicates": 0,
+          "maximum_lateness_us": 861,
+          "network_stack_headroom": 2772,
+          "executor_stack_headroom": 2720
+        },
+        "COM5": {
+          "executed": 2,
+          "execution_failed": 0,
+          "execution_dropped": 0,
+          "late": 0,
+          "duplicates": 95,
+          "maximum_lateness_us": 1064,
+          "network_stack_headroom": 2360,
+          "executor_stack_headroom": 2608
+        },
+        "COM9": {
+          "executed": 2,
+          "execution_failed": 0,
+          "execution_dropped": 0,
+          "late": 0,
+          "duplicates": 94,
+          "maximum_lateness_us": 410,
+          "network_stack_headroom": 2136,
+          "executor_stack_headroom": 2392
+        },
+        "COM15": {
+          "executed": 2,
+          "execution_failed": 0,
+          "execution_dropped": 0,
+          "late": 0,
+          "duplicates": 94,
+          "maximum_lateness_us": 1003,
+          "network_stack_headroom": 2364,
+          "executor_stack_headroom": 2612
+        },
+        "COM13": {
+          "executed": 2,
+          "execution_failed": 0,
+          "execution_dropped": 0,
+          "late": 0,
+          "duplicates": 70,
+          "maximum_lateness_us": 735,
+          "network_stack_headroom": 2700,
+          "executor_stack_headroom": 2712
+        },
+        "COM12": {
+          "executed": 2,
+          "execution_failed": 0,
+          "execution_dropped": 0,
+          "late": 0,
+          "duplicates": 95,
+          "maximum_lateness_us": 1022,
+          "network_stack_headroom": 2640,
+          "executor_stack_headroom": 2616
+        }
+      },
+      "passed": true
+    },
+    {
+      "report_path": "build/m44-ball-chunks31-native-firmware.json",
+      "report_sha256": "3cfc57a6fb703cfe67f31bce424b1708d54d6d2b3c0cdae44d7592929daa5a9c",
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": true,
+      "policy_restored": true,
+      "expected_code": 31,
+      "before_code": 30,
+      "transfer_and_boot_seconds": 66.28776279999875,
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "f25639badfe333375e0575c61815dcbdbbde1bd503062e88642761b23620e3b3",
+      "serial_reconnects": 6,
+      "checks_total": 12,
+      "checks_passed": 12,
+      "source_snapshot_sha256": "09c91833a05570a6b48480b8f26441a1397802a1edf95a2afbdc9d10d0afe41c"
+    },
+    {
+      "report_path": "build/m44-huzzah32-chunks31-native-firmware.json",
+      "report_sha256": "0f9729b11ec009dd1b9bcaadb1eb0a4c9f3f4ef9c0d76249c44fab85a983e90e",
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "passed": true,
+      "policy_restored": true,
+      "expected_code": 31,
+      "before_code": 29,
+      "transfer_and_boot_seconds": 35.04538949999551,
+      "original_policy": {
+        "endpoint": "http://www.goldengeek.org/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "e1234964d2fecb746b2efa8bb1a97b79f00f65086c8d0ccac398ccdfff1ac4c4",
+      "serial_reconnects": 2,
+      "checks_total": 12,
+      "checks_passed": 12,
+      "source_snapshot_sha256": "09c91833a05570a6b48480b8f26441a1397802a1edf95a2afbdc9d10d0afe41c"
+    },
+    {
+      "report_path": "build/m44-m5dial-chunks31-native-firmware.json",
+      "report_sha256": "c5c36e21b84d6e83fde161e6bc921a5b8412143fb3a892db7a7cc48302a32d4d",
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "passed": false,
+      "error": "AssertionError: eligible firmware update",
+      "policy_restored": true,
+      "expected_code": 31,
+      "before_code": 29,
+      "original_policy": {
+        "endpoint": "http://www.goldengeek.org/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "47fa8b55bece70db7799706390f81263d1739da1cf10cdfeadd2493aed6bb0c4",
+      "checks_total": 5,
+      "checks_passed": 4,
+      "source_snapshot_sha256": "09c91833a05570a6b48480b8f26441a1397802a1edf95a2afbdc9d10d0afe41c"
+    },
+    {
+      "report_path": "build/m44-ball-chunks31-web3114-normal-client.json",
+      "report_sha256": "c49d81add8034595f0a9fa3bf772e651ecaa44441c168180ab8a0bf891c5dc87",
+      "trials": [],
+      "bundle_sha256": "199db7e79eee98ee1e0468f847f80def03162ed538663db80e4c2b8b88cfa31d",
+      "flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "held_http_sessions": 0,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": true,
+      "policy_restored": true,
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "initial_medium": "sd-spi",
+      "initial_web": 3113,
+      "successful_web_result": {
+        "state": "web-installed",
+        "error": "",
+        "received": 26680,
+        "expected": 26680,
+        "worker_stack_headroom": 1968,
+        "http_read_retries": 5
+      },
+      "artifact_pause_seconds": 15.0,
+      "artifact_pauses": 1,
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Script retained through a delayed SD web update"
+      },
+      "tool_sha256": "16dbce15c8c48a1a66dd4cfe9a833593848a7ea8f266e3f88119f4a44220daab",
+      "serial_capture_sha256": "d798cd47fe74a3525adaa64fbf8a19961a8b0f0541691d84ae9eb32ee773bd62",
+      "browser_report_sha256": "5f4bab2eeb534abd22d89cf18f5cf32a6133d44eae3f89313d8ad14595086edc",
+      "firmware_sha256": "f25639badfe333375e0575c61815dcbdbbde1bd503062e88642761b23620e3b3",
+      "initial_firmware_sha256": "f25639badfe333375e0575c61815dcbdbbde1bd503062e88642761b23620e3b3",
+      "checks_total": 21,
+      "checks_passed": 21,
+      "source_snapshot_sha256": "09c91833a05570a6b48480b8f26441a1397802a1edf95a2afbdc9d10d0afe41c",
+      "sample_count": 132,
+      "sample_minima": {
+        "heap": 4388,
+        "largest": 1824,
+        "dma_heap": 1956,
+        "dma_largest": 720
+      },
+      "browser": {
+        "report_sha256": "5f4bab2eeb534abd22d89cf18f5cf32a6133d44eae3f89313d8ad14595086edc",
+        "passed": true,
+        "navigations": 2,
+        "longest_transition_ms": 4514,
+        "longest_reconnect_ms": 0,
+        "longest_refresh_ms": 4514,
+        "errors": [],
+        "samples": 159
+      }
+    },
+    {
+      "report_path": "build/m44-ball-chunks31-full-recovery.json",
+      "report_sha256": "331bb0668893be4555a0ef699f6d782b3006430929b6156bfbcfe1b1dd5de816",
+      "trials": [
+        {
+          "mode": "web-identity",
+          "state": "error",
+          "received": 0,
+          "error": "artifact-transfer-or-validation",
+          "worker_stack_headroom": 1968,
+          "heap": 21212
+        },
+        {
+          "mode": "web-sha",
+          "state": "error",
+          "received": 26680,
+          "error": "artifact-transfer-or-validation",
+          "worker_stack_headroom": 1968,
+          "heap": 21236
+        },
+        {
+          "mode": "web-truncated",
+          "state": "error",
+          "received": 8192,
+          "error": "artifact-transfer-or-validation",
+          "worker_stack_headroom": 1968,
+          "heap": 21236
+        },
+        {
+          "mode": "web-crc",
+          "state": "error",
+          "received": 26680,
+          "error": "artifact-transfer-or-validation",
+          "worker_stack_headroom": 1968,
+          "heap": 21236
+        },
+        {
+          "mode": "web-stalled",
+          "state": "error",
+          "received": 4096,
+          "error": "artifact-transfer-or-validation",
+          "worker_stack_headroom": 1968,
+          "heap": 21236
+        },
+        {
+          "mode": "web-cancel",
+          "state": "cancelled",
+          "received": 3120,
+          "error": "",
+          "worker_stack_headroom": 1968,
+          "heap": 21236
+        },
+        {
+          "mode": "web-reset",
+          "state": "not-checked",
+          "received": 0,
+          "error": "",
+          "worker_stack_headroom": 0,
+          "heap": 22384
+        },
+        {
+          "mode": "firmware-identity",
+          "state": "error",
+          "received": 0,
+          "error": "artifact-transfer-or-validation",
+          "worker_stack_headroom": 4528,
+          "heap": 22228
+        },
+        {
+          "mode": "firmware-sha",
+          "state": "error",
+          "received": 2046272,
+          "error": "artifact-transfer-or-validation",
+          "worker_stack_headroom": 4528,
+          "heap": 22624
+        },
+        {
+          "mode": "firmware-truncated",
+          "state": "error",
+          "received": 8192,
+          "error": "artifact-transfer-or-validation",
+          "worker_stack_headroom": 4528,
+          "heap": 22628
+        },
+        {
+          "mode": "firmware-stalled",
+          "state": "error",
+          "received": 4096,
+          "error": "artifact-transfer-or-validation",
+          "worker_stack_headroom": 4528,
+          "heap": 22628
+        },
+        {
+          "mode": "firmware-cancel",
+          "state": "cancelled",
+          "received": 6124,
+          "error": "",
+          "worker_stack_headroom": 4528,
+          "heap": 22640
+        },
+        {
+          "mode": "firmware-reset",
+          "state": "not-checked",
+          "received": 0,
+          "error": "",
+          "worker_stack_headroom": 0,
+          "heap": 22372
+        }
+      ],
+      "bundle_sha256": "57c5f36566e8ef5947b76c19b9548aa10e051a01a4e178080d5fb88ca072914c",
+      "flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "held_http_sessions": 0,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": true,
+      "policy_restored": true,
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "initial_medium": "sd-spi",
+      "initial_web": 3114,
+      "successful_web_result": {
+        "state": "web-installed",
+        "error": "",
+        "received": 26680,
+        "expected": 26680,
+        "worker_stack_headroom": 1968,
+        "http_read_retries": 1
+      },
+      "fault_matrix_passed": true,
+      "cancel_seconds": {
+        "web": 0.41092150000622496,
+        "firmware": 0.21303250000346452
+      },
+      "artifact_pause_seconds": 15.0,
+      "artifact_pauses": 1,
+      "tool_sha256": "16dbce15c8c48a1a66dd4cfe9a833593848a7ea8f266e3f88119f4a44220daab",
+      "serial_capture_sha256": "8fc5b8c274c1df8f6480316f6aba5868f410f199671173407e6cdb57f252c7e0",
+      "browser_report_sha256": "38da7e99eba612608d0cebaaa87230ac15a035ec0a6be4a324817c7a0efe3a32",
+      "firmware_sha256": "1de1c23fb531531fd605f9ea1df3bb7fc0180234e1f048e968ab91a1fc2f9362",
+      "initial_firmware_sha256": "f25639badfe333375e0575c61815dcbdbbde1bd503062e88642761b23620e3b3",
+      "checks_total": 145,
+      "checks_passed": 145,
+      "source_snapshot_sha256": "09c91833a05570a6b48480b8f26441a1397802a1edf95a2afbdc9d10d0afe41c",
+      "sample_count": 428,
+      "sample_minima": {
+        "heap": 8412,
+        "largest": 5120,
+        "dma_heap": 2428,
+        "dma_largest": 1024
+      },
+      "browser": {
+        "report_sha256": "38da7e99eba612608d0cebaaa87230ac15a035ec0a6be4a324817c7a0efe3a32",
+        "passed": true,
+        "navigations": 2,
+        "longest_transition_ms": 4513,
+        "longest_reconnect_ms": 0,
+        "longest_refresh_ms": 4513,
+        "errors": [],
+        "samples": 121
+      }
+    },
+    {
+      "report_path": "build/m44-ball-status29-web3114-stall.json",
+      "report_sha256": "fc82a0c946734d694148376f88b092790bc4ff6f115e18dbc2d20f87b809a194",
+      "trials": [],
+      "bundle_sha256": "199db7e79eee98ee1e0468f847f80def03162ed538663db80e4c2b8b88cfa31d",
+      "flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "held_http_sessions": 3,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": false,
+      "error": "AssertionError: successful web installation",
+      "policy_restored": true,
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "initial_medium": "sd-spi",
+      "initial_web": 3113,
+      "successful_web_result": {
+        "state": "error",
+        "error": "artifact-transfer-or-validation",
+        "received": 10512,
+        "expected": 26680,
+        "worker_stack_headroom": 2784,
+        "http_read_retries": 8
+      },
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Script retained through a delayed SD web update"
+      },
+      "tool_sha256": "16dbce15c8c48a1a66dd4cfe9a833593848a7ea8f266e3f88119f4a44220daab",
+      "serial_capture_sha256": "8c9812f95e37f3ec8e1a9a10174252fb58baf29ab0b24e88bad259e9649330e8",
+      "firmware_sha256": "d61a6f74a6bd071042a8268c13a4ee53ffbd28f666104a825cf5175356e7f890",
+      "initial_firmware_sha256": "d61a6f74a6bd071042a8268c13a4ee53ffbd28f666104a825cf5175356e7f890",
+      "checks_total": 12,
+      "checks_passed": 11,
+      "source_snapshot_sha256": "53018476ce5d893483104805900e1c926fd3d486bd5be988bb9340be8e03595a",
+      "sample_count": 125,
+      "sample_minima": {
+        "heap": 1248,
+        "largest": 560,
+        "dma_heap": 800,
+        "dma_largest": 528
+      }
+    },
+    {
+      "report_path": "build/m44-ball-rx30-native-firmware.json",
+      "report_sha256": "b55827dd75f6bed53aca864ab6e5cbc22310fe25a8695aea08e9c146180b315e",
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": true,
+      "policy_restored": true,
+      "expected_code": 30,
+      "before_code": 29,
+      "transfer_and_boot_seconds": 70.05269620000036,
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "tool_sha256": "8130245935bed5d6b9a1ba3cbb25fa4d65bf07c08cd375b101266e670f48a640",
+      "firmware_sha256": "94cfe13a717fdad4e342a38ccdc8eafb9c4c909ed189ad33b955f5c135d5c024",
+      "serial_reconnects": 6,
+      "checks_total": 12,
+      "checks_passed": 12,
+      "source_snapshot_sha256": "5ad718caabcd830b850311e3dd2d554b97c4f5b6694a68e6bf74ee6be51cad4a"
+    },
+    {
+      "report_path": "build/m44-ball-rx30-web3114-stall.json",
+      "report_sha256": "9b97214e738b87bcad13d851f6b8656dee8361c503e81ad00e011fcf6a3d6e4d",
+      "trials": [],
+      "bundle_sha256": "199db7e79eee98ee1e0468f847f80def03162ed538663db80e4c2b8b88cfa31d",
+      "flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "held_http_sessions": 3,
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": false,
+      "error": "AssertionError: successful web installation",
+      "policy_restored": true,
+      "original_policy": {
+        "endpoint": "http://192.168.27.176:8088/blip/update",
+        "channel": "stable",
+        "interval_hours": 24,
+        "automatic_web": false,
+        "automatic_firmware": false
+      },
+      "initial_medium": "sd-spi",
+      "initial_web": 3113,
+      "successful_web_result": {
+        "state": "error",
+        "error": "artifact-transfer-or-validation",
+        "received": 12364,
+        "expected": 26680,
+        "worker_stack_headroom": 2784,
+        "http_read_retries": 7
+      },
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Script retained through a delayed SD web update"
+      },
+      "tool_sha256": "16dbce15c8c48a1a66dd4cfe9a833593848a7ea8f266e3f88119f4a44220daab",
+      "serial_capture_sha256": "a3887775cacc60228b1c3ac4271876f9a5478a1ddfbb310dcdda789b453cebda",
+      "firmware_sha256": "94cfe13a717fdad4e342a38ccdc8eafb9c4c909ed189ad33b955f5c135d5c024",
+      "initial_firmware_sha256": "94cfe13a717fdad4e342a38ccdc8eafb9c4c909ed189ad33b955f5c135d5c024",
+      "checks_total": 12,
+      "checks_passed": 11,
+      "source_snapshot_sha256": "5ad718caabcd830b850311e3dd2d554b97c4f5b6694a68e6bf74ee6be51cad4a",
+      "sample_count": 101,
+      "sample_minima": {
+        "heap": 4156,
+        "largest": 1184,
+        "dma_heap": 2448,
+        "dma_largest": 768
+      },
+      "browser": {
+        "report_sha256": "670963b679dd9071b09a9cea43eaae7a0d38e9d7c199e6fbef16f25635d85c46",
+        "passed": false,
+        "navigations": 1,
+        "longest_transition_ms": 26091,
+        "longest_reconnect_ms": 26091,
+        "longest_refresh_ms": 0,
+        "errors": [],
+        "samples": 134
+      }
+    },
+    {
+      "report_path": "build/m44-huzzah32-status29-quiet-transport-stack.json",
+      "report_sha256": "31737ad1939143c60a2be298386c6d3dc7e1d3332fde5a42a8233505db896cb1",
+      "flash_log_sha256": "e23a78fa823670bfab4459568be56d46db85f75aabe4d8e76424691397d91b71",
+      "restored": {
+        "serial": 2880,
+        "udp": 1856,
+        "wifi": 1760,
+        "http": 1396,
+        "heap_free": 31536,
+        "heap_largest": 25600
+      },
+      "stage": "provisioning",
+      "before": {
+        "serial": 3072,
+        "udp": 7312,
+        "wifi": 1760,
+        "http": 2164,
+        "heap_free": 31328,
+        "heap_largest": 25600
+      },
+      "after": {
+        "serial": 3072,
+        "udp": 1856,
+        "wifi": 1760,
+        "http": 1396,
+        "heap_free": 31648,
+        "heap_largest": 25600
+      },
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "passed": true,
+      "checker_sha256": "389ca97061935ffc6fdcb1fd78e7b528b35d85a0818ea62b494bef0785c2798c",
+      "artifacts": {
+        "blip-v2.bin": "97f1961c2c640901fd4082e53dd1d7486c391e7f36b395a21906a14e18b17e07",
+        "blip-v2.elf": "c33aff8759340715fe9458b45bfbc6de0e3b002a12dc4fd073c7923e5de3abbd",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54"
+      },
+      "checks_total": 1035,
+      "checks_passed": 1035,
+      "source_snapshot_sha256": "746ce527eb36a0ff04585bc9e8e8f70b60fb7d5a2fb4053f2c20e0a1ec584009"
+    },
+    {
+      "report_path": "build/m44-huzzah32-status29-quiet-live-controls.json",
+      "report_sha256": "4f6f1e01bd7ac27e55c0a641762ac47113f7c3fb8e7a6e828e92a579aa829ffa",
+      "flash_log_sha256": "e23a78fa823670bfab4459568be56d46db85f75aabe4d8e76424691397d91b71",
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "flashed_mac": "30:ae:a4:f2:d1:84",
+      "passed": true,
+      "checker_sha256": "11fae7904c003307d2ce84618a63297a1d25fca4efced57f41340fe8deb5135e",
+      "serial_capture_sha256": "6e42f7d7099281f12481a5a0c8942115280e0c21527ac15c08cc15905f35eedd",
+      "artifacts": {
+        "blip-v2.bin": "97f1961c2c640901fd4082e53dd1d7486c391e7f36b395a21906a14e18b17e07",
+        "blip-v2.elf": "c33aff8759340715fe9458b45bfbc6de0e3b002a12dc4fd073c7923e5de3abbd",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54"
+      },
+      "worker_stack_headroom": 4896,
+      "checks_total": 121,
+      "checks_passed": 121,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-xiao-status29-quiet-transport-stack.json",
+      "report_sha256": "d1b7abc0b63d03b3f4de43c2d89fa6af2d855d32f0e7a5989c4a252e20c2f2f7",
+      "flash_log_sha256": "af83da0c1f7f62d12dc0ecacb9dd6171eaf3855e3ff2dc84313b7a5631c31fcc",
+      "restored": {
+        "serial": 2752,
+        "udp": 2304,
+        "wifi": 2352,
+        "http": 2496,
+        "heap_free": 92244,
+        "heap_largest": 79872
+      },
+      "stage": "udp-exchange-/blip/wasm/fire",
+      "before": {
+        "serial": 2752,
+        "udp": 2304,
+        "wifi": 2352,
+        "http": 2496,
+        "heap_free": 92652,
+        "heap_largest": 79872
+      },
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "mac": "10:51:db:1a:a6:68",
+      "passed": false,
+      "error": "TimeoutError",
+      "checker_sha256": "389ca97061935ffc6fdcb1fd78e7b528b35d85a0818ea62b494bef0785c2798c",
+      "artifacts": {
+        "blip-v2.bin": "39a770c0b777eadfcb713e9ad891e67eca5f1efb77a561ae095dc780121435ac",
+        "blip-v2.elf": "f95cb6ed9ad3626817f6f5a35b5d9ba378401077184090e4f00406a984de9743",
+        "sdkconfig": "b3aa9e358a8cd509c80fc7d186017bb2d85c79caa633244b352ba7d3a8ed5c9b"
+      },
+      "checks_total": 270,
+      "checks_passed": 270,
+      "source_snapshot_sha256": "746ce527eb36a0ff04585bc9e8e8f70b60fb7d5a2fb4053f2c20e0a1ec584009"
+    },
+    {
+      "report_path": "build/m44-ball-status29-wasm.json",
+      "report_sha256": "1e20a43b7d68148f1e3466e6bb30664789a97888ee9221df4c82ae6d1bcefc9f",
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "d61a6f74a6bd071042a8268c13a4ee53ffbd28f666104a825cf5175356e7f890",
+        "blip-v2.elf": "95d16f16434a3e3260ca277e6076fdb6f250b0327bbb10847b2a1c4660776003",
+        "blip-v2.map": "4b66c882a4f468f99d01b76214167203693bdb2941850ce0de2cc3631e673f3d",
+        "sdkconfig": "7e3904e04425851be21110cb5c2531abe3245e3273852ed4cbe188717ee4ac24"
+      },
+      "heap": {
+        "heap_free_internal": 10276,
+        "heap_minimum_internal": 656,
+        "heap_largest_internal": 2752
+      },
+      "metrics": {
+        "state": "ready",
+        "submitted": 435,
+        "completed": 435,
+        "failed": 28,
+        "rejected": 4,
+        "deadlines": 3,
+        "cancelled": 12,
+        "pool_reserved": 81920,
+        "pool_used": 3960,
+        "pool_peak": 77208,
+        "worker_stack_headroom": 4960,
+        "supervisor_stack_headroom": 2440
+      },
+      "heap_windows": [
+        {
+          "before": 10276,
+          "after": 10276,
+          "cycles": 20
+        }
+      ],
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "checks_total": 161,
+      "checks_passed": 161,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-ball-status29-coexistence.json",
+      "report_sha256": "fe3fa638da32552655a7f44041f664e6e57ba817174878658a97b0530f494396",
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "passed": false,
+      "failure": "LED/network/settings coexistence counters failed; inspect the report",
+      "artifacts": {
+        "blip-v2.bin": "d61a6f74a6bd071042a8268c13a4ee53ffbd28f666104a825cf5175356e7f890",
+        "blip-v2.elf": "95d16f16434a3e3260ca277e6076fdb6f250b0327bbb10847b2a1c4660776003",
+        "blip-v2.map": "4b66c882a4f468f99d01b76214167203693bdb2941850ce0de2cc3631e673f3d",
+        "sdkconfig": "7e3904e04425851be21110cb5c2531abe3245e3273852ed4cbe188717ee4ac24"
+      },
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "coexistence": {
+        "passed": false,
+        "ip": "192.168.27.186",
+        "pixels": 36,
+        "ddp_rate_hz": 60,
+        "before": {
+          "led_frames": 1,
+          "led_failures": 0,
+          "ddp_accepted": 0,
+          "ddp_output_rejections": 0
+        },
+        "after": {
+          "led_frames": 26,
+          "led_failures": 0,
+          "ddp_accepted": 4,
+          "ddp_output_rejections": 0
+        },
+        "network": {
+          "ddp_sent": 109,
+          "ddp_failures": [],
+          "http_ok": 0,
+          "http_failures": [
+            "<urlopen error timed out>"
+          ],
+          "http_max_ms": 0
+        },
+        "script_calls": [
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 54536,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51973,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52688,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52909,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 53212,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 53632,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52674,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52246,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52984,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52531,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 53365,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52458,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 53453,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52658,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52613,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52390,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52123,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51896,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52350,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 53140,
+            "probe": 0
+          }
+        ],
+        "settings_writes": 20,
+        "settings_restored": true,
+        "worker_state_after": "ready",
+        "worker_stack_headroom_after": 4960,
+        "supervisor_stack_headroom_after": 2440,
+        "led_stack_headroom_after": 1952,
+        "ddp_stack_headroom_after": 2288,
+        "heap_free_after": 8284,
+        "heap_minimum": 656
+      },
+      "checks_total": 1,
+      "checks_passed": 0,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-ball-status29-transport-stack.json",
+      "report_sha256": "7c7cb99f17086012e6f5d437b2dbfe1491adfdf00e750cee9c02d3ac5a26bd0b",
+      "flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "restored": {
+        "serial": 2624,
+        "udp": 7536,
+        "wifi": 2752,
+        "http": 2496,
+        "heap_free": 5688,
+        "heap_largest": 1440
+      },
+      "stage": "dynamic-http-tree",
+      "before": {
+        "serial": 2624,
+        "udp": 7536,
+        "wifi": 2752,
+        "http": 2496,
+        "heap_free": 10152,
+        "heap_largest": 2752
+      },
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": false,
+      "error": "TimeoutError",
+      "checker_sha256": "389ca97061935ffc6fdcb1fd78e7b528b35d85a0818ea62b494bef0785c2798c",
+      "artifacts": {
+        "blip-v2.bin": "d61a6f74a6bd071042a8268c13a4ee53ffbd28f666104a825cf5175356e7f890",
+        "blip-v2.elf": "95d16f16434a3e3260ca277e6076fdb6f250b0327bbb10847b2a1c4660776003",
+        "sdkconfig": "7e3904e04425851be21110cb5c2531abe3245e3273852ed4cbe188717ee4ac24"
+      },
+      "checks_total": 6,
+      "checks_passed": 6,
+      "source_snapshot_sha256": "746ce527eb36a0ff04585bc9e8e8f70b60fb7d5a2fb4053f2c20e0a1ec584009"
+    },
+    {
+      "report_path": "build/m44-ball-status29-live-controls.json",
+      "report_sha256": "ca69ae8c3a84d2537dd2d851fc15ec316b13fa2f027ad2ee7ca4e1b6277d56a6",
+      "flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "flashed_mac": "08:92:72:f6:4d:dc",
+      "passed": false,
+      "error": "<urlopen error timed out>",
+      "checker_sha256": "11fae7904c003307d2ce84618a63297a1d25fca4efced57f41340fe8deb5135e",
+      "serial_capture_sha256": "a74fb16695707e173cd819f63a17eb2ca5fe9044aeb05b67daa2fcf384eb0817",
+      "artifacts": {
+        "blip-v2.bin": "d61a6f74a6bd071042a8268c13a4ee53ffbd28f666104a825cf5175356e7f890",
+        "blip-v2.elf": "95d16f16434a3e3260ca277e6076fdb6f250b0327bbb10847b2a1c4660776003",
+        "sdkconfig": "7e3904e04425851be21110cb5c2531abe3245e3273852ed4cbe188717ee4ac24"
+      },
+      "checks_total": 14,
+      "checks_passed": 14,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-huzzah32-status29-wasm.json",
+      "report_sha256": "273ec7984ab20a4018fa0ca21a3cd6f555a86f248d56d07f8a80828667caee81",
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "97f1961c2c640901fd4082e53dd1d7486c391e7f36b395a21906a14e18b17e07",
+        "blip-v2.elf": "c33aff8759340715fe9458b45bfbc6de0e3b002a12dc4fd073c7923e5de3abbd",
+        "blip-v2.map": "136a7abfb2315d1afcfe3e0fdb5bae856a5ccd6cafd2f0e98a7bf9094607d94d",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54"
+      },
+      "heap": {
+        "heap_free_internal": 32512,
+        "heap_minimum_internal": 21428,
+        "heap_largest_internal": 25600
+      },
+      "metrics": {
+        "state": "ready",
+        "submitted": 427,
+        "completed": 427,
+        "failed": 29,
+        "rejected": 1,
+        "deadlines": 4,
+        "cancelled": 4,
+        "pool_reserved": 81920,
+        "pool_used": 3960,
+        "pool_peak": 77200,
+        "worker_stack_headroom": 4864,
+        "supervisor_stack_headroom": 2200
+      },
+      "heap_windows": [
+        {
+          "before": 32512,
+          "after": 32512,
+          "cycles": 20
+        }
+      ],
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "checks_total": 161,
+      "checks_passed": 161,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-huzzah32-status29-coexistence.json",
+      "report_sha256": "1b2f551520c9abe567149f81b30375cb385602359818891b2be9079fbd30a513",
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "97f1961c2c640901fd4082e53dd1d7486c391e7f36b395a21906a14e18b17e07",
+        "blip-v2.elf": "c33aff8759340715fe9458b45bfbc6de0e3b002a12dc4fd073c7923e5de3abbd",
+        "blip-v2.map": "136a7abfb2315d1afcfe3e0fdb5bae856a5ccd6cafd2f0e98a7bf9094607d94d",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54"
+      },
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "coexistence": {
+        "passed": true,
+        "ip": "192.168.27.156",
+        "pixels": 1,
+        "ddp_rate_hz": 60,
+        "before": {
+          "led_frames": 1,
+          "led_failures": 0,
+          "ddp_accepted": 0,
+          "ddp_output_rejections": 0
+        },
+        "after": {
+          "led_frames": 822,
+          "led_failures": 0,
+          "ddp_accepted": 800,
+          "ddp_output_rejections": 0
+        },
+        "network": {
+          "ddp_sent": 929,
+          "ddp_failures": [],
+          "http_ok": 67,
+          "http_failures": [],
+          "http_max_ms": 1211.6124000021955
+        },
+        "script_calls": [
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 93541,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 53264,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52619,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52303,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 118891,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 85875,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 94845,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52418,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51997,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 58202,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 53441,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51915,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 174011,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 275403,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 126344,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 53944,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52707,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52069,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 132080,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52868,
+            "probe": 0
+          }
+        ],
+        "settings_writes": 20,
+        "settings_restored": true,
+        "worker_state_after": "ready",
+        "worker_stack_headroom_after": 4864,
+        "supervisor_stack_headroom_after": 2168,
+        "led_stack_headroom_after": 1536,
+        "ddp_stack_headroom_after": 1920,
+        "heap_free_after": 32356,
+        "heap_minimum": 21428
+      },
+      "checks_total": 5,
+      "checks_passed": 5,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-huzzah32-status29-transport-stack.json",
+      "report_sha256": "7346f920578caa24bb0558115285227d8e163068ad806902365b8ec3936b81d6",
+      "flash_log_sha256": "e23a78fa823670bfab4459568be56d46db85f75aabe4d8e76424691397d91b71",
+      "restored": {
+        "serial": 3072,
+        "udp": 7360,
+        "wifi": 1760,
+        "http": 8192,
+        "heap_free": 33348,
+        "heap_largest": 25600
+      },
+      "stage": "websocket-exchange-/blip/output/strip0/red",
+      "before": {
+        "serial": 2224,
+        "udp": 7280,
+        "wifi": 2352,
+        "http": 4452,
+        "heap_free": 32376,
+        "heap_largest": 25600
+      },
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "passed": false,
+      "error": "TimeoutError",
+      "checker_sha256": "389ca97061935ffc6fdcb1fd78e7b528b35d85a0818ea62b494bef0785c2798c",
+      "artifacts": {
+        "blip-v2.bin": "97f1961c2c640901fd4082e53dd1d7486c391e7f36b395a21906a14e18b17e07",
+        "blip-v2.elf": "c33aff8759340715fe9458b45bfbc6de0e3b002a12dc4fd073c7923e5de3abbd",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54"
+      },
+      "checks_total": 759,
+      "checks_passed": 759,
+      "source_snapshot_sha256": "746ce527eb36a0ff04585bc9e8e8f70b60fb7d5a2fb4053f2c20e0a1ec584009"
+    },
+    {
+      "report_path": "build/m44-huzzah32-status29-live-controls.json",
+      "report_sha256": "f5b7a9706c5c1a33031250958900704d1fc4e0dae2fa5a7884358d5361c9564c",
+      "flash_log_sha256": "e23a78fa823670bfab4459568be56d46db85f75aabe4d8e76424691397d91b71",
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "flashed_mac": "30:ae:a4:f2:d1:84",
+      "passed": false,
+      "error": "timed out",
+      "checker_sha256": "11fae7904c003307d2ce84618a63297a1d25fca4efced57f41340fe8deb5135e",
+      "serial_capture_sha256": "b0d2d8bc7ce78123ae2f1115239d24329c4dc42bf0dbf53697c0f0a24c293780",
+      "artifacts": {
+        "blip-v2.bin": "97f1961c2c640901fd4082e53dd1d7486c391e7f36b395a21906a14e18b17e07",
+        "blip-v2.elf": "c33aff8759340715fe9458b45bfbc6de0e3b002a12dc4fd073c7923e5de3abbd",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54"
+      },
+      "checks_total": 14,
+      "checks_passed": 14,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-m5dial-status29-wasm.json",
+      "report_sha256": "ed07427315165db6f80c4ab7fdda36b6956333bd4518005899ca1f8ee2478446",
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "8907c875be7b3e59c89a69cc16f1cea7ede9321cbca22cd236f0c73e677e840c",
+        "blip-v2.elf": "7487f75774e321a3d3b84b1d43a7e2bb8b9698c72a8214385ce23b2624148295",
+        "blip-v2.map": "8cbec2caa07bec7d3042570a73d8efc43799d40d7d9351d165017294d5eaadd5",
+        "sdkconfig": "15a8f1c085d83036e76ba1c59ac6e1e76d5fd8b84e17141c805bc3f9849f650e"
+      },
+      "heap": {
+        "heap_free_internal": 34580,
+        "heap_minimum_internal": 24692,
+        "heap_largest_internal": 19456
+      },
+      "metrics": {
+        "state": "ready",
+        "submitted": 427,
+        "completed": 427,
+        "failed": 29,
+        "rejected": 3,
+        "deadlines": 2,
+        "cancelled": 13,
+        "pool_reserved": 81920,
+        "pool_used": 3960,
+        "pool_peak": 77208,
+        "worker_stack_headroom": 4696,
+        "supervisor_stack_headroom": 1980
+      },
+      "heap_windows": [
+        {
+          "before": 34580,
+          "after": 34580,
+          "cycles": 20
+        }
+      ],
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "checks_total": 161,
+      "checks_passed": 161,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-m5dial-status29-coexistence.json",
+      "report_sha256": "8b0cc486b52fbf3c4ab6a5cc767f521d9269b300a5eb196e9e6815f882459134",
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "8907c875be7b3e59c89a69cc16f1cea7ede9321cbca22cd236f0c73e677e840c",
+        "blip-v2.elf": "7487f75774e321a3d3b84b1d43a7e2bb8b9698c72a8214385ce23b2624148295",
+        "blip-v2.map": "8cbec2caa07bec7d3042570a73d8efc43799d40d7d9351d165017294d5eaadd5",
+        "sdkconfig": "15a8f1c085d83036e76ba1c59ac6e1e76d5fd8b84e17141c805bc3f9849f650e"
+      },
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "coexistence": {
+        "passed": true,
+        "ip": "192.168.27.137",
+        "pixels": 1,
+        "ddp_rate_hz": 60,
+        "before": {
+          "led_frames": 0,
+          "led_failures": 0,
+          "ddp_accepted": 0,
+          "ddp_output_rejections": 0
+        },
+        "after": {
+          "led_frames": 79,
+          "led_failures": 0,
+          "ddp_accepted": 58,
+          "ddp_output_rejections": 0
+        },
+        "network": {
+          "ddp_sent": 107,
+          "ddp_failures": [],
+          "http_ok": 4,
+          "http_failures": [],
+          "http_max_ms": 839.5302999997512
+        },
+        "script_calls": [
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51561,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 50855,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51561,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51519,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51481,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51392,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51434,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51452,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 50914,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 64562,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 82299,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51672,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 54496,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51440,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51367,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51432,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52844,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51125,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51498,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51497,
+            "probe": 0
+          }
+        ],
+        "settings_writes": 20,
+        "settings_restored": true,
+        "worker_state_after": "ready",
+        "worker_stack_headroom_after": 4616,
+        "supervisor_stack_headroom_after": 1980,
+        "led_stack_headroom_after": 1216,
+        "ddp_stack_headroom_after": 1696,
+        "heap_free_after": 32672,
+        "heap_minimum": 15068
+      },
+      "checks_total": 5,
+      "checks_passed": 5,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-m5dial-status29-transport-stack.json",
+      "report_sha256": "d8ef68e09dca5e191bde53895fd8763f6547f278868f9e859602eb9d5dc26fba",
+      "flash_log_sha256": "ce498e0420b4c88fb00eded715233590cc7503709f33596c630053a611ca745d",
+      "restored": {
+        "serial": 1872,
+        "udp": 1504,
+        "wifi": 1616,
+        "http": 1068,
+        "heap_free": 33440,
+        "heap_largest": 19456
+      },
+      "stage": "provisioning",
+      "before": {
+        "serial": 1872,
+        "udp": 7104,
+        "wifi": 2240,
+        "http": 4236,
+        "heap_free": 34420,
+        "heap_largest": 19456
+      },
+      "after": {
+        "serial": 1872,
+        "udp": 1504,
+        "wifi": 1616,
+        "http": 1068,
+        "heap_free": 33608,
+        "heap_largest": 19456
+      },
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "passed": true,
+      "checker_sha256": "389ca97061935ffc6fdcb1fd78e7b528b35d85a0818ea62b494bef0785c2798c",
+      "artifacts": {
+        "blip-v2.bin": "8907c875be7b3e59c89a69cc16f1cea7ede9321cbca22cd236f0c73e677e840c",
+        "blip-v2.elf": "7487f75774e321a3d3b84b1d43a7e2bb8b9698c72a8214385ce23b2624148295",
+        "sdkconfig": "15a8f1c085d83036e76ba1c59ac6e1e76d5fd8b84e17141c805bc3f9849f650e"
+      },
+      "checks_total": 1035,
+      "checks_passed": 1035,
+      "source_snapshot_sha256": "746ce527eb36a0ff04585bc9e8e8f70b60fb7d5a2fb4053f2c20e0a1ec584009"
+    },
+    {
+      "report_path": "build/m44-m5dial-status29-live-controls.json",
+      "report_sha256": "c9676de9653bca59b87b0043881b87bfa28d4a2ceed13fa50ef8923b9e9bc5ee",
+      "flash_log_sha256": "ce498e0420b4c88fb00eded715233590cc7503709f33596c630053a611ca745d",
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "flashed_mac": "b0:81:84:96:83:74",
+      "passed": true,
+      "checker_sha256": "11fae7904c003307d2ce84618a63297a1d25fca4efced57f41340fe8deb5135e",
+      "serial_capture_sha256": "d6de95b55033df4daa8f2cd39e4e8719a8a5c4df77443c64f11290f4039ac517",
+      "artifacts": {
+        "blip-v2.bin": "8907c875be7b3e59c89a69cc16f1cea7ede9321cbca22cd236f0c73e677e840c",
+        "blip-v2.elf": "7487f75774e321a3d3b84b1d43a7e2bb8b9698c72a8214385ce23b2624148295",
+        "sdkconfig": "15a8f1c085d83036e76ba1c59ac6e1e76d5fd8b84e17141c805bc3f9849f650e"
+      },
+      "worker_stack_headroom": 4616,
+      "checks_total": 121,
+      "checks_passed": 121,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-club-status29-wasm.json",
+      "report_sha256": "a91e46397cc75441a3a023afc0e845e9d82071852b4315c9d70f69266ea74f72",
+      "board": "creators-club",
+      "port": "COM15",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "e8fd6bf23308976f2038988e2a65fe3f42075fb4766d3f12575015bab1980596",
+        "blip-v2.elf": "6f6f392d558521adab23cc237ac5a6170baae65b496f86d31e0f6be6d28d8a38",
+        "blip-v2.map": "20adf83e2dd9882104578f7a4f56c314ae60eae6ea645903e3829f2c72393297",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa"
+      },
+      "heap": {
+        "heap_free_internal": 42256,
+        "heap_minimum_internal": 31220,
+        "heap_largest_internal": 34816
+      },
+      "metrics": {
+        "state": "ready",
+        "submitted": 427,
+        "completed": 427,
+        "failed": 29,
+        "rejected": 1,
+        "deadlines": 4,
+        "cancelled": 4,
+        "pool_reserved": 81920,
+        "pool_used": 3960,
+        "pool_peak": 77200,
+        "worker_stack_headroom": 4900,
+        "supervisor_stack_headroom": 2412
+      },
+      "heap_windows": [
+        {
+          "before": 42256,
+          "after": 42256,
+          "cycles": 20
+        }
+      ],
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "checks_total": 161,
+      "checks_passed": 161,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-club-status29-coexistence.json",
+      "report_sha256": "32f948b6ff88392a5326fe54590e4f8e600d2dddaae4c5e38bdcf76006d49c4e",
+      "board": "creators-club",
+      "port": "COM15",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "e8fd6bf23308976f2038988e2a65fe3f42075fb4766d3f12575015bab1980596",
+        "blip-v2.elf": "6f6f392d558521adab23cc237ac5a6170baae65b496f86d31e0f6be6d28d8a38",
+        "blip-v2.map": "20adf83e2dd9882104578f7a4f56c314ae60eae6ea645903e3829f2c72393297",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa"
+      },
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "coexistence": {
+        "passed": true,
+        "ip": "192.168.27.163",
+        "pixels": 32,
+        "ddp_rate_hz": 60,
+        "before": {
+          "led_frames": 0,
+          "led_failures": 0,
+          "ddp_accepted": 0,
+          "ddp_output_rejections": 0
+        },
+        "after": {
+          "led_frames": 991,
+          "led_failures": 0,
+          "ddp_accepted": 1044,
+          "ddp_output_rejections": 0
+        },
+        "network": {
+          "ddp_sent": 1077,
+          "ddp_failures": [],
+          "http_ok": 121,
+          "http_failures": [],
+          "http_max_ms": 1084.9256999936188
+        },
+        "script_calls": [
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51775,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52941,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 151213,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 143460,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 55143,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 152914,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52890,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 211554,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52397,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 67214,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 139063,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 69309,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51898,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 150370,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 55073,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 57228,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 62510,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52769,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 198216,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 112261,
+            "probe": 0
+          }
+        ],
+        "settings_writes": 20,
+        "settings_restored": true,
+        "worker_state_after": "ready",
+        "worker_stack_headroom_after": 4884,
+        "supervisor_stack_headroom_after": 2172,
+        "led_stack_headroom_after": 1568,
+        "ddp_stack_headroom_after": 1920,
+        "heap_free_after": 42236,
+        "heap_minimum": 31220
+      },
+      "checks_total": 5,
+      "checks_passed": 5,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-club-status29-transport-stack.json",
+      "report_sha256": "36c811ea61e01633418ee90acc4da74d2f2200b6a8ab02b05216cad69c6a65f3",
+      "flash_log_sha256": "3ace9b8fc371f54229481a48972b21f54bbc3a77a1224b86d061a74962582234",
+      "restored": {
+        "serial": 2160,
+        "udp": 1824,
+        "wifi": 1760,
+        "http": 1396,
+        "heap_free": 41152,
+        "heap_largest": 34816
+      },
+      "stage": "provisioning",
+      "before": {
+        "serial": 2160,
+        "udp": 7296,
+        "wifi": 2352,
+        "http": 4452,
+        "heap_free": 42236,
+        "heap_largest": 34816
+      },
+      "after": {
+        "serial": 2160,
+        "udp": 1824,
+        "wifi": 1760,
+        "http": 1396,
+        "heap_free": 41264,
+        "heap_largest": 34816
+      },
+      "board": "creators-club",
+      "port": "COM15",
+      "mac": "30:ae:a4:f3:a3:88",
+      "passed": true,
+      "checker_sha256": "389ca97061935ffc6fdcb1fd78e7b528b35d85a0818ea62b494bef0785c2798c",
+      "artifacts": {
+        "blip-v2.bin": "e8fd6bf23308976f2038988e2a65fe3f42075fb4766d3f12575015bab1980596",
+        "blip-v2.elf": "6f6f392d558521adab23cc237ac5a6170baae65b496f86d31e0f6be6d28d8a38",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa"
+      },
+      "checks_total": 1035,
+      "checks_passed": 1035,
+      "source_snapshot_sha256": "746ce527eb36a0ff04585bc9e8e8f70b60fb7d5a2fb4053f2c20e0a1ec584009"
+    },
+    {
+      "report_path": "build/m44-club-status29-live-controls.json",
+      "report_sha256": "dbd8bac40c91264ec6974dc20cb043068ff9961e6b8612cf04bfb13d49fc9abc",
+      "flash_log_sha256": "3ace9b8fc371f54229481a48972b21f54bbc3a77a1224b86d061a74962582234",
+      "board": "creators-club",
+      "port": "COM15",
+      "flashed_mac": "30:ae:a4:f3:a3:88",
+      "passed": true,
+      "checker_sha256": "11fae7904c003307d2ce84618a63297a1d25fca4efced57f41340fe8deb5135e",
+      "serial_capture_sha256": "26bd3c236dcdba8350735f716f91809371882c72fe1484ccc758b22bd5df6990",
+      "artifacts": {
+        "blip-v2.bin": "e8fd6bf23308976f2038988e2a65fe3f42075fb4766d3f12575015bab1980596",
+        "blip-v2.elf": "6f6f392d558521adab23cc237ac5a6170baae65b496f86d31e0f6be6d28d8a38",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa"
+      },
+      "worker_stack_headroom": 4884,
+      "checks_total": 121,
+      "checks_passed": 121,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-m5stickc-status29-wasm.json",
+      "report_sha256": "e8b114845edcc3a38f1d3766f1a443ec846f4259ffde15c48b08fa4a5d19ccf0",
+      "board": "m5stack-m5stickc",
+      "port": "COM12",
+      "passed": false,
+      "failure": "serial request 446 timed out",
+      "artifacts": {
+        "blip-v2.bin": "46244617d94b67d2399f71875bc39e3d74f729330cdcacfe61891d0cd20cdc29",
+        "blip-v2.elf": "66a2e6d052527679f4031e3284b831a29c2e97eaf9a88b703de13bd238cd70d2",
+        "blip-v2.map": "23c41159c7bea7ea794f7e4788c818226a73c7e299e6410f2d543e0f90c0365c",
+        "sdkconfig": "120f4d9a39f4f45a7c99cf3e02188cf3a60db42ebbaaf4310ff79fa75437aff0"
+      },
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "checks_total": 67,
+      "checks_passed": 67,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-m5stickc-status29-coexistence.json",
+      "report_sha256": "74f2190aa1a446ec8e927909b6092bda450c656ccb786fab9958d3ff66f094c9",
+      "board": "m5stack-m5stickc",
+      "port": "COM12",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "46244617d94b67d2399f71875bc39e3d74f729330cdcacfe61891d0cd20cdc29",
+        "blip-v2.elf": "66a2e6d052527679f4031e3284b831a29c2e97eaf9a88b703de13bd238cd70d2",
+        "blip-v2.map": "23c41159c7bea7ea794f7e4788c818226a73c7e299e6410f2d543e0f90c0365c",
+        "sdkconfig": "120f4d9a39f4f45a7c99cf3e02188cf3a60db42ebbaaf4310ff79fa75437aff0"
+      },
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "coexistence": {
+        "passed": true,
+        "ip": "192.168.27.149",
+        "pixels": 1,
+        "ddp_rate_hz": 60,
+        "before": {
+          "led_frames": 0,
+          "led_failures": 0,
+          "ddp_accepted": 0,
+          "ddp_output_rejections": 0
+        },
+        "after": {
+          "led_frames": 1103,
+          "led_failures": 0,
+          "ddp_accepted": 1081,
+          "ddp_output_rejections": 0
+        },
+        "network": {
+          "ddp_sent": 1097,
+          "ddp_failures": [],
+          "http_ok": 135,
+          "http_failures": [],
+          "http_max_ms": 378.6982000019634
+        },
+        "script_calls": [
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 64075,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51721,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52315,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52252,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 57137,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51826,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52439,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 63641,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 64077,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 78224,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 58020,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 57205,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 138983,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52081,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 60100,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 55612,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 78979,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 56254,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 58113,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 57124,
+            "probe": 0
+          }
+        ],
+        "settings_writes": 20,
+        "settings_restored": true,
+        "worker_state_after": "ready",
+        "worker_stack_headroom_after": 4872,
+        "supervisor_stack_headroom_after": 2160,
+        "led_stack_headroom_after": 1568,
+        "ddp_stack_headroom_after": 1920,
+        "heap_free_after": 36120,
+        "heap_minimum": 23560
+      },
+      "checks_total": 5,
+      "checks_passed": 5,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-m5stickc-status29-transport-stack.json",
+      "report_sha256": "6875d2ac73504f59096b33378f5b5e017a9c26b2b0ba26acc10d21ab1716a71a",
+      "flash_log_sha256": "c40ef59c2d80b964440a269b75a8cfcfac2ea88d69a8ff5f05a8e9f27ad63353",
+      "restored": {
+        "serial": 2128,
+        "udp": 1856,
+        "wifi": 1760,
+        "http": 1372,
+        "heap_free": 35296,
+        "heap_largest": 29696
+      },
+      "stage": "provisioning",
+      "before": {
+        "serial": 2128,
+        "udp": 7280,
+        "wifi": 2480,
+        "http": 4460,
+        "heap_free": 36120,
+        "heap_largest": 29696
+      },
+      "after": {
+        "serial": 2128,
+        "udp": 1856,
+        "wifi": 1760,
+        "http": 1372,
+        "heap_free": 35284,
+        "heap_largest": 29696
+      },
+      "board": "m5stack-m5stickc",
+      "port": "COM12",
+      "mac": "94:b9:7e:8b:b7:84",
+      "passed": true,
+      "checker_sha256": "389ca97061935ffc6fdcb1fd78e7b528b35d85a0818ea62b494bef0785c2798c",
+      "artifacts": {
+        "blip-v2.bin": "46244617d94b67d2399f71875bc39e3d74f729330cdcacfe61891d0cd20cdc29",
+        "blip-v2.elf": "66a2e6d052527679f4031e3284b831a29c2e97eaf9a88b703de13bd238cd70d2",
+        "sdkconfig": "120f4d9a39f4f45a7c99cf3e02188cf3a60db42ebbaaf4310ff79fa75437aff0"
+      },
+      "checks_total": 1035,
+      "checks_passed": 1035,
+      "source_snapshot_sha256": "746ce527eb36a0ff04585bc9e8e8f70b60fb7d5a2fb4053f2c20e0a1ec584009"
+    },
+    {
+      "report_path": "build/m44-m5stickc-status29-live-controls.json",
+      "report_sha256": "72dcf606ce4655699ff638c088b15d28ff6b23379a83e862d32f2a14611b8566",
+      "flash_log_sha256": "c40ef59c2d80b964440a269b75a8cfcfac2ea88d69a8ff5f05a8e9f27ad63353",
+      "board": "m5stack-m5stickc",
+      "port": "COM12",
+      "flashed_mac": "94:b9:7e:8b:b7:84",
+      "passed": false,
+      "error": "serial request 133 timed out",
+      "checker_sha256": "11fae7904c003307d2ce84618a63297a1d25fca4efced57f41340fe8deb5135e",
+      "serial_capture_sha256": "289d3c1751e7f851f2b6b7243fe38d3076ab95d745d5f1c1f3fd128c2086065b",
+      "artifacts": {
+        "blip-v2.bin": "46244617d94b67d2399f71875bc39e3d74f729330cdcacfe61891d0cd20cdc29",
+        "blip-v2.elf": "66a2e6d052527679f4031e3284b831a29c2e97eaf9a88b703de13bd238cd70d2",
+        "sdkconfig": "120f4d9a39f4f45a7c99cf3e02188cf3a60db42ebbaaf4310ff79fa75437aff0"
+      },
+      "checks_total": 25,
+      "checks_passed": 25,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-xiao-status29-wasm.json",
+      "report_sha256": "df733b130e2a74fc4573868a2618ab73e77866de7c0ff267492688be6b690e54",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "39a770c0b777eadfcb713e9ad891e67eca5f1efb77a561ae095dc780121435ac",
+        "blip-v2.elf": "f95cb6ed9ad3626817f6f5a35b5d9ba378401077184090e4f00406a984de9743",
+        "blip-v2.map": "a783541adfa813cfa09100e90dfd38f9344bcdb3b30afc69485b1869ee082a8a",
+        "sdkconfig": "b3aa9e358a8cd509c80fc7d186017bb2d85c79caa633244b352ba7d3a8ed5c9b"
+      },
+      "heap": {
+        "heap_free_internal": 92820,
+        "heap_minimum_internal": 83360,
+        "heap_largest_internal": 79872
+      },
+      "metrics": {
+        "state": "ready",
+        "submitted": 426,
+        "completed": 426,
+        "failed": 28,
+        "rejected": 4,
+        "deadlines": 3,
+        "cancelled": 12,
+        "pool_reserved": 81920,
+        "pool_used": 3960,
+        "pool_peak": 77208,
+        "worker_stack_headroom": 4960,
+        "supervisor_stack_headroom": 2440
+      },
+      "heap_windows": [
+        {
+          "before": 92820,
+          "after": 92820,
+          "cycles": 20
+        }
+      ],
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "checks_total": 161,
+      "checks_passed": 161,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-xiao-status29-coexistence.json",
+      "report_sha256": "5f6f28a7b5ec0e1d39b58373a13a4b45c271fa0cdaec1bfbb85cb0acc5526af4",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "39a770c0b777eadfcb713e9ad891e67eca5f1efb77a561ae095dc780121435ac",
+        "blip-v2.elf": "f95cb6ed9ad3626817f6f5a35b5d9ba378401077184090e4f00406a984de9743",
+        "blip-v2.map": "a783541adfa813cfa09100e90dfd38f9344bcdb3b30afc69485b1869ee082a8a",
+        "sdkconfig": "b3aa9e358a8cd509c80fc7d186017bb2d85c79caa633244b352ba7d3a8ed5c9b"
+      },
+      "fixture_hashes": {
+        "workloads": "4f091b3380cfec44f4006155ff18b9cf887a07aa5c1f3c1d460e4559238cc199",
+        "start_loop": "bce408457b7690be5872e988148994d5ff9827f7fcfeac0f607db762a677e74e",
+        "post_loop": "90f80f59db2779e9039e3593b83b81d6ce084c802c2e8d303e0fd742881483d1",
+        "ctor_loop": "14f9ea70132e9fc5ca7945ec5b0298bed3815dc632597978ea918c5690dff84a",
+        "initialize_loop": "bc235ed6c917134569e7fe139cd44cdd0b1d64fe25154e33ade55445a892f226",
+        "imported": "58e993a71a90061ac7993c5d418caf0ce23b012fa80a199edba09e04e8481427",
+        "large_memory": "3b5f64800d0ff1d72ed92ed495ef1f54efaff7b0fd5fa52094d172c4e08c609b",
+        "memory_access": "9675ce78700ab8adcd04db185eba4d6c51439f8f68ba9b55f6160af825e28f72",
+        "memory_growth": "9647c30d40191368c594a43e4aa2585dc4ba48d167612963cd4dae9b7267761a"
+      },
+      "coexistence": {
+        "passed": true,
+        "ip": "192.168.27.136",
+        "pixels": 1,
+        "ddp_rate_hz": 60,
+        "before": {
+          "led_frames": 0,
+          "led_failures": 0,
+          "ddp_accepted": 0,
+          "ddp_output_rejections": 0
+        },
+        "after": {
+          "led_frames": 130,
+          "led_failures": 0,
+          "ddp_accepted": 108,
+          "ddp_output_rejections": 0
+        },
+        "network": {
+          "ddp_sent": 123,
+          "ddp_failures": [],
+          "http_ok": 12,
+          "http_failures": [],
+          "http_max_ms": 358.3547999878647
+        },
+        "script_calls": [
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 61285,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 53004,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51867,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 67055,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51829,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52405,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52180,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51932,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 60627,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 57378,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52355,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52238,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 56642,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51822,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 54484,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 82039,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 52116,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 56121,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 63182,
+            "probe": 0
+          },
+          {
+            "error": "budget_exceeded",
+            "count": 0,
+            "elapsed_us": 51821,
+            "probe": 0
+          }
+        ],
+        "settings_writes": 20,
+        "settings_restored": true,
+        "worker_state_after": "ready",
+        "worker_stack_headroom_after": 4960,
+        "supervisor_stack_headroom_after": 2440,
+        "led_stack_headroom_after": 1920,
+        "ddp_stack_headroom_after": 2224,
+        "heap_free_after": 92668,
+        "heap_minimum": 72504
+      },
+      "checks_total": 5,
+      "checks_passed": 5,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    },
+    {
+      "report_path": "build/m44-xiao-status29-transport-stack.json",
+      "report_sha256": "00102564607c89f4371d1794cf9f704fac16ba215b187b9ae6e86b25aa33514e",
+      "flash_log_sha256": "af83da0c1f7f62d12dc0ecacb9dd6171eaf3855e3ff2dc84313b7a5631c31fcc",
+      "restored": {
+        "serial": 2752,
+        "udp": 2304,
+        "wifi": 2352,
+        "http": 2496,
+        "heap_free": 90916,
+        "heap_largest": 79872
+      },
+      "stage": "udp-exchange-/blip/wasm/note",
+      "before": {
+        "serial": 2752,
+        "udp": 7552,
+        "wifi": 2784,
+        "http": 4896,
+        "heap_free": 92700,
+        "heap_largest": 79872
+      },
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "mac": "10:51:db:1a:a6:68",
+      "passed": false,
+      "error": "TimeoutError",
+      "checker_sha256": "389ca97061935ffc6fdcb1fd78e7b528b35d85a0818ea62b494bef0785c2798c",
+      "artifacts": {
+        "blip-v2.bin": "39a770c0b777eadfcb713e9ad891e67eca5f1efb77a561ae095dc780121435ac",
+        "blip-v2.elf": "f95cb6ed9ad3626817f6f5a35b5d9ba378401077184090e4f00406a984de9743",
+        "sdkconfig": "b3aa9e358a8cd509c80fc7d186017bb2d85c79caa633244b352ba7d3a8ed5c9b"
+      },
+      "checks_total": 177,
+      "checks_passed": 177,
+      "source_snapshot_sha256": "746ce527eb36a0ff04585bc9e8e8f70b60fb7d5a2fb4053f2c20e0a1ec584009"
+    },
+    {
+      "report_path": "build/m44-xiao-status29-live-controls.json",
+      "report_sha256": "cfbc273bfb614206edc7c0810c0c6af3d4bc7ba41c0c68cf29cafdd6595b8846",
+      "flash_log_sha256": "af83da0c1f7f62d12dc0ecacb9dd6171eaf3855e3ff2dc84313b7a5631c31fcc",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "flashed_mac": "10:51:db:1a:a6:68",
+      "passed": true,
+      "checker_sha256": "11fae7904c003307d2ce84618a63297a1d25fca4efced57f41340fe8deb5135e",
+      "serial_capture_sha256": "3d23590d51a6fa0bbbc4a7536a659d5f36d15d738db9cae411ddbeeaaeaec5d1",
+      "artifacts": {
+        "blip-v2.bin": "39a770c0b777eadfcb713e9ad891e67eca5f1efb77a561ae095dc780121435ac",
+        "blip-v2.elf": "f95cb6ed9ad3626817f6f5a35b5d9ba378401077184090e4f00406a984de9743",
+        "sdkconfig": "b3aa9e358a8cd509c80fc7d186017bb2d85c79caa633244b352ba7d3a8ed5c9b"
+      },
+      "worker_stack_headroom": 4960,
+      "checks_total": 121,
+      "checks_passed": 121,
+      "source_snapshot_sha256": "9d18b09c2d459450bc2c3d0a7ab0edc216bc826dcfa3c5cb0bd736104d0aa75a"
+    }
+  ],
+  "open_items": [
+    "Creators Tab absent on USB after reconnect; earlier flash reads returned ff/ffff and boot flash-read errors.",
+    "M5StickC binary UART burst replies can lose bytes; original checks remain failed.",
+    "Remaining full seven-board, external-media, first-run, lighting/BLE/fleet coexistence and endurance gates.",
+    "Remaining application, guest events, SDK and persisted file-consumer integration."
+  ],
+  "verification_logs": {
+    "build/m44-host-status-build.log": "c38d087e88454f832efdc16c6fc38ec3b978dff482be45b91036eea53393f318",
+    "build/m44-host-status-tests.log": "eb05d5e6fccae3d2fafcb967c243544384f44c793955765d4772254fa951aae7",
+    "build/m44-web-final-tests.log": "9ba6854d857acc1be2b1d58a926235f251a78385927bcfae71781d1d447ecf12",
+    "build/m44-release-python-final-tests.log": "a4ff80797ce47211cb1bb635780e8316d3d29491ccde73f9bc2c18bb1474afea"
+  }
+}

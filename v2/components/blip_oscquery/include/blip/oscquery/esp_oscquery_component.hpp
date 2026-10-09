@@ -83,9 +83,11 @@ class EspOscQueryComponent final : public core::Component, public network::HttpR
     LegacyOscEndpoint websocket_endpoint_;
     std::array<std::byte, kMaxOscPacketBytes> udp_packet_{};
     std::array<std::byte, kMaxOscPacketBytes> udp_response_{};
-    std::array<std::byte, kMaxOscPacketBytes> websocket_packet_{};
     std::array<std::byte, kMaxOscPacketBytes> websocket_response_{};
-    std::array<std::byte, 1024> http_asset_buffer_{};
+    // Asset/file/JSON streaming and WebSocket receives are synchronous callbacks
+    // on the same HTTP server task. They can share scratch; keep the
+    // WebSocket reply separate because decoded strings borrow the input.
+    std::array<std::byte, kMaxOscPacketBytes> http_asset_buffer_{};
     alignas(16) std::array<StackType_t, kTaskStackWords> task_stack_{};
     StaticTask_t task_storage_{};
     TaskHandle_t task_{};
