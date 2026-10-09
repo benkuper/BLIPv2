@@ -13,6 +13,8 @@ const browser = await chromium.launch({ executablePath: args.browser, headless: 
 const page = await browser.newPage();
 const report = { passed: false, pc_network_changed: false, errors: [], samples: [], requests: [],
   checker_sha256: createHash("sha256").update(await readFile(new URL(import.meta.url))).digest("hex") };
+const requirePausedReadings = args["require-paused-readings"] === "true";
+page.on("request", request => report.requests.push({ time: Date.now(), url: request.url(), phase: "start" }));
 page.on("pageerror", error => report.errors.push(String(error)));
 page.on("requestfailed", request => report.requests.push({ time: Date.now(), url: request.url(),
   failure: request.failure()?.errorText }));
@@ -28,13 +30,16 @@ try {
   await page.locator("#connection-status").filter({ hasText: /^Live$/ }).waitFor({ timeout: 30000 });
   await writeFile(args.ready, JSON.stringify({ ready: true }) + "\n");
   const deadline = Date.now() + 180000;
+  const settled = () => report.samples.at(-1)?.status === "Live" &&
+    (!requirePausedReadings || report.samples.at(-1)?.readings?.startsWith("Readings updated"));
   // A stop request can arrive while the installed-version poll has just
   // refreshed the page. Observe that transition through recovery as well.
-  while ((!stop || report.samples.at(-1)?.status !== "Live") &&
+  while ((!stop || !settled()) &&
          Date.now() < Math.min(deadline, stopDeadline)) {
     try {
       report.samples.push({ ...(await page.evaluate(() => ({ time: Date.now(),
         status: document.querySelector("#connection-status")?.textContent,
+        readings: document.querySelector("#sample-status")?.textContent,
         name: document.querySelector("#device-name")?.textContent,
         notice: document.querySelector("#notice")?.textContent }))), navigations });
     } catch (error) {
@@ -61,11 +66,18 @@ try {
   report.longest_transition_ms = longestTransition;
   report.longest_reconnect_ms = longestReconnect;
   report.longest_refresh_ms = longestRefresh;
+  const paused = report.samples.filter(sample => sample.readings?.includes("readings paused"));
+  report.paused_reading_samples = paused.length;
+  report.schema_reads_during_pause = report.requests.filter(request => request.phase === "start" &&
+    request.url.includes("?config=1") && request.time >= paused[0]?.time &&
+    request.time < (paused.at(-1)?.time ?? 0) - 3500).length;
+  report.requires_paused_readings = requirePausedReadings;
   report.passed = stop && report.samples.length >= 4 && report.errors.length === 0 && navigations <= 2 &&
     report.samples.at(-1)?.status === "Live" && report.samples.filter(sample => sample.status === "Live").every(sample => sample.name) &&
     loading.every(sample => sample.status === "Reconnecting" ||
       (sample.navigating || (sample.navigations >= 2 && ["Loading", "Connecting", "Offline"].includes(sample.status)))) &&
-    longestReconnect <= 5000 && longestRefresh <= 15000;
+    longestReconnect <= 5000 && longestRefresh <= 15000 &&
+    (!requirePausedReadings || (paused.length >= 4 && report.schema_reads_during_pause === 0 && settled()));
 } catch (error) { report.errors.push(String(error.stack ?? error)); }
 finally {
   // Preserve the failed continuity observation even if browser cleanup stalls.

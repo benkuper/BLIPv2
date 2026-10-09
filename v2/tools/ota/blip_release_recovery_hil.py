@@ -37,6 +37,7 @@ class FaultServer(ThreadingHTTPServer):
         self.mode = "valid"; self.artifact_started = threading.Event()
         self.sent = 0; self.requests = []
         self.artifact_pause_seconds = 0
+        self.artifact_pause_after_bytes = 4096
         self.artifact_pauses = 0
 
     def select(self, mode):
@@ -82,7 +83,7 @@ class FaultHandler(BaseHTTPRequestHandler):
             for offset in range(0, len(body), 512):
                 if mode.endswith("-stalled") and offset == 4096:
                     time.sleep(40)
-                if mode == "web-browser" and offset == 4096 and server.artifact_pause_seconds:
+                if mode == "web-browser" and offset == server.artifact_pause_after_bytes and server.artifact_pause_seconds:
                     server.artifact_pauses += 1
                     time.sleep(server.artifact_pause_seconds)
                 self.wfile.write(body[offset:offset + 512]); self.wfile.flush()
@@ -103,14 +104,21 @@ def main():
     parser.add_argument("--browser", type=Path)
     parser.add_argument("--skip-faults", action="store_true", help="Isolate the successful browser/native-update trial")
     parser.add_argument("--hold-http-sessions", type=int, default=0, choices=range(4), help="Exercise the remaining HTTP session capacity alongside the browser")
-    parser.add_argument("--artifact-pause-seconds", type=float, default=0, help="Pause the successful web response once after 4 KiB to exercise transient read timeouts (0..20)")
+    parser.add_argument("--artifact-pause-seconds", type=float, default=0, help="Pause the successful web response once to exercise transient read timeouts (0..20)")
+    parser.add_argument("--artifact-pause-after-bytes", type=int, default=4096,
+                        help="Offset for the successful web pause (512-byte aligned); use 0 to isolate socket reads from SD writes")
     parser.add_argument("--require-script-controls", action="store_true", help="Require the standard production script fixture to stay loaded through the successful web update")
     parser.add_argument("--require-ble", action="store_true", help="Require the NimBLE transport to remain active through the successful web update")
     parser.add_argument("--sample-dma", action="store_true", help="Record DMA heap metrics exposed by the installed firmware")
+    parser.add_argument("--require-paused-readings", action="store_true", help="Require browser background readings to pause during the update and resume afterward")
     args = parser.parse_args()
     if not 0 <= args.artifact_pause_seconds <= 20:
         parser.error("artifact pause must be 0..20 seconds")
+    if args.artifact_pause_after_bytes < 0 or args.artifact_pause_after_bytes % 512:
+        parser.error("artifact pause offset must be nonnegative and 512-byte aligned")
     if bool(args.playwright) != bool(args.browser): parser.error("browser and playwright must be supplied together")
+    if args.require_paused_readings and not args.browser:
+        parser.error("paused readings qualification requires a browser observer")
     identity, code, version = firmware_metadata(args.build / "blip-v2.bin")
     initial_identity, initial_code, _ = firmware_metadata(args.initial_build / "blip-v2.bin")
     web_code, web_version = web_metadata(args.bundle)
@@ -126,6 +134,8 @@ def main():
                 "sha256": hashlib.sha256(data).hexdigest(), "url": base + "/blip/releases/" + path,
                 "minimum_other_code": 0 if path.endswith(".bin") else 1}
     fw = (args.build / "blip-v2.bin").read_bytes(); web = args.bundle.read_bytes()
+    if args.artifact_pause_seconds and args.artifact_pause_after_bytes >= len(web):
+        parser.error("artifact pause offset must be within the web bundle")
     catalog = {"schema": 1, **identity, "channel": "stable", "firmware": artifact(fw, code, version, "firmware.bin"),
                "web": artifact(web, web_code, web_version, "web.bundle")}
     server = FaultServer((args.listen, args.server_port), catalog, fw, web)
@@ -262,7 +272,8 @@ def main():
             ready = args.report.with_suffix(".browser-ready.json"); ready.unlink(missing_ok=True)
             browser_report = args.report.with_suffix(".browser.json")
             observer = subprocess.Popen(["node", "v2/tools/web/blip_web_update_observer.mjs", "--device", "http://" + report["host"],
-                "--playwright", str(args.playwright), "--browser", str(args.browser), "--ready", str(ready), "--report", str(browser_report)],
+                "--playwright", str(args.playwright), "--browser", str(args.browser), "--ready", str(ready), "--report", str(browser_report),
+                "--require-paused-readings", str(args.require_paused_readings).lower()],
                 stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             deadline = time.monotonic() + 45
             while not ready.exists():
@@ -283,6 +294,7 @@ def main():
             check("BLE active before update", get("active", "blip.transport.ble"))
         check("successful web catalog", catalog_check("web-browser") == "updates-available")
         server.artifact_pause_seconds = args.artifact_pause_seconds
+        server.artifact_pause_after_bytes = args.artifact_pause_after_bytes
         client.request("action", updates, "install_web")
         final_state = settled(150)
         report["successful_web_result"] = {"state": final_state, "error": get("last_error"),
@@ -290,6 +302,7 @@ def main():
             "worker_stack_headroom": get("worker_stack_headroom"), "http_read_retries": get("http_read_retries")}
         check("successful web installation", final_state == "web-installed")
         report["artifact_pause_seconds"] = args.artifact_pause_seconds
+        report["artifact_pause_after_bytes"] = args.artifact_pause_after_bytes
         report["artifact_pauses"] = server.artifact_pauses
         if args.artifact_pause_seconds:
             check("transient artifact pause exercised", server.artifact_pauses == 1)

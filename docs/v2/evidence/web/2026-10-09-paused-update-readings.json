@@ -1,0 +1,227 @@
+{
+  "date": "2026-10-09",
+  "milestone_complete": false,
+  "pc_network_changed": false,
+  "scope": "Focused Ball SD concurrency qualification; original failed reports retained. Automatic/manual paths, sustained traffic and seven-board qualification remain open.",
+  "ui": {
+    "version": "0.3.7",
+    "factory_code": 3007,
+    "bytes": 26816,
+    "sha256": "6ce2a0f591f9d66904539b8335d8bff93500712be547fb7da5819ee08eadcbda",
+    "application_changed": false
+  },
+  "installed": {
+    "board": "creators-ball-v2",
+    "mac": "08:92:72:f6:4d:dc",
+    "firmware_code": 31,
+    "web_code": 3118,
+    "storage": "sd-spi"
+  },
+  "host_suites_passed": 33,
+  "javascript_tests_passed": 34,
+  "verification_logs": {
+    "build/m45-web-paused-readings-tests.log": "de79bf025ce5ab19222ddbf6463c6b2534bf4ea8d415c095d999c3cebd2ade3e",
+    "build/m45-host-web-bundle-build.log": "88eb4477d068c76277f37ac28e5bc7bad9c8b0dd9c66f0926149acf8104b707a",
+    "build/m45-host-web-bundle-tests.log": "1f05c9d5722b89da9f22371ab85a83ccc47c4917fec225f48ec7ba6d08245c43"
+  },
+  "reports": [
+    {
+      "report": "build/m45-ball-ui037-seed.json",
+      "report_sha256": "11100d11a4118be9c2d1554082b48b18c97555a67d6610b50862b007f8a4cb79",
+      "passed": false,
+      "checks": 9,
+      "meaning": "Old UI browser trial failed at 7804 bytes; old bundle retained.",
+      "tool_sha256": "90d5bb971adbd0139724ef1fadfb3e8c626c7eb6aeeeeee9dcd8ed2f82cdcd63",
+      "source_snapshot_sha256": "3b4a8cfe3426bade7bdf8c6fcbf49441277b6599740289313be97a2c8d9261f8",
+      "firmware_sha256": "f25639badfe333375e0575c61815dcbdbbde1bd503062e88642761b23620e3b3",
+      "bundle_sha256": "0bafb04968a42dab5a7459ac6a0c56dfe7004da217c4753d146797e36df55bad",
+      "initial_web": 3115,
+      "held_http_sessions": 0,
+      "result": {
+        "state": "error",
+        "error": "artifact-transfer-or-validation",
+        "received": 7804,
+        "expected": 26816,
+        "worker_stack_headroom": 1968,
+        "http_read_retries": 3
+      },
+      "policy_restored": true,
+      "artifact_pause_seconds": 0,
+      "artifact_pause_after_bytes": 4096,
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Paused polls keep UI update memory bounded"
+      },
+      "error": "AssertionError: successful web installation",
+      "sampled_memory_minima": {
+        "heap": 4088,
+        "largest": 1984,
+        "dma_heap": 1688,
+        "dma_largest": 1056
+      },
+      "browser": {
+        "report": "build/m45-ball-ui037-seed.browser.json",
+        "report_sha256": "8b4e5b5c773871a9cfcbe1bcea261e185d047a4547e6b9fcdfb19eeeba3b6ef4",
+        "passed": true,
+        "pc_network_changed": false,
+        "errors": [],
+        "checker_sha256": "ee6b020f1c49ec6d455845fc0cddc2ea196c1c322cb7b98e50dc19c72248f17c",
+        "navigations": 1,
+        "longest_transition_ms": 0,
+        "longest_reconnect_ms": 0,
+        "longest_refresh_ms": 0,
+        "paused_reading_samples": 0,
+        "schema_reads_during_pause": 0,
+        "requires_paused_readings": false
+      }
+    },
+    {
+      "report": "build/m45-ball-ui037-native-seed.json",
+      "report_sha256": "549da7522904e5ac398ccdc7c81f793a9bdea43cc7d4530bfc9b55e7b8a96f72",
+      "passed": true,
+      "checks": 18,
+      "meaning": "Browser-free installation seeded UI 0.3.7.",
+      "tool_sha256": "90d5bb971adbd0139724ef1fadfb3e8c626c7eb6aeeeeee9dcd8ed2f82cdcd63",
+      "source_snapshot_sha256": "3b4a8cfe3426bade7bdf8c6fcbf49441277b6599740289313be97a2c8d9261f8",
+      "firmware_sha256": "f25639badfe333375e0575c61815dcbdbbde1bd503062e88642761b23620e3b3",
+      "bundle_sha256": "0bafb04968a42dab5a7459ac6a0c56dfe7004da217c4753d146797e36df55bad",
+      "initial_web": 3115,
+      "held_http_sessions": 0,
+      "result": {
+        "state": "web-installed",
+        "error": "",
+        "received": 26816,
+        "expected": 26816,
+        "worker_stack_headroom": 1968,
+        "http_read_retries": 0
+      },
+      "policy_restored": true,
+      "artifact_pause_seconds": 0,
+      "artifact_pause_after_bytes": 4096,
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Paused polls keep UI update memory bounded"
+      },
+      "error": null,
+      "sampled_memory_minima": {
+        "heap": 9516,
+        "largest": 5632,
+        "dma_heap": 3532,
+        "dma_largest": 2880
+      }
+    },
+    {
+      "report": "build/m45-ball-ui037-paused-extra-clients.json",
+      "report_sha256": "6b54f2eff5214706fa369ac6dead440d48634f212992beadd5fe6ed843ee669d",
+      "passed": false,
+      "checks": 14,
+      "meaning": "Bundle 3117 installed and browser passed, but no socket read retry occurred; timeout coverage gate failed.",
+      "tool_sha256": "90d5bb971adbd0139724ef1fadfb3e8c626c7eb6aeeeeee9dcd8ed2f82cdcd63",
+      "source_snapshot_sha256": "3b4a8cfe3426bade7bdf8c6fcbf49441277b6599740289313be97a2c8d9261f8",
+      "firmware_sha256": "f25639badfe333375e0575c61815dcbdbbde1bd503062e88642761b23620e3b3",
+      "bundle_sha256": "979f4b9f09ebb2b2c5df5dc1569e653a8e936af51fb967954b0469d1f9dbb337",
+      "initial_web": 3116,
+      "held_http_sessions": 3,
+      "result": {
+        "state": "web-installed",
+        "error": "",
+        "received": 26816,
+        "expected": 26816,
+        "worker_stack_headroom": 1968,
+        "http_read_retries": 0
+      },
+      "policy_restored": true,
+      "artifact_pause_seconds": 15.0,
+      "artifact_pause_after_bytes": 4096,
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Paused polls keep UI update memory bounded"
+      },
+      "error": "AssertionError: transient HTTP read timeout recovered",
+      "sampled_memory_minima": {
+        "heap": 7484,
+        "largest": 3840,
+        "dma_heap": 1500,
+        "dma_largest": 528
+      },
+      "browser": {
+        "report": "build/m45-ball-ui037-paused-extra-clients.browser.json",
+        "report_sha256": "f2d9c7719fe07fb377cdcebe8d680a6b73b3b9d43ba958ad0279ebfa4e93baf3",
+        "passed": true,
+        "pc_network_changed": false,
+        "errors": [],
+        "checker_sha256": "ee6b020f1c49ec6d455845fc0cddc2ea196c1c322cb7b98e50dc19c72248f17c",
+        "navigations": 2,
+        "longest_transition_ms": 5020,
+        "longest_reconnect_ms": 0,
+        "longest_refresh_ms": 5020,
+        "paused_reading_samples": 77,
+        "schema_reads_during_pause": 0,
+        "requires_paused_readings": true
+      }
+    },
+    {
+      "report": "build/m45-ball-ui037-paused-zero-offset.json",
+      "report_sha256": "9eca051ac43238c5796f49826fad827562eb3cce072e99ed4b9c23b87ac7326c",
+      "passed": true,
+      "checks": 24,
+      "meaning": "Bundle 3118 installed with three extra HTTP clients; before-body pause exercised three read retries.",
+      "tool_sha256": "76d33d31f1ffbe390729469ef797c87e4926ba76b543d1f8120e261db5c2767e",
+      "source_snapshot_sha256": "b40c2f217a2c9f5341a986b1184032aaa76321cb5b17e96e911954c4ba6dd32a",
+      "firmware_sha256": "f25639badfe333375e0575c61815dcbdbbde1bd503062e88642761b23620e3b3",
+      "bundle_sha256": "40136a151cd139444cf8d2ed1bd6746c1cd87803685a0a2b22ce57030a9a3874",
+      "initial_web": 3117,
+      "held_http_sessions": 3,
+      "result": {
+        "state": "web-installed",
+        "error": "",
+        "received": 26816,
+        "expected": 26816,
+        "worker_stack_headroom": 1968,
+        "http_read_retries": 3
+      },
+      "policy_restored": true,
+      "artifact_pause_seconds": 15.0,
+      "artifact_pause_after_bytes": 0,
+      "script_before_web": {
+        "state": "loaded",
+        "control_text_reserved": 640,
+        "level": 42,
+        "note": "Paused polls keep UI update memory bounded"
+      },
+      "error": null,
+      "sampled_memory_minima": {
+        "heap": 3604,
+        "largest": 2496,
+        "dma_heap": 788,
+        "dma_largest": 408
+      },
+      "browser": {
+        "report": "build/m45-ball-ui037-paused-zero-offset.browser.json",
+        "report_sha256": "588ba6f22b0e271fd9b7e906041ab302471e3c157cb08499e5e536026d7e73ab",
+        "passed": true,
+        "pc_network_changed": false,
+        "errors": [],
+        "checker_sha256": "ee6b020f1c49ec6d455845fc0cddc2ea196c1c322cb7b98e50dc19c72248f17c",
+        "navigations": 2,
+        "longest_transition_ms": 4514,
+        "longest_reconnect_ms": 0,
+        "longest_refresh_ms": 4514,
+        "paused_reading_samples": 85,
+        "schema_reads_during_pause": 0,
+        "requires_paused_readings": true
+      }
+    }
+  ],
+  "limitations": [
+    "The successful trial still sampled only 788 free DMA bytes and a 408-byte largest DMA block; it is not a general memory-margin or endurance claim.",
+    "Creators Tab remains absent; M5StickC serial burst and strict XIAO UDP gates remain open.",
+    "Manual firmware upload and automatic-update detection latency have not been qualified by this UI trial."
+  ]
+}

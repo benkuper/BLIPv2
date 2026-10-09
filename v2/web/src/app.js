@@ -69,6 +69,10 @@ function scheduleRefresh(current) {
   refreshTimer = setTimeout(async () => {
     if (client !== current) return;
     if (document.hidden) { scheduleRefresh(current); return; }
+    if (updatePanel.busy) {
+      sampleStatus.textContent = "Updating BLIP · readings paused";
+      scheduleRefresh(current); return;
+    }
     try {
       const updated = buildControlModel(await current.loadTree());
       if (client !== current) return;

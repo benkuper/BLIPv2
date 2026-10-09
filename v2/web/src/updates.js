@@ -18,22 +18,31 @@ export function releaseSummary(state) {
 export class UpdatePanel {
   constructor({ document, root, onError, reload = () => location.reload() }) {
     this.root = root; this.onError = onError; this.reload = reload; this.client = null;
+    this.busy = false; this.refreshSequence = 0;
     this.status = root.querySelector("[data-update-status]");
     this.progress = root.querySelector("progress"); this.version = null;
     for (const button of root.querySelectorAll("[data-update-action]")) button.addEventListener("click", async () => {
+      const client = this.client, previousBusy = this.busy;
       button.disabled = true;
-      try { await this.client.release(button.dataset.updateAction); await this.refresh(); }
-      catch (error) { this.status.textContent = error.message; this.onError?.(error); }
+      this.busy = true; ++this.refreshSequence; clearTimeout(this.timer);
+      try { await client.release(button.dataset.updateAction); if (client === this.client) await this.refresh(); }
+      catch (error) {
+        if (client !== this.client) return;
+        this.busy = previousBusy; this.status.textContent = error.message; this.onError?.(error);
+        this.timer = setTimeout(() => this.refresh(), 5000);
+      }
     });
   }
-  connect(client) { this.client = client; this.version = null; this.refresh(); }
+  connect(client) { this.client = client; this.version = null; this.busy = false; this.refresh(); }
   async refresh() {
     clearTimeout(this.timer);
     const client = this.client;
     if (!client) return;
+    const sequence = ++this.refreshSequence;
     try {
       const state = await client.loadReleases();
-      if (client !== this.client) return;
+      if (client !== this.client || sequence !== this.refreshSequence) return;
+      this.busy = Boolean(state.busy);
       this.status.textContent = releaseSummary(state.state) + (state.error ? ` · ${state.error.replaceAll("-", " ")}` : "");
       this.root.querySelector("[data-firmware-version]").textContent = state.firmware_version || `Release ${state.installed_firmware}`;
       this.root.querySelector("[data-web-version]").textContent = webVersion(state.installed_web);
@@ -51,7 +60,7 @@ export class UpdatePanel {
       this.version = state.installed_web;
       this.timer = setTimeout(() => this.refresh(), state.busy ? 1000 : 10000);
     } catch {
-      if (client !== this.client) return;
+      if (client !== this.client || sequence !== this.refreshSequence) return;
       this.status.textContent = "Update status unavailable. Retrying shortly.";
       this.timer = setTimeout(() => this.refresh(), 5000);
     }

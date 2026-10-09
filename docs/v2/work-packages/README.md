@@ -43,6 +43,7 @@ wire protocols, or public OSC paths.
 | [3.8/3.9 native updates and first run](3.8-native-update-and-first-run.md) | Independent website updates, filesystem-only full UI and automatic first run; HUZZAH32 browser/native OTA and mismatch checks passed, seven-board/recovery/coexistence qualification open |
 | [3.8 update recovery](3.8-update-recovery.md) | Socket capacity, automatic browser reconnection, bounded file buffering and fault-injected update trials; seven-board/coexistence qualification open |
 | [3.8 reserved worker and RAM](3.8-update-recovery.md#reserved-worker-and-sd-progress-checkpoint) | Preallocated OTA task, compact copied controls and responsive SD status; six-board native/fleet and Ball SD recovery trials passed; extra-client, Tab and full milestone gates remain open |
+| [3.8 update reading pause](3.8-update-recovery.md#pausing-background-readings-during-updates) | Filesystem UI pauses heavy reads during updates; Ball passed a delayed SD update with three extra clients, loaded script and BLE; other update paths and full milestone gates remain open |
 | [3.8 transport stacks](3.8-transport-stack-qualification.md) | UDP persisted-name/NVS overflow fixed; six boards passed 1,035 network/script/provisioning checks each with unchanged static RAM; Tab and update coexistence remain open |
 
 ## Milestone 4
