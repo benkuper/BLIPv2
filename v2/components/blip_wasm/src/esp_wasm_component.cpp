@@ -57,12 +57,14 @@ constexpr std::array<core::FieldDescriptor, 1> call_fields{{{"export", core::Val
 constexpr std::array<core::FieldDescriptor, 2> i32_fields{{{"export", core::ValueType::string, true}, {"argument", core::ValueType::integer, true}}};
 constexpr std::array<core::FieldDescriptor, 1> completion_fields{{{"request", core::ValueType::integer, true}}};
 constexpr std::array<core::FieldDescriptor, 2> result_fields{{{"request", core::ValueType::integer, true}, {"index", core::ValueType::integer, true}}};
-constexpr std::array<core::ActionDescriptor, 9> actions{{
+constexpr std::array<core::FieldDescriptor, 1> file_fields{{{"path", core::ValueType::string, true}}};
+constexpr std::array<core::ActionDescriptor, 10> actions{{
     {"upload_begin", "Begin a module upload", begin_fields}, {"upload_chunk", "Upload a contiguous module chunk", chunk_fields},
     {"upload_commit", "Validate and load the uploaded module", {}}, {"call0", "Queue an export without arguments", call_fields},
     {"call_i32", "Queue an export with one i32 argument", i32_fields}, {"unload", "Queue module unload", {}},
     {"cancel_all", "Cancel active and queued work", {}}, {"completion", "Read request completion", completion_fields},
-    {"result", "Read typed result bits", result_fields}}};
+    {"result", "Read typed result bits", result_fields},
+    {"load_file", "Load a saved script", file_fields}}};
 constexpr std::array<core::MetadataEntry, 9> metadata{{
     {"ui_topic", "Scripts"}, {"ui_primary", "state"},
     {"worker_priority", "2"}, {"supervisor_priority", "6"}, {"core_affinity", "none"},
@@ -95,7 +97,9 @@ int nibble(char value) {
 const core::ComponentDescriptor EspWasmComponent::base_descriptor_{make_descriptor()};
 const core::ComponentDescriptor& EspWasmComponent::descriptor() const noexcept { return descriptor_; }
 
-EspWasmComponent::EspWasmComponent(Runtime& runtime) noexcept : runtime_(&runtime), descriptor_(base_descriptor_) {
+EspWasmComponent::EspWasmComponent(Runtime& runtime, storage::AutomaticFileStore* files) noexcept
+    : runtime_(&runtime), files_(files), descriptor_(base_descriptor_) {
+    static_assert(sizeof(Request::file_path) <= sizeof(Request::arguments));
     admission_ = xSemaphoreCreateMutexStatic(&admission_storage_);
     snapshot_mutex_ = xSemaphoreCreateMutexStatic(&snapshot_storage_);
     monitor_mutex_ = xSemaphoreCreateMutexStatic(&monitor_storage_);
@@ -122,6 +126,7 @@ core::Status EspWasmComponent::bind_capabilities(const core::RegistryView& regis
     if (!bound) return bound;
     std::size_t count = 1;
     required_services_[0] = required[0];
+    if (files_) required_services_[count++] = "storage.files";
     std::string_view previous;
     for (std::size_t i = 0; i < capabilities_.size(); ++i) {
         const auto module = capabilities_.binding(i).component->wasm.import_module;
@@ -241,7 +246,7 @@ core::Result<std::uint32_t> EspWasmComponent::submit(Request& request) noexcept 
         return Result::failure(failure(ErrorCode::queue_full, "submit", "worker-queue-full").error());
     }
     ++next_id_;
-    if (request.kind == Kind::begin || request.kind == Kind::commit || request.kind == Kind::unload) {
+    if (request.kind == Kind::begin || request.kind == Kind::commit || request.kind == Kind::unload || request.kind == Kind::load_file) {
         script_admission_ = false; closed_through_ = request.id;
     }
     return Result::success(request.id);
@@ -325,6 +330,18 @@ void EspWasmComponent::run_worker() noexcept {
     { Guard guard(snapshot_mutex_, portMAX_DELAY); snapshot_ = service.snapshot(); }
     xSemaphoreGive(ready_);
     auto current_epoch = epoch_.load();
+    const auto reserve_module = [&](std::size_t size) {
+        if (module_capacity_ == size) return core::Status::success();
+        auto status = service.replace_module_storage({});
+        if (!status) return status;
+        heap_caps_free(module_); module_ = nullptr; module_capacity_ = 0;
+        module_ = static_cast<std::byte*>(heap_caps_malloc(size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+        module_capacity_ = module_ ? size : 0;
+        upload = ModuleUpload({module_, module_capacity_});
+        buffer_reserved_.store(kPoolBytes + module_capacity_);
+        return module_ ? service.replace_module_storage({module_, module_capacity_})
+                       : failure(ErrorCode::resource_unavailable, "upload", "module-buffer-unavailable");
+    };
     while (initialized && started_.load()) {
         if (current_epoch != epoch_.load()) {
             current_epoch = epoch_.load(); upload.cancel();
@@ -336,6 +353,17 @@ void EspWasmComponent::run_worker() noexcept {
         const auto began = static_cast<std::uint64_t>(esp_timer_get_time());
         core::Status status = core::Status::success();
         std::array<Value, kMaximumResults> results{}; std::size_t count{};
+        const auto publish_module = [&](std::span<const std::byte> bytes) {
+            auto loaded = controls_.prepare(bytes, descriptor_);
+            if (loaded) loaded = service.load(bytes);
+            Guard guard(admission_, portMAX_DELAY);
+            if (loaded && (!started_.load() || request.epoch != epoch_.load()))
+                loaded = failure(ErrorCode::cancelled, "commit", "stale-work-epoch");
+            if (loaded) loaded = controls_.publish(*runtime_, service.snapshot().generation);
+            if (!loaded) { controls_.retire(); service.unload(); }
+            script_admission_ = loaded.ok() && started_.load() && request.epoch == epoch_.load() && request.id >= closed_through_;
+            return loaded;
+        };
         // Markers and copied payloads are admitted together under admission_.
         // Take even canceled payloads so every accepted ticket is completed and
         // replacement cannot strand an old action in the store.
@@ -352,33 +380,48 @@ void EspWasmComponent::run_worker() noexcept {
         } else if (request.kind == Kind::begin) {
             controls_.retire();
             service.unload(); upload.cancel();
-            if (module_capacity_ != request.number) {
-                status = service.replace_module_storage({});
-                if (status) {
-                    heap_caps_free(module_); module_ = nullptr; module_capacity_ = 0;
-                    module_ = static_cast<std::byte*>(heap_caps_malloc(request.number, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
-                    module_capacity_ = module_ ? request.number : 0;
-                    upload = ModuleUpload({module_, module_capacity_});
-                    buffer_reserved_.store(kPoolBytes + module_capacity_);
-                    status = module_ ? service.replace_module_storage({module_, module_capacity_})
-                                     : failure(ErrorCode::resource_unavailable, "upload", "module-buffer-unavailable");
-                }
-            }
+            status = reserve_module(request.number);
             if (status) status = upload.begin(request.number, request.crc);
         } else if (request.kind == Kind::chunk) {
             status = upload.append(request.number, std::span<const std::byte>(request.bytes).first(request.size));
         } else if (request.kind == Kind::commit) {
             const auto bytes = upload.finish();
             controls_.retire();
-            status = bytes ? controls_.prepare(bytes.value(), descriptor_) : core::Status::failure(bytes.error());
-            if (status) status = service.load(bytes.value());
-            {
+            status = bytes ? publish_module(bytes.value()) : core::Status::failure(bytes.error());
+        } else if (request.kind == Kind::load_file) {
+            const auto opened = files_->open(request.file_path.data());
+            status = opened ? core::Status::success() : core::Status::failure(opened.error());
+            if (status && (opened.value().size < 8 || opened.value().size > kModuleBytes))
+                status = failure(ErrorCode::capacity_exceeded, "load-file", "module-size");
+            // Missing or oversized files leave the current module untouched.
+            // Once its buffer is reused, a read/validation failure leaves it
+            // unloaded; no partially read module is ever published or executed.
+            if (status) {
+                controls_.retire(); service.unload(); upload.cancel();
+                status = reserve_module(opened.value().size);
+                std::size_t offset{};
+                while (status && offset < opened.value().size) {
+                    if (!started_.load() || request.epoch != epoch_.load()) {
+                        status = failure(ErrorCode::cancelled, "load-file", "stale-work-epoch");
+                        cancelled_.fetch_add(1); break;
+                    }
+                    const auto part = std::span(module_, module_capacity_).subspan(offset,
+                        std::min<std::size_t>(512, opened.value().size - offset));
+                    const auto read = files_->read(opened.value(), offset, part);
+                    if (!read || read.value() != part.size()) {
+                        status = read ? failure(ErrorCode::io_failed, "load-file", "short-file")
+                                      : core::Status::failure(read.error());
+                        break;
+                    }
+                    offset += read.value();
+                }
+            }
+            if (opened) files_->close(opened.value());
+            if (status) status = publish_module({module_, module_capacity_});
+            else {
                 Guard guard(admission_, portMAX_DELAY);
-                if (status && (!started_.load() || request.epoch != epoch_.load()))
-                    status = failure(ErrorCode::cancelled, "commit", "stale-work-epoch");
-                if (status) status = controls_.publish(*runtime_, service.snapshot().generation);
-                if (!status) { controls_.retire(); service.unload(); }
-                script_admission_ = status.ok() && started_.load() && request.epoch == epoch_.load() && request.id >= closed_through_;
+                script_admission_ = service.snapshot().state == State::loaded && controls_.generation() &&
+                    started_.load() && request.epoch == epoch_.load() && request.id >= closed_through_;
             }
         } else if (request.kind == Kind::unload) {
             controls_.retire();
@@ -583,6 +626,17 @@ core::Status EspWasmComponent::invoke_action(std::string_view id, std::span<cons
             if (high < 0 || low < 0) return failure(ErrorCode::invalid_argument, "upload", "hex-character");
             request.bytes[i] = static_cast<std::byte>((high << 4) | low);
         }
+    } else if (id == "load_file" && args.size() == 1 && args[0].type == core::ValueType::string) {
+        const auto path = args[0].string;
+        if (!files_) return failure(ErrorCode::resource_unavailable, "load-file", "file-service-unavailable");
+        if (!path.starts_with("scripts/") || path.size() <= 8 || path.size() > storage::kMaxLogicalPathBytes ||
+            path.back() == '/' || path.find("..") != path.npos || path.find("//") != path.npos ||
+            !std::all_of(path.begin(), path.end(), [](char c) {
+                return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ||
+                    c == '/' || c == '-' || c == '_' || c == '.';
+            })) return failure(ErrorCode::invalid_argument, "load-file", "script-path");
+        request.kind = Kind::load_file; request.file_path = {};
+        std::copy(path.begin(), path.end(), request.file_path.begin());
     } else if (id == "upload_commit" && args.empty()) request.kind = Kind::commit;
     else if (id == "unload" && args.empty()) request.kind = Kind::unload;
     else return failure(ErrorCode::invalid_argument, "action", "invalid-action");

@@ -52,9 +52,9 @@ power, GPIO27 enables the strip, and SPI2 drives SK9822 data/clock on
 GPIO25/GPIO26. The fixed 32 logical pixels each expand to three physical LEDs
 in reverse logical order, matching V1's `LED_LEDS_PER_PIXEL=3` and
 `LED_DEFAULT_INVERT_DIRECTION=true`. The V1 default power budget is 1200 mA
-and its 0.4 brightness factor maps to V2 brightness 102/255. The Club's SD,
-IMU, button, battery, and IR pins are reserved in the manifest; those devices
-do not yet have V2 components. V1 lists GPIO3 as charge sense, overlapping
+and its 0.4 brightness factor maps to V2 brightness 102/255. The Club's SD
+uses the automatic file service on its reserved SPI3 pins and active-low power
+enable. IMU, button, battery, and IR drivers remain pending. V1 lists GPIO3 as charge sense, overlapping
 the ESP32 UART0 RX used by the USB serial bridge, so no charge sense driver
 claims that pin.
 The V2 full-strip red, green, and blue check was visually confirmed on

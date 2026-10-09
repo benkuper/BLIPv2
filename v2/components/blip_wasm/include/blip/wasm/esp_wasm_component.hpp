@@ -3,6 +3,7 @@
 #include "blip/wasm/service.hpp"
 #include "blip/wasm/capability.hpp"
 #include "blip/wasm/script_controls.hpp"
+#include "blip/storage/automatic_file_store.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
@@ -22,7 +23,7 @@ class EspWasmComponent final : public core::Component {
 #endif
     static constexpr std::size_t kWorkerStackBytes = 8192, kSupervisorStackBytes = 3072;
     static constexpr std::size_t kQueueCapacity = 8, kCompletionCapacity = 16, kChunkBytes = 64;
-    explicit EspWasmComponent(Runtime& runtime) noexcept;
+    explicit EspWasmComponent(Runtime& runtime, storage::AutomaticFileStore* files = nullptr) noexcept;
     ~EspWasmComponent() override;
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
     // Once, after all components are added and before Registry::validate.
@@ -52,13 +53,18 @@ class EspWasmComponent final : public core::Component {
     // Full typed entry point for future component-owned providers/SDK bindings.
     [[nodiscard]] core::Result<std::uint32_t> call(std::string_view, std::span<const Value>) noexcept;
   private:
-    enum class Kind : std::uint8_t { begin, chunk, commit, call, unload, script_action };
+    enum class Kind : std::uint8_t { begin, chunk, commit, call, unload, script_action, load_file };
     enum class Cancellation : std::uint8_t { none, requested, deadline };
     struct Request {
         std::uint32_t id{}, epoch{}, generation{}, number{}, crc{}, instructions{}, deadline_ms{};
         Kind kind{};
         std::uint8_t argument_count{}, size{};
-        std::array<Value, kMaximumArguments> arguments{};
+        // File paths and guest arguments are mutually exclusive. Reuse the
+        // copied queue payload instead of adding a path buffer to every slot.
+        union {
+            std::array<Value, kMaximumArguments> arguments{};
+            std::array<char, storage::kMaxLogicalPathBytes + 1> file_path;
+        };
         std::array<char, kMaximumExportNameBytes + 1> name{};
         std::array<std::byte, kChunkBytes> bytes{};
     };
@@ -75,6 +81,7 @@ class EspWasmComponent final : public core::Component {
     void run_worker() noexcept;
     void run_supervisor() noexcept;
     Runtime* runtime_;
+    storage::AutomaticFileStore* files_{};
     std::byte* pool_{};
     std::byte* module_{};
     std::size_t module_capacity_{}; // Worker owns it while running.
@@ -108,7 +115,7 @@ class EspWasmComponent final : public core::Component {
     ScriptControlMessage action_scratch_{}; // Worker only; outside its bounded stack.
     bool script_admission_{}; // Admission mutex. Replacement closes it at submission.
     std::uint32_t closed_through_{}; // Last accepted replacement/unload request.
-    std::array<std::string_view, 1 + kMaximumCapabilityProviders> required_services_{};
+    std::array<std::string_view, 2 + kMaximumCapabilityProviders> required_services_{};
     core::ComponentDescriptor descriptor_{}; // Stable address borrowed by registry.
     static const core::ComponentDescriptor base_descriptor_;
 };

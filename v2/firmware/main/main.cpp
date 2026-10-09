@@ -247,7 +247,7 @@ blip::core::Registry<20> registry{};
 blip::core::RegistryControlService<20> control_component{registry};
 #if defined(BLIP_ENABLE_WASM)
 blip::wasm::WamrRuntime wasm_runtime{};
-blip::wasm::EspWasmComponent wasm_component{wasm_runtime};
+blip::wasm::EspWasmComponent wasm_component{wasm_runtime, &file_storage_component.files()};
 #endif
 blip::ota::EspReleaseComponent release_component{firmware_release_identity(0), wifi_component,
     file_storage_component.web_assets(), settings_component.settings(), ota_component.updates()};

@@ -175,10 +175,42 @@ def check_fixture(name: str, should_pass: bool, expected_text: str = "") -> None
     print(f"PASS resource manifest: {name}")
 
 
+def validate_storage(storage: Any, pins: dict[int, dict[str, Any]], source: str) -> None:
+    require(isinstance(storage, dict), f"{source}: storage must be an object")
+    require_keys(storage, {"type", "mosi", "miso", "clock", "namespace"},
+                 {"type", "host", "mosi", "miso", "clock", "select", "power", "power_level", "namespace"}, source)
+    kind = storage["type"]
+    require(isinstance(kind, str) and kind in {"sd-spi", "sd-mmc", "spi-nor"}, f"{source}: invalid storage type")
+    require(storage["namespace"] == "blip-v2", f"{source}: invalid storage namespace")
+    if kind == "sd-mmc":
+        require(type(storage.get("host", 0)) is int and storage.get("host", 0) == 0 and storage.get("select") is None,
+                f"{source}: MMC uses its native host without chip select")
+    else:
+        host = storage.get("host")
+        require((type(host) is int and host in {2, 3}) or (kind == "sd-spi" and host == "software"),
+                f"{source}: invalid storage host")
+        require(type(storage.get("select")) is int, f"{source}: SPI requires chip select")
+    used: set[int] = set()
+    for role, capability in (("mosi", "output"), ("miso", "input"), ("clock", "output"),
+                             ("select", "output"), ("power", "output")):
+        gpio = storage.get(role)
+        if gpio is None and role in {"select", "power"}: continue
+        require(type(gpio) is int and gpio >= 0 and gpio not in used,
+                f"{source}: invalid or duplicate storage {role} pin")
+        pin = pins.get(gpio, {})
+        require(pin.get("reserved_for") == "system.storage" and pin.get("selectable") is False and
+                capability in pin.get("capabilities", []), f"{source}: storage {role} must use a reserved capable pin")
+        used.add(gpio)
+    if storage.get("power") is not None:
+        require(type(storage.get("power_level")) is bool, f"{source}: storage power polarity required")
+    elif "power_level" in storage:
+        require(type(storage["power_level"]) is bool, f"{source}: invalid storage power polarity")
+
+
 def validate_board(path: Path) -> None:
     document = load_manifest(path)
     require_keys(document, {"schema_version", "id", "target", "sources", "pins"},
-                 {"schema_version", "id", "target", "sources", "pins", "antenna", "buses", "flash_bytes"}, path.as_posix())
+                 {"schema_version", "id", "target", "sources", "pins", "antenna", "buses", "flash_bytes", "storage"}, path.as_posix())
     require(document["schema_version"] == 1, f"{path}: unsupported board schema")
     require(document["target"] in {"esp32", "esp32s3", "esp32c6"}, f"{path}: invalid target")
     if "flash_bytes" in document:
@@ -212,6 +244,8 @@ def validate_board(path: Path) -> None:
         ids.add(pin["id"])
         gpios.add(pin["gpio"])
         by_gpio[pin["gpio"]] = pin
+    if "storage" in document:
+        validate_storage(document["storage"], by_gpio, path.as_posix())
     if document["id"] == "seeed-xiao-esp32c6-chip-antenna":
         require(document.get("antenna") == "onboard", f"{path}: reference C6 must use onboard antenna")
         require(by_gpio[3].get("reason") == "onboard-antenna-rf-switch-power",
@@ -305,6 +339,14 @@ def main() -> int:
     check_fixture("conflict-reserved.json", False, "system.flash")
     for board in sorted((ROOT / "v2" / "boards").glob("*.json")):
         validate_board(board)
+    board = load_manifest(ROOT / "v2/boards/creators-club.json")
+    pins = {pin["gpio"]: pin for pin in board["pins"]}
+    for field, value in (("host", 1), ("mosi", 25), ("clock", 13), ("namespace", "../other"),
+                         ("power_level", None), ("unexpected", True)):
+        storage = {**board["storage"], field: value}
+        try: validate_storage(storage, pins, "invalid-storage-fixture")
+        except ManifestError: print(f"PASS rejected invalid storage {field}")
+        else: raise ManifestError(f"invalid storage {field} accepted")
     print("Resource and board manifest validation passed")
     return 0
 

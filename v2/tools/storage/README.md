@@ -9,6 +9,8 @@ Mount selection currently happens at startup. Live card reprobe remains open.
 
 The public HTTP API requires no password or API key. Relative logical names use
 ASCII letters, digits, `-`, `_`, `.`, and `/`, with a maximum of 96 characters.
+Each path component must also fit its filesystem's name limit, including the
+three-byte physical generation suffix (LittleFS is configured for 64 bytes).
 Traversal and encoded/absolute paths are rejected. The default file bound is
 16 MiB; capacity can be lower on the selected volume. One writer and four
 readers are admitted. A busy updater rejects manual file transfers, and active
@@ -49,5 +51,27 @@ It verifies board/network identity, all three namespaces, repeated replacements,
 interrupted uploads/downloads, path bounds, empty/deleted files and optional
 reboot persistence. It disables periodic release checks for the file test and
 restores their original interval. It never changes the PC's Wi-Fi connection.
-Browser file listing and persistent script/playback execution are follow-up
-integration work; this tool qualifies the shared storage and transfer boundary.
+Browser file listing and playback/sequence consumers remain follow-up work.
+
+With WASM enabled, `blip.wasm/load_file` accepts a logical path such as
+`scripts/show.wasm` and returns a queued request ID. Read its usual `completion`
+result before calling exports or script actions. The worker validates the stored
+generation and module, publishes its declared controls, and loads passively;
+uploading or loading a file does not execute guest code. Missing/oversized files
+preserve the running module. After buffer reuse begins, an I/O or module
+validation failure leaves the worker unloaded. The 16 KiB module bound still
+applies. A loaded module is independent of later file replacement/deletion.
+There is no boot autostart policy yet.
+
+```powershell
+python v2/tools/storage/blip_stored_script_hil.py `
+  --device http://DEVICE_IP --port COM_PORT --build build/BOARD_BUILD `
+  --flash-log build/FLASH_LOG --mac FLASHED_MAC --expected-medium sd-spi `
+  --reset --report build/stored-script-trial.json
+```
+
+This adds named loading, exact copied guest results, early/late failure recovery,
+96-byte nested paths, repeated replacement and post-reset loading checks. File
+validation can take longer than the serial client's execution-completion poll;
+this helper allows 60 seconds for file operations. Guest execution budgets are
+unchanged. Cancellation during long storage validation remains to be qualified.

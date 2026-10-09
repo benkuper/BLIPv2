@@ -70,6 +70,6 @@ if(NOT CMAKE_BUILD_EARLY_EXPANSION)
     set_source_files_properties(${WAMR_RUNTIME_LIB_SOURCE} PROPERTIES COMPILE_OPTIONS "-Wno-error;-Wno-format")
 endif()
 idf_component_register(SRCS ${srcs} INCLUDE_DIRS "include" PRIV_INCLUDE_DIRS ${engine_includes}
-                       REQUIRES blip_core pthread lwip esp_timer heap freertos)
+                       REQUIRES blip_core blip_storage pthread lwip esp_timer heap freertos)
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/blip_component.cmake)
 blip_configure_component(${COMPONENT_LIB})

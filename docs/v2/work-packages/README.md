@@ -21,6 +21,7 @@ wire protocols, or public OSC paths.
 | [2.1](2.1-versioned-nvs-settings.md) | Versioned per-component NVS records with two-slot interrupted-save recovery |
 | [2.2](2.2-atomic-file-storage.md) | Versioned atomic LittleFS files and an optional two-slot SD service with bounded recovery |
 | [2.2 media extension](2.2-automatic-media-storage.md) | Automatic external/internal bulk files for web assets, scripts, playback and sequences; integration/qualification in progress |
+| [2.2 stored scripts](2.2-automatic-media-storage.md#stored-script-consumer-checkpoint) | Passive named script loading through automatic storage; six boards passed 215 file-consumer checks each, seven builds pass; cancellation, other consumers and full qualification remain open |
 | [2.3](2.3-settings-migration-v1-import.md) | Ordered V2 schema migrations; prior V1 import evidence retained as historical record |
 | [2.4](2.4-diagnostics-safe-mode.md) | Bounded structured diagnostics, retained coredumps, and physically qualified boot-loop recovery |
 | [2.5](2.5-serial-transport.md) | Versioned common envelope, bounded Serial/USB control, host CLI, and normal/recovery hardware qualification |
