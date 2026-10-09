@@ -61,6 +61,7 @@ class EspOscQueryComponent final : public core::Component, public network::HttpR
     [[nodiscard]] esp_err_t handle_resource_reassignment(httpd_req_t* request) noexcept;
     [[nodiscard]] esp_err_t handle_firmware_upload(httpd_req_t* request) noexcept;
     [[nodiscard]] esp_err_t handle_file(httpd_req_t* request) noexcept;
+    [[nodiscard]] esp_err_t handle_file_list(httpd_req_t*, std::string_view directory, std::string_view query) noexcept;
     [[nodiscard]] esp_err_t handle_websocket(httpd_req_t* request) noexcept;
     [[nodiscard]] std::string_view local_ip() noexcept;
 

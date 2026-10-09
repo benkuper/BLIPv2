@@ -1,4 +1,5 @@
 #include "blip/storage/posix_file_backend.hpp"
+#include <dirent.h>
 
 #include <cerrno>
 #include <climits>
@@ -219,6 +220,44 @@ core::Result<std::size_t> PosixFileBackend::file_size(std::string_view path) noe
                                                    "negative"});
     }
     return core::Result<std::size_t>::success(static_cast<std::size_t>(state.st_size));
+}
+
+core::Status PosixFileBackend::visit_directory(std::string_view path, void* context, DirectoryVisitor visitor) noexcept {
+    std::array<char, kMaxFullPathBytes> resolved{};
+    if (!visitor || !full_path(path, resolved))
+        return core::Status::failure({core::ErrorDomain::storage, core::ErrorCode::invalid_argument,
+                                      {}, "file-directory", "path-or-visitor"});
+    auto* directory = ::opendir(resolved.data());
+    if (!directory) return core::Status::failure(errno_error("file-directory", errno));
+    core::Status status = core::Status::success();
+    while (true) {
+        errno = 0;
+        const auto* entry = ::readdir(directory);
+        if (!entry) {
+            if (errno) status = core::Status::failure(errno_error("file-directory", errno));
+            break;
+        }
+        const std::string_view name{entry->d_name};
+        if (name == "." || name == "..") continue;
+        if (entry->d_type == DT_DIR || entry->d_type == DT_REG) {
+            visitor(context, name, entry->d_type == DT_DIR);
+        } else if (entry->d_type == DT_UNKNOWN) {
+            const auto length = path.size() + 1 + name.size();
+            if (length + root_size_ + 2 > resolved.size()) continue;
+            const auto base = root_size_ + 1 + path.size();
+            resolved[base] = '/';
+            std::memcpy(resolved.data() + base + 1, name.data(), name.size());
+            resolved[base + 1 + name.size()] = '\0';
+            struct stat state{};
+            if (::stat(resolved.data(), &state) != 0) {
+                status = core::Status::failure(errno_error("file-directory-stat", errno)); break;
+            }
+            resolved[base] = '\0';
+            if (S_ISDIR(state.st_mode) || S_ISREG(state.st_mode)) visitor(context, name, S_ISDIR(state.st_mode));
+        }
+    }
+    if (::closedir(directory) != 0 && status) status = core::Status::failure(errno_error("file-directory-close", errno));
+    return status;
 }
 
 core::Result<std::size_t> PosixFileBackend::read_at(std::string_view path, std::size_t offset,

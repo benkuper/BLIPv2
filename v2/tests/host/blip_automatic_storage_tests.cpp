@@ -20,6 +20,7 @@ class MemoryVolume final : public WebAssetBackend {
     std::string writing;
     bool available{true};
     bool fail_finish{};
+    std::size_t read_bytes{};
     static Status failure(ErrorCode code) noexcept {
         return Status::failure({blip::core::ErrorDomain::storage, code, {}, {}, "test-volume"});
     }
@@ -35,6 +36,7 @@ class MemoryVolume final : public WebAssetBackend {
         if (!size) return size;
         if (offset > size.value()) return Result<std::size_t>::failure(failure(ErrorCode::invalid_argument).error());
         const auto count = std::min(output.size(), size.value() - offset);
+        read_bytes += count;
         std::copy_n(files.find(path)->second.begin() + static_cast<std::ptrdiff_t>(offset), count, output.begin());
         return Result<std::size_t>::success(count);
     }
@@ -73,6 +75,19 @@ class MemoryVolume final : public WebAssetBackend {
         const auto found = files.find(path);
         if (found != files.end()) files.erase(found);
         return Status::success();
+    }
+    Status visit_directory(std::string_view directory, void* context, DirectoryVisitor visitor) noexcept override {
+        if (!available) return failure(ErrorCode::io_failed);
+        const auto prefix = std::string(directory) + "/";
+        bool found{};
+        for (const auto& [path, bytes] : files) {
+            if (!path.starts_with(prefix)) continue;
+            found = true;
+            const auto child = std::string_view(path).substr(prefix.size());
+            const auto separator = child.find('/');
+            visitor(context, child.substr(0, separator), separator != child.npos);
+        }
+        return found ? Status::success() : failure(ErrorCode::not_found);
     }
 };
 
@@ -277,7 +292,7 @@ bool web_uses_external_bulk_store_and_retains_factory_and_previous_bundle() {
     AutomaticWebBackend backend(files, internal);
     WebAssetStore assets(backend, web_scratch);
     BLIP_CHECK(assets.load_active());
-    BLIP_CHECK(backend.using_factory() && assets.info().bundle_version == 3007);
+    BLIP_CHECK(backend.using_factory() && assets.info().bundle_version == 3009);
     BLIP_CHECK(assets.begin_install(bundle.size()));
     for (std::size_t offset = 0; offset < bundle.size(); offset += 17)
         BLIP_CHECK(assets.append_install(std::span(bundle).subspan(offset, std::min<std::size_t>(17, bundle.size() - offset))));
@@ -290,7 +305,7 @@ bool web_uses_external_bulk_store_and_retains_factory_and_previous_bundle() {
     corrupt.back() ^= std::byte{1};
     BLIP_CHECK(assets.begin_install(corrupt.size()) && assets.append_install(corrupt));
     BLIP_CHECK(!assets.finish_install());
-    BLIP_CHECK(assets.active() && assets.info().bundle_version == 3007);
+    BLIP_CHECK(assets.active() && assets.info().bundle_version == 3009);
     BLIP_CHECK(!external.files.contains("server/assets.bundle.b1"));
     // Repeat to ensure the web reader releases the old generation on commit.
     for (unsigned i = 0; i < 4; ++i) {
@@ -372,6 +387,61 @@ bool validation_cancellation_does_not_publish_pin_or_fall_back() {
     BLIP_CHECK(opened && opened.value().size == second.size()); store.close(opened.value());
     return true;
 }
+
+bool directory_pages_merge_media_hide_deletions_and_do_not_scan_payloads() {
+    MemoryVolume internal, external;
+    std::array<std::byte, 64> scratch{};
+    AutomaticFileStore store(internal, scratch);
+    BLIP_CHECK(store.save("scripts/common", first));
+    BLIP_CHECK(store.save("scripts/internal", first));
+    BLIP_CHECK(store.save("scripts/deleted", first));
+    BLIP_CHECK(store.set_external(&external));
+    BLIP_CHECK(store.save("scripts/common", second));
+    BLIP_CHECK(store.erase("scripts/deleted"));
+    BLIP_CHECK(store.save("scripts/folder/nested", first));
+    BLIP_CHECK(store.save("scripts/folder", first));
+    const std::vector<std::byte> large(65536, std::byte{42});
+    BLIP_CHECK(store.save("scripts/large", large));
+    std::array<FileListEntry, 2> entries{};
+    std::map<std::string, FileListEntry> seen;
+    std::string cursor;
+    internal.read_bytes = external.read_bytes = 0;
+    for (unsigned round = 0; round < 10; ++round) {
+        const auto page = store.list("scripts", cursor, entries);
+        BLIP_CHECK(page && page.value().count <= entries.size());
+        for (std::size_t i = 0; i < page.value().count; ++i)
+            BLIP_CHECK(seen.emplace(entries[i].path.data(), entries[i]).second);
+        if (!page.value().more) break;
+        BLIP_CHECK(std::string_view{page.value().cursor.data()} > cursor);
+        cursor = page.value().cursor.data();
+    }
+    BLIP_CHECK(seen.size() == 4 && !seen.contains("scripts/deleted"));
+    BLIP_CHECK(seen.at("scripts/common").external && !seen.at("scripts/internal").external);
+    BLIP_CHECK(seen.at("scripts/folder").file && seen.at("scripts/folder").directory);
+    BLIP_CHECK(internal.read_bytes + external.read_bytes < 2048);
+    auto page = store.list("scripts/folder", {}, entries);
+    BLIP_CHECK(page && page.value().count == 1 && std::string_view{entries[0].path.data()} == "scripts/folder/nested");
+    page = store.list("sequences", {}, entries);
+    BLIP_CHECK(page && !page.value().count && !page.value().more);
+    // A corrupt tombstone must not hide a recoverable name or expose a stale
+    // internal payload. Listing exposes the name for replacement/deletion.
+    external.files["scripts/deleted.b0"].back() ^= std::byte{1};
+    page = store.list("scripts", "common", entries);
+    BLIP_CHECK(page && page.value().count == 2 && entries[0].unreadable);
+    // Payload checks are intentionally deferred to open, even after listing.
+    external.files["scripts/common.b0"][40] ^= std::byte{1};
+    page = store.list("scripts", {}, entries);
+    BLIP_CHECK(page && !entries[0].unreadable);
+    const auto opened = store.open("scripts/common");
+    BLIP_CHECK(!opened && opened.error().code == ErrorCode::corrupt_data);
+    BLIP_CHECK(!store.list("scripts", "../bad", entries));
+    BLIP_CHECK(!store.list("scripts", "folder/nested", entries));
+    BLIP_CHECK(!store.list("scripts", {}, {}));
+    external.available = false;
+    page = store.list("scripts", {}, entries);
+    BLIP_CHECK(!page && page.error().code == ErrorCode::io_failed);
+    return true;
+}
 } // namespace
 
 int main() {
@@ -387,6 +457,7 @@ int main() {
         {"web uses shared external file storage", web_uses_external_bulk_store_and_retains_factory_and_previous_bundle},
         {"durable deletion and empty files", deletion_hides_internal_fallback_and_empty_files_remain_distinct},
         {"cancel validation without pins or fallback", validation_cancellation_does_not_publish_pin_or_fall_back},
+        {"bounded directory merge and metadata-only listing", directory_pages_merge_media_hide_deletions_and_do_not_scan_payloads},
     };
     return run_tests(tests);
 }

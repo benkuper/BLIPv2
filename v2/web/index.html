@@ -73,6 +73,28 @@
           <p class="update-note">Firmware installation restarts your BLIP. Interface installation refreshes this page.</p>
         </section>
 
+        <section id="file-center" class="file-center advanced-only" aria-labelledby="files-heading" hidden>
+          <div class="update-title"><div><p class="eyebrow">Your show, on your device</p><h2 id="files-heading">Files</h2></div>
+            <button data-file-refresh class="secondary-button" type="button">Refresh files</button></div>
+          <p data-file-medium class="file-note">Automatic storage</p>
+          <nav class="topic-nav" aria-label="File types">
+            <button data-file-namespace="scripts" type="button" aria-pressed="true">Scripts</button>
+            <button data-file-namespace="playback" type="button" aria-pressed="false">Playback</button>
+            <button data-file-namespace="sequences" type="button" aria-pressed="false">Sequences</button>
+          </nav>
+          <nav data-file-breadcrumbs class="file-breadcrumbs" aria-label="File location"></nav>
+          <ul data-file-rows class="file-rows" aria-label="Stored files"></ul>
+          <button data-file-more class="secondary-button" type="button" hidden>Load more</button>
+          <form class="file-upload">
+            <label><span>File</span><input data-file-input type="file" required /></label>
+            <label><span>Save in this folder as</span><input data-file-path type="text" placeholder="folder/filename.wasm" required autocomplete="off" maxlength="96" /></label>
+            <button class="primary-button" type="submit">Upload file</button>
+          </form>
+          <div class="update-footer"><p data-file-status role="status" aria-live="polite">Choose Advanced mode to browse files</p>
+            <button data-file-cancel class="secondary-button" type="button" hidden>Cancel transfer</button></div>
+          <p class="file-note">Uploads replace files with the same name. Folders are created automatically. Names use letters, digits, dots, dashes and underscores. Contents are checked when opened.</p>
+        </section>
+
         <section class="firmware-panel advanced-only" aria-labelledby="reservations-heading" hidden>
           <div>
             <p class="eyebrow">Board resources</p>

@@ -10,6 +10,18 @@ sliders and real recent-reading graphs/meters. Advanced exposes all published
 controls plus resource assignments, with topics and search. Component hints and
 the remaining scope are in [ADR-0018](../../docs/v2/adr/0018-device-web-presentation.md).
 
+Advanced also provides a common Scripts/Playback/Sequences browser. It navigates
+bounded directory pages and uploads, downloads or deletes logical files through
+automatic storage selection. Scripts can be loaded passively, with queued work
+completion shown before their controls appear. Readings pause during file
+operations; the live control socket remains active. Transfer cancellation does
+not promise that a request already committed on the device was undone; refresh
+to check. An uncertain action reply requires reconnecting before retrying.
+Network failures during reads have at most two retries; each download attempt
+starts from an empty buffer. New transfers suppress queued sensor-read retries.
+Uploads, deletes and actions are never automatically resubmitted. Mutation
+responses are consumed before the next request releases its connection.
+
 The app fetches `/?HOST_INFO` and `/?config=1`, then controls
 the device through binary OSC messages on the root WebSocket. Parameters render
 as booleans, numbers, strings, password fields, enumerated selects, or read-only
@@ -76,3 +88,15 @@ intended only for a trusted local network.
 
 See [the 3.2 work-package record](../../docs/v2/work-packages/3.2-filesystem-web-assets.md)
 for the binary format, HTTP routes, recovery rules, and build evidence.
+
+The installed-interface browser trial is
+[`../tools/web/blip_file_browser_hil.mjs`](../tools/web/blip_file_browser_hil.mjs).
+Run it with `node`, supplying `--device`, the local Playwright module path as
+`--playwright`, Chromium/Edge executable as `--browser`, a compiled script-controls
+WASM fixture as `--fixture`, and a JSON `--report` path. It checks all namespaces,
+exact downloaded bytes, script loading/schema refresh, deletion, desktop/mobile
+screenshots and horizontal overflow. It reclaims test payloads and closes its
+browser; empty fixture folders and the loaded passive test module remain until
+the module is unloaded through the normal control/serial interface.
+It records at most two startup reloads before any controls are submitted, and
+follows directory pagination when earlier fixture folders occupy the first page.

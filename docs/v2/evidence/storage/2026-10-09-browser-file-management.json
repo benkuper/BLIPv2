@@ -1,0 +1,1153 @@
+{
+  "date": "2026-10-09",
+  "milestone_complete": false,
+  "goal_complete": false,
+  "agent_changed_pc_network": false,
+  "scope": "Bounded merged logical directory listing and Advanced file management; six-device firmware/native update, listing and real-browser checkpoints. Full seven-board milestone remains open.",
+  "firmware_code": 35,
+  "web": {
+    "source_version": "0.3.9",
+    "factory_code": 3009,
+    "published_code": 3122,
+    "bytes": 33044,
+    "factory_sha256": "a6e2900c9d10d421a76c710c5a7a51f484157e8f2d299888e02892e2424d6efc",
+    "published_sha256": "f7ae427fa7812d4977d6df80e7471834daae14b4d928853268f19f3b0fc17e5c",
+    "embedded_in_application": false
+  },
+  "verification": {
+    "host_suites": 33,
+    "browser_tests": 41,
+    "host_build_log_sha256": "b8d6cffc582fd83276c47b61d29b8b08cd1fcd6aedfd5a76753303ceb0f7504a",
+    "host_test_log_sha256": "57bd4a1a3cb072c5acfeb284617af259a448dc2938fda714ce7ee9ca7a417e23",
+    "browser_test_log_sha256": "d61ecce922f37d986b16f331503a57227accdf2a6b27ff32ba623710ca457bfd"
+  },
+  "production_builds": [
+    {
+      "profile": "ball",
+      "identity": {
+        "project": "blip-v2",
+        "board": "creators-ball-v2",
+        "target": "esp32c6",
+        "layout": "ota-8mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 8388608,
+        "features": 123,
+        "api": 1
+      },
+      "code": 35,
+      "app_bytes": 2052720,
+      "app_delta": 4480,
+      "static_sections": {
+        ".dram0.data": 24532,
+        ".noinit": 0,
+        ".dram0.bss": 131880,
+        ".dram0.heap_start": 8
+      },
+      "static_sections_before": {
+        ".dram0.data": 24532,
+        ".noinit": 0,
+        ".dram0.bss": 131880,
+        ".dram0.heap_start": 8
+      },
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "f75ea1a589ea16fe5abb63b56b941229639e6c11dfe5e045c9f581aabe5dc084",
+        "blip-v2.elf": "5fceb05b2a214d8b520bf71b65bee23081083fa4164c6ba96a1727de2588a615",
+        "blip-v2.map": "030c320e9ad0fc68c91208f2d8a727c49e2ba0d6d295774f66ef2fe47c3b8f05",
+        "sdkconfig": "b056eea7aa6d48a5ce37b2dd803661936d4fbf5edcc2fd085e7f75cb53e615e9",
+        "flash_args": "eab98e020c75d1d5a3774824d230c178f6851cdf0ac6154af26aa70d5cbb968a",
+        "storage.bin": "de41e8df3cf03af8176e525de3c50bb1184f134fad7a50f14c292b9439224ee9"
+      },
+      "build_log_sha256": "7fab9a43ba22a19d4390459a90eaefa11359ab998f4663e17c9689602f2f1efb",
+      "factory_image_log_sha256": "ae21653d82038519082ce20f72746e22f9a16adbc41c8a8a32d152a197712737"
+    },
+    {
+      "profile": "club",
+      "identity": {
+        "project": "blip-v2",
+        "board": "creators-club",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 35,
+      "app_bytes": 1525136,
+      "app_delta": 4304,
+      "static_sections": {
+        ".dram0.data": 23966,
+        ".noinit": 4,
+        ".dram0.bss": 124408,
+        ".dram0.heap_start": 0
+      },
+      "static_sections_before": {
+        ".dram0.data": 23966,
+        ".noinit": 4,
+        ".dram0.bss": 124408,
+        ".dram0.heap_start": 0
+      },
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "8f3049364a034f46cbc47f0da83e356765793e56177ff73cf6ae97ea24c96454",
+        "blip-v2.elf": "b5414c849e6a2d0c5f3898c35583ac7abd3c5556c57bbcb9dea79b6a8d4c99e4",
+        "blip-v2.map": "85eb434f5f52813bd4ce53e72121da855be9f746f71c6e2a0f0c14611a5989e5",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa",
+        "flash_args": "f7f533cb5baf407299c5b899ed0b1fd6baea8012f87f356373b290ed9c2fdced",
+        "storage.bin": "230a30c2fdcb7fc7aaa6603198d409a2d36ce10b0436757411885685337749e9"
+      },
+      "build_log_sha256": "b669691b0d9e2b0c234374fbc5204f4c8ec66bdf648ecda0b7936979742f8891",
+      "factory_image_log_sha256": "79c2287c5e156fdb244a577fac09c55678d104ac01e7539d397dfcee42b08e85"
+    },
+    {
+      "profile": "tab",
+      "identity": {
+        "project": "blip-v2",
+        "board": "creators-tab",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 35,
+      "app_bytes": 1531232,
+      "app_delta": 4320,
+      "static_sections": {
+        ".dram0.data": 24053,
+        ".noinit": 4,
+        ".dram0.bss": 137944,
+        ".dram0.heap_start": 0
+      },
+      "static_sections_before": {
+        ".dram0.data": 24053,
+        ".noinit": 4,
+        ".dram0.bss": 137944,
+        ".dram0.heap_start": 0
+      },
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "84d66d4a7961b29a906de08e16704dbf5e0008e63aa4a172dd044de27e6537bd",
+        "blip-v2.elf": "6c67cf758040bce6cb8893bc16e8d86050188d77e1f516214abb9002686457c2",
+        "blip-v2.map": "f813ebe3515988657bf5bd3b6ad3aa60a2e692ac6b6547094f9cdca76be21b8f",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa",
+        "flash_args": "f7f533cb5baf407299c5b899ed0b1fd6baea8012f87f356373b290ed9c2fdced",
+        "storage.bin": "230a30c2fdcb7fc7aaa6603198d409a2d36ce10b0436757411885685337749e9"
+      },
+      "build_log_sha256": "293745246db59f8b8fc7b601fcc64aef6d572edf6cf1d2be3d2c0cf6cb0e949c",
+      "factory_image_log_sha256": "29db4e120dae6f4b0872886e5001557cb8daa9d599b5b98f14743bee9a2b9496"
+    },
+    {
+      "profile": "huzzah32",
+      "identity": {
+        "project": "blip-v2",
+        "board": "adafruit-huzzah32",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 35,
+      "app_bytes": 1466736,
+      "app_delta": 4336,
+      "static_sections": {
+        ".dram0.data": 23932,
+        ".noinit": 4,
+        ".dram0.bss": 140896,
+        ".dram0.heap_start": 0
+      },
+      "static_sections_before": {
+        ".dram0.data": 23932,
+        ".noinit": 4,
+        ".dram0.bss": 140896,
+        ".dram0.heap_start": 0
+      },
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "4df73d3221419cfef033f5b1b710d3e1c7bcc439543dadb233765407a2128537",
+        "blip-v2.elf": "4df1870f725ccc86bf4e32f9a7c924b8a2bb1aa2cfa7da82ec3b816078e3ff6d",
+        "blip-v2.map": "13e8e3e65f5ce9e4ef67147f7e6f23c3e96fe3cd6b6592741c4347cc3611cb2a",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54",
+        "flash_args": "f7f533cb5baf407299c5b899ed0b1fd6baea8012f87f356373b290ed9c2fdced",
+        "storage.bin": "230a30c2fdcb7fc7aaa6603198d409a2d36ce10b0436757411885685337749e9"
+      },
+      "build_log_sha256": "74b92b7993907eb41580283cdb79119867d40b914f05b9edaa49fd78edde0c35",
+      "factory_image_log_sha256": "9bb590c080afc39d6a1048d1addbf7982d6c496bac448a3c9d0e1cfb1f34c150"
+    },
+    {
+      "profile": "m5stickc",
+      "identity": {
+        "project": "blip-v2",
+        "board": "m5stack-m5stickc",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 35,
+      "app_bytes": 1443136,
+      "app_delta": 4576,
+      "static_sections": {
+        ".dram0.data": 23804,
+        ".noinit": 4,
+        ".dram0.bss": 137560,
+        ".dram0.heap_start": 0
+      },
+      "static_sections_before": {
+        ".dram0.data": 23804,
+        ".noinit": 4,
+        ".dram0.bss": 137560,
+        ".dram0.heap_start": 0
+      },
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "9e7b1982c8d00a6106842406aabca6894c14195b60752ce5da968d2853bad124",
+        "blip-v2.elf": "c52c7f56dfb725d8572d655043cc8fb3d6f86e06e251d2fab133d913a362ebc3",
+        "blip-v2.map": "26a82a06ebbfdd3ff063449557bbaae9a99417d65e4f3eb3f42a280f9060346a",
+        "sdkconfig": "120f4d9a39f4f45a7c99cf3e02188cf3a60db42ebbaaf4310ff79fa75437aff0",
+        "flash_args": "f7f533cb5baf407299c5b899ed0b1fd6baea8012f87f356373b290ed9c2fdced",
+        "storage.bin": "230a30c2fdcb7fc7aaa6603198d409a2d36ce10b0436757411885685337749e9"
+      },
+      "build_log_sha256": "bbd077fe5c8909fdc08e733102034fc7a40569207e597763b8dc093c4f5c20bd",
+      "factory_image_log_sha256": "e4e8afa3e5022f3b89201f158b6b921bc24080ddc2acd841d61e1db256dbdffc"
+    },
+    {
+      "profile": "m5dial",
+      "identity": {
+        "project": "blip-v2",
+        "board": "m5stack-m5dial",
+        "target": "esp32s3",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 35,
+      "app_bytes": 1447664,
+      "app_delta": 4240,
+      "static_sections": {
+        ".dram0.data": 29749,
+        ".noinit": 3,
+        ".dram0.bss": 136208,
+        ".dram0.heap_start": 0
+      },
+      "static_sections_before": {
+        ".dram0.data": 29749,
+        ".noinit": 3,
+        ".dram0.bss": 136208,
+        ".dram0.heap_start": 0
+      },
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "f4c0ab884e915b3813221c69a81736fc4f0390b4842263821a7288288f01b129",
+        "blip-v2.elf": "1fb726bfeff7f70e0e036be14d59758ee0b1a244e6ccbf91e46e6d750e3a211d",
+        "blip-v2.map": "0e917f05f0fdd0b0c89f97bd26fdaf8c9336212e6d19f9cbef10238e03cc0b9f",
+        "sdkconfig": "15a8f1c085d83036e76ba1c59ac6e1e76d5fd8b84e17141c805bc3f9849f650e",
+        "flash_args": "e8d153776127bd97ee2eb200338cb948b8385c18ec3fe555e333e306950f8089",
+        "storage.bin": "230a30c2fdcb7fc7aaa6603198d409a2d36ce10b0436757411885685337749e9"
+      },
+      "build_log_sha256": "a15eb268b1f2ad0fecd016f42b0e986ccdac73f2195ece91e119ff62afe06dc9",
+      "factory_image_log_sha256": "e79e4dc0c43f9ef194bb49951837b4c1076d00c020f3673b5c6170c0580f7f87"
+    },
+    {
+      "profile": "xiao",
+      "identity": {
+        "project": "blip-v2",
+        "board": "seeed-xiao-esp32c6-chip-antenna",
+        "target": "esp32c6",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 35,
+      "app_bytes": 1626816,
+      "app_delta": 4512,
+      "static_sections": {
+        ".dram0.data": 23372,
+        ".noinit": 0,
+        ".dram0.bss": 142160,
+        ".dram0.heap_start": 0
+      },
+      "static_sections_before": {
+        ".dram0.data": 23372,
+        ".noinit": 0,
+        ".dram0.bss": 142160,
+        ".dram0.heap_start": 0
+      },
+      "passed": true,
+      "artifacts": {
+        "blip-v2.bin": "a2e95f3855db35948016c5bbe0fc58eea19c98464db1685869901434d747a861",
+        "blip-v2.elf": "dd223cf19206c9e71c3347318d1ef7a1c1f2feda366d508f0bfa3a89ea740fdb",
+        "blip-v2.map": "1a94ef99cbab0edac78be1fd47bc6aa22a4ac43cdf0fa0edf6b5fb09e225d859",
+        "sdkconfig": "b3aa9e358a8cd509c80fc7d186017bb2d85c79caa633244b352ba7d3a8ed5c9b",
+        "flash_args": "e8d153776127bd97ee2eb200338cb948b8385c18ec3fe555e333e306950f8089",
+        "storage.bin": "230a30c2fdcb7fc7aaa6603198d409a2d36ce10b0436757411885685337749e9"
+      },
+      "build_log_sha256": "bd7a664057343ba75a720ff60053aafe8b11f17cb64a470c5134b6918eb2ff99",
+      "factory_image_log_sha256": "08f9d490e92ef3f59d2bf194f242c149c5d471715fb4506a6f060bda8d0bb3dc"
+    }
+  ],
+  "hardware": [
+    {
+      "profile": "ball",
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "medium": "sd-spi",
+      "firmware_upgrade": {
+        "passed": true,
+        "checks": 13,
+        "report": "build/m48-ball-files35-native-firmware.json",
+        "sha256": "794af11e5dcab701059e30ceeb7c8c61e338bf6bf8a3afcc8b1c6a4d84d6610e"
+      },
+      "initial_web_upgrade": {
+        "passed": true,
+        "checks": 10,
+        "report": "build/m48-ball-web3119.json",
+        "sha256": "f67c9c23ecb6f9e49d6d8ce3d75f1f5815d2805d8a78f3f7d3a51db168951c43"
+      },
+      "latest_web_upgrade_report": {
+        "passed": true,
+        "checks": 10,
+        "report": "build/m48-ball-web3122.json",
+        "sha256": "52206651c21971fec2fd225ff29bd57b3e3cc83ac5575dd2a7eb142e8363d326",
+        "error": null
+      },
+      "latest_web_followup": {
+        "passed": true,
+        "cleanup": [
+          {
+            "path": "/api/files/playback/000_browser_1a121bc2a82/show.bin",
+            "deletes": [
+              200,
+              200
+            ],
+            "get": 404
+          },
+          {
+            "path": "/api/files/playback/000_browser_1a121c4357e/show.bin",
+            "deletes": [
+              200,
+              200
+            ],
+            "get": 404
+          },
+          {
+            "path": "/api/files/scripts/000_browser_1a121bc2a82/show.wasm",
+            "deletes": [
+              200,
+              200
+            ],
+            "get": 404
+          },
+          {
+            "path": "/api/files/scripts/000_browser_1a121c4357e/show.wasm",
+            "deletes": [
+              200,
+              200
+            ],
+            "get": 404
+          }
+        ],
+        "http_checks": [
+          {
+            "path": "/api/web-assets",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "e16689b9acda26c882a76e0224d7080bcbc2a0e8b4724128036d2e4f78ed619a"
+          },
+          {
+            "path": "/src/client.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "c571b30838ea0b4eedf749574f5acc58410be19adaf35a9d1c0c01b8f25cbf11"
+          },
+          {
+            "path": "/src/files.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "1a0a2816821455425771ecf01acbcedf9ba53578022912832b9d720167a87f30"
+          }
+        ],
+        "pc_network_changed": false,
+        "profile": "ball",
+        "board": "creators-ball-v2",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3122,
+        "boot_sequence": 21,
+        "http_stack_headroom": 3168,
+        "unload": {
+          "error": "none",
+          "count": 0,
+          "elapsed_us": 2799
+        }
+      },
+      "listing": {
+        "passed": true,
+        "checks": 265,
+        "report": "build/m48-ball-listing.json",
+        "sha256": "1375d0fdd2fdff8bfb8396e0b1d25f983f1299b2054d69290300618343d51f8b",
+        "http_stack_headroom": 3968
+      },
+      "browser": {
+        "passed": true,
+        "checks": 22,
+        "report": "build/m48-ball-browser-captured.json",
+        "sha256": "47ba780737da1f6fb8ac996971c49bc6042f5f9fa3a84efe39525a8cad694771",
+        "bootstrap_reloads": 1,
+        "request_failures": [
+          {
+            "url": "http://192.168.27.186/src/view.js",
+            "failure": {
+              "errorText": "net::ERR_ABORTED"
+            }
+          },
+          {
+            "url": "http://192.168.27.186/api/files/playback/000_browser_1a121c7b9f4/show.bin",
+            "failure": {
+              "errorText": "net::ERR_INCOMPLETE_CHUNKED_ENCODING"
+            }
+          },
+          {
+            "url": "http://192.168.27.186/api/files/playback/000_browser_1a121c7b9f4/show.bin",
+            "failure": {
+              "errorText": "net::ERR_ABORTED"
+            }
+          }
+        ],
+        "schema_read_count": 5,
+        "schema_reads_during_files": 0,
+        "screenshots": {
+          "build/m48-ball-browser-captured-desktop.png": "49dc8be0f9e6c724a658566b530a789466fdde1543c5470784c40e524d787fc0",
+          "build/m48-ball-browser-captured-mobile.png": "7c686497af43aa26a50f088ce3a0bd6eaa99272d8ca12769f5c5eb8683ee058d"
+        }
+      }
+    },
+    {
+      "profile": "club",
+      "board": "creators-club",
+      "port": "COM15",
+      "mac": "30:ae:a4:f3:a3:88",
+      "medium": "sd-spi",
+      "firmware_upgrade": {
+        "passed": true,
+        "checks": 13,
+        "report": "build/m48-club-files35-native-firmware.json",
+        "sha256": "139b69476ee02828bc89ac92714411e68368755049aa5fa799c0d9a920425c20"
+      },
+      "initial_web_upgrade": {
+        "passed": true,
+        "checks": 10,
+        "report": "build/m48-club-web3119.json",
+        "sha256": "b6d398db3164213385dae41ad35aed6d5afe9d696f12b872d19a16d1ff940e04"
+      },
+      "latest_web_upgrade_report": {
+        "passed": true,
+        "checks": 10,
+        "report": "build/m48-club-web3122-retry.json",
+        "sha256": "d3b98c8dff62b929232657478e734d13cc6df468cd7a5c349709ca8d5d2c62c2",
+        "error": null
+      },
+      "latest_web_followup": {
+        "profile": "club",
+        "board": "creators-club",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3122,
+        "boot_sequence": 2,
+        "http_stack_headroom": 2568,
+        "unload": {
+          "error": "none",
+          "count": 0,
+          "elapsed_us": 1982
+        },
+        "http_checks": [
+          {
+            "path": "/api/web-assets",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "e16689b9acda26c882a76e0224d7080bcbc2a0e8b4724128036d2e4f78ed619a"
+          },
+          {
+            "path": "/src/client.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "c571b30838ea0b4eedf749574f5acc58410be19adaf35a9d1c0c01b8f25cbf11"
+          },
+          {
+            "path": "/src/files.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "1a0a2816821455425771ecf01acbcedf9ba53578022912832b9d720167a87f30"
+          }
+        ]
+      },
+      "listing": {
+        "passed": true,
+        "checks": 265,
+        "report": "build/m48-club-listing.json",
+        "sha256": "387df9f00826d2ffb37786d35cd7ca859bb7405afa6cc09b3e03f4835f1706cb",
+        "http_stack_headroom": 2632
+      },
+      "browser": {
+        "passed": true,
+        "checks": 22,
+        "report": "build/m48-club-browser-pages.json",
+        "sha256": "e96710d841310a383a8180b578cf4c7f9348bcd9437dfebb6c9c2511544c3806",
+        "bootstrap_reloads": 1,
+        "request_failures": [
+          {
+            "url": "http://192.168.27.163/?config=1",
+            "failure": {
+              "errorText": "net::ERR_ABORTED"
+            }
+          },
+          {
+            "url": "http://192.168.27.163/api/files/playback/000_browser_1a121c4f4af/show.bin",
+            "failure": {
+              "errorText": "net::ERR_ABORTED"
+            }
+          }
+        ],
+        "schema_read_count": 3,
+        "schema_reads_during_files": 0,
+        "screenshots": {
+          "build/m48-club-browser-pages-desktop.png": "bf54a4dbc5b6501a18ff28e4ade1028dc61dfaec8ba8ca10ff6deea8346f4e70",
+          "build/m48-club-browser-pages-mobile.png": "146dff4ad494862f7cdaa636983165f9945406d4d4ea083e2202d2d517a4aa9b"
+        }
+      }
+    },
+    {
+      "profile": "tab",
+      "hardware_passed": false,
+      "reason": "Not present in the six-port serial inventories; build-only evidence does not close its hardware gate."
+    },
+    {
+      "profile": "huzzah32",
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "medium": "internal",
+      "firmware_upgrade": {
+        "passed": true,
+        "checks": 13,
+        "report": "build/m48-huzzah32-files35-native-firmware.json",
+        "sha256": "1180f4f282ddfd7bd1bcf233528378d2acb2ada1379e8591920dda7c94d6dde9"
+      },
+      "initial_web_upgrade": {
+        "passed": true,
+        "checks": 10,
+        "report": "build/m48-huzzah32-web3119.json",
+        "sha256": "bd7e35f28abed31166c50e5b3423904701746fb33d34050b6d9dc4b6350640a8"
+      },
+      "latest_web_upgrade_report": {
+        "passed": false,
+        "checks": 9,
+        "report": "build/m48-huzzah32-web3122.json",
+        "sha256": "e0659ec7b6d4b2a1b88962f8fff57beafd407fced2d45e1888a7a68025b5cd3c",
+        "error": "URLError: <urlopen error timed out>"
+      },
+      "latest_web_followup": {
+        "profile": "huzzah32",
+        "board": "adafruit-huzzah32",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3122,
+        "boot_sequence": 2,
+        "http_stack_headroom": 2884,
+        "unload": {
+          "error": "none",
+          "count": 0,
+          "elapsed_us": 4499
+        },
+        "http_checks": [
+          {
+            "path": "/api/web-assets",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "e16689b9acda26c882a76e0224d7080bcbc2a0e8b4724128036d2e4f78ed619a"
+          },
+          {
+            "path": "/src/client.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "c571b30838ea0b4eedf749574f5acc58410be19adaf35a9d1c0c01b8f25cbf11"
+          },
+          {
+            "path": "/src/files.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "1a0a2816821455425771ecf01acbcedf9ba53578022912832b9d720167a87f30"
+          }
+        ]
+      },
+      "listing": {
+        "passed": true,
+        "checks": 265,
+        "report": "build/m48-huzzah32-listing.json",
+        "sha256": "57b8ffc1227226c2d007c7c2c5c77d593e053f923d09b845ff862cf3737bf61e",
+        "http_stack_headroom": 3108
+      },
+      "browser": {
+        "passed": true,
+        "checks": 22,
+        "report": "build/m48-huzzah32-browser-pages.json",
+        "sha256": "d06e9e9194e0b557c47f797d5a2e45e3dbeb1247915acc0e4d7ea2af890a9c19",
+        "bootstrap_reloads": 0,
+        "request_failures": [
+          {
+            "url": "http://192.168.27.156/api/files/playback/000_browser_1a121c433cf/show.bin",
+            "failure": {
+              "errorText": "net::ERR_ABORTED"
+            }
+          }
+        ],
+        "schema_read_count": 2,
+        "schema_reads_during_files": 0,
+        "screenshots": {
+          "build/m48-huzzah32-browser-pages-desktop.png": "e9f63ee6ea0c10e9618b5203c753467493be7e1c4c5d35a6c4d9d4816663790c",
+          "build/m48-huzzah32-browser-pages-mobile.png": "3d5088bbb60eb836b653df7e219e2afa532a7f4863445f6bceb7a708ed69b8c1"
+        }
+      }
+    },
+    {
+      "profile": "m5stickc",
+      "board": "m5stack-m5stickc",
+      "port": "COM12",
+      "mac": "94:b9:7e:8b:b7:84",
+      "medium": "internal",
+      "firmware_upgrade": {
+        "passed": true,
+        "checks": 13,
+        "report": "build/m48-m5stickc-files35-native-firmware.json",
+        "sha256": "b6f0e332533cbb9ec256a320b31cafe8104211e04ee8918b9445a9e496175b87"
+      },
+      "initial_web_upgrade": {
+        "passed": true,
+        "checks": 10,
+        "report": "build/m48-m5stickc-web3119.json",
+        "sha256": "14ed5565a1cd9e15dadc760043b5156cbee6913a373cf69e0009e1e6f9ea034e"
+      },
+      "latest_web_upgrade_report": {
+        "passed": false,
+        "checks": 9,
+        "report": "build/m48-m5stickc-web3122.json",
+        "sha256": "76c843469be6fd406b3514975f4a35c79654b6f3b67dfc892cc60a703bef7b7b",
+        "error": "URLError: <urlopen error timed out>"
+      },
+      "latest_web_followup": {
+        "profile": "m5stickc",
+        "board": "m5stack-m5stickc",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3122,
+        "boot_sequence": 2,
+        "http_stack_headroom": 2812,
+        "unload": {
+          "error": "none",
+          "count": 0,
+          "elapsed_us": 2011
+        },
+        "http_checks": [
+          {
+            "path": "/api/web-assets",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "e16689b9acda26c882a76e0224d7080bcbc2a0e8b4724128036d2e4f78ed619a"
+          },
+          {
+            "path": "/src/client.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "c571b30838ea0b4eedf749574f5acc58410be19adaf35a9d1c0c01b8f25cbf11"
+          },
+          {
+            "path": "/src/files.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "1a0a2816821455425771ecf01acbcedf9ba53578022912832b9d720167a87f30"
+          }
+        ]
+      },
+      "listing": {
+        "passed": true,
+        "checks": 265,
+        "report": "build/m48-m5stickc-listing.json",
+        "sha256": "16c65e14080e8bfe5b753ddebb13c5d62ebe6346cc165fd115aadc58cc531758",
+        "http_stack_headroom": 3116
+      },
+      "browser": {
+        "passed": true,
+        "checks": 22,
+        "report": "build/m48-m5stickc-browser-pages.json",
+        "sha256": "eea2fce269d67f2b14af457447aecc859e7975c5d7b6442e9a5063e2a4606b13",
+        "bootstrap_reloads": 0,
+        "request_failures": [
+          {
+            "url": "http://192.168.27.149/api/files/playback/000_browser_1a121c435b1/show.bin",
+            "failure": {
+              "errorText": "net::ERR_ABORTED"
+            }
+          }
+        ],
+        "schema_read_count": 2,
+        "schema_reads_during_files": 0,
+        "screenshots": {
+          "build/m48-m5stickc-browser-pages-desktop.png": "a4a87afc77a13f53d290432b24362ddab2ff5d03fe1a9f689f163712599ca2e7",
+          "build/m48-m5stickc-browser-pages-mobile.png": "f6494df9a96c7b00e8ab745934a05a3d0918a10b39209d81e5bf91665c878f7f"
+        }
+      }
+    },
+    {
+      "profile": "m5dial",
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "medium": "internal",
+      "firmware_upgrade": {
+        "passed": true,
+        "checks": 13,
+        "report": "build/m48-m5dial-files35-native-firmware.json",
+        "sha256": "5967874c6264dcc0614cdfcb8c9e1f617aafe707893f5ea62a697477e1aa0b0b"
+      },
+      "initial_web_upgrade": {
+        "passed": true,
+        "checks": 10,
+        "report": "build/m48-m5dial-web3119.json",
+        "sha256": "755fbde93f8c98bac3622db677936f3910f151cbc938d3da68749e351ce7d38d"
+      },
+      "latest_web_upgrade_report": {
+        "passed": false,
+        "checks": 9,
+        "report": "build/m48-m5dial-web3122.json",
+        "sha256": "4655b821ffc882e4a9a8a582694fc0cf102196153c42fb3dec5bd625ba42dfb2",
+        "error": "TimeoutError: timed out"
+      },
+      "latest_web_followup": {
+        "profile": "m5dial",
+        "board": "m5stack-m5dial",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3122,
+        "boot_sequence": 13,
+        "http_stack_headroom": 2424,
+        "unload": {
+          "error": "none",
+          "count": 0,
+          "elapsed_us": 1905
+        },
+        "http_checks": [
+          {
+            "path": "/api/web-assets",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "e16689b9acda26c882a76e0224d7080bcbc2a0e8b4724128036d2e4f78ed619a"
+          },
+          {
+            "path": "/src/client.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "c571b30838ea0b4eedf749574f5acc58410be19adaf35a9d1c0c01b8f25cbf11"
+          },
+          {
+            "path": "/src/files.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "1a0a2816821455425771ecf01acbcedf9ba53578022912832b9d720167a87f30"
+          }
+        ]
+      },
+      "listing": {
+        "passed": true,
+        "checks": 265,
+        "report": "build/m48-m5dial-listing.json",
+        "sha256": "032010a557146e329eb2f1aa7c0436007404deed481f5099147402a2369fb6ae",
+        "http_stack_headroom": 2664
+      },
+      "browser": {
+        "passed": true,
+        "checks": 22,
+        "report": "build/m48-m5dial-browser-pages.json",
+        "sha256": "3c752da12b14afa99f46adb7574ef17dac062a15c4c09d8c515b066d9d39f0bb",
+        "bootstrap_reloads": 0,
+        "request_failures": [
+          {
+            "url": "http://192.168.27.137/api/files/playback/000_browser_1a121c4334e/show.bin",
+            "failure": {
+              "errorText": "net::ERR_ABORTED"
+            }
+          }
+        ],
+        "schema_read_count": 2,
+        "schema_reads_during_files": 0,
+        "screenshots": {
+          "build/m48-m5dial-browser-pages-desktop.png": "ad586ff2a28ac39f783dff147974c8d3f570d18465df8d6b6cb35508bd80ba8f",
+          "build/m48-m5dial-browser-pages-mobile.png": "1ea0cfd98129af28b5c87ef457ac65d69f79fa8660af913a71f99cf056df9793"
+        }
+      }
+    },
+    {
+      "profile": "xiao",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "mac": "10:51:db:1a:a6:68",
+      "medium": "internal",
+      "firmware_upgrade": {
+        "passed": true,
+        "checks": 13,
+        "report": "build/m48-xiao-files35-native-firmware.json",
+        "sha256": "2aa6cc3fa3238939b80166dd10ddc1b2c39a941a245c0ac25e9ee011ec394370"
+      },
+      "initial_web_upgrade": {
+        "passed": true,
+        "checks": 10,
+        "report": "build/m48-xiao-web3119.json",
+        "sha256": "f7ed3cc66240c3fe406a026b052206d087d273fba44d6e5177652e243cea7f23"
+      },
+      "latest_web_upgrade_report": {
+        "passed": false,
+        "checks": 9,
+        "report": "build/m48-xiao-web3122.json",
+        "sha256": "4ff9128ab881d03be2573d821d66c973ed4c2251efc3fac5839013adc8034f0c",
+        "error": "URLError: <urlopen error timed out>"
+      },
+      "latest_web_followup": {
+        "profile": "xiao",
+        "board": "seeed-xiao-esp32c6-chip-antenna",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3122,
+        "boot_sequence": 9,
+        "http_stack_headroom": 3200,
+        "unload": {
+          "error": "none",
+          "count": 0,
+          "elapsed_us": 2123
+        },
+        "http_checks": [
+          {
+            "path": "/api/web-assets",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "e16689b9acda26c882a76e0224d7080bcbc2a0e8b4724128036d2e4f78ed619a"
+          },
+          {
+            "path": "/src/client.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "c571b30838ea0b4eedf749574f5acc58410be19adaf35a9d1c0c01b8f25cbf11"
+          },
+          {
+            "path": "/src/files.js",
+            "passed": true,
+            "attempts": 1,
+            "sha256": "1a0a2816821455425771ecf01acbcedf9ba53578022912832b9d720167a87f30"
+          }
+        ]
+      },
+      "listing": {
+        "passed": true,
+        "checks": 265,
+        "report": "build/m48-xiao-listing.json",
+        "sha256": "b9ee2959284c428deea84e1224e104cfa990c3245b7792e8fb7682380b413b00",
+        "http_stack_headroom": 3856
+      },
+      "browser": {
+        "passed": true,
+        "checks": 22,
+        "report": "build/m48-xiao-browser-pages.json",
+        "sha256": "5325444f8d4869d33f9e90389e085c44a94590bb233499832cdd5aeba21f6cc5",
+        "bootstrap_reloads": 0,
+        "request_failures": [
+          {
+            "url": "http://192.168.27.136/api/files/playback/000_browser_1a121c433ef/show.bin",
+            "failure": {
+              "errorText": "net::ERR_ABORTED"
+            }
+          }
+        ],
+        "schema_read_count": 2,
+        "schema_reads_during_files": 0,
+        "screenshots": {
+          "build/m48-xiao-browser-pages-desktop.png": "e79d08c7ab17252048a69cfe591be0ad8f8ce63e011d74335261a25d545c5b7d",
+          "build/m48-xiao-browser-pages-mobile.png": "097e8402816b52a1f43fd4902f898496d81ed1f5c59cfafd8a41d23814d1eb40"
+        }
+      }
+    }
+  ],
+  "source_sha256_lf": {
+    "v2/components/blip_oscquery/include/blip/oscquery/esp_oscquery_component.hpp": "49c714459a246653b3f467f7a8dac41f243e2bc361aaa772344b16c0e824f8dc",
+    "v2/components/blip_oscquery/src/esp_oscquery_component.cpp": "0dba88074f15517a257806977c6077361630c5e6d933b3ac69b5cc6eabf4a62f",
+    "v2/components/blip_storage/include/blip/storage/automatic_file_store.hpp": "f414a233603835543c8d968a097148093ed47f7acedb02d788791a6f3029efbe",
+    "v2/components/blip_storage/include/blip/storage/posix_file_backend.hpp": "ddda9a3c0fb3f992518f4d460b2e543f70f5a9651a05386643d009d315f2cd0b",
+    "v2/components/blip_storage/include/blip/storage/web_asset_store.hpp": "39d174f6e93c394e6cb65e9c8bcc99696e070d63ac4723fbe1f75a4f51558f8d",
+    "v2/components/blip_storage/src/automatic_file_store.cpp": "e38054ddee33db133cd7b768cbc68bfe3b1a77f38581e539b75c68cf82b9cef6",
+    "v2/components/blip_storage/src/posix_file_backend.cpp": "39a259616674e4aa922414eaf8a324fd9c4f192971ccd802bd776911414c9c95",
+    "v2/web/src/client.js": "ffd2da34845aac27859d924d538ecce3de5f9fc03b9296c9471f446e4dc5c7cc",
+    "v2/web/src/files.js": "8112e652af4658a810a5a34fac5390dadfadbd1098bbdc59865d0c52c619e4fb",
+    "v2/web/src/app.js": "a85652500fecd6b42f0aba59119bc0cac022d81700a0145728b959c0943b7677",
+    "v2/web/src/boot.js": "58be1d89917798c1ac03afb79160391838d57d50863ebed6cdf84bcc8edfa264",
+    "v2/web/index.html": "c870914cd9a2336c07d42ec937fe5591277f2e410ef11ab3f4eb03ed2e2d97e0",
+    "v2/web/styles.css": "27943f83ae01501a4ea785f82369bbac00f07fb41cc865899ad41b6f0d8108d3",
+    "v2/tools/storage/blip_file_listing_hil.py": "99751c436650166b159678578026110030f5a579419d9acebaec2081102c2ea2",
+    "v2/tools/web/blip_file_browser_hil.mjs": "b5318e8cb99ddc7b50376247f47478badae89546eb1d9f9ef1bd92f1d1534d05"
+  },
+  "catalog": {
+    "report": "build/m48-local-catalog-check-final.json",
+    "report_sha256": "67e401b9c907b1f581c06463af2cb3fa65c029dd8aed74c6b105b9dddf3c9cad",
+    "catalog_sha256": "f27b196f29d0e391edc930272ad7b231af6d548b814bebc1bdbeacbf66dc8dba",
+    "public_query_profiles": 7
+  },
+  "followup_proof_reports": {
+    "build/m48-five-final-proof.json": "ec9a4581243805b5c04be1f263c8ab25cd2643429074bb6df30186ebe96d8499",
+    "build/m48-ball-final-proof.json": "34f4dade35620e7075247415686b3f11222f1902303dc70add3ae652e04ba272"
+  },
+  "ball_memory": {
+    "before": {
+      "heap_free_internal": 22212,
+      "heap_largest_internal": 10240,
+      "heap_minimum_internal": 1684,
+      "heap_free_dma": 16228,
+      "heap_largest_dma": 10240
+    },
+    "browser_exit": 0,
+    "after": {
+      "heap_free_internal": 20788,
+      "heap_largest_internal": 10240,
+      "heap_minimum_internal": 1684,
+      "heap_free_dma": 14804,
+      "heap_largest_dma": 10240
+    }
+  },
+  "ball_serial_log_sha256": "7fc8daf4cc20608d89603a27c0ac61869feadd872f5e6f49390c8728ced6e471",
+  "reviewed_earlier_failures": [
+    {
+      "report": "build\\m48-ball-browser-files.json",
+      "sha256": "f3d1581d2f0a1e67ffd29ce39a90f4576aa6981654c44c0ccadb9016f138887e",
+      "checks": 5,
+      "error": "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.control-row').filter({ has: locator('.control-label').filter({ hasText: /^Script level$/ }) }) to be visible\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:76:121",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-ball-browser-files32k-instrumented.json",
+      "sha256": "94a864d85d631602987d267d96f105abad3c95ece37f627f813614f03e7e4737",
+      "checks": 5,
+      "error": "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.control-row').filter({ has: locator('.control-label').filter({ hasText: /^Script level$/ }) }) to be visible\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:85:121",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-ball-browser-files32k-sequential.json",
+      "sha256": "417376743deaa937fd540b82eefb5782a1dd50bf01d5b0dacba28188252e38a2",
+      "checks": 10,
+      "error": "page.waitForEvent: Timeout 60000ms exceeded while waiting for event \"download\"\n=========================== logs ===========================\nwaiting for event \"download\"\n============================================================\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:76:32",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-ball-browser-final.json",
+      "sha256": "22b2c6de3d440a7bb7715bce3ed4ad0a2b12621a5fffa6de154324a14a1c357c",
+      "checks": 9,
+      "error": "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#file-center').locator('[data-file-status]').filter({ hasText: /^Saved on device$/ }) to be visible\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:70:88",
+      "cleanup_error": "The operation was aborted due to timeout"
+    },
+    {
+      "report": "build\\m48-ball-browser-pages.json",
+      "sha256": "c94656e163461f8f0b0c4d2b66ae828561467a16f911cc21860a4e2d3154a86a",
+      "checks": 10,
+      "error": "page.waitForEvent: Timeout 60000ms exceeded while waiting for event \"download\"\n=========================== logs ===========================\nwaiting for event \"download\"\n============================================================\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:92:32",
+      "cleanup_error": "fetch failed"
+    },
+    {
+      "report": "build\\m48-ball-browser3122.json",
+      "sha256": "d5fcb75d42502d1f691340d5166f8a6c84a674251c96fb061e0d4e0709314805",
+      "checks": 2,
+      "error": "locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#file-center').locator('li').filter({ has: locator('strong').filter({ hasText: '000_browser_1a121c1b5b5' }) }).getByRole('button', { name: 'Open folder' })\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:82:63",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-ball-listing-diagnostic-name-negative.json",
+      "sha256": "4d138ee205cea3de993b812cd9dccb064747f7cee7974a42da02d7b6dc2fbe98",
+      "checks": 264,
+      "error": "ProtocolError: {'operation': 'get', 'component': 'blip.transport.oscquery', 'control': 'http_stack_headroom', 'error_domain': 'control', 'error_code': 'not_found', 'detail': 'component-not-found', 'values': []}",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-ball-listing-overlapping-tool-negative.json",
+      "sha256": "c0e72562751eed4e29a7ac8eea8e9d8784d8b5fe44bdffb3d771949aa4f6b57f",
+      "checks": 0,
+      "error": "SerialException: could not open port 'COM10': PermissionError(13, 'Access is denied.', None, 5)",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-club-browser-files32k.json",
+      "sha256": "2b1ce744a8e515da37c82b22680a0c73e0a4dfbf9fc41dd36f940d44c88a963e",
+      "checks": 5,
+      "error": "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.control-row').filter({ has: locator('.control-label').filter({ hasText: /^Script level$/ }) }) to be visible\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:76:121",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-club-browser3122.json",
+      "sha256": "d0697ea7ac0e0f6733614b207d728d09b365dd03c8f4c0e31ddad3813942dc4a",
+      "checks": 2,
+      "error": "locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#file-center').locator('li').filter({ has: locator('strong').filter({ hasText: '000_browser_1a121c11b7a' }) }).getByRole('button', { name: 'Open folder' })\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:82:63",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-club-listing-diagnostic-name-negative.json",
+      "sha256": "d824519dc4fb04a192532f459ae62230c99dcff415794bf4ca70bbc107b5ed2b",
+      "checks": 264,
+      "error": "ProtocolError: {'operation': 'get', 'component': 'blip.transport.oscquery', 'control': 'http_stack_headroom', 'error_domain': 'control', 'error_code': 'not_found', 'detail': 'component-not-found', 'values': []}",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-club-web3122.json",
+      "sha256": "9fccc4473935288fc604cddfc5102b28520b39b45cb01641717ad9342e64d787",
+      "checks": 6,
+      "error": "AssertionError: native web installed",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-huzzah32-browser-final.json",
+      "sha256": "308396fca8ecc1024e9ab36b56aab5c95d7192c07ea30bc041efc057cce565be",
+      "checks": 0,
+      "error": "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#connection-status').filter({ hasText: /^Live$/ }) to be visible\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:53:74",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-huzzah32-browser3122.json",
+      "sha256": "ae9811305b23ae24745df937d27a5adaea178c5dcb5982be42fb3bd88c124a53",
+      "checks": 0,
+      "error": "page.goto: net::ERR_NETWORK_CHANGED at http://192.168.27.156/\nCall log:\n\u001b[2m  - navigating to \"http://192.168.27.156/\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:52:14",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-huzzah32-listing-diagnostic-name-negative.json",
+      "sha256": "e29e050462a2e793fddec887837ab0a03db0acf24c8dddba612aa7c5dc65db56",
+      "checks": 264,
+      "error": "ProtocolError: {'operation': 'get', 'component': 'blip.transport.oscquery', 'control': 'http_stack_headroom', 'error_domain': 'control', 'error_code': 'not_found', 'detail': 'component-not-found', 'values': []}",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-huzzah32-web3122.json",
+      "sha256": "e0659ec7b6d4b2a1b88962f8fff57beafd407fced2d45e1888a7a68025b5cd3c",
+      "checks": 9,
+      "error": "URLError: <urlopen error timed out>",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-m5dial-browser-files32k-fresh.json",
+      "sha256": "d2e3fbc34d8d35d855845bd823f5894afbd0c420ceedb753bd05549f7482e426",
+      "checks": 10,
+      "error": "page.waitForEvent: Timeout 60000ms exceeded while waiting for event \"download\"\n=========================== logs ===========================\nwaiting for event \"download\"\n============================================================\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:72:32",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-m5dial-browser-files32k-instrumented.json",
+      "sha256": "a2767797b91d05dfef140b15a960bdc8b29909b045a585bb5ae20b239b729f06",
+      "checks": 0,
+      "error": "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#connection-status').filter({ hasText: /^Live$/ }) to be visible\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:53:74",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-m5dial-browser-files32k-sequential.json",
+      "sha256": "91615c78607484fe307374e33f6c542173818fc56313e1697ec8880b2ab26728",
+      "checks": 0,
+      "error": "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#connection-status').filter({ hasText: /^Live$/ }) to be visible\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:53:74",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-m5dial-browser-files32k.json",
+      "sha256": "0170fd44b5f730d065508bb96944fd7f6bea32f9e27e452682bb0198a98a0a16",
+      "checks": 8,
+      "error": "TypeError: fetch failed",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-m5dial-browser3122.json",
+      "sha256": "654d7641bca237b0c4c1767e563b391c944ddba5af0ad7b43b160787b411cd8b",
+      "checks": 2,
+      "error": "locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#file-center').locator('li').filter({ has: locator('strong').filter({ hasText: '000_browser_1a121c0c3e5' }) }).getByRole('button', { name: 'Open folder' })\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:82:63",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-m5dial-listing-diagnostic-name-negative.json",
+      "sha256": "ca704a69079a206873a068da89067506c02b5979ba78a79b8047d4cfdc8bf2a2",
+      "checks": 264,
+      "error": "ProtocolError: {'operation': 'get', 'component': 'blip.transport.oscquery', 'control': 'http_stack_headroom', 'error_domain': 'control', 'error_code': 'not_found', 'detail': 'component-not-found', 'values': []}",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-m5dial-web3122.json",
+      "sha256": "4655b821ffc882e4a9a8a582694fc0cf102196153c42fb3dec5bd625ba42dfb2",
+      "checks": 9,
+      "error": "TimeoutError: timed out",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-m5stickc-browser3122.json",
+      "sha256": "cf422f835f053b6a4f55577b1daf1a4c1135d01124585fe222a9988097c485e2",
+      "checks": 0,
+      "error": "page.reload: net::ERR_NETWORK_CHANGED\nCall log:\n\u001b[2m  - waiting for navigation until \"domcontentloaded\"\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:61:18",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-m5stickc-listing-diagnostic-name-negative.json",
+      "sha256": "5d007c0666ae1fce44b69536dc337ee0d9fea902a46a555fb9c6c84da1b835b4",
+      "checks": 264,
+      "error": "ProtocolError: {'operation': 'get', 'component': 'blip.transport.oscquery', 'control': 'http_stack_headroom', 'error_domain': 'control', 'error_code': 'not_found', 'detail': 'component-not-found', 'values': []}",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-m5stickc-web3122.json",
+      "sha256": "76c843469be6fd406b3514975f4a35c79654b6f3b67dfc892cc60a703bef7b7b",
+      "checks": 9,
+      "error": "URLError: <urlopen error timed out>",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-xiao-browser3122.json",
+      "sha256": "efd80587ad50022ac1e80c42fc6e29d81ad5e3d8f4db1ae022e35c2da67a3adc",
+      "checks": 0,
+      "error": "page.goto: net::ERR_NETWORK_CHANGED at http://192.168.27.136/\nCall log:\n\u001b[2m  - navigating to \"http://192.168.27.136/\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_file_browser_hil.mjs:52:14",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-xiao-listing-diagnostic-name-negative.json",
+      "sha256": "ff3ad084dd21dbed50247d21d1b70d441f7a45cde8f24557a7dcf4e2be3049bd",
+      "checks": 264,
+      "error": "ProtocolError: {'operation': 'get', 'component': 'blip.transport.oscquery', 'control': 'http_stack_headroom', 'error_domain': 'control', 'error_code': 'not_found', 'detail': 'component-not-found', 'values': []}",
+      "cleanup_error": null
+    },
+    {
+      "report": "build\\m48-xiao-web3122.json",
+      "sha256": "4ff9128ab881d03be2573d821d66c973ed4c2251efc3fac5839013adc8034f0c",
+      "checks": 9,
+      "error": "URLError: <urlopen error timed out>",
+      "cleanup_error": null
+    }
+  ],
+  "qualification_notes": [
+    "All six initial firmware/web upgrades passed 13/10 checks each. Final web reports on four boards timed out during the PC HTTP verification after successful on-device installation; follow-up verified installed versions and exact served client/file sources on all six.",
+    "The original helper queried the wrong HTTP diagnostics component; it was corrected to blip.oscquery and all six directory trials reran successfully. One overlapping Ball helper was rejected by the serial port; final trials used exclusive serial ownership.",
+    "Browser failures included ERR_NETWORK_CHANGED, truncated responses, unread short mutation responses, and a helper that did not follow pagination after fixture folders accumulated. Final helper follows pages and records bounded read-only startup reloads. Earlier failed reports are retained.",
+    "Ball serial capture includes send errno 11 and socket resets. The final 32 KiB browser flow passed with bounded read recovery; this is not uninterrupted-transfer, no-reconnect, sustained-RAM or large-media performance qualification.",
+    "Payloads from failed cleanups were reclaimed through the common API and all passive fixture modules were unloaded. Empty test folders remain. Validated firmware/interface images remain installed."
+  ],
+  "remaining": [
+    "Creators Tab hardware access and seven-device milestone",
+    "Physical MMC/NOR, full/corrupt/removed media and hot-plug",
+    "Sustained concurrent I/O, timing and memory margin",
+    "Stored playback/sequence consumers and script boot policy",
+    "Existing M5StickC UART burst and strict XIAO UDP gates",
+    "Full web/update coexistence, initial module-load failures and other plan work packages"
+  ]
+}

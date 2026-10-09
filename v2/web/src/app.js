@@ -4,6 +4,7 @@ import { normalizeResourceSnapshot } from "./resources.js";
 import { ControlView, ReservationView } from "./view.js";
 import { uploadFirmware } from "./firmware.js";
 import { UpdatePanel } from "./updates.js";
+import { FilePanel } from "./files.js";
 
 const controlsRoot = document.querySelector("#controls");
 const emptyTemplate = document.querySelector("#empty-state-template");
@@ -33,6 +34,8 @@ let mode = "simple", topic = "All", model = { components: [], index: new Map() }
 let shape = "", refreshTimer, refreshFailures = 0;
 let nameControl = null;
 const updatePanel = new UpdatePanel({ document, root: document.querySelector("#update-center") });
+const filePanel = new FilePanel({ document, root: document.querySelector("#file-center"),
+  isUpdating: () => updatePanel.busy, onLoaded: () => scheduleRefresh(client) });
 
 function present() {
   nameControl = model.components.find(component => component.id === "blip.device.identity")?.controls.find(control => control.id === "name") ?? null;
@@ -44,6 +47,7 @@ function present() {
   document.querySelector("#mode-description").textContent = mode === "simple" ? "Main controls & live readings" : "All parameters, organized by component";
   document.querySelector("#controls-heading").textContent = mode === "simple" ? "At a glance" : "Device configuration";
   for (const panel of document.querySelectorAll(".advanced-only")) panel.hidden = mode !== "advanced";
+  filePanel.setModel(model); filePanel.setVisible(mode === "advanced");
   topicsRoot.hidden = mode !== "advanced";
   topicsRoot.replaceChildren();
   for (const label of ["All", ...new Set(model.components.map(component => component.topic))]) {
@@ -69,12 +73,12 @@ function scheduleRefresh(current) {
   refreshTimer = setTimeout(async () => {
     if (client !== current) return;
     if (document.hidden) { scheduleRefresh(current); return; }
-    if (updatePanel.busy) {
-      sampleStatus.textContent = "Updating BLIP · readings paused";
+    if (updatePanel.busy || filePanel.busy) {
+      sampleStatus.textContent = "Device transfer active · readings paused";
       scheduleRefresh(current); return;
     }
     try {
-      const updated = buildControlModel(await current.loadTree());
+      const updated = buildControlModel(await current.loadTree(() => client === current && !updatePanel.busy && !filePanel.busy));
       if (client !== current) return;
       const nextShape = modelShapeKey(updated);
       if (nextShape !== shape) {
@@ -91,6 +95,7 @@ function scheduleRefresh(current) {
       sampleStatus.textContent = `Readings updated ${new Date().toLocaleTimeString()} · every 3 seconds`;
     } catch {
       if (client !== current) return;
+      if (updatePanel.busy || filePanel.busy) { scheduleRefresh(current); return; }
       refreshFailures++;
       sampleStatus.textContent = "Readings unavailable · retrying";
     }
@@ -158,6 +163,7 @@ async function connect() {
     deviceMeta.textContent = `${identity.type} · ${identity.id} · firmware ${identity.version}`;
     view.setResources(resourceSnapshot);
     reservationView.setSnapshot(resourceSnapshot);
+    filePanel.connect(current);
     present();
     current.open({
       onMessage: receive,

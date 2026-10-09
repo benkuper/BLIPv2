@@ -55,6 +55,7 @@ struct WebAssetBundleInfo {
 
 class WebAssetBackend {
   public:
+    using DirectoryVisitor = void (*)(void*, std::string_view, bool directory) noexcept;
     WebAssetBackend() = default;
     virtual ~WebAssetBackend() = default;
     WebAssetBackend(const WebAssetBackend&) = delete;
@@ -77,6 +78,12 @@ class WebAssetBackend {
     [[nodiscard]] virtual core::Status replace(std::string_view source,
                                                std::string_view destination) noexcept = 0;
     [[nodiscard]] virtual core::Status remove(std::string_view path) noexcept = 0;
+    // Names are borrowed for this callback only. No directory handle survives
+    // the call. Providers report I/O errors rather than substituting a volume.
+    [[nodiscard]] virtual core::Status visit_directory(std::string_view, void*, DirectoryVisitor) noexcept {
+        return core::Status::failure({core::ErrorDomain::storage, core::ErrorCode::invalid_state,
+                                      {}, "file-directory", "unsupported"});
+    }
 };
 
 class WebAssetStore {

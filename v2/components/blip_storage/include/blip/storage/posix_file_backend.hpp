@@ -34,6 +34,7 @@ class PosixFileBackend final : public FileBackend, public WebAssetBackend {
     [[nodiscard]] core::Status finish_write() noexcept override;
     [[nodiscard]] core::Status resume_write(std::string_view path) noexcept override;
     void abort_write() noexcept override;
+    [[nodiscard]] core::Status visit_directory(std::string_view, void*, DirectoryVisitor) noexcept override;
     [[nodiscard]] bool valid() const noexcept { return valid_; }
 
   private:

@@ -93,7 +93,7 @@ bool AutomaticFileStore::external() const noexcept {
 }
 
 core::Result<AutomaticFileStore::Record> AutomaticFileStore::inspect_slot(
-    WebAssetBackend& backend, std::string_view path, unsigned slot, FileReadCancellation cancellation) noexcept {
+    WebAssetBackend& backend, std::string_view path, unsigned slot, FileReadCancellation cancellation, bool verify_payload) noexcept {
     using Result = core::Result<Record>;
     if (cancellation.cancelled()) return Result::failure(error(core::ErrorCode::cancelled, "file-validation-cancelled"));
     std::array<char, kMaxLogicalPathBytes + 4> buffer{};
@@ -117,6 +117,8 @@ core::Result<AutomaticFileStore::Record> AutomaticFileStore::inspect_slot(
     auto checksum = crc(0xffffffffU, header);
     std::size_t offset = kHeaderBytes;
     const auto end = length.value() - kTrailerBytes;
+    if (!verify_payload && size != 0)
+        return Result::success({generation, static_cast<std::size_t>(size), slot, false});
     while (offset < end) {
         if (cancellation.cancelled()) return Result::failure(error(core::ErrorCode::cancelled, "file-validation-cancelled"));
         // A cancelling consumer bounds work between checks without growing its
@@ -138,10 +140,10 @@ core::Result<AutomaticFileStore::Record> AutomaticFileStore::inspect_slot(
 }
 
 core::Result<AutomaticFileStore::Record> AutomaticFileStore::inspect(
-    WebAssetBackend& backend, std::string_view path, FileReadCancellation cancellation) noexcept {
-    const auto first = inspect_slot(backend, path, 0, cancellation);
+    WebAssetBackend& backend, std::string_view path, FileReadCancellation cancellation, bool verify_payload) noexcept {
+    const auto first = inspect_slot(backend, path, 0, cancellation, verify_payload);
     if (!first && first.error().code == core::ErrorCode::cancelled) return first;
-    const auto second = inspect_slot(backend, path, 1, cancellation);
+    const auto second = inspect_slot(backend, path, 1, cancellation, verify_payload);
     // A failed medium is not a missing file. Do not silently overwrite it or
     // combine its generations with those from another filesystem.
     for (const auto* result : {&first, &second}) {
@@ -357,5 +359,78 @@ core::Status AutomaticFileStore::erase(std::string_view path) noexcept {
     std::lock_guard guard(mutex_);
     const auto started = begin_record(path, 0, true);
     return started ? finish(started.value()) : core::Status::failure(started.error());
+}
+
+core::Result<FileListPage> AutomaticFileStore::list(std::string_view directory, std::string_view after,
+    std::span<FileListEntry> output) noexcept {
+    std::lock_guard guard(mutex_);
+    using Result = core::Result<FileListPage>;
+    if (!valid_path(directory) || directory.size() + 2 > kMaxLogicalPathBytes ||
+        (!after.empty() && (!valid_path(after) || after.find('/') != after.npos)) ||
+        output.empty() || output.size() > 16 || scratch_.empty())
+        return Result::failure(error(core::ErrorCode::invalid_argument, "directory-cursor-or-capacity"));
+    std::fill(output.begin(), output.end(), FileListEntry{});
+    struct Scan {
+        std::string_view directory, after;
+        std::span<FileListEntry> output;
+        std::size_t count{};
+        bool more{};
+    } scan{directory, after, output};
+    const auto collect = [](void* context, std::string_view name, bool is_directory) noexcept {
+        auto& state = *static_cast<Scan*>(context);
+        if (!is_directory) {
+            if (!(name.ends_with(".b0") || name.ends_with(".b1"))) return;
+            name.remove_suffix(3);
+        }
+        if (name.empty() || name <= state.after || name.find('/') != name.npos ||
+            state.directory.size() + 1 + name.size() > kMaxLogicalPathBytes) return;
+        FileListEntry candidate{};
+        auto* path = candidate.path.data();
+        std::memcpy(path, state.directory.data(), state.directory.size()); path[state.directory.size()] = '/';
+        std::memcpy(path + state.directory.size() + 1, name.data(), name.size());
+        if (!AutomaticFileStore::valid_path(path)) return;
+        auto end = state.output.begin() + static_cast<std::ptrdiff_t>(state.count);
+        auto found = std::lower_bound(state.output.begin(), end, std::string_view{path},
+            [](const FileListEntry& entry, std::string_view wanted) { return std::string_view{entry.path.data()} < wanted; });
+        if (found != end && std::string_view{found->path.data()} == path) {
+            found->directory |= is_directory; found->file |= !is_directory; return;
+        }
+        if (state.count == state.output.size()) {
+            state.more = true;
+            if (found == end) return;
+            --end;
+        } else ++state.count;
+        std::move_backward(found, end, end + 1);
+        candidate.directory = is_directory; candidate.file = !is_directory; *found = candidate;
+    };
+    for (auto* backend : {external_, internal_}) {
+        if (!backend) continue;
+        const auto status = backend->visit_directory(directory, &scan, collect);
+        if (!status && status.error().code != core::ErrorCode::not_found) return Result::failure(status.error());
+    }
+    FileListPage page{}; page.more = scan.more;
+    if (scan.count) {
+        const std::string_view last{output[scan.count - 1].path.data()};
+        const auto basename = last.substr(directory.size() + 1);
+        std::copy(basename.begin(), basename.end(), page.cursor.begin());
+    }
+    for (std::size_t i = 0; i < scan.count; ++i) {
+        auto entry = output[i];
+        if (entry.file) {
+            auto* backend = external_ ? external_ : internal_;
+            auto record = inspect(*backend, entry.path.data(), {}, false);
+            if (!record && backend != internal_ && record.error().code == core::ErrorCode::not_found) {
+                backend = internal_; record = inspect(*backend, entry.path.data(), {}, false);
+            }
+            entry.external = backend == external_;
+            if (!record) {
+                if (record.error().code == core::ErrorCode::not_found) entry.file = false;
+                else if (record.error().code == core::ErrorCode::corrupt_data) entry.unreadable = true;
+                else return Result::failure(record.error());
+            } else if (record.value().deleted) entry.file = false;
+        }
+        if (entry.file || entry.directory) output[page.count++] = entry;
+    }
+    return Result::success(page);
 }
 } // namespace blip::storage

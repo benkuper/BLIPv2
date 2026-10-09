@@ -23,6 +23,7 @@ manual transfers defer update checks/installs.
 | `PUT` | `/api/files/sequences/<name>` | Stream and commit sequence data |
 | `GET` | Any of the above | Download the current checked generation |
 | `DELETE` | Any of the above | Commit a deletion tombstone; a subsequent GET returns 404 |
+| `GET` | `/api/files/<namespace>/<folder>/?after=<basename>` | Bounded sorted directory page; omit folder/cursor to begin at the namespace root |
 
 Web/server assets go through `PUT /api/web-assets` or the device release service,
 so their format and CRC are validated before publication. Factory flashing
@@ -51,7 +52,32 @@ It verifies board/network identity, all three namespaces, repeated replacements,
 interrupted uploads/downloads, path bounds, empty/deleted files and optional
 reboot persistence. It disables periodic release checks for the file test and
 restores their original interval. It never changes the PC's Wi-Fi connection.
-Browser file listing and playback/sequence consumers remain follow-up work.
+Advanced mode has a common file browser for all three namespaces, with folder
+navigation, uploads, exact downloads, deletion and passive stored-script loading.
+Playback/sequence consumers remain follow-up work.
+
+Directory responses have `schema: 1`, `directory`, `cursor`, `more` and at most
+four `files`. Entries expose `path`, `directory`, `file`, `external` and
+`unreadable`. A folder and a file can share a logical name; both flags are then
+true. Pages merge mounted external media and internal fallback names without
+exposing physical generations. Follow `cursor` whenever `more` is true, even if
+the visible page is empty: checked deletion records advance the cursor. There
+is no directory snapshot across pages; refresh after concurrent modifications.
+Listings inspect bounded metadata, not entire payloads. A listed name is not a
+content-integrity claim: opening/downloading/loading still validates the CRC.
+An unreadable metadata entry can be replaced or deleted. Mounted-media I/O
+errors fail the page instead of silently switching media.
+
+```powershell
+python v2/tools/storage/blip_file_listing_hil.py `
+  --device http://DEVICE_IP --port COM_PORT --build build/BOARD_BUILD `
+  --flash-log build/FLASH_LOG --mac FLASHED_MAC --expected-medium internal `
+  --report build/file-listing-trial.json
+```
+
+This checks paged names, empty/deleted files, nested folders, file/folder name
+collisions, medium attribution, checked downloads and HTTP stack headroom across
+all three namespaces. Test payloads are reclaimed; empty fixture folders remain.
 
 With WASM enabled, `blip.wasm/load_file` accepts a logical path such as
 `scripts/show.wasm` and returns a queued request ID. Read its usual `completion`

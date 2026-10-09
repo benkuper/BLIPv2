@@ -509,6 +509,14 @@ void EspOscQueryComponent::run() noexcept {
 }
 
 esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
+    const std::string_view uri{request->uri};
+    const auto separator = uri.find('?');
+    const auto file_path = uri.substr(0, separator);
+    if (file_path.starts_with("/api/files/")) {
+        if (file_path.size() > 11 && file_path.ends_with('/')) return handle_file_list(request,
+            file_path.substr(11, file_path.size() - 12), separator == uri.npos ? std::string_view{} : uri.substr(separator + 1));
+        return handle_file(request);
+    }
     std::array<char, 32> query{};
     const std::size_t query_size = httpd_req_get_url_query_len(request);
     if (query_size >= query.size() ||
@@ -521,7 +529,6 @@ esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
     const std::string_view path = request_uri.substr(0U, query_separator);
     const std::string_view query_text{query.data(), query_size};
     if (path == "/api/releases" && query_text.empty()) return handle_release_status(request);
-    if (path.starts_with("/api/files/") && query_text.empty()) return handle_file(request);
     if ((path == "/firstrun" || path == "/firstrun/") ||
         (path == "/" && query_text.empty() && request_accepts_html(request) && !web_assets_->active())) {
         httpd_resp_set_type(request, "text/html; charset=utf-8");
@@ -1031,6 +1038,41 @@ esp_err_t EspOscQueryComponent::handle_file(httpd_req_t* request) noexcept {
     }
     files_->close(opened.value());
     return result == ESP_OK ? httpd_resp_send_chunk(request, nullptr, 0) : result;
+}
+
+esp_err_t EspOscQueryComponent::handle_file_list(httpd_req_t* request, std::string_view directory,
+    std::string_view query) noexcept {
+    if (!(directory == "scripts" || directory.starts_with("scripts/") ||
+          directory == "playback" || directory.starts_with("playback/") ||
+          directory == "sequences" || directory.starts_with("sequences/")) ||
+        (!query.empty() && !query.starts_with("after=")))
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "invalid file directory");
+    ManualTransferScope transfer(*releases_);
+    if (!transfer.status()) return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "device update active");
+    // Small pages keep directory navigation inside the existing HTTP stack.
+    // The cursor advances over tombstones too, so an empty page can have more.
+    std::array<storage::FileListEntry, 4> entries{};
+    const auto page = files_->list(directory, query.empty() ? query : query.substr(6), entries);
+    if (!page) return httpd_resp_send_err(request,
+        page.error().code == core::ErrorCode::invalid_argument ? HTTPD_400_BAD_REQUEST : HTTPD_500_INTERNAL_SERVER_ERROR,
+        page.error().detail.data());
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    httpd_resp_set_hdr(request, "Access-Control-Allow-Origin", "*");
+    HttpChunkSink sink{request, http_asset_buffer_};
+    if (!sink.write("{\"schema\":1,\"directory\":") || !write_json_string(directory, sink) ||
+        !sink.write(",\"cursor\":") || !write_json_string(page.value().cursor.data(), sink) ||
+        !sink.write(page.value().more ? ",\"more\":true,\"files\":[" : ",\"more\":false,\"files\":[")) return ESP_FAIL;
+    for (std::size_t i = 0; i < page.value().count; ++i) {
+        const auto& entry = entries[i];
+        if ((i && !sink.write(",")) || !sink.write("{\"path\":") || !write_json_string(entry.path.data(), sink) ||
+            !sink.write(entry.directory ? ",\"directory\":true" : ",\"directory\":false") ||
+            !sink.write(entry.file ? ",\"file\":true" : ",\"file\":false") ||
+            !sink.write(entry.external ? ",\"external\":true" : ",\"external\":false") ||
+            !sink.write(entry.unreadable ? ",\"unreadable\":true}" : ",\"unreadable\":false}")) return ESP_FAIL;
+    }
+    if (!sink.write("]}")) return ESP_FAIL;
+    return sink.finish();
 }
 
 esp_err_t EspOscQueryComponent::handle_http_root(httpd_req_t* request) noexcept {

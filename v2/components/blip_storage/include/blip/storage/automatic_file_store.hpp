@@ -24,6 +24,16 @@ struct FileReadCancellation {
     [[nodiscard]] bool cancelled() const noexcept { return requested && requested(context); }
 };
 
+struct FileListEntry {
+    std::array<char, kMaxLogicalPathBytes + 1> path{};
+    bool directory{}, file{}, external{}, unreadable{};
+};
+struct FileListPage {
+    std::size_t count{};
+    std::array<char, kMaxLogicalPathBytes + 1> cursor{}; // Last examined basename, even if deleted.
+    bool more{};
+};
+
 // Bulk files use two independently checksummed generations on every medium.
 // This also works on FAT: publishing does not depend on overwriting by rename.
 class AutomaticFileStore {
@@ -59,6 +69,11 @@ class AutomaticFileStore {
     [[nodiscard]] core::Status save(std::string_view path,
                                     std::span<const std::byte> input) noexcept;
     [[nodiscard]] core::Status erase(std::string_view path) noexcept;
+    // Bounded sorted page of logical names, merging both media. Payload CRCs
+    // are checked on open, not during directory navigation. Deletion records
+    // are small enough to validate completely before hiding their names.
+    [[nodiscard]] core::Result<FileListPage> list(std::string_view directory, std::string_view after,
+        std::span<FileListEntry> output) noexcept;
 
   private:
     struct Record {
@@ -82,11 +97,11 @@ class AutomaticFileStore {
         bool prepared{};
     };
     [[nodiscard]] core::Result<Record> inspect(WebAssetBackend& backend,
-        std::string_view path, FileReadCancellation cancellation = {}) noexcept;
+        std::string_view path, FileReadCancellation cancellation = {}, bool verify_payload = true) noexcept;
     [[nodiscard]] core::Result<std::uint32_t> begin_record(std::string_view path,
         std::size_t size, bool deleted) noexcept;
     [[nodiscard]] core::Result<Record> inspect_slot(WebAssetBackend& backend,
-        std::string_view path, unsigned slot, FileReadCancellation cancellation = {}) noexcept;
+        std::string_view path, unsigned slot, FileReadCancellation cancellation = {}, bool verify_payload = true) noexcept;
     [[nodiscard]] static bool valid_path(std::string_view path) noexcept;
     [[nodiscard]] static std::string_view physical(std::string_view path, unsigned slot,
                                                    std::span<char> buffer) noexcept;

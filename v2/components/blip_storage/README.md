@@ -25,17 +25,24 @@ directly.
 The internal service uses verified temporary-file replacement. The optional SD
 service uses two full generations and a checked pointer, tolerating filesystems
 whose replacement durability is weaker. Neither service automatically formats
-nonblank unknown media. The generic targets enable only the internal 384 KiB
-LittleFS partition and assign no SD pins.
+nonblank unknown media. The standard 4 MiB layout has 640 KiB of internal
+LittleFS (512 KiB in the BLE layout); Ball's 8 MiB layout has 1.75 MiB.
+Generic board manifests assign no external-storage pins.
 
-`WebAssetStore` streams a maximum 256 KiB candidate into
-`web/assets.upload`, verifies its format, layout, and layered CRC-32 values with
-a fixed 512-byte scratch buffer, and atomically renames it to
-`web/assets.bundle`. An interrupted or invalid update leaves the previous bundle
-active. On boot, a missing or corrupt active file is recovered from the
-firmware-embedded factory bundle; any valid independently installed format-1
-bundle is retained. The component publishes `storage.web_assets` plus read-only
-bundle version, asset count, and bundle size parameters.
+`AutomaticFileStore` streams bulk files through two independently checked
+generations on the selected filesystem. Mounted external storage is preferred;
+missing external files can fall back to internal storage. An admitted handle
+keeps its medium until close/cancel. Filesystem I/O errors are not treated as
+missing files. Directory pages merge logical names with bounded caller-supplied
+space; payload integrity is checked when opening files.
+
+`WebAssetStore` verifies a maximum 256 KiB candidate's format, layout and layered
+CRC-32 values before publishing through that file service. An interrupted or
+invalid update retains the previous bundle. Factory flashing writes the complete
+UI into a separate internal filesystem image, and a checked copy migrates to
+external media when present. The full UI is absent from the application image.
+Missing/corrupt UI opens the small firmware-resident first-run downloader. The
+component publishes `storage.web_assets` plus bundle version, count and size.
 
 See [the 2.1 work-package record](../../../docs/v2/work-packages/2.1-versioned-nvs-settings.md),
 [the 2.2 record](../../../docs/v2/work-packages/2.2-atomic-file-storage.md),
