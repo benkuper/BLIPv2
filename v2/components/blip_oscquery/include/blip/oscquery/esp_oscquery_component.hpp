@@ -26,7 +26,8 @@ namespace blip::oscquery {
 class EspOscQueryComponent final : public core::Component, public network::HttpRootDelegate {
   public:
     static constexpr std::uint16_t kOscPort = 9000;
-    static constexpr std::size_t kTaskStackBytes = 6144;
+    // Persisted writes can trigger NVS page collection beneath OSC dispatch.
+    static constexpr std::size_t kTaskStackBytes = 8192;
     static constexpr std::size_t kTaskStackWords = kTaskStackBytes / sizeof(StackType_t);
 
     EspOscQueryComponent(const core::RegistryView& registry, core::ControlService& controls,

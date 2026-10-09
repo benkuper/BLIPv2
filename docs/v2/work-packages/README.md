@@ -42,6 +42,7 @@ wire protocols, or public OSC paths.
 | [3.7 device identity](3.7-device-identity.md) | Editable saved names, board type, live name-based mDNS and web identity; six-board identity trials passed, Tab access and full milestone qualification open |
 | [3.8/3.9 native updates and first run](3.8-native-update-and-first-run.md) | Independent website updates, filesystem-only full UI and automatic first run; HUZZAH32 browser/native OTA and mismatch checks passed, seven-board/recovery/coexistence qualification open |
 | [3.8 update recovery](3.8-update-recovery.md) | Socket capacity, automatic browser reconnection, bounded file buffering and fault-injected update trials; seven-board/coexistence qualification open |
+| [3.8 transport stacks](3.8-transport-stack-qualification.md) | UDP persisted-name/NVS overflow fixed; six boards passed 1,035 network/script/provisioning checks each with unchanged static RAM; Tab and update coexistence remain open |
 
 ## Milestone 4
 

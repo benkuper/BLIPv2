@@ -1,0 +1,558 @@
+{
+  "schema": 1,
+  "created_at": "2026-10-09T13:18:29.105103+00:00",
+  "scope": "Persisted UDP/WebSocket controls and task-stack checkpoint",
+  "seven_board_milestone_complete": false,
+  "pc_network_changed": false,
+  "test_firmware_left_installed": true,
+  "installed_release_code": 15,
+  "stack_bytes": {
+    "serial": 8192,
+    "osc_udp": 8192,
+    "wifi_worker": 4096,
+    "http": 8192
+  },
+  "before_stack_bytes": {
+    "serial": 8192,
+    "osc_udp": 6144,
+    "wifi_worker": 6144,
+    "http": 8192
+  },
+  "boards": [
+    {
+      "profile": "ball",
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": true,
+      "checks": 1035,
+      "report": {
+        "path": "build/m43-ball-stack15-transport-stack.json",
+        "sha256": "fa6c7b12cd9acae247588df13aebf614f3acf3029491d7c3da434c29ae998825"
+      },
+      "artifacts": {
+        "blip-v2.bin": "ae23a91ccda5bce978a8ff37329122569ad7309610778594266277c8929ebc57",
+        "blip-v2.elf": "3508d52571a1100c512dd6d7937ebfbeefa250dac00041b38cb72b7e2acdbdf5",
+        "sdkconfig": "92b38d869aa2a671b15c83b60ce010383a5939fcfbead9c8816bc5e9ee8789d5"
+      },
+      "stack_headroom_bytes": {
+        "serial": 3496,
+        "udp": 2304,
+        "wifi": 2352,
+        "http": 1936
+      },
+      "heap_after": {
+        "heap_free": 7592,
+        "heap_largest": 3136
+      },
+      "original_settings_restored": true,
+      "unexpected_reboots": 0,
+      "serial_log": {
+        "path": "build/m43-ball-stack15-transport-stack.serial.log",
+        "sha256": "5e750982315f413187b5d687256d62302256c18813c73178bd9e4ed71b149742"
+      }
+    },
+    {
+      "profile": "huzzah32",
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "passed": true,
+      "checks": 1035,
+      "report": {
+        "path": "build/m43-huzzah32-stack15-transport-stack.json",
+        "sha256": "53ddac5013a7f1243283e63fc5f87f3cf88c2a3d93b28ed2c4cbb7252fabf519"
+      },
+      "artifacts": {
+        "blip-v2.bin": "ba0235b77b9f0932082e45821f286c4195c81f040e4d952e3006f602fc51c3fe",
+        "blip-v2.elf": "de1f235fa7cf6aae788f8decc2689f9ae01ae0d98e617320f1d30e669209233a",
+        "sdkconfig": "b2bbe36dfb94f6f2bfeda1788f8e192005960de5b3c0b5fe5b889b4aa85eb8f3"
+      },
+      "stack_headroom_bytes": {
+        "serial": 2128,
+        "udp": 1856,
+        "wifi": 1760,
+        "http": 1396
+      },
+      "heap_after": {
+        "heap_free": 26208,
+        "heap_largest": 20480
+      },
+      "original_settings_restored": true,
+      "unexpected_reboots": 0,
+      "serial_log": {
+        "path": "build/m43-huzzah32-stack15-transport-stack.serial.log",
+        "sha256": "f5813d45976191ce121975145b179820a35eed8d5b41da1b920cc7e18914a555"
+      }
+    },
+    {
+      "profile": "m5dial",
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "passed": true,
+      "checks": 1035,
+      "report": {
+        "path": "build/m43-m5dial-stack15-transport-stack.json",
+        "sha256": "6eb49ea0144a0f4627117e1cf8eef576ca04a9872d17382cfc3c3719e1691180"
+      },
+      "artifacts": {
+        "blip-v2.bin": "e8ef35f0a7aa41f8256c58a1444d8305aad7147079b65bdf0d7014327e3ec396",
+        "blip-v2.elf": "1100d65b340a885cb3deabf5bd3732202ee3ed29312f2db4244a60f49a214f37",
+        "sdkconfig": "5be68ca07b088ddca9cf3f629c6a4065117bb072a582f014363c6bdae82001fd"
+      },
+      "stack_headroom_bytes": {
+        "serial": 1776,
+        "udp": 1648,
+        "wifi": 1616,
+        "http": 1080
+      },
+      "heap_after": {
+        "heap_free": 27804,
+        "heap_largest": 14336
+      },
+      "original_settings_restored": true,
+      "unexpected_reboots": 0,
+      "serial_log": {
+        "path": "build/m43-m5dial-stack15-transport-stack.serial.log",
+        "sha256": "6ac9c4c85d1a22c4b6d34b0c02d1b661df05cb704c3da8aa36e55b816125ad40"
+      }
+    },
+    {
+      "profile": "club",
+      "board": "creators-club",
+      "port": "COM15",
+      "mac": "30:ae:a4:f3:a3:88",
+      "passed": true,
+      "checks": 1035,
+      "report": {
+        "path": "build/m43-club-stack15-transport-stack.json",
+        "sha256": "8639e5da6f6e5089cb6caeba1005f0c93d21377f15985bfb1da4fbf5a7453fc0"
+      },
+      "artifacts": {
+        "blip-v2.bin": "21101fe2ce089be8fd3af176240815fbc7527e924d4393bb474465dab20e38c0",
+        "blip-v2.elf": "af0579048cd302bf051e626d36514248134e91a1d72443e2396edc6924176b89",
+        "sdkconfig": "a8bda3843b5484b91bbf53e8309939b49de05d54a1ab590288b1d72fefb549bc"
+      },
+      "stack_headroom_bytes": {
+        "serial": 2880,
+        "udp": 1856,
+        "wifi": 1760,
+        "http": 1344
+      },
+      "heap_after": {
+        "heap_free": 35676,
+        "heap_largest": 29696
+      },
+      "original_settings_restored": true,
+      "unexpected_reboots": 0,
+      "serial_log": {
+        "path": "build/m43-club-stack15-transport-stack.serial.log",
+        "sha256": "7aa9fae0661f3709964b84c92c18086238fd77c2e3b11dcbf7c9ba0a5fd0a384"
+      }
+    },
+    {
+      "profile": "xiao",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "mac": "10:51:db:1a:a6:68",
+      "passed": true,
+      "checks": 1035,
+      "report": {
+        "path": "build/m43-xiao-stack15-transport-stack.json",
+        "sha256": "a4c07ef1f5b0708b166d3555d3c4c31885d0a3c0e4ce35025fb2cec8b453c1be"
+      },
+      "artifacts": {
+        "blip-v2.bin": "a96f00dfd5d418ef71371ce9c90334bb57887044cbf68a900c07ee2d21675f55",
+        "blip-v2.elf": "b792cfdefeef4f6f83f92175a5941f620e5345854a7d2fce503b58133521bfc5",
+        "sdkconfig": "0c3fc6948d7e75128bb72324c4211a3fcba10ee9cdde580ab0134c520fd77f8f"
+      },
+      "stack_headroom_bytes": {
+        "serial": 3496,
+        "udp": 2400,
+        "wifi": 2352,
+        "http": 1936
+      },
+      "heap_after": {
+        "heap_free": 86504,
+        "heap_largest": 65536
+      },
+      "original_settings_restored": true,
+      "unexpected_reboots": 0,
+      "serial_log": {
+        "path": "build/m43-xiao-stack15-transport-stack.serial.log",
+        "sha256": "d9665f6904d5bba6dab00e96a3db156c3d0f94f57ac1bf032c1e46af7a1a827a"
+      }
+    },
+    {
+      "profile": "m5stickc",
+      "board": "m5stack-m5stickc",
+      "port": "COM12",
+      "mac": "94:b9:7e:8b:b7:84",
+      "passed": true,
+      "checks": 1035,
+      "report": {
+        "path": "build/m43-m5stickc-stack15-transport-stack.json",
+        "sha256": "54ee53c7503ae654454a4e222bf1cdeac2642da13aafc1225c9756fb81e9e60c"
+      },
+      "artifacts": {
+        "blip-v2.bin": "366ee99d0c818227fd135c16c981078bc5dd63d27f5cbb5d25d15317dc6f3b51",
+        "blip-v2.elf": "96b8362890f284ded4ddf5b41ab1fdc0fbfa8bc2fbd65d0729771e48c9edc7e0",
+        "sdkconfig": "2533dd067b92712fd9aba5c2c2a432f08391f468ae16cdc3f3bf8afb45472714"
+      },
+      "stack_headroom_bytes": {
+        "serial": 3072,
+        "udp": 1856,
+        "wifi": 1760,
+        "http": 1424
+      },
+      "heap_after": {
+        "heap_free": 29492,
+        "heap_largest": 23552
+      },
+      "original_settings_restored": true,
+      "unexpected_reboots": 0,
+      "serial_log": {
+        "path": "build/m43-m5stickc-stack15-transport-stack.serial.log",
+        "sha256": "6dbd0d4055d0ad9b93773350a7c5a774adeba8eb52a74fdbdb74bce7475ba2c7"
+      }
+    },
+    {
+      "profile": "tab",
+      "board": "creators-tab",
+      "port": "COM14",
+      "passed": false,
+      "reason": "ROM flash ID ff/ffff, unreadable boot flash; physical recovery required",
+      "flash_id_probe": {
+        "path": "build/m43-tab-readonly-flash-id.log",
+        "sha256": "07661b26901c7880492c327a242b15fcf539915d293021d419ecd009807c6273"
+      },
+      "boot_log": {
+        "path": "build/m43-tab-boot-fault.serial.log",
+        "sha256": "15da06521f64aa71f7f11908d289fecbf99974693a9da2e3890f0fa8dcf16136"
+      }
+    }
+  ],
+  "builds": [
+    {
+      "profile": "ball",
+      "identity": {
+        "project": "blip-v2",
+        "board": "creators-ball-v2",
+        "target": "esp32c6",
+        "layout": "ota-8mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 8388608,
+        "features": 123,
+        "api": 1
+      },
+      "code": 15,
+      "firmware": {
+        "path": "build/m6-production-ball/blip-v2.bin",
+        "sha256": "ae23a91ccda5bce978a8ff37329122569ad7309610778594266277c8929ebc57"
+      },
+      "build_log": {
+        "path": "build/m41-stack15-ball-build.log",
+        "sha256": "26eace0d920bfeaa2155aa6a73bda2f9a853a0ead6322d8e9f648ea22407b484"
+      }
+    },
+    {
+      "profile": "huzzah32",
+      "identity": {
+        "project": "blip-v2",
+        "board": "adafruit-huzzah32",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 15,
+      "firmware": {
+        "path": "build/m6-production-huzzah32/blip-v2.bin",
+        "sha256": "ba0235b77b9f0932082e45821f286c4195c81f040e4d952e3006f602fc51c3fe"
+      },
+      "build_log": {
+        "path": "build/m41-stack15-huzzah32-build.log",
+        "sha256": "d32741f62759973b036922486709b2f2e42185a2b266df10cac98240cbaba9f7"
+      }
+    },
+    {
+      "profile": "m5dial",
+      "identity": {
+        "project": "blip-v2",
+        "board": "m5stack-m5dial",
+        "target": "esp32s3",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 15,
+      "firmware": {
+        "path": "build/m6-production-m5dial/blip-v2.bin",
+        "sha256": "e8ef35f0a7aa41f8256c58a1444d8305aad7147079b65bdf0d7014327e3ec396"
+      },
+      "build_log": {
+        "path": "build/m41-stack15-m5dial-build.log",
+        "sha256": "b317c25e8502de552baed8f5a57ba88f54e03189889d0eb62dae39d90381ec97"
+      }
+    },
+    {
+      "profile": "club",
+      "identity": {
+        "project": "blip-v2",
+        "board": "creators-club",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 15,
+      "firmware": {
+        "path": "build/m6-production-club/blip-v2.bin",
+        "sha256": "21101fe2ce089be8fd3af176240815fbc7527e924d4393bb474465dab20e38c0"
+      },
+      "build_log": {
+        "path": "build/m41-stack15-club-build.log",
+        "sha256": "0799ddd6b3e70e641f8e13cf7be06ce56b00b4e3f6485f441ee54b1217598a7f"
+      }
+    },
+    {
+      "profile": "tab",
+      "identity": {
+        "project": "blip-v2",
+        "board": "creators-tab",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 15,
+      "firmware": {
+        "path": "build/m6-production-tab/blip-v2.bin",
+        "sha256": "690ae8f9a80988270e621b449dc53dd74e0de402609028b42c4674a5aba1706b"
+      },
+      "build_log": {
+        "path": "build/m41-stack15-tab-build.log",
+        "sha256": "27a9ce05d56ec20e022ee6e387c196ee713ac7b0df04638acf7ba9fe3dd7feac"
+      }
+    },
+    {
+      "profile": "xiao",
+      "identity": {
+        "project": "blip-v2",
+        "board": "seeed-xiao-esp32c6-chip-antenna",
+        "target": "esp32c6",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 15,
+      "firmware": {
+        "path": "build/m6-production-xiao/blip-v2.bin",
+        "sha256": "a96f00dfd5d418ef71371ce9c90334bb57887044cbf68a900c07ee2d21675f55"
+      },
+      "build_log": {
+        "path": "build/m41-stack15-xiao-build.log",
+        "sha256": "992425d4bba126c6a86ada0cd47d46f9dc5a7be7117fbd6a495f387e2949ba5a"
+      }
+    },
+    {
+      "profile": "m5stickc",
+      "identity": {
+        "project": "blip-v2",
+        "board": "m5stack-m5stickc",
+        "target": "esp32",
+        "layout": "ota-4mb-v1",
+        "profile": "minimal",
+        "flash_bytes": 4194304,
+        "features": 121,
+        "api": 1
+      },
+      "code": 15,
+      "firmware": {
+        "path": "build/m6-production-m5stickc/blip-v2.bin",
+        "sha256": "366ee99d0c818227fd135c16c981078bc5dd63d27f5cbb5d25d15317dc6f3b51"
+      },
+      "build_log": {
+        "path": "build/m41-stack15-m5stickc-build.log",
+        "sha256": "12f5e470476b86262e19d4f1b1d394789609b5ed7d11242bd6563b85cdf39663"
+      }
+    }
+  ],
+  "static_ram_comparison": [
+    {
+      "profile": "ball",
+      "before": {
+        "bss_bytes": 134792,
+        "data_bytes": 24532,
+        "firmware_bytes": 2043120,
+        "elf": {
+          "path": "build/m43-baseline12-ball/blip-v2.elf",
+          "sha256": "d58d8b3e088ee24685719abe26b778869056b84cb0a7b45b2a62cd3ded4daca5"
+        }
+      },
+      "after": {
+        "bss_bytes": 134792,
+        "data_bytes": 24532,
+        "firmware_bytes": 2043072,
+        "elf": {
+          "path": "build/m6-production-ball/blip-v2.elf",
+          "sha256": "3508d52571a1100c512dd6d7937ebfbeefa250dac00041b38cb72b7e2acdbdf5"
+        }
+      }
+    },
+    {
+      "profile": "huzzah32",
+      "before": {
+        "bss_bytes": 143808,
+        "data_bytes": 23932,
+        "firmware_bytes": 1457760,
+        "elf": {
+          "path": "build/m43-baseline12-huzzah32/blip-v2.elf",
+          "sha256": "1c88eb1ce394797b8e81d352df574763a9f07032dc5a26e56959b72c40f62011"
+        }
+      },
+      "after": {
+        "bss_bytes": 143808,
+        "data_bytes": 23932,
+        "firmware_bytes": 1457552,
+        "elf": {
+          "path": "build/m6-production-huzzah32/blip-v2.elf",
+          "sha256": "de1f235fa7cf6aae788f8decc2689f9ae01ae0d98e617320f1d30e669209233a"
+        }
+      }
+    },
+    {
+      "profile": "m5dial",
+      "before": {
+        "bss_bytes": 139104,
+        "data_bytes": 29749,
+        "firmware_bytes": 1438704,
+        "elf": {
+          "path": "build/m43-baseline12-m5dial/blip-v2.elf",
+          "sha256": "baadb8599e6228137303573cff9c4ae7b0a33b076436b71b3e98b6797f1f36c6"
+        }
+      },
+      "after": {
+        "bss_bytes": 139104,
+        "data_bytes": 29749,
+        "firmware_bytes": 1438480,
+        "elf": {
+          "path": "build/m6-production-m5dial/blip-v2.elf",
+          "sha256": "1100d65b340a885cb3deabf5bd3732202ee3ed29312f2db4244a60f49a214f37"
+        }
+      }
+    }
+  ],
+  "failed_probes": [
+    {
+      "path": "build/m43-huzzah32-baseline12-transport-diagnostic.json",
+      "sha256": "694c325672131c4a2df5177cd0d94d72e95645522c0b3b7e90318e26249b58f6"
+    },
+    {
+      "path": "build/m43-huzzah32-baseline12-transport-diagnostic.serial.log",
+      "sha256": "778ed0923cfc0276c25836ab30547cb7caf0cc232d974dc8297cb3d9d1e9046a"
+    },
+    {
+      "path": "build/m43-huzzah32-trim13-transport-stack.json",
+      "sha256": "02886b076659488beef660b37043aae8a8fbf793d3e8ce49dbd9959dc3be700a"
+    },
+    {
+      "path": "build/m43-huzzah32-copy14-transport-stack.json",
+      "sha256": "5548eef8c78b70afb173bab082c24047d270fa6de377a7102319806f16d36644"
+    },
+    {
+      "path": "build/m43-huzzah32-copy14-transport-stack.serial.log",
+      "sha256": "0a2c05acc3fb9b1b042783e775f01ca9b776651413f292dbb0792c45e12f68b7"
+    },
+    {
+      "path": "build/m43-ball-stack15-ota.json",
+      "sha256": "c6726c7be6d5f947de5a63664181b639915b3f9f9494b876283682c4890ec595"
+    },
+    {
+      "path": "build/m43-ball-stack15-ota-repeat.json",
+      "sha256": "fcb6395f796ed82eb10a4c350910d7ee53346efe854888ad83ef1f77b229e31a"
+    },
+    {
+      "path": "build/m43-ball-stack15-ota-repeat.serial.log",
+      "sha256": "ac228e6b5e0f4a477a3ef23f888fe5bcd9ecc5164aa223e3c615969016fe31d0"
+    }
+  ],
+  "baseline_script_controls": [
+    {
+      "path": "build/m43-ball-baseline12-script-controls.json",
+      "sha256": "78a59be4879e2ea79b09e6b33eb04b22d9bc17719a716d9e142b2719ae4033b3"
+    },
+    {
+      "path": "build/m43-huzzah32-baseline12-script-controls.json",
+      "sha256": "4376d41806578f747e17e39ca08ce78a881f3bb30a50c19180aea20012fc8bc6"
+    },
+    {
+      "path": "build/m43-m5dial-baseline12-script-controls.json",
+      "sha256": "87fda546964e4890bf0d9c4cbc279610b70238986d37b5f5c842e2112c273032"
+    }
+  ],
+  "native_code15_updates": [
+    {
+      "profile": "huzzah32",
+      "passed": true,
+      "report": {
+        "path": "build/m43-huzzah32-stack15-ota.json",
+        "sha256": "959bef45a966bf2105a5471c8751eadf8af26122c37fdf7ba697f04c92578410"
+      }
+    },
+    {
+      "profile": "m5dial",
+      "passed": true,
+      "report": {
+        "path": "build/m43-m5dial-stack15-ota.json",
+        "sha256": "d05d22bac2a4cbec48e5b5e36c24e64ece6c3fba180d8725cee69c7cc544bfde"
+      }
+    }
+  ],
+  "factory_flashes": [
+    {
+      "path": "build/m43-ball-stack15-full-flash.log",
+      "sha256": "304f666a45cc025408b8f0e69be0a3e1467eaf556519a7d0ccc2d9c5213618e3"
+    },
+    {
+      "path": "build/m43-club-stack15-full-flash.log",
+      "sha256": "c3193716eb3c1c03dc9517d798c7e6be734907ffe52ffb74d3ece84e3b104814"
+    },
+    {
+      "path": "build/m43-xiao-stack15-full-flash.log",
+      "sha256": "30721ed9a46f85d40b00847cc30d62c9c238fe3e1ed5dd9a68482f48392d318d"
+    },
+    {
+      "path": "build/m43-m5stickc-stack15-full-flash.log",
+      "sha256": "182810f7201148887fbe1ec4b1a95eeca08607bfe01bee81101ee017d351f606"
+    }
+  ],
+  "host_tests": {
+    "passed": 33,
+    "report": {
+      "path": "build/m43-host-tests.log",
+      "sha256": "386c420e36414837f8b142069de835ebe537dfcebb4aac324247b1d81bc324ba"
+    }
+  },
+  "ball_remaining_issue": {
+    "native_code12_to15": "Two downloads failed; repeat serial log identifies http/body-read with socket-not-connected errors. Code15 installed by generated 8MiB factory flash.",
+    "post_probe_snapshot": {
+      "path": "build/m43-ball-post-stack-snapshot.json",
+      "sha256": "0a97a43ddc46ed114a6697155221f06b1d634e666dec5828b1934b5841f64718"
+    },
+    "preferred_medium": "sd-spi",
+    "retained_web_code": 3106,
+    "notes": "Full BLE/WASM profile still lacks update memory under live browser traffic. Heap recovery does not ensure a contiguous 6144-byte worker allocation. Broader recovery/browser fault matrix remains open."
+  }
+}

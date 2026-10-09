@@ -32,7 +32,7 @@ class HttpRootDelegate {
 class EspWifiComponent final : public core::Component {
   public:
     static constexpr std::size_t kPortalTaskStackBytes = 8192;
-    static constexpr std::size_t kWorkerTaskStackBytes = 6144;
+    static constexpr std::size_t kWorkerTaskStackBytes = 4096;
     static constexpr std::size_t kWorkerTaskStackWords =
         kWorkerTaskStackBytes / sizeof(StackType_t);
 

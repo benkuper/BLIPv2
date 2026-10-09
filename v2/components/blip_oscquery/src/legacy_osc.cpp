@@ -257,32 +257,27 @@ core::Status LegacyOscEndpoint::handle_control(const OscMessage& request, bool u
     const auto* parameter =
         find_parameter(*matched, alias == nullptr ? control_id : alias->parameter_id);
     control.control_id = parameter == nullptr ? control_id : parameter->id;
-    const auto* action = find_action(*matched, control_id);
+    bool is_parameter = parameter != nullptr;
+    bool is_action = find_action(*matched, control_id) != nullptr;
     core::DynamicSchemaLease schema;
-    core::ParameterDescriptor dynamic_parameter{};
-    core::ActionDescriptor dynamic_action{};
-    std::array<core::FieldDescriptor, core::kMaxControlValues> dynamic_fields{};
-    if (!parameter && !action) {
+    if (!is_parameter && !is_action) {
         const auto acquired = registry_->acquire_dynamic_schema(matched->id, schema);
         if (!acquired) return acquired;
         for (std::size_t i = 0; i < schema.size(); ++i) {
             if (schema.id(i) != control_id) continue;
-            if (schema.kind(i) == core::DynamicControlKind::parameter) {
-                const auto projected = schema.parameter(i, dynamic_parameter);
-                if (!projected) return projected;
-                parameter = &dynamic_parameter;
-            } else if (schema.kind(i) == core::DynamicControlKind::action) {
-                const auto projected = schema.action(i, dynamic_fields, dynamic_action);
-                if (!projected) return projected;
-                action = &dynamic_action;
-            }
+            // Routing needs only the kind and generation. The dispatcher
+            // validates the complete leased descriptor before admission;
+            // projecting it here duplicated large arrays on every OSC stack,
+            // including static persisted-setting writes.
+            is_parameter = schema.kind(i) == core::DynamicControlKind::parameter;
+            is_action = schema.kind(i) == core::DynamicControlKind::action;
             control.generation = schema.generation(); break;
         }
     }
-    if (parameter != nullptr) {
+    if (is_parameter) {
         control.operation = request.argument_count == 0U ? core::ControlOperation::read_parameter
                                                          : core::ControlOperation::write_parameter;
-    } else if (action != nullptr) {
+    } else if (is_action) {
         control.operation = core::ControlOperation::invoke_action;
     } else {
         return failure(core::ErrorCode::not_found, "route", "control");
@@ -290,7 +285,7 @@ core::Status LegacyOscEndpoint::handle_control(const OscMessage& request, bool u
 
     std::array<core::ScalarValue, core::kMaxControlValues> values{};
     for (std::size_t index = 0; index < request.argument_count; ++index) {
-        if (!legacy_to_core(request.arguments[index], parameter == nullptr ? nullptr : alias,
+        if (!legacy_to_core(request.arguments[index], is_parameter ? alias : nullptr,
                             values[index])) {
             return failure(core::ErrorCode::invalid_argument, "route", "argument-type");
         }
@@ -325,8 +320,17 @@ core::Status LegacyOscEndpoint::handle_control(const OscMessage& request, bool u
         }
     }
     response.argument_count = output_index;
+    return own_response_strings(response);
+}
+
+// Keep the copy scratch out of persisted-setting and guest dispatch stacks.
+// This also preserves overlapping views when an existing reply is reused.
+#ifdef ESP_PLATFORM
+[[gnu::noinline]]
+#endif
+core::Status LegacyOscEndpoint::own_response_strings(OscMessage& response) noexcept {
     std::size_t string_bytes{};
-    for (std::size_t i = 0; i < output_index; ++i) {
+    for (std::size_t i = 0; i < response.argument_count; ++i) {
         if (response.arguments[i].type != OscValueType::string) continue;
         if (response.arguments[i].string.size() > response_strings_.size() - string_bytes)
             return failure(core::ErrorCode::capacity_exceeded, "feedback", "string-storage");
@@ -334,7 +338,7 @@ core::Status LegacyOscEndpoint::handle_control(const OscMessage& request, bool u
     }
     std::array<char, core::kControlResponseStringBytes> strings{};
     string_bytes = 0;
-    for (std::size_t i = 0; i < output_index; ++i) {
+    for (std::size_t i = 0; i < response.argument_count; ++i) {
         auto& value = response.arguments[i]; if (value.type != OscValueType::string) continue;
         if (!value.string.empty()) std::memcpy(strings.data() + string_bytes, value.string.data(), value.string.size());
         value.string = {response_strings_.data() + string_bytes, value.string.size()}; string_bytes += value.string.size();

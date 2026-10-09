@@ -30,6 +30,7 @@ class LegacyOscEndpoint {
   private:
     [[nodiscard]] core::Status handle_control(const OscMessage& request, bool udp_feedback,
                                               OscMessage& response) noexcept;
+    [[nodiscard]] core::Status own_response_strings(OscMessage& response) noexcept;
 
     const core::RegistryView* registry_{};
     core::ControlService* controls_{};

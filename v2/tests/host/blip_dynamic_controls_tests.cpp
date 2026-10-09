@@ -198,6 +198,14 @@ bool osc_routes_dynamic_and_retains_feedback() {
     request.arguments[1] = blip::oscquery::OscValue::from_string("OSC action");
     BLIP_CHECK(endpoint.handle(request, "127.0.0.1", false, reply, should_reply));
     BLIP_CHECK(s.script.actions == 1 && s.script.observed_text == "OSC action");
+    // The endpoint resolves kind/generation; the dispatcher still validates
+    // the leased action fields before the script can observe the request.
+    request.arguments[0] = blip::oscquery::OscValue::from_integer(1);
+    const auto invalid = endpoint.handle(request, "127.0.0.1", true, reply, should_reply);
+    BLIP_CHECK(!invalid && invalid.error().code == ErrorCode::validation_failed);
+    BLIP_CHECK(s.script.actions == 1);
+    request.address = "/test/script/changed"; request.argument_count = 0;
+    BLIP_CHECK(!endpoint.handle(request, "127.0.0.1", false, reply, should_reply));
     return true;
 }
 bool response_capacity_copy_and_aliasing() {

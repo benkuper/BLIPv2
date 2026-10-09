@@ -15,6 +15,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "control"))
 from blip_wasm_hil import Client
 
 
+class SerialCapture:
+    def __init__(self, connection, received):
+        self.connection, self.received = connection, received
+
+    def __getattr__(self, name):
+        return getattr(self.connection, name)
+
+    def read(self, count):
+        data = self.connection.read(count)
+        self.received.extend(data)
+        return data
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("port", "mac", "endpoint"): parser.add_argument("--" + name, required=True)
@@ -27,6 +40,11 @@ def main():
               "firmware_sha256": sha(args.build / "blip-v2.bin"), "source_snapshot": snapshot(),
               "tool_sha256": sha(Path(__file__)), "initial_flash_log_sha256": sha(args.flash_log)}
     client = None; saved = {}; updates = "blip.updates"
+    serial_received = bytearray()
+    def open_client():
+        opened = Client(args.port)
+        opened.connection = SerialCapture(opened.connection, serial_received)
+        return opened
     def check(name, condition):
         report["checks"].append({"name": name, "passed": bool(condition)})
         if not condition: raise AssertionError(name)
@@ -35,10 +53,12 @@ def main():
         raw = args.flash_log.read_bytes()
         log = raw.decode("utf-16" if raw.startswith((b'\xff\xfe', b'\xfe\xff')) else "utf-8-sig")
         check("initial flashed MAC", args.mac.lower() in re.findall(r"mac:\s*([0-9a-f:]+)", log.lower()))
-        client = Client(args.port)
+        client = open_client()
         check("installed board identity", get("board", "blip.ota") == identity["board"])
         report["before_code"] = get("release_code", "blip.ota")
         check("candidate advances firmware release", code > report["before_code"])
+        report["memory_before"] = {key: get(key, "blip.diagnostics")
+            for key in ("heap_free_internal", "heap_largest_internal")}
         report["boot_before"] = get("boot_sequence", "blip.diagnostics")
         report["name_before"] = get("name", "blip.device.identity")
         report["web_before"] = get("web_bundle_version", "blip.storage.files.internal")
@@ -61,9 +81,10 @@ def main():
         client.request("action", updates, "install_firmware")
         deadline = time.monotonic() + 210
         progress = []; confirmed = False
+        report["download_progress"] = progress  # Retain partial progress on failure too.
         while time.monotonic() < deadline:
             try:
-                if client is None: client = Client(args.port)
+                if client is None: client = open_client()
                 installed_code = get("release_code", "blip.ota")
                 if installed_code == code:
                     if get("state", "blip.ota") == "confirmed": confirmed = True; break
@@ -98,7 +119,7 @@ def main():
     except Exception as error: report["error"] = f"{type(error).__name__}: {error}"
     finally:
         if client is None and saved:
-            try: client = Client(args.port)
+            try: client = open_client()
             except (OSError, SerialException) as error: report["policy_restore_error"] = str(error)
         if client:
             try:
@@ -108,6 +129,9 @@ def main():
             except Exception as error: report["policy_restore_error"] = str(error); report["passed"] = False
             client.connection.close()
         args.report.parent.mkdir(parents=True, exist_ok=True)
+        serial_log = args.report.with_suffix(".serial.log")
+        serial_log.write_bytes(serial_received)
+        report["serial_log_sha256"] = sha(serial_log)
         args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf8")
     print(json.dumps({"board": report["board"], "passed": report["passed"], "checks": len(report["checks"]),
                       "error": report.get("error"), "report": str(args.report)}), flush=True)

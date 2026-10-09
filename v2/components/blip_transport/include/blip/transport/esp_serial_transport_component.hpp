@@ -24,6 +24,7 @@ class EspSerialTransportComponent final : public core::Component {
     [[nodiscard]] core::Status start(const core::StartContext&) noexcept override;
     [[nodiscard]] core::Status stop() noexcept override;
     [[nodiscard]] bool callbacks_quiesced() const noexcept override { return quiesced_.load(); }
+    [[nodiscard]] core::Status read_parameter(std::string_view, core::ScalarValue&) noexcept override;
 
     void enable_control() noexcept { control_enabled_.store(true); }
     [[nodiscard]] std::uint32_t received_frames() const noexcept { return received_frames_.load(); }

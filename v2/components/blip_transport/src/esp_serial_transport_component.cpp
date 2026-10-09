@@ -25,6 +25,18 @@ constexpr std::array<core::DiagnosticDescriptor, 4> kDiagnostics{{
     {"rejected_frames", core::ValueType::integer, "frames"},
     {"overflow_frames", core::ValueType::integer, "frames"},
 }};
+constexpr std::array<core::ParameterDescriptor, 5> kParameters{{
+    {"rx_frames", "Received frames", core::ValueType::integer, core::Access::read_only,
+     false, core::ScalarValue::from_integer(0), {}, "frames"},
+    {"tx_frames", "Transmitted frames", core::ValueType::integer, core::Access::read_only,
+     false, core::ScalarValue::from_integer(0), {}, "frames"},
+    {"rejected_frames", "Rejected frames", core::ValueType::integer, core::Access::read_only,
+     false, core::ScalarValue::from_integer(0), {}, "frames"},
+    {"overflow_frames", "Overflow frames", core::ValueType::integer, core::Access::read_only,
+     false, core::ScalarValue::from_integer(0), {}, "frames"},
+    {"task_stack_headroom", "Serial task stack headroom", core::ValueType::integer, core::Access::read_only,
+     false, core::ScalarValue::from_integer(0), {}, "bytes"},
+}};
 
 [[nodiscard]] constexpr core::ComponentDescriptor serial_descriptor() noexcept {
     core::ComponentDescriptor descriptor{};
@@ -35,6 +47,7 @@ constexpr std::array<core::DiagnosticDescriptor, 4> kDiagnostics{{
     descriptor.provided_services = kProvidedServices;
     descriptor.required_services = kRequiredServices;
     descriptor.diagnostics = kDiagnostics;
+    descriptor.parameters = kParameters;
     descriptor.settings = {1, 1};
     descriptor.disable_policy = core::DisablePolicy::reboot_required;
     descriptor.cost = {32768, 12288, EspSerialTransportComponent::kTaskStackBytes};
@@ -63,6 +76,19 @@ EspSerialTransportComponent::EspSerialTransportComponent(core::ControlService& c
 
 const core::ComponentDescriptor& EspSerialTransportComponent::descriptor() const noexcept {
     return descriptor_;
+}
+
+core::Status EspSerialTransportComponent::read_parameter(std::string_view id, core::ScalarValue& output) noexcept {
+    std::uint32_t value{};
+    if (id == "rx_frames") value = received_frames_.load();
+    else if (id == "tx_frames") value = transmitted_frames_.load();
+    else if (id == "rejected_frames") value = rejected_frames_.load();
+    else if (id == "overflow_frames") value = overflow_frames_.load();
+    else if (id == "task_stack_headroom") value = task_handle_ ?
+        static_cast<std::uint32_t>(uxTaskGetStackHighWaterMark(task_handle_)) * sizeof(StackType_t) : 0;
+    else return core::Status::failure(serial_error(core::ErrorCode::not_found, "read-parameter", id));
+    output = core::ScalarValue::from_integer(value);
+    return core::Status::success();
 }
 
 core::Status EspSerialTransportComponent::install_driver() noexcept {
