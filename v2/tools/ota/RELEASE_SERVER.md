@@ -50,3 +50,24 @@ python v2/tools/ota/test_release_server.py -v
 Setting that environment variable also runs an actual HTTP response through the
 C++ device parser and compatibility validator. Unit tests use local HTTP only;
 the production server entry point requires TLS.
+
+Package an actual generated firmware image and the independently versioned web
+bundle before deploying them to the separate API server:
+
+```powershell
+python v2/tools/ota/release_publish.py --firmware build/m6-production-ball/blip-v2.bin --web v2/components/blip_storage/factory_web.bundle --catalog published/releases.json --artifacts published/files
+```
+
+The tool reads the firmware's embedded board/layout/profile/feature/API identity
+and its native app version. It verifies the web bundle, derives both version
+codes, computes complete SHA-256 digests, copies immutable digest-named artifacts
+and replaces the index atomically after verifying those copied files. Firmware
+release codes come from `-DBLIP_RELEASE_SEQUENCE=N`; increase the code when image
+or release metadata changes. `-DBLIP_RELEASE_PROFILE=NAME` sets the profile.
+Publishing firmware alone preserves the existing independent web entry.
+
+Keep publication serialized to one writer. The tool packages local artifacts;
+it does not upload them or restart the API service. Deploy `published/files` as
+the artifact root and `published/releases.json` as its catalog. The default
+public artifact URL is `https://www.goldengeek.org/blip/releases`; override
+`--base-url` only when the actual public hosting path differs.

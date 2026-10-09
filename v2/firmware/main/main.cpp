@@ -34,6 +34,7 @@
 #include "blip/transport/esp_classic_transport_component.hpp"
 #endif
 #include "network_lighting_features.hpp"
+#include "release_identity.hpp"
 #include "driver/gpio.h"
 #include "esp_idf_version.h"
 #include "esp_log.h"
@@ -235,7 +236,7 @@ blip::power::EspSleepComponent sleep_storage{wifi_component, *led_component};
 blip::power::EspSleepComponent* sleep_component{&sleep_storage};
 #endif
 #endif
-blip::ota::EspOtaComponent ota_component{"blip-v2", CONFIG_IDF_TARGET, "minimal"};
+blip::ota::EspOtaComponent ota_component{firmware_release_identity(0)};
 blip::core::Registry<20> registry{};
 blip::core::RegistryControlService<20> control_component{registry};
 #if defined(BLIP_ENABLE_WASM)

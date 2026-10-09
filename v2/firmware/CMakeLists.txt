@@ -2,6 +2,19 @@ cmake_minimum_required(VERSION 3.22)
 
 # Keep generated configuration isolated inside each selected build directory.
 set(SDKCONFIG "${CMAKE_BINARY_DIR}/sdkconfig")
+set(BLIP_RELEASE_SEQUENCE "1" CACHE STRING "Monotonic firmware release code")
+set(BLIP_RELEASE_PROFILE "minimal" CACHE STRING "Firmware release profile identity")
+string(LENGTH "${BLIP_RELEASE_SEQUENCE}" blip_release_digits)
+string(LENGTH "${BLIP_RELEASE_PROFILE}" blip_release_profile_length)
+if(NOT BLIP_RELEASE_SEQUENCE MATCHES "^[1-9][0-9]*$" OR blip_release_digits GREATER 10)
+    message(FATAL_ERROR "BLIP_RELEASE_SEQUENCE must be 1..4294967295")
+endif()
+if(BLIP_RELEASE_SEQUENCE GREATER 4294967295)
+    message(FATAL_ERROR "BLIP_RELEASE_SEQUENCE must be 1..4294967295")
+endif()
+if(NOT BLIP_RELEASE_PROFILE MATCHES "^[A-Za-z0-9][A-Za-z0-9._-]*$" OR blip_release_profile_length GREATER 31)
+    message(FATAL_ERROR "BLIP_RELEASE_PROFILE must be a 1..31 character identifier")
+endif()
 option(BLIP_ENABLE_BLE "Include the NimBLE control transport" OFF)
 option(BLIP_ENABLE_CLASSIC_BT "Include Classic Bluetooth SPP control on ESP32" OFF)
 option(BLIP_ENABLE_ESPNOW "Include ESP-NOW V2 peer control" OFF)
@@ -120,6 +133,18 @@ idf_build_set_property(
     "${CMAKE_CURRENT_LIST_DIR}/dependencies.lock.${IDF_TARGET}")
 
 project(blip-v2 VERSION 0.1.0)
+
+if(CONFIG_ESPTOOLPY_FLASHSIZE_8MB)
+    if(NOT CONFIG_PARTITION_TABLE_CUSTOM_FILENAME STREQUAL "partitions-8mb.csv")
+        message(FATAL_ERROR "Release layout ota-8mb-v1 requires partitions-8mb.csv")
+    endif()
+elseif(CONFIG_ESPTOOLPY_FLASHSIZE_4MB)
+    if(NOT CONFIG_PARTITION_TABLE_CUSTOM_FILENAME STREQUAL "partitions.csv")
+        message(FATAL_ERROR "Release layout ota-4mb-v1 requires partitions.csv")
+    endif()
+else()
+    message(FATAL_ERROR "Declare a BLIP release layout for the selected flash size")
+endif()
 
 # Defaults do not replace an existing sdkconfig. Refuse a stale generic C6
 # configuration before producing a Ball image with the wrong factory layout.

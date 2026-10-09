@@ -17,7 +17,15 @@ constexpr std::array<core::MetadataEntry, 4> kMetadata{{
     {"rollback", "bootloader-confirmation"},
     {"signature", "esp-idf-policy"},
 }};
-constexpr std::array<core::ParameterDescriptor, 4> kParameters{{
+constexpr std::array<core::ParameterDescriptor, 12> kParameters{{
+    {"release_code", "Installed firmware code", core::ValueType::integer, core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, ""},
+    {"version", "Installed firmware version", core::ValueType::string, core::Access::read_only, false, core::ScalarValue::from_string(""), {}, ""},
+    {"board", "Firmware board", core::ValueType::string, core::Access::read_only, false, core::ScalarValue::from_string(""), {}, ""},
+    {"target", "Firmware target", core::ValueType::string, core::Access::read_only, false, core::ScalarValue::from_string(""), {}, ""},
+    {"layout", "Firmware layout", core::ValueType::string, core::Access::read_only, false, core::ScalarValue::from_string(""), {}, ""},
+    {"profile", "Firmware profile", core::ValueType::string, core::Access::read_only, false, core::ScalarValue::from_string(""), {}, ""},
+    {"features", "Firmware features", core::ValueType::integer, core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, ""},
+    {"flash_bytes", "Firmware flash layout bytes", core::ValueType::integer, core::Access::read_only, false, core::ScalarValue::from_integer(0), {}, "bytes"},
     {"state",
      "Update state",
      core::ValueType::string,
@@ -169,6 +177,9 @@ EspOtaComponent::EspOtaComponent(std::string_view project, std::string_view targ
                                  std::string_view profile) noexcept
     : service_(backend_, project, target, profile) {}
 
+EspOtaComponent::EspOtaComponent(ReleaseIdentity identity) noexcept
+    : service_(backend_, identity.project, identity.target, identity.profile), identity_(identity) {}
+
 const core::ComponentDescriptor& EspOtaComponent::descriptor() const noexcept {
     return descriptor_;
 }
@@ -193,7 +204,23 @@ core::Status EspOtaComponent::read_parameter(std::string_view id,
         return ota_failure(core::ErrorCode::invalid_state, "read-parameter", "not-started");
     }
     const auto& status = service_.status();
-    if (id == "state") {
+    if (id == "release_code") {
+        output = core::ScalarValue::from_integer(identity_.firmware_code);
+    } else if (id == "version") {
+        output = core::ScalarValue::from_string(identity_.firmware_version);
+    } else if (id == "board") {
+        output = core::ScalarValue::from_string(identity_.board);
+    } else if (id == "target") {
+        output = core::ScalarValue::from_string(identity_.target);
+    } else if (id == "layout") {
+        output = core::ScalarValue::from_string(identity_.layout);
+    } else if (id == "profile") {
+        output = core::ScalarValue::from_string(identity_.profile);
+    } else if (id == "features") {
+        output = core::ScalarValue::from_integer(identity_.features);
+    } else if (id == "flash_bytes") {
+        output = core::ScalarValue::from_integer(identity_.flash_bytes);
+    } else if (id == "state") {
         output = core::ScalarValue::from_string(update_state_name(status.state));
     } else if (id == "received_bytes") {
         output = core::ScalarValue::from_integer(static_cast<std::int64_t>(status.received_bytes));

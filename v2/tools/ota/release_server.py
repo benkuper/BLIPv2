@@ -87,7 +87,7 @@ def validate_release(release):
             raise ValueError("invalid artifact fields")
         for key in ("code", "bytes", "minimum_other_code"):
             uint32(artifact[key])
-        if not artifact["code"] or not (288 if kind == "firmware" else 48) <= artifact["bytes"] <= (8 * 1024 * 1024 if kind == "firmware" else 256 * 1024):
+        if not artifact["code"] or not (492 if kind == "firmware" else 48) <= artifact["bytes"] <= (8 * 1024 * 1024 if kind == "firmware" else 256 * 1024):
             raise ValueError("invalid artifact code/size")
         ascii_text(artifact["version"], 31)
         https_url(artifact["url"])

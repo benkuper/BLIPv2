@@ -46,6 +46,29 @@ timeouts. Startup requires a TLS certificate/key. Hosting this handler on
 GoldenGeek remains a deployment step; no live catalog or release publication
 is claimed by this contract checkpoint.
 
-The native HTTPS worker, update center, automatic policy, embedded downloaded
-firmware compatibility metadata and interruption/corruption/rollback hardware
+The native HTTPS worker, update center, automatic policy and
+interruption/corruption/rollback hardware
 qualification remain required before completing 3.8/3.9 or Gate B.
+
+The subsequent image checkpoint embeds a 204-byte `BLIPREL1` descriptor directly
+after the native app descriptor, at image byte 288. It stores schema, monotonic
+release code, configured flash bytes, feature mask, control API, project, board,
+target, layout and profile. Fixed ASCII text has zero padding. Download prefix
+validation compares these fields plus native app project/version against the
+selected release before activation. The catalog now requires firmware to be at
+least 492 bytes. Native chip/signature/image validation remains mandatory.
+
+Feature bits 0..7 are WASM, BLE, Classic BT, ESP-NOW, fleet, Art-Net, DDP and
+E1.31. Board identity distinguishes onboard hardware; future feature mappings
+must extend this documented mask. Firmware builds validate nonzero u32 release
+codes, bounded profile identifiers and the declared 4/8 MB partition filenames.
+Configured flash/layout identity describes the generated installation layout;
+it does not claim the physical flash was independently measured on each board.
+
+The local packaging CLI reads actual image metadata, checks target/header
+consistency and partition capacity, verifies the web bundle, computes file
+digests and copies immutable digest-named artifacts before atomically replacing
+the index. It rejects changes under an existing release code. Firmware-only
+publication retains the independent web entry. Publication uses one writer.
+The user selected a separate API server; the Python handler is the deployment
+target. Remote deployment and native HTTPS installation remain open.

@@ -2,6 +2,7 @@
 
 #include "blip/core/component.hpp"
 #include "blip/ota/update_service.hpp"
+#include "blip/ota/release_catalog.hpp"
 #include "esp_ota_ops.h"
 
 #include <cstddef>
@@ -31,6 +32,7 @@ class EspOtaComponent final : public core::Component {
   public:
     EspOtaComponent(std::string_view project, std::string_view target,
                     std::string_view profile) noexcept;
+    explicit EspOtaComponent(ReleaseIdentity identity) noexcept;
 
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
     [[nodiscard]] core::Status start(const core::StartContext&) noexcept override;
@@ -54,6 +56,7 @@ class EspOtaComponent final : public core::Component {
     static const core::ComponentDescriptor descriptor_;
     EspOtaBackend backend_{};
     UpdateService service_;
+    const ReleaseIdentity identity_{};
     bool started_{};
 };
 

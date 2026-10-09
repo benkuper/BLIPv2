@@ -3,6 +3,7 @@ idf_component_register(
         "src/esp_ota_component.cpp"
         "src/update_service.cpp"
         "src/release_catalog.cpp"
+        "src/release_image.cpp"
     INCLUDE_DIRS "include"
     REQUIRES app_update blip_core esp_app_format log)
 

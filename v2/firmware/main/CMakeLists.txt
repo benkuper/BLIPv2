@@ -9,7 +9,7 @@ idf_build_get_property(blip_wasm_enabled BLIP_ENABLE_WASM)
 idf_build_get_property(blip_qualify_providers BLIP_QUALIFY_WASM_PROVIDERS)
 idf_build_get_property(blip_huzzah32_enabled BLIP_BOARD_ADAFRUIT_HUZZAH32)
 
-set(blip_main_sources "main.cpp")
+set(blip_main_sources "main.cpp" "release_identity.cpp")
 set(blip_main_requires blip_core blip_led blip_network blip_oscquery blip_ota
     blip_pm blip_resources blip_storage blip_transport esp_driver_gpio esp_system esp_timer log)
 if(blip_artnet_enabled)
@@ -47,6 +47,9 @@ idf_component_register(
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/blip_component.cmake)
 blip_configure_component(${COMPONENT_LIB})
+target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    BLIP_RELEASE_SEQUENCE=${BLIP_RELEASE_SEQUENCE}U BLIP_RELEASE_PROFILE="${BLIP_RELEASE_PROFILE}")
+target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--undefined=blip_release_image_descriptor")
 
 if(blip_artnet_enabled)
     target_compile_definitions(${COMPONENT_LIB} PRIVATE BLIP_ENABLE_ARTNET=1)

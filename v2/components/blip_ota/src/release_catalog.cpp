@@ -1,4 +1,5 @@
 #include "blip/ota/release_catalog.hpp"
+#include "blip/ota/release_image.hpp"
 #include <charconv>
 #include <limits>
 
@@ -206,7 +207,7 @@ core::Status validate_release_catalog(const ReleaseCatalog& catalog, const Relea
         if (!artifact->present) continue;
         const bool firmware = artifact == &catalog.firmware;
         if (!artifact->code || artifact->version.view().empty() || !valid_release_https_url(artifact->url.view()) ||
-            artifact->bytes < (firmware ? kEspAppDescriptorEnd : 48) ||
+            artifact->bytes < (firmware ? kReleaseImagePrefixBytes : 48) ||
             artifact->bytes > (firmware ? maximum_firmware_bytes : maximum_web_bytes) ||
             std::all_of(artifact->sha256.begin(), artifact->sha256.end(), [](std::byte byte) { return byte == std::byte{}; }))
             return failure(core::ErrorCode::verification_failed, "invalid-release-artifact");
