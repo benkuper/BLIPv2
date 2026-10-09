@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate seven production worker trials and selected guarded traffic trials."""
+"""Validate the six required production worker profiles and guarded traffic."""
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -17,7 +17,6 @@ from blip_wasm_hil import source_snapshot
 PROFILES = {
     "huzzah32": ("adafruit-huzzah32", "esp32", "BLIP_BOARD_ADAFRUIT_HUZZAH32", "30:ae:a4:f2:d1:84"),
     "club": ("creators-club", "esp32", "BLIP_BOARD_CREATORS_CLUB", "30:ae:a4:f3:a3:88"),
-    "tab": ("creators-tab", "esp32", "BLIP_BOARD_CREATORS_TAB", "50:02:91:9f:8e:d0"),
     "m5stickc": ("m5stack-m5stickc", "esp32", "BLIP_BOARD_M5STICKC", "94:b9:7e:8b:b7:84"),
     "m5dial": ("m5stack-m5dial", "esp32s3", None, "b0:81:84:96:83:74"),
     "ball": ("creators-ball-v2", "esp32c6", "BLIP_BOARD_CREATORS_BALL_V2", "08:92:72:f6:4d:dc"),
@@ -67,7 +66,6 @@ def main():
     assert revision == "25bd7eb63e828e4bd242cc9b38d260b4b31c6605"
     assert not subprocess.check_output(["git", "-C", str(engine), "status", "--porcelain"], text=True).strip()
     baseline = read_json(ROOT / "docs/v2/evidence/fleet/2026-10-01-seven-board-build.json")
-    baseline_names = {"tab": "creators-tab"}
     boards = []
     for profile, (board, target, selector, mac) in PROFILES.items():
         build = ROOT / (args.build_prefix + profile)
@@ -106,7 +104,7 @@ def main():
         app_bytes = (build / "blip-v2.bin").stat().st_size
         partition_bytes = app_partition_bytes(build)
         assert app_bytes <= partition_bytes
-        prior = next(item for item in baseline["boards"] if item["profile"] == baseline_names.get(profile, profile))
+        prior = next(item for item in baseline["boards"] if item["profile"] == profile)
         assert prior["partition_bytes"] == partition_bytes
         item = {"profile": profile, "board": board, "target": target, "mac": mac,
                 "enabled_features": list(enabled) + (["BLE"] if profile == "ball" else []),
@@ -135,13 +133,13 @@ def main():
             item.update(coexistence_trial_sha256=sha(network_path), coexistence_trial=network)
         boards.append(item)
     evidence = {"schema_version": 1, "recorded_utc": datetime.now(timezone.utc).isoformat(), "passed": True,
-        "result": "seven production profiles passed their declared memory/policy checks; M5StickC large UART burst remains unresolved; full Gate D open",
+        "result": "six required production profiles passed their declared memory/policy checks; M5StickC large UART burst remains unresolved; full Gate D open",
         "runtime": {"name": "WAMR fast interpreter", "commit": revision, "checkout_unmodified": True},
         "source_snapshot": snapshot, "prior_profile_source_commit": baseline["source_commit"],
         "firmware_restore_requested": False, "boards": boards,
         "limitations": [
             "Native component task stop/restart and allocation-failure qualification remain open.",
-            "The M5StickC omits two large UART-burst checks after repeated damaged replies; the same queue-overload policy passes on the other three ESP32 profiles. See the separate serial-burst evidence.",
+            "The M5StickC omits two large UART-burst checks after repeated damaged replies; the same queue-overload policy passes on the other two required ESP32 profiles. See the separate serial-burst evidence.",
             "Traffic trials are brief operational checks, not lossless UDP or a network latency/soak guarantee.",
             "A first combined HUZZAH32 serial/traffic run had three HTTP timeouts; the separate traffic trial must pass and long-run latency remains open.",
             "Deadline cancellation and late-result rejection are enforced; SDK/cache work can delay completion.",

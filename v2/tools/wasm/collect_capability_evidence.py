@@ -1,4 +1,4 @@
-"""Validate portable provider qualification and seven production compatibility builds."""
+"""Validate portable provider qualification and six required production compatibility builds."""
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -132,7 +132,7 @@ def main():
         "production_builds": builds, "size_tool_sha256": sha(size_tool), "native_imports_exercised": False,
         "limitations": ["Guest imports remain rejected. Native registration, trampoline, import allowlist/signature checks and production-owned providers are the next 6.5 checkpoint.",
             "Native dispatch used real WAMR guest memory on XIAO C6 with synthetic component-owned providers; no radio, LED, settings or production provider coexistence was exercised.",
-            "Seven production images were built but not flashed. They link the metadata validator; the unused provider catalog is removed by linker garbage collection.",
+            "Six required production images were built but not flashed. They link the metadata validator; the unused provider catalog is removed by linker garbage collection.",
             "Callback time bounds are declarations of trusted native work. This portable checkpoint does not enforce elapsed time or prove a bound under load.",
             "Static RAM deltas use the earlier production memory matrix because the UTF-8 checkpoint did not record linked RAM. Production pool/module/native task reservations are unchanged.",
             "Full Gate C/D, soaks, M5StickC serial burst recovery, SDK generation and script controls remain open."]}

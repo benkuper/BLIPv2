@@ -110,3 +110,30 @@ export async function uploadFirmware({ file, target, baseUrl, fetchImpl = global
   }
   return image;
 }
+
+export class FirmwarePanel {
+  constructor({ root, baseUrl, isTransferring = () => false, upload = uploadFirmware }) {
+    this.root = root; this.baseUrl = baseUrl; this.isTransferring = isTransferring; this.upload = upload; this.busy = false;
+    this.file = root.querySelector("#firmware-file"); this.target = root.querySelector("#firmware-target");
+    this.button = root.querySelector("#firmware-button"); this.status = root.querySelector("#firmware-status");
+    this.button.addEventListener("click", () => this.submit());
+  }
+  async submit() {
+    if (this.busy) return;
+    if (this.isTransferring()) { this.status.textContent = "Wait for the device transfer to finish"; return; }
+    const file = this.file.files?.[0];
+    if (!file) { this.status.textContent = "Choose a BLIP application image first."; return; }
+    // Pause before image hashing, which yields to the browser between chunks.
+    this.busy = true; this.root.setAttribute("aria-busy", "true");
+    this.button.disabled = this.file.disabled = this.target.disabled = true;
+    this.status.textContent = "Validating and uploading firmware…";
+    try {
+      const image = await this.upload({ file, target: this.target.value, baseUrl: this.baseUrl() });
+      this.status.textContent = `${image.project} ${image.version} accepted. The device is restarting.`;
+    } catch (error) { this.status.textContent = error instanceof Error ? error.message : String(error); }
+    finally {
+      this.busy = false; this.root.setAttribute("aria-busy", "false");
+      this.button.disabled = this.file.disabled = this.target.disabled = false;
+    }
+  }
+}

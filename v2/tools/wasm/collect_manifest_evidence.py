@@ -79,7 +79,7 @@ def main():
             "Repeated parse duration uses a one-control fixture, not a worst-case schema or deadline guarantee",
             "The 20 KiB qualification stack accommodates allocating host fixtures and schema copies; it is not a production stack requirement",
             "Compiler frame sizes are individual functions, not a complete call-chain measurement",
-            "Production code does not yet instantiate or consume the owned declaration schema; seven production profiles will be renewed when live integration is enabled",
+            "Production code does not yet instantiate or consume the owned declaration schema; six required production profiles will be renewed when live integration is enabled",
             "Full 6.6/6.7, Gate C/D, concurrency/lifecycle stress and multi-day soaks remain open"
         ]
     }

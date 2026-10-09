@@ -1,4 +1,4 @@
-"""Collect checked-string native trials and seven production compatibility builds."""
+"""Collect checked-string native trials and six required production compatibility builds."""
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -98,7 +98,7 @@ def main():
     if "100% tests passed" not in read_text(hostlog) or "out of 23" not in read_text(hostlog):
         raise RuntimeError("Host suite incomplete")
     evidence={"schema_version":1,"recorded_utc":datetime.now(timezone.utc).isoformat(),"passed":True,
-        "result":"checked UTF-8 ABI passed host and three-family native qualification; seven production compatibility builds passed",
+        "result":"checked UTF-8 ABI passed host and three-family native qualification; six required production compatibility builds passed",
         "string_abi_version":1,"maximum_string_bytes":256,"source_snapshot":sources,
         "runtime":{"commit":PIN,"checkout_unmodified":True},"fixture_sha256":fixture_hash,
         "native_checks":sum(next(r for r in t["trial"]["records"] if r["type"]=="complete")["checks"] for t in trials),
@@ -107,7 +107,7 @@ def main():
         "host_executables":{name:sha(ROOT / "build/host-m4/Release" / name) for name in ("blip_wasm_tests.exe","blip_wasm_utf8_tests.exe")},
         "limitations":[
             "String APIs are worker-confined runtime/service boundaries. Component-owned imports, registry declarations and generated SDK bindings follow in 6.5-6.7.",
-            "Native string trials are isolated from production radio, LED and settings tasks. Compatibility images were compiled on all seven profiles but were not flashed by this string trial.",
+            "Native string trials are isolated from production radio, LED and settings tasks. Compatibility images were compiled on all six required profiles but were not flashed by this string trial.",
             "Production string helpers are currently removed by linker garbage collection until bindings use them; app deltas include the checked memory adapter/vtable and build metadata.",
             "Maximum read/write times are observed isolated workloads, not hard real-time bounds. The 256-byte read scratch uses the existing worker stack; no persistent string buffer or heap reservation is added.",
             "Full Gate D, active BLE/fleet coexistence, cold/global OOM, long soaks, M5StickC serial bursts and physical Gate C timing remain open.",

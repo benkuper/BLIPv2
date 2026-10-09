@@ -55,6 +55,7 @@
         <nav id="topics" class="topic-nav" aria-label="Control topics" hidden></nav>
         <div class="section-intro"><h2 id="controls-heading">At a glance</h2><p id="sample-status" role="status">Waiting for your device</p></div>
 
+        <p id="startup-recovery" class="notice" role="status">Loading the interface. If it stops, <a href="">reload the interface</a>.</p>
         <p id="notice" class="notice" role="status" hidden></p>
         <section id="controls" class="control-grid" aria-label="Device controls"></section>
 
@@ -108,7 +109,7 @@
           <div id="reservations" aria-live="polite"></div>
         </section>
 
-        <section class="firmware-panel advanced-only" aria-labelledby="firmware-heading" hidden>
+        <section id="firmware-center" class="firmware-panel advanced-only" aria-labelledby="firmware-heading" aria-busy="false" hidden>
           <div>
             <p class="eyebrow">Maintenance</p>
             <h2 id="firmware-heading">Firmware update</h2>

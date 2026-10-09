@@ -106,7 +106,7 @@ def main():
                 "remaining": ["complete diagnostic inspection", "lossless i64 and schema-bound transport requests in 6.6", "firmware/web self-updates in 3.8/3.9", "Gate B/C/D and endurance"]}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"browser_checks": 45, "boards": 3, "builds": 7}))
+    print(json.dumps({"browser_checks": 45, "boards": 3, "builds": len(builds)}))
 
 
 if __name__ == "__main__":

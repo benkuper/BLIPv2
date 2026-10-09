@@ -16,12 +16,13 @@ export function releaseSummary(state) {
 }
 
 export class UpdatePanel {
-  constructor({ document, root, onError, reload = () => location.reload() }) {
+  constructor({ document, root, onError, reload = () => location.reload(), isTransferring = () => false }) {
     this.root = root; this.onError = onError; this.reload = reload; this.client = null;
-    this.busy = false; this.refreshSequence = 0;
+    this.busy = false; this.refreshSequence = 0; this.isTransferring = isTransferring;
     this.status = root.querySelector("[data-update-status]");
     this.progress = root.querySelector("progress"); this.version = null;
     for (const button of root.querySelectorAll("[data-update-action]")) button.addEventListener("click", async () => {
+      if (this.isTransferring()) { this.status.textContent = "Wait for the device transfer to finish"; return; }
       const client = this.client, previousBusy = this.busy;
       button.disabled = true;
       this.busy = true; ++this.refreshSequence; clearTimeout(this.timer);
@@ -38,10 +39,14 @@ export class UpdatePanel {
     clearTimeout(this.timer);
     const client = this.client;
     if (!client) return;
+    if (this.isTransferring()) { this.timer = setTimeout(() => this.refresh(), 1000); return; }
     const sequence = ++this.refreshSequence;
     try {
       const state = await client.loadReleases();
       if (client !== this.client || sequence !== this.refreshSequence) return;
+      // A response started before a manual transfer must not reload the page
+      // or reopen update controls while that transfer owns admission.
+      if (this.isTransferring()) { this.timer = setTimeout(() => this.refresh(), 1000); return; }
       this.busy = Boolean(state.busy);
       this.status.textContent = releaseSummary(state.state) + (state.error ? ` · ${state.error.replaceAll("-", " ")}` : "");
       this.root.querySelector("[data-firmware-version]").textContent = state.firmware_version || `Release ${state.installed_firmware}`;

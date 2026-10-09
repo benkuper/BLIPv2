@@ -279,19 +279,6 @@ def validate_board(path: Path) -> None:
             require(pin.get("reserved_for") == owner and pin.get("reason") == reason
                     and pin.get("selectable") is False,
                     f"{path}: GPIO{gpio} must remain reserved for {owner}")
-    if document["id"] == "creators-tab":
-        require(document["target"] == "esp32", f"{path}: Creators Tab target changed")
-        for gpio, owner, reason in (
-            (12, "system.power", "power-hold-critical"),
-            (23, "bus.i2c.imu", "onboard-imu-bus"),
-            (25, "blip.output.strip0:pin", "ws2812b-data"),
-            (27, "system.led-power", "led-enable"),
-            (39, "system.battery", "battery-charge-input"),
-        ):
-            pin = by_gpio.get(gpio, {})
-            require(pin.get("reserved_for") == owner and pin.get("reason") == reason
-                    and pin.get("selectable") is False,
-                    f"{path}: GPIO{gpio} must remain reserved for {owner}")
     if document["id"] == "creators-club":
         require(document["target"] == "esp32", f"{path}: Creators Club target changed")
         for gpio, owner, reason in (
@@ -338,6 +325,9 @@ def main() -> int:
     check_fixture("conflict-exclusive.json", False, "feature.button")
     check_fixture("conflict-reserved.json", False, "system.flash")
     for board in sorted((ROOT / "v2" / "boards").glob("*.json")):
+        # User retired Creators Tab from all checks on 2026-10-09.
+        if board.stem == "creators-tab":
+            continue
         validate_board(board)
     board = load_manifest(ROOT / "v2/boards/creators-club.json")
     pins = {pin["gpio"]: pin for pin in board["pins"]}

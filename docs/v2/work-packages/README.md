@@ -1,5 +1,10 @@
 # V2 implementation work packages
 
+Current validation scope (2026-10-09): Creators Club, Creators Ball V2, HUZZAH32,
+XIAO C6, M5StickC and M5Dial. The user removed Creators Tab from all checks because
+no working unit remains. Historical seven-board build/trial records retain their
+original scope; Tab absence or failure no longer blocks a milestone.
+
 ## Milestone 1
 
 | Work package | Result |
@@ -21,7 +26,7 @@ wire protocols, or public OSC paths.
 | [2.1](2.1-versioned-nvs-settings.md) | Versioned per-component NVS records with two-slot interrupted-save recovery |
 | [2.2](2.2-atomic-file-storage.md) | Versioned atomic LittleFS files and an optional two-slot SD service with bounded recovery |
 | [2.2 media extension](2.2-automatic-media-storage.md) | Automatic external/internal bulk files for web assets, scripts, playback and sequences; integration/qualification in progress |
-| [2.2 browser files](2.2-automatic-media-storage.md#browser-file-management) | Bounded directory pages and Advanced file management; six boards passed 265 API and 22 browser checks each, seven builds pass; Tab and full milestone qualification remain open |
+| [2.2 browser files](2.2-automatic-media-storage.md#browser-file-management) | Bounded directory pages and Advanced file management; six boards passed 265 API and 22 browser checks each, seven builds pass; full milestone qualification remains open |
 | [2.2 stored scripts](2.2-automatic-media-storage.md#stored-script-consumer-checkpoint) | Passive named script loading through automatic storage; six boards passed 215 file-consumer checks each, seven builds pass; other consumers and full qualification remain open |
 | [2.2 cancellable validation](2.2-automatic-media-storage.md#cancellable-stored-file-validation) | Borrowed cancellation checks with no static RAM increase; Club/Ball passed 222 checks with 0.072/0.612-second cancellation; three-family regressions pass, sustained I/O and full milestone gates remain open |
 | [2.3](2.3-settings-migration-v1-import.md) | Ordered V2 schema migrations; prior V1 import evidence retained as historical record |
@@ -42,12 +47,13 @@ wire protocols, or public OSC paths.
 | [3.6](3.6-pin-reservation-ui.md) | Complete pin/reservation inspection with conflict-safe reassignment and shared-bus handling |
 | [3.7–3.9](3.7-device-web-and-self-update.md) | Required Simple/Advanced graphical web app and device-specific firmware/web self-updates; implementation checkpoints below, full qualification open |
 | [3.7 browser foundation](3.7-simple-advanced-foundation.md) | Simple/Advanced modes, real graphs and automatic script-schema refresh; seven builds and three-family device-served browser trials passed; remaining diagnostic/scalar surfaces and self-updates open |
-| [3.7 device identity](3.7-device-identity.md) | Editable saved names, board type, live name-based mDNS and web identity; six-board identity trials passed, Tab access and full milestone qualification open |
-| [3.8/3.9 native updates and first run](3.8-native-update-and-first-run.md) | Independent website updates, filesystem-only full UI and automatic first run; HUZZAH32 browser/native OTA and mismatch checks passed, seven-board/recovery/coexistence qualification open |
-| [3.8 update recovery](3.8-update-recovery.md) | Socket capacity, automatic browser reconnection, bounded file buffering and fault-injected update trials; seven-board/coexistence qualification open |
-| [3.8 reserved worker and RAM](3.8-update-recovery.md#reserved-worker-and-sd-progress-checkpoint) | Preallocated OTA task, compact copied controls and responsive SD status; six-board native/fleet and Ball SD recovery trials passed; extra-client, Tab and full milestone gates remain open |
+| [3.7 device identity](3.7-device-identity.md) | Editable saved names, board type, live name-based mDNS and web identity; six-board identity trials passed, broader milestone qualification open |
+| [3.8/3.9 native updates and first run](3.8-native-update-and-first-run.md) | Independent website updates, filesystem-only full UI and automatic first run; HUZZAH32 browser/native OTA and mismatch checks passed, six-board recovery/coexistence qualification open |
+| [3.8 update recovery](3.8-update-recovery.md) | Socket capacity, automatic browser reconnection, bounded file buffering and fault-injected update trials; six-board/coexistence qualification open |
+| [3.8 reserved worker and RAM](3.8-update-recovery.md#reserved-worker-and-sd-progress-checkpoint) | Preallocated OTA task, compact copied controls and responsive SD status; six-board native/fleet and Ball SD recovery trials passed; extra-client and full milestone gates remain open |
 | [3.8 update reading pause](3.8-update-recovery.md#pausing-background-readings-during-updates) | Filesystem UI pauses heavy reads during updates; Ball passed a delayed SD update with three extra clients, loaded script and BLE; other update paths and full milestone gates remain open |
-| [3.8 transport stacks](3.8-transport-stack-qualification.md) | UDP persisted-name/NVS overflow fixed; six boards passed 1,035 network/script/provisioning checks each with unchanged static RAM; Tab and update coexistence remain open |
+| [3.8 startup/manual admission](3.8-update-recovery.md#interface-startup-and-manual-upload-admission) | Bounded startup recovery and paused manual uploads; six boards passed 29 browser and 10 native UI checks each, six required factory images match unchanged apps; sustained/full-upload qualification remains open |
+| [3.8 transport stacks](3.8-transport-stack-qualification.md) | UDP persisted-name/NVS overflow fixed; six boards passed 1,035 network/script/provisioning checks each with unchanged static RAM; update coexistence remains open |
 
 ## Milestone 4
 

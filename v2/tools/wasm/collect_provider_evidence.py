@@ -137,7 +137,7 @@ def main():
             "Task time includes interrupts and meter overhead; wall time is reported separately. Native code remains trusted, bounded and nonblocking. Post-return checks and cooperative cancellation do not preempt a hung provider or roll back effects.",
             "Stop retains the fixed 96 KiB script reservation. Permanent retirement must release it after join. Runtime engine metrics alone do not describe these retained SDK buffers.",
             "M5Dial uses the primary native USB console and matching bootloader. It required stub-assisted esptool run after flashing; no-stub run was insufficient. USB console/framed replies share the driver; unattended installer reset behavior needs separate qualification.",
-            "Tab and absent M5StickC are compile-only in this checkpoint. Large UART bursts, full Gate C/D, RF scale, allocation/fragmentation stress and multi-day soaks remain open.",
+            "M5StickC is compile-only in this checkpoint. Creators Tab is excluded from current checks. Large UART bursts, full Gate C/D, RF scale, allocation/fragmentation stress and multi-day soaks remain open.",
             "Generated script controls/SDK bindings, script persistence and later implementation milestones remain incomplete."]}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")

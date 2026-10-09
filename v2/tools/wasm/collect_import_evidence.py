@@ -1,4 +1,4 @@
-"""Validate actual native imports on three families and seven production builds."""
+"""Validate actual native imports on three families and six required production builds."""
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -147,7 +147,7 @@ def main():
         "production_builds": builds, "size_tool_sha256": sha(size_tool), "collector_sha256": sha(Path(__file__)),
         "native_imports_exercised": True, "limitations": [
             "Native qualification uses two synthetic component-owned providers, eleven registered functions and 32 imported function slots. It does not exercise a fully occupied eight-provider/32-function native registration catalog.",
-            "Seven production images were built but not flashed. No production catalog is configured yet, so they still refuse nonempty imports. LED/fleet providers and worker-before-provider teardown remain the next 6.5 checkpoint.",
+            "Six required production images were built but not flashed. No production catalog is configured yet, so they still refuse nonempty imports. LED/fleet providers and worker-before-provider teardown remain the next 6.5 checkpoint.",
             "Trusted native callbacks cannot be forcibly preempted. Elapsed time is checked after return; cancellation is cooperative and does not roll back completed effects. The largest reported callback deliberately delays about 10 ms to test overrun faults.",
             "Native callback cancellation uses the main task to call request_cancel; production supervisor/provider coexistence, radio/render stress, allocator exhaustion, fragmentation, soaks and full Gate D remain open.",
             "The registration table and nodes use the existing fixed 80 KiB engine budget without SDK heap fallback. Production pool/module/native task reservations are unchanged; production runtime heap was not remeasured.",

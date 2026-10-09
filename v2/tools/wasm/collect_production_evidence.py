@@ -80,7 +80,7 @@ def main():
                        "note": "Profile comparison includes the new Wi-Fi RAM and tick settings; not an isolated engine delta."},
         "trial": report,
         "limitations": [
-            "Only the Ball C6 production profile is qualified here; six remaining board profiles are open.",
+            "Only the Ball C6 production profile is qualified here; five remaining required board profiles are open.",
             "Native component task stop/restart and allocation-failure lifecycle qualification are open.",
             "Network and LED counters establish operation, not physical LED waveform timing or long-term RF performance.",
             "Deadline failure is enforced; low worker priority and SDK/cache work can delay completion beyond the requested deadline.",

@@ -1,0 +1,834 @@
+{
+  "date": "2026-10-09",
+  "milestone_complete": false,
+  "goal_complete": false,
+  "pc_network_changed": false,
+  "scope": "Filesystem UI startup recovery and manual-upload/read/status admission on all six required boards. Creators Tab is excluded by the user. Rejected manual prefix only; complete valid upload and sustained coexistence remain separate gates.",
+  "validation_scope": {
+    "required_profiles": [
+      "ball",
+      "club",
+      "huzzah32",
+      "m5stickc",
+      "m5dial",
+      "xiao"
+    ],
+    "excluded_profiles": {
+      "tab": "User retired Creators Tab from all checks on 2026-10-09; historical evidence is retained."
+    }
+  },
+  "firmware": {
+    "code": 35,
+    "application_changed": false,
+    "static_ram_changed": false,
+    "previous_build_evidence": "docs/v2/evidence/storage/2026-10-09-browser-file-management.json",
+    "previous_build_evidence_sha256": "adf5d0a7b85861d48e377b2c910c5fe43029d1cef45dfeb2e9ebba8567f47845"
+  },
+  "ui": {
+    "source_version": "0.3.10",
+    "factory_code": 3010,
+    "development_code": 3125,
+    "minimum_firmware_code": 35,
+    "bytes": 34276,
+    "delta_bytes": 1232,
+    "assets": 12,
+    "embedded_in_application": false,
+    "factory_sha256": "2520b2927e29e36d47d51ca8390ffd23f49470e1916fd0dc030a021582db2247",
+    "published_sha256": "6cb7ba9f14b1af5d9ac98561ec14f4aaa7396fa9737ab2f4e58bbbe0d3e26d1c"
+  },
+  "verification": {
+    "host_suites_passed": 33,
+    "javascript_tests_passed": 47,
+    "six_profile_matrix": {
+      "report": "build/m49-six-profile-proof.json",
+      "sha256": "68261e0cbd0ca965102859d673aa40bbef742b4e890141c0027c486538d3b7c2",
+      "passed": true,
+      "required_profiles": [
+        "ball",
+        "club",
+        "huzzah32",
+        "m5dial",
+        "m5stickc",
+        "xiao"
+      ],
+      "collectors": [
+        "collect_string_evidence",
+        "collect_capability_evidence",
+        "collect_import_evidence",
+        "collect_provider_evidence",
+        "collect_live_controls_evidence",
+        "collect_dynamic_schema_evidence",
+        "collect_script_store_evidence",
+        "collect_modes_evidence",
+        "collect_release_image_evidence",
+        "collect_catalog_evidence"
+      ],
+      "resource_validation": [
+        "PASS resource manifest: minimal profile",
+        "PASS resource manifest: valid.json",
+        "PASS expected conflict: conflict-exclusive.json: D:/Projects/Dev/BLIPv2/v2/tests/fixtures/v2/resources/conflict-exclusive.json: feature 'feature.led' request 'led_data': cannot acquire ['gpio.4']; blocked by ['feature.button']",
+        "PASS expected conflict: conflict-reserved.json: D:/Projects/Dev/BLIPv2/v2/tests/fixtures/v2/resources/conflict-reserved.json: feature 'feature.user' request 'data': cannot acquire ['gpio.0']; blocked by ['system.flash']",
+        "PASS board manifest: adafruit-huzzah32.json (15 pins)",
+        "PASS board manifest: creators-ball-v2.json (20 pins)",
+        "PASS board manifest: creators-club.json (18 pins)",
+        "PASS board manifest: m5stack-m5dial.json (22 pins)",
+        "PASS board manifest: m5stack-m5stickc.json (20 pins)",
+        "PASS board manifest: seeed-xiao-esp32c6-chip-antenna.json (19 pins)",
+        "PASS rejected invalid storage host",
+        "PASS rejected invalid storage mosi",
+        "PASS rejected invalid storage clock",
+        "PASS rejected invalid storage namespace",
+        "PASS rejected invalid storage power_level",
+        "PASS rejected invalid storage unexpected",
+        "Resource and board manifest validation passed"
+      ],
+      "source_sha256_lf": {
+        "v2/tools/wasm/collect_profile_evidence.py": "d3bcd8186d3d7b95e72c32774db9086bfdb2b5e2eece2867fa426977013c3877",
+        "v2/tests/host/validate_resource_manifests.py": "41f5dcc5f81847d900a13723014285f407ebc106d0bd4d79da3a63a844eb0081",
+        "v2/tests/host/blip_device_identity_tests.cpp": "67ba992ac00732a89bfbff4911266fa1fb1674e79507c458e973edf46369f1de",
+        "v2/tools/web/collect_modes_evidence.py": "2e550e45791ba8b880e2470387d776681449b4c254185a8c790f8f250a8ef147"
+      }
+    },
+    "logs": {
+      "build/m49-host-final-build.log": "5fc031f844580c1678567b72be396f635e79be7369980bb85f0c928843ce67ee",
+      "build/m49-host-verified-tests.log": "8d85455f5c8d44cf93600e301f60a7d54bf0caeea89b2c216f68868f3992f87c",
+      "build/m49-web-tests-verified.log": "538f9eb26d2aed21e329326e88e9977e5e198f6f467ca5391d0963e035ef1469"
+    }
+  },
+  "factory_images": [
+    {
+      "profile": "ball",
+      "factory_match": true,
+      "app_unchanged": true,
+      "archive": "build\\m49-production35-ball",
+      "storage_sha256": "e92220275cca755f23a5ec41b791373eb5f01a7a7a2e6444c73d1e026dfd3ff7",
+      "application_sha256": "f75ea1a589ea16fe5abb63b56b941229639e6c11dfe5e045c9f581aabe5dc084",
+      "application_bytes": 2052720,
+      "factory_log_sha256": "0e134b4e47f544776bfed0047986791f64ad6a6743e6bf0b5ef0d5ae1c502af6"
+    },
+    {
+      "profile": "club",
+      "factory_match": true,
+      "app_unchanged": true,
+      "archive": "build\\m49-production35-club",
+      "storage_sha256": "a2bd3023bf7010c65bfc4f16570bff324c6aec30a8cc497a47eb1ebb64e39136",
+      "application_sha256": "8f3049364a034f46cbc47f0da83e356765793e56177ff73cf6ae97ea24c96454",
+      "application_bytes": 1525136,
+      "factory_log_sha256": "af6118565ef8ae773b647b6d8d2024e55b871f31a05ed225aeda8cd3fc4ce8db"
+    },
+    {
+      "profile": "huzzah32",
+      "factory_match": true,
+      "app_unchanged": true,
+      "archive": "build\\m49-production35-huzzah32",
+      "storage_sha256": "a2bd3023bf7010c65bfc4f16570bff324c6aec30a8cc497a47eb1ebb64e39136",
+      "application_sha256": "4df73d3221419cfef033f5b1b710d3e1c7bcc439543dadb233765407a2128537",
+      "application_bytes": 1466736,
+      "factory_log_sha256": "9835cb5ff12941d11e0c56c550f788a966650b37631c4c4c27861ddf068b47e5"
+    },
+    {
+      "profile": "m5stickc",
+      "factory_match": true,
+      "app_unchanged": true,
+      "archive": "build\\m49-production35-m5stickc",
+      "storage_sha256": "a2bd3023bf7010c65bfc4f16570bff324c6aec30a8cc497a47eb1ebb64e39136",
+      "application_sha256": "9e7b1982c8d00a6106842406aabca6894c14195b60752ce5da968d2853bad124",
+      "application_bytes": 1443136,
+      "factory_log_sha256": "2fd7060080c3000b9fdd4681f09e4d4586be616f82d459ebf69c61e49f0af13d"
+    },
+    {
+      "profile": "m5dial",
+      "factory_match": true,
+      "app_unchanged": true,
+      "archive": "build\\m49-production35-m5dial",
+      "storage_sha256": "a2bd3023bf7010c65bfc4f16570bff324c6aec30a8cc497a47eb1ebb64e39136",
+      "application_sha256": "f4c0ab884e915b3813221c69a81736fc4f0390b4842263821a7288288f01b129",
+      "application_bytes": 1447664,
+      "factory_log_sha256": "1847a8b7bc9a50d6d36cc533ac1973dd45df41615300b809e6a03bcd6f134bb3"
+    },
+    {
+      "profile": "xiao",
+      "factory_match": true,
+      "app_unchanged": true,
+      "archive": "build\\m49-production35-xiao",
+      "storage_sha256": "a2bd3023bf7010c65bfc4f16570bff324c6aec30a8cc497a47eb1ebb64e39136",
+      "application_sha256": "a2e95f3855db35948016c5bbe0fc58eea19c98464db1685869901434d747a861",
+      "application_bytes": 1626816,
+      "factory_log_sha256": "45a772850c63cd83a4ecc497b860c3038ae16adcdde170646c114a9b5385b719"
+    }
+  ],
+  "hardware": [
+    {
+      "profile": "ball",
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "medium": "sd-spi",
+      "hardware_passed": true,
+      "native_web": {
+        "report": "build/m49-ball-web3125.json",
+        "sha256": "5dbcf855c782a804720438259ab269fa99ec3010e840cbee47caaf0db7014089",
+        "checks": 10,
+        "policy_restored": true,
+        "worker_stack_headroom": 1744
+      },
+      "browser": {
+        "report": "build/m49-ball-browser-final29-retry.json",
+        "sha256": "1d5d225a04739ec1c4cd2a9490f80587aaece36bd0706327d68d8014759e734d",
+        "tool_sha256": "e5c81e61b1de4059c026dcfff24d87aefda6e2313285fb7361b1fc585bcd0a71",
+        "checks": 29,
+        "startup_scenarios": [
+          {
+            "asset": "boot",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": true,
+            "failed_requests": 3,
+            "documents": 4,
+            "page_errors": []
+          }
+        ],
+        "manual_final_state": {
+          "firmware": "Device rejected firmware (HTTP 400): image board or layout rejected",
+          "busy": "false",
+          "readings": "Readings updated 8:28:24 PM \u00b7 every 3 seconds",
+          "visibility": "visible"
+        },
+        "manual_documents": 1,
+        "upload_submissions": 1,
+        "other_requests_during_upload": 0
+      }
+    },
+    {
+      "profile": "club",
+      "board": "creators-club",
+      "port": "COM15",
+      "mac": "30:ae:a4:f3:a3:88",
+      "medium": "sd-spi",
+      "hardware_passed": true,
+      "native_web": {
+        "report": "build/m49-club-web3125.json",
+        "sha256": "7b2d8158de2410f54250ea54113a6ebadbb07ee7406fb947b95440b74beed961",
+        "checks": 10,
+        "policy_restored": true,
+        "worker_stack_headroom": 832
+      },
+      "browser": {
+        "report": "build/m49-club-browser-final29.json",
+        "sha256": "96507390878bc0625f4972e7dc0cead0f71c477dce547357120005d6d2d73531",
+        "tool_sha256": "86c004cfee999b81cb34a02b9d670c333fac46068236bec73ed7b6d578bf9d6e",
+        "checks": 29,
+        "startup_scenarios": [
+          {
+            "asset": "boot",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": true,
+            "failed_requests": 3,
+            "documents": 4,
+            "page_errors": []
+          }
+        ],
+        "manual_final_state": {
+          "firmware": "Device rejected firmware (HTTP 400): image board or layout rejected",
+          "busy": "false",
+          "readings": "Readings updated 8:20:33 PM \u00b7 every 3 seconds",
+          "visibility": "visible"
+        },
+        "manual_documents": 1,
+        "upload_submissions": 1,
+        "other_requests_during_upload": 0
+      }
+    },
+    {
+      "profile": "huzzah32",
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "medium": "internal",
+      "hardware_passed": true,
+      "native_web": {
+        "report": "build/m49-huzzah32-web3125.json",
+        "sha256": "30410c30be2b8124f47765f237f1d25adf47ad2a574f79bf7ceefd42088a5e75",
+        "checks": 10,
+        "policy_restored": true,
+        "worker_stack_headroom": 1280
+      },
+      "browser": {
+        "report": "build/m49-huzzah32-browser-final29.json",
+        "sha256": "3dfb95249db413e7db2a0910315c7640bba2c45af7504f8a74c888f9a0bfb94a",
+        "tool_sha256": "86c004cfee999b81cb34a02b9d670c333fac46068236bec73ed7b6d578bf9d6e",
+        "checks": 29,
+        "startup_scenarios": [
+          {
+            "asset": "boot",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": true,
+            "failed_requests": 3,
+            "documents": 4,
+            "page_errors": []
+          }
+        ],
+        "manual_final_state": {
+          "firmware": "Device rejected firmware (HTTP 400): image board or layout rejected",
+          "busy": "false",
+          "readings": "Readings updated 8:21:45 PM \u00b7 every 3 seconds",
+          "visibility": "visible"
+        },
+        "manual_documents": 1,
+        "upload_submissions": 1,
+        "other_requests_during_upload": 0
+      }
+    },
+    {
+      "profile": "m5stickc",
+      "board": "m5stack-m5stickc",
+      "port": "COM12",
+      "mac": "94:b9:7e:8b:b7:84",
+      "medium": "internal",
+      "hardware_passed": true,
+      "native_web": {
+        "report": "build/m49-m5stickc-web3125.json",
+        "sha256": "f0dfe71827d6f0c6936175180dd465d6be6add2cc765a6129efdd28a84a34053",
+        "checks": 10,
+        "policy_restored": true,
+        "worker_stack_headroom": 1280
+      },
+      "browser": {
+        "report": "build/m49-m5stickc-browser-final29.json",
+        "sha256": "076cf1675fbb47c26d5e7bdf8847901321c958b09481bf9c0eece74a5352e36b",
+        "tool_sha256": "86c004cfee999b81cb34a02b9d670c333fac46068236bec73ed7b6d578bf9d6e",
+        "checks": 29,
+        "startup_scenarios": [
+          {
+            "asset": "boot",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": true,
+            "failed_requests": 3,
+            "documents": 4,
+            "page_errors": []
+          }
+        ],
+        "manual_final_state": {
+          "firmware": "Device rejected firmware (HTTP 400): image board or layout rejected",
+          "busy": "false",
+          "readings": "Readings updated 8:22:36 PM \u00b7 every 3 seconds",
+          "visibility": "visible"
+        },
+        "manual_documents": 1,
+        "upload_submissions": 1,
+        "other_requests_during_upload": 0
+      }
+    },
+    {
+      "profile": "m5dial",
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "medium": "internal",
+      "hardware_passed": true,
+      "native_web": {
+        "report": "build/m49-m5dial-web3125.json",
+        "sha256": "2e9d0c4e97e180d4628fa102af7ccc757b4b9683fc40d74a756c4e042a7cefe9",
+        "checks": 10,
+        "policy_restored": true,
+        "worker_stack_headroom": 944
+      },
+      "browser": {
+        "report": "build/m49-m5dial-browser-final29.json",
+        "sha256": "97368d2a8c543023b49fe10387ff59da1bd7e79d467e59c06deffdcc05b1f396",
+        "tool_sha256": "86c004cfee999b81cb34a02b9d670c333fac46068236bec73ed7b6d578bf9d6e",
+        "checks": 29,
+        "startup_scenarios": [
+          {
+            "asset": "boot",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": true,
+            "failed_requests": 3,
+            "documents": 4,
+            "page_errors": []
+          }
+        ],
+        "manual_final_state": {
+          "firmware": "Device rejected firmware (HTTP 400): image board or layout rejected",
+          "busy": "false",
+          "readings": "Readings updated 8:18:45 PM \u00b7 every 3 seconds",
+          "visibility": "visible"
+        },
+        "manual_documents": 1,
+        "upload_submissions": 1,
+        "other_requests_during_upload": 0
+      }
+    },
+    {
+      "profile": "xiao",
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "mac": "10:51:db:1a:a6:68",
+      "medium": "internal",
+      "hardware_passed": true,
+      "native_web": {
+        "report": "build/m49-xiao-web3125.json",
+        "sha256": "abff235d837cfd0e1c36931d5f4d3cc4e6a1635770bc54f6ab242d3a481f5607",
+        "checks": 10,
+        "policy_restored": true,
+        "worker_stack_headroom": 1632
+      },
+      "browser": {
+        "report": "build/m49-xiao-browser-final29.json",
+        "sha256": "256f7c41b09b7346cedf2b4e9beb8ecc0bfa1cf279d4cdf465b4b7a97323ca90",
+        "tool_sha256": "86c004cfee999b81cb34a02b9d670c333fac46068236bec73ed7b6d578bf9d6e",
+        "checks": 29,
+        "startup_scenarios": [
+          {
+            "asset": "boot",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": false,
+            "failed_requests": 1,
+            "documents": 2,
+            "page_errors": []
+          },
+          {
+            "asset": "files",
+            "permanent": true,
+            "failed_requests": 3,
+            "documents": 4,
+            "page_errors": []
+          }
+        ],
+        "manual_final_state": {
+          "firmware": "Device rejected firmware (HTTP 400): image board or layout rejected",
+          "busy": "false",
+          "readings": "Readings updated 8:23:20 PM \u00b7 every 3 seconds",
+          "visibility": "visible"
+        },
+        "manual_documents": 1,
+        "upload_submissions": 1,
+        "other_requests_during_upload": 0
+      }
+    }
+  ],
+  "final_proof": {
+    "report": "build/m49-final-proof.json",
+    "sha256": "53222e08ca180c922a8fb05832d57ea328f6e13243637cae0a8ac5fb51de965d",
+    "boards": [
+      {
+        "profile": "ball",
+        "port": "COM10",
+        "board": "creators-ball-v2",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3125,
+        "boot_sequence": 21,
+        "http_stack_headroom": 3168,
+        "heap_free_internal": 22100,
+        "heap_largest_internal": 10240,
+        "script_state": "ready",
+        "sources": [
+          {
+            "path": "/",
+            "sha256": "19ae633943f12fe9882823a3f9d3d475d17c4d5476e838a7e21edb147e041a1c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/boot.js",
+            "sha256": "e4535722ace68046937f1790fe79e7dd3e6a4065a21248a44549cb751eacc2af",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/firmware.js",
+            "sha256": "d4559b70e6b0b25c077def5f2dcc016c030123c2bd05bc92baee3b1f1e7153a6",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/updates.js",
+            "sha256": "e37ce4c6cb985e96bf964f5113707fc7b015a4a1f98e126d011d6c3994a9bf0c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/app.js",
+            "sha256": "12ed65b323aaf9f57bf35323976606ceeb4e664c031b8f55698409454618e55b",
+            "attempts": 1,
+            "earlier_errors": []
+          }
+        ]
+      },
+      {
+        "profile": "club",
+        "port": "COM15",
+        "board": "creators-club",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3125,
+        "boot_sequence": 2,
+        "http_stack_headroom": 2568,
+        "heap_free_internal": 42096,
+        "heap_largest_internal": 34816,
+        "script_state": "ready",
+        "sources": [
+          {
+            "path": "/",
+            "sha256": "19ae633943f12fe9882823a3f9d3d475d17c4d5476e838a7e21edb147e041a1c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/boot.js",
+            "sha256": "e4535722ace68046937f1790fe79e7dd3e6a4065a21248a44549cb751eacc2af",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/firmware.js",
+            "sha256": "d4559b70e6b0b25c077def5f2dcc016c030123c2bd05bc92baee3b1f1e7153a6",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/updates.js",
+            "sha256": "e37ce4c6cb985e96bf964f5113707fc7b015a4a1f98e126d011d6c3994a9bf0c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/app.js",
+            "sha256": "12ed65b323aaf9f57bf35323976606ceeb4e664c031b8f55698409454618e55b",
+            "attempts": 1,
+            "earlier_errors": []
+          }
+        ]
+      },
+      {
+        "profile": "huzzah32",
+        "port": "COM5",
+        "board": "adafruit-huzzah32",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3125,
+        "boot_sequence": 2,
+        "http_stack_headroom": 2884,
+        "heap_free_internal": 32608,
+        "heap_largest_internal": 25600,
+        "script_state": "ready",
+        "sources": [
+          {
+            "path": "/",
+            "sha256": "19ae633943f12fe9882823a3f9d3d475d17c4d5476e838a7e21edb147e041a1c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/boot.js",
+            "sha256": "e4535722ace68046937f1790fe79e7dd3e6a4065a21248a44549cb751eacc2af",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/firmware.js",
+            "sha256": "d4559b70e6b0b25c077def5f2dcc016c030123c2bd05bc92baee3b1f1e7153a6",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/updates.js",
+            "sha256": "e37ce4c6cb985e96bf964f5113707fc7b015a4a1f98e126d011d6c3994a9bf0c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/app.js",
+            "sha256": "12ed65b323aaf9f57bf35323976606ceeb4e664c031b8f55698409454618e55b",
+            "attempts": 1,
+            "earlier_errors": []
+          }
+        ]
+      },
+      {
+        "profile": "m5stickc",
+        "port": "COM12",
+        "board": "m5stack-m5stickc",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3125,
+        "boot_sequence": 2,
+        "http_stack_headroom": 2812,
+        "heap_free_internal": 36232,
+        "heap_largest_internal": 29696,
+        "script_state": "ready",
+        "sources": [
+          {
+            "path": "/",
+            "sha256": "19ae633943f12fe9882823a3f9d3d475d17c4d5476e838a7e21edb147e041a1c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/boot.js",
+            "sha256": "e4535722ace68046937f1790fe79e7dd3e6a4065a21248a44549cb751eacc2af",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/firmware.js",
+            "sha256": "d4559b70e6b0b25c077def5f2dcc016c030123c2bd05bc92baee3b1f1e7153a6",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/updates.js",
+            "sha256": "e37ce4c6cb985e96bf964f5113707fc7b015a4a1f98e126d011d6c3994a9bf0c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/app.js",
+            "sha256": "12ed65b323aaf9f57bf35323976606ceeb4e664c031b8f55698409454618e55b",
+            "attempts": 1,
+            "earlier_errors": []
+          }
+        ]
+      },
+      {
+        "profile": "m5dial",
+        "port": "COM9",
+        "board": "m5stack-m5dial",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3125,
+        "boot_sequence": 13,
+        "http_stack_headroom": 2424,
+        "heap_free_internal": 34556,
+        "heap_largest_internal": 19456,
+        "script_state": "ready",
+        "sources": [
+          {
+            "path": "/",
+            "sha256": "19ae633943f12fe9882823a3f9d3d475d17c4d5476e838a7e21edb147e041a1c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/boot.js",
+            "sha256": "e4535722ace68046937f1790fe79e7dd3e6a4065a21248a44549cb751eacc2af",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/firmware.js",
+            "sha256": "d4559b70e6b0b25c077def5f2dcc016c030123c2bd05bc92baee3b1f1e7153a6",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/updates.js",
+            "sha256": "e37ce4c6cb985e96bf964f5113707fc7b015a4a1f98e126d011d6c3994a9bf0c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/app.js",
+            "sha256": "12ed65b323aaf9f57bf35323976606ceeb4e664c031b8f55698409454618e55b",
+            "attempts": 1,
+            "earlier_errors": []
+          }
+        ]
+      },
+      {
+        "profile": "xiao",
+        "port": "COM13",
+        "board": "seeed-xiao-esp32c6-chip-antenna",
+        "firmware": 35,
+        "ota_state": "confirmed",
+        "web": 3125,
+        "boot_sequence": 9,
+        "http_stack_headroom": 3200,
+        "heap_free_internal": 93068,
+        "heap_largest_internal": 79872,
+        "script_state": "ready",
+        "sources": [
+          {
+            "path": "/",
+            "sha256": "19ae633943f12fe9882823a3f9d3d475d17c4d5476e838a7e21edb147e041a1c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/boot.js",
+            "sha256": "e4535722ace68046937f1790fe79e7dd3e6a4065a21248a44549cb751eacc2af",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/firmware.js",
+            "sha256": "d4559b70e6b0b25c077def5f2dcc016c030123c2bd05bc92baee3b1f1e7153a6",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/updates.js",
+            "sha256": "e37ce4c6cb985e96bf964f5113707fc7b015a4a1f98e126d011d6c3994a9bf0c",
+            "attempts": 1,
+            "earlier_errors": []
+          },
+          {
+            "path": "/src/app.js",
+            "sha256": "12ed65b323aaf9f57bf35323976606ceeb4e664c031b8f55698409454618e55b",
+            "attempts": 1,
+            "earlier_errors": []
+          }
+        ]
+      }
+    ],
+    "public_query_profiles": [
+      "ball",
+      "club",
+      "huzzah32",
+      "m5stickc",
+      "m5dial",
+      "xiao"
+    ],
+    "artifact_sha256": "6cb7ba9f14b1af5d9ac98561ec14f4aaa7396fa9737ab2f4e58bbbe0d3e26d1c"
+  },
+  "source_sha256_lf": {
+    "v2/web/index.html": "19ae633943f12fe9882823a3f9d3d475d17c4d5476e838a7e21edb147e041a1c",
+    "v2/web/package.json": "4cbd131255664db023837991e97b8ab079c3ee94b7c9b82707cb4a51f2536133",
+    "v2/web/src/app.js": "12ed65b323aaf9f57bf35323976606ceeb4e664c031b8f55698409454618e55b",
+    "v2/web/src/boot.js": "e4535722ace68046937f1790fe79e7dd3e6a4065a21248a44549cb751eacc2af",
+    "v2/web/src/firmware.js": "d4559b70e6b0b25c077def5f2dcc016c030123c2bd05bc92baee3b1f1e7153a6",
+    "v2/web/src/updates.js": "e37ce4c6cb985e96bf964f5113707fc7b015a4a1f98e126d011d6c3994a9bf0c",
+    "v2/web/tests/boot.test.js": "499236ee4155cc8c45d0f2fb9c605c45b75d2b2aa5a68f20219c9c85af5e7d0b",
+    "v2/web/tests/firmware.test.js": "99b64d6a86e97a9de01253bebf33d7b0fdc16ae0dcbc21546c7533e9ab8f6f9d",
+    "v2/web/tests/updates.test.js": "12e700be2514bb54c781ec2f690ebfd5efd61c1d78e331a4453acbbf392c7fa5",
+    "v2/tools/web/blip_interface_recovery_hil.mjs": "e5c81e61b1de4059c026dcfff24d87aefda6e2313285fb7361b1fc585bcd0a71",
+    "AGENTS.md": "593b668c3d6f1d8388197d547a9da0a528ad572319e064e2c1542986928ea3dd",
+    "v2/tools/wasm/collect_profile_evidence.py": "d3bcd8186d3d7b95e72c32774db9086bfdb2b5e2eece2867fa426977013c3877"
+  },
+  "earlier_failed_trials": [
+    {
+      "report": "build/m49-m5dial-browser-recovery.json",
+      "sha256": "7d0c3e9f0c5a51edac4c032f57f06a3ed38c02d3e0f684aae2c1a9d2005a9669",
+      "passed": false,
+      "checks": 0,
+      "error": "locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#connection-status').filter({ hasText: /^Live$/ }) to be visible\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_interface_recovery_hil.mjs:45:76",
+      "meaning": "Inline entry error handler was blocked by the unchanged device content policy; replaced with a static HTML reload link."
+    },
+    {
+      "report": "build/m49-m5dial-browser-recovery-final.json",
+      "sha256": "5cc95e754e5d4decb992f632af4bcd7ce5ecf6db30767cf0faca9875d0fda115",
+      "passed": false,
+      "checks": 24,
+      "error": "page.waitForFunction: Timeout 60000ms exceeded.\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_interface_recovery_hil.mjs:103:14",
+      "meaning": "24 successful checks followed by a harness timeout waiting for config=0; production polling uses config=1. Corrected harness and repeated the full trial."
+    },
+    {
+      "report": "build/m49-ball-browser-final29.json",
+      "sha256": "ea20995050ab567205414aef10e619108d4bc5a3b0c547213fdc29f4b07356dd",
+      "passed": false,
+      "checks": 19,
+      "error": "locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-update-action=\"check\"]')\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"button\" class=\"secondary-button\" data-update-action=\"check\">Check for updates</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 \u00d7 waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 \u00d7 waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    118 \u00d7 waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m        - element is not enabled\u001b[22m\n\u001b[2m      - retrying click action\u001b[22m\n\u001b[2m        - waiting 500ms\u001b[22m\n\n    at D:\\Projects\\Dev\\BLIPv2\\v2\\tools\\web\\blip_interface_recovery_hil.mjs:106:54",
+      "meaning": "19 successful checks followed by a harness click timeout on a disabled update button. The intercepted second fetch was an initial-status retry, leaving no initial version; the corrected helper waits for initial status before holding a later poll."
+    },
+    {
+      "report": "build/m49-host-tests.log",
+      "sha256": "2bfe2493b064798cda555851c8f021a543249b1f468055776c4187f1c7c90d5d",
+      "passed": false,
+      "meaning": "Factory version expectation with an unsigned C++ suffix remained at 3009; corrected to 3010 and reran all 33 suites."
+    }
+  ],
+  "qualification_notes": [
+    "The entry-script failure uses a plain HTML reload link; dependent-module network failures use at most two session-budgeted automatic page reloads. There is no harness reload before controls.",
+    "The browser deliberately holds one invalid-prefix PUT for seven seconds and delivers a fabricated stale web-installed status during it. The device subsequently rejects the prefix before app-slot opening. It is not a full valid firmware upload.",
+    "Mutating operations are not replayed. Readings and status requests pause and resume; earlier status replies cannot force a reload while a manual transfer is active.",
+    "Original native update policies are restored, test browsers closed, and firmware 35 / UI 3125 left installed. No filesystem payloads or scripts are created by this recovery trial.",
+    "Existing failed stress, low-memory, physical media, sustained-load, Stick UART and strict XIAO UDP evidence remains open. Creators Tab is no longer a required gate."
+  ],
+  "remaining": [
+    "Full milestone qualification on the six required boards",
+    "Complete valid manual-upload coexistence trials on all chip families and device types",
+    "Sustained lighting/BLE/fleet/storage/update concurrency and memory margin",
+    "Physical MMC/NOR, hot-plug, absent/full/corrupt/removal and endurance",
+    "Playback/sequence stored-file consumers, script boot/autostart, guest event/parameter bridge and SDK/parity/builder work",
+    "Normalize text asset line endings for deterministic bundles across clean Windows/Linux checkouts; current Windows working sources and served bytes are verified exactly."
+  ],
+  "tool_versions": {
+    "build/m49-interface-recovery-original29.mjs": "86c004cfee999b81cb34a02b9d670c333fac46068236bec73ed7b6d578bf9d6e",
+    "v2/tools/web/blip_interface_recovery_hil.mjs": "e5c81e61b1de4059c026dcfff24d87aefda6e2313285fb7361b1fc585bcd0a71"
+  },
+  "line_ending_experiment": {
+    "report": "build/m49-line-ending-check.json",
+    "sha256": "22f9d42714cfc408b95c6f0201e95bdc6e1e1e03a99178f6871c7ce3625cb98b"
+  }
+}

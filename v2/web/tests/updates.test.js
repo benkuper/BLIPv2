@@ -60,3 +60,27 @@ test("an older status response cannot undo a newer update pause", async t => {
   panel.connect({ loadReleases: async () => ({ busy: false, state: "current", installed_web: 3007 }) });
   assert.equal(panel.busy, false, "a different device starts with its own status");
 });
+
+test("another transfer pauses status requests and blocks update admission without replay", async t => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const { panel, buttons } = panelFixture(); let transferring = true, reads = 0, mutations = 0;
+  panel.isTransferring = () => transferring;
+  panel.client = { loadReleases: async () => { reads++; return { busy: false, state: "current", installed_web: 3010 }; },
+    release: async () => { mutations++; } };
+  await panel.refresh(); assert.equal(reads, 0);
+  await buttons[0].listeners.click(); assert.equal(mutations, 0); assert.match(panel.status.textContent, /Wait/);
+  transferring = false; await panel.refresh(); assert.equal(reads, 1); assert.equal(mutations, 0);
+});
+
+test("an in-flight status reply cannot reload the page during a newer manual transfer", async t => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const { panel } = panelFixture(); let transferring = false, resolve, reloads = 0;
+  panel.version = 3010; panel.isTransferring = () => transferring; panel.reload = () => reloads++;
+  panel.client = { loadReleases: () => new Promise(done => { resolve = done; }) };
+  const pending = panel.refresh(); transferring = true;
+  resolve({ busy: false, state: "web-installed", installed_web: 3011 }); await pending;
+  assert.equal(reloads, 0); assert.equal(panel.version, 3010, "defer the version transition until transfer admission is released");
+  transferring = false;
+  panel.client.loadReleases = async () => ({ busy: false, state: "web-installed", installed_web: 3011 });
+  await panel.refresh(); assert.equal(reloads, 1);
+});

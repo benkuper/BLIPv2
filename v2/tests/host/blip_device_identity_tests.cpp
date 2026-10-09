@@ -76,9 +76,9 @@ bool validation_and_dns_labels() {
     BLIP_CHECK(!storage::device_hostname("name", mac, std::span{host}.first(63)));
     return true;
 }
-bool all_board_type_names() {
-    constexpr std::array<std::string_view, 7> ids{"creators-club", "creators-tab", "creators-ball-v2", "adafruit-huzzah32", "seeed-xiao-esp32c6-chip-antenna", "m5stack-m5stickc", "m5stack-m5dial"};
-    constexpr std::array<std::string_view, 7> names{"Creators Club", "Creators Tab", "Creators Ball V2", "HUZZAH32", "XIAO C6", "M5 Stick C", "M5 Dial"};
+bool required_board_type_names() {
+    constexpr std::array<std::string_view, 6> ids{"creators-club", "creators-ball-v2", "adafruit-huzzah32", "seeed-xiao-esp32c6-chip-antenna", "m5stack-m5stickc", "m5stack-m5dial"};
+    constexpr std::array<std::string_view, 6> names{"Creators Club", "Creators Ball V2", "HUZZAH32", "XIAO C6", "M5 Stick C", "M5 Dial"};
     for (std::size_t i = 0; i < ids.size(); ++i) {
         resources::BoardManifest board{}; board.id = ids[i];
         BLIP_CHECK(resources::board_display_name(board) == names[i]);
@@ -88,6 +88,6 @@ bool all_board_type_names() {
 }
 int main() {
     const TestCase tests[]{{"saved identity and owned reads", saved_identity_and_owned_reads},
-        {"name validation and stable DNS labels", validation_and_dns_labels}, {"seven board type names", all_board_type_names}};
+        {"name validation and stable DNS labels", validation_and_dns_labels}, {"six required board type names", required_board_type_names}};
     return run_tests(tests);
 }

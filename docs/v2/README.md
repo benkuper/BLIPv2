@@ -47,6 +47,11 @@ host interruption simulation from hardware qualification.
 
 ## Decision status
 
+The current validation matrix contains six board types: Creators Club, Creators
+Ball V2, HUZZAH32, XIAO C6, M5StickC and M5Dial. On 2026-10-09 the user removed
+Creators Tab from all checks because no working unit remains. Earlier evidence
+keeps its original scope; no new check or milestone depends on Tab hardware.
+
 [ADR-0020](adr/0020-private-show-network-defaults.md) records the user's firmware-wide
 policy: lean private show-network defaults, optional encryption/access control,
 and local update simulation followed by later user-managed online deployment.

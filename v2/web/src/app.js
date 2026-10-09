@@ -2,7 +2,7 @@ import { DeviceClient, deviceUrlFromLocation } from "./client.js";
 import { buildControlModel, describeHost, presentationModel, modelShapeKey } from "./model.js";
 import { normalizeResourceSnapshot } from "./resources.js";
 import { ControlView, ReservationView } from "./view.js";
-import { uploadFirmware } from "./firmware.js";
+import { FirmwarePanel } from "./firmware.js";
 import { UpdatePanel } from "./updates.js";
 import { FilePanel } from "./files.js";
 
@@ -22,10 +22,6 @@ const simpleButton = document.querySelector("#simple-mode");
 const advancedButton = document.querySelector("#advanced-mode");
 const topicsRoot = document.querySelector("#topics");
 const sampleStatus = document.querySelector("#sample-status");
-const firmwareFile = document.querySelector("#firmware-file");
-const firmwareTarget = document.querySelector("#firmware-target");
-const firmwareButton = document.querySelector("#firmware-button");
-const firmwareStatus = document.querySelector("#firmware-status");
 const reservationsRoot = document.querySelector("#reservations");
 const reservationSearch = document.querySelector("#reservation-search");
 
@@ -33,9 +29,13 @@ let client = null;
 let mode = "simple", topic = "All", model = { components: [], index: new Map() };
 let shape = "", refreshTimer, refreshFailures = 0;
 let nameControl = null;
-const updatePanel = new UpdatePanel({ document, root: document.querySelector("#update-center") });
+const updatePanel = new UpdatePanel({ document, root: document.querySelector("#update-center"),
+  isTransferring: () => firmwarePanel.busy || filePanel.busy });
 const filePanel = new FilePanel({ document, root: document.querySelector("#file-center"),
-  isUpdating: () => updatePanel.busy, onLoaded: () => scheduleRefresh(client) });
+  isUpdating: () => updatePanel.busy || firmwarePanel.busy, onLoaded: () => scheduleRefresh(client) });
+const firmwarePanel = new FirmwarePanel({ root: document.querySelector("#firmware-center"),
+  baseUrl: deviceUrlFromLocation, isTransferring: () => updatePanel.busy || filePanel.busy });
+const transferActive = () => updatePanel.busy || filePanel.busy || firmwarePanel.busy;
 
 function present() {
   nameControl = model.components.find(component => component.id === "blip.device.identity")?.controls.find(control => control.id === "name") ?? null;
@@ -73,12 +73,12 @@ function scheduleRefresh(current) {
   refreshTimer = setTimeout(async () => {
     if (client !== current) return;
     if (document.hidden) { scheduleRefresh(current); return; }
-    if (updatePanel.busy || filePanel.busy) {
+    if (transferActive()) {
       sampleStatus.textContent = "Device transfer active · readings paused";
       scheduleRefresh(current); return;
     }
     try {
-      const updated = buildControlModel(await current.loadTree(() => client === current && !updatePanel.busy && !filePanel.busy));
+      const updated = buildControlModel(await current.loadTree(() => client === current && !transferActive()));
       if (client !== current) return;
       const nextShape = modelShapeKey(updated);
       if (nextShape !== shape) {
@@ -95,7 +95,7 @@ function scheduleRefresh(current) {
       sampleStatus.textContent = `Readings updated ${new Date().toLocaleTimeString()} · every 3 seconds`;
     } catch {
       if (client !== current) return;
-      if (updatePanel.busy || filePanel.busy) { scheduleRefresh(current); return; }
+      if (transferActive()) { scheduleRefresh(current); return; }
       refreshFailures++;
       sampleStatus.textContent = "Readings unavailable · retrying";
     }
@@ -142,6 +142,7 @@ const reservationView = new ReservationView({
 });
 
 async function connect() {
+  if (transferActive()) { notice.textContent = "Wait for the device transfer to finish before reconnecting."; notice.hidden = false; return; }
   connectButton.disabled = true;
   connectButton.textContent = "Connecting";
   notice.hidden = true;
@@ -186,7 +187,7 @@ async function connect() {
   }
 }
 
-connectButton.addEventListener("click", connect);
+connectButton.addEventListener("click", event => { event.preventDefault(); connect(); });
 deviceNameForm.addEventListener("submit", event => {
   event.preventDefault();
   if (!nameControl) return;
@@ -207,27 +208,5 @@ search.addEventListener("input", () => view.setFilter(search.value));
 reservationSearch.addEventListener("input", () => reservationView.setFilter(reservationSearch.value));
 view.setModel({ components: [], index: new Map() });
 present();
-
-firmwareButton.addEventListener("click", async () => {
-  const file = firmwareFile.files?.[0];
-  if (!file) {
-    firmwareStatus.textContent = "Choose a BLIP application image first.";
-    return;
-  }
-  firmwareButton.disabled = true;
-  firmwareStatus.textContent = "Validating and uploading firmware…";
-  try {
-    const image = await uploadFirmware({
-      file,
-      target: firmwareTarget.value,
-      baseUrl: deviceUrlFromLocation(),
-    });
-    firmwareStatus.textContent = `${image.project} ${image.version} accepted. The device is restarting.`;
-  } catch (error) {
-    firmwareStatus.textContent = error instanceof Error ? error.message : String(error);
-  } finally {
-    firmwareButton.disabled = false;
-  }
-});
 
 if (location.protocol === "http:" || location.protocol === "https:") connect();

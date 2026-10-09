@@ -6,7 +6,9 @@ qualifies serial/HTTP identity, live mDNS renaming and reboot persistence on an
 already provisioned shared network. It requires `pyserial` and `zeroconf`, takes
 `--port`, `--type`, `--mac`, `--build`, `--flash-log`, and `--report`, and restores
 the original device name. It never changes the PC's Wi-Fi connection. Milestones
-must run on all seven board types; reverify ports and MACs before flashing.
+must run on the six required board types: Creators Club, Creators Ball V2,
+HUZZAH32, XIAO C6, M5StickC and M5Dial. Creators Tab is excluded from all checks
+at the user's request (2026-10-09). Reverify ports and MACs before flashing.
 
 The utility sends the COBS-framed BLIP envelope v1 over UART or native USB
 Serial/JTAG. It needs Python 3.10 or newer and pyserial for hardware access.

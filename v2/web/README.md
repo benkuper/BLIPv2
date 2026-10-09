@@ -33,6 +33,11 @@ Visible pages poll every three seconds with backoff, refresh dynamic schema
 generations and preserve focused input drafts during value updates. Module
 startup is sequential to fit the device's four HTTP sessions. The home page
 works on station/AP; `/setup` keeps independent Wi-Fi recovery available.
+If a module fetch fails, the interface can reload twice using a budget retained
+across page reloads. Repeated failures leave a manual retry button. If the entry
+script itself cannot load, a plain HTML reload link remains usable. Blocked
+session storage disables automatic reloads, and successful startup clears the
+budget. No inline JavaScript or firmware policy change is required.
 
 ## Local use
 
@@ -65,6 +70,11 @@ SubtleCrypto; it yields while processing larger images. The device checks the
 embedded board/layout/profile identity before writing an uploaded app.
 Factory flashing uses the separate complete images and
 manifests under [`../installer/`](../installer/README.md).
+Manual upload admission pauses readings before hashing starts and until the
+response body has been consumed. File operations, release actions and explicit
+reconnection are blocked during the upload; release-status polling also waits.
+A status reply begun earlier cannot reload the page during a newer transfer.
+Failures release admission and resume readings without resubmitting the image.
 
 The packer can also produce and atomically upload a separately versioned bundle
 to a device on a trusted local network:
@@ -100,3 +110,12 @@ browser; empty fixture folders and the loaded passive test module remain until
 the module is unloaded through the normal control/serial interface.
 It records at most two startup reloads before any controls are submitted, and
 follows directory pagination when earlier fixture folders occupy the first page.
+
+[`../tools/web/blip_interface_recovery_hil.mjs`](../tools/web/blip_interface_recovery_hil.mjs)
+uses the installed interface on the existing LAN. Supply `--device`, `--target`,
+`--playwright`, `--browser` and `--report`. It injects entry/module fetch failures,
+checks the two-reload limit and explicit recovery, and delivers an old status
+response during a held manual upload. The rejected upload has an invalid BLIP
+identity prefix, so the device rejects it before opening an app slot. The trial
+checks paused reads, mutual admission and resumption without replay; it does
+not qualify a complete valid firmware transfer or sustained coexistence.

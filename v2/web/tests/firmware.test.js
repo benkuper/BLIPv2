@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash, webcrypto } from "node:crypto";
 import test from "node:test";
 
-import { inspectFirmware, uploadFirmware, sha256Hex } from "../src/firmware.js";
+import { inspectFirmware, uploadFirmware, sha256Hex, FirmwarePanel } from "../src/firmware.js";
 
 function fixture(project = "blip-v2", version = "0.1.0") {
   const image = new Uint8Array(512);
@@ -85,4 +85,28 @@ test("uploads over HTTP without SubtleCrypto and preserves the verified checksum
   assert.equal(image.sha256, expected);
   assert.equal(request.headers["X-BLIP-SHA256"], expected);
   assert.equal(request.body, source);
+});
+
+test("manual firmware owns transfer admission from validation through response consumption", async () => {
+  const elements = new Map(["file", "target", "button", "status"].map(key => ["#firmware-" + key,
+    { files: [{}], value: "esp32c6", addEventListener() {} }]));
+  const root = { querySelector: key => elements.get(key), setAttribute(key, value) { this[key] = value; } };
+  let done, calls = 0, rejected = false;
+  const panel = new FirmwarePanel({ root, baseUrl: () => "http://192.0.2.7/", isTransferring: () => rejected,
+    upload: options => {
+      calls++; assert.equal(panel.busy, true); assert.equal(root["aria-busy"], "true");
+      assert.equal(options.target, "esp32c6"); assert.equal(options.baseUrl, "http://192.0.2.7/");
+      return new Promise(resolve => { done = resolve; });
+    } });
+  const pending = panel.submit();
+  assert.equal(panel.button.disabled, true); assert.equal(panel.file.disabled, true);
+  await panel.submit(); assert.equal(calls, 1, "a second click cannot repeat the upload");
+  done({ project: "blip-v2", version: "test" }); await pending;
+  assert.equal(panel.busy, false); assert.equal(root["aria-busy"], "false");
+  assert.match(panel.status.textContent, /accepted/);
+  rejected = true; await panel.submit(); assert.equal(calls, 1); assert.match(panel.status.textContent, /Wait/);
+  rejected = false; panel.upload = async () => { calls++; throw new TypeError("connection lost"); };
+  await panel.submit(); assert.equal(calls, 2, "uncertain writes must not be replayed");
+  assert.equal(panel.busy, false); assert.equal(panel.button.disabled, false);
+  assert.match(panel.status.textContent, /connection lost/);
 });
