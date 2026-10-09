@@ -93,8 +93,9 @@ bool AutomaticFileStore::external() const noexcept {
 }
 
 core::Result<AutomaticFileStore::Record> AutomaticFileStore::inspect_slot(
-    WebAssetBackend& backend, std::string_view path, unsigned slot) noexcept {
+    WebAssetBackend& backend, std::string_view path, unsigned slot, FileReadCancellation cancellation) noexcept {
     using Result = core::Result<Record>;
+    if (cancellation.cancelled()) return Result::failure(error(core::ErrorCode::cancelled, "file-validation-cancelled"));
     std::array<char, kMaxLogicalPathBytes + 4> buffer{};
     const auto name = physical(path, slot, buffer);
     const auto length = backend.file_size(name);
@@ -117,12 +118,17 @@ core::Result<AutomaticFileStore::Record> AutomaticFileStore::inspect_slot(
     std::size_t offset = kHeaderBytes;
     const auto end = length.value() - kTrailerBytes;
     while (offset < end) {
-        auto chunk = scratch_.first(std::min(scratch_.size(), end - offset));
+        if (cancellation.cancelled()) return Result::failure(error(core::ErrorCode::cancelled, "file-validation-cancelled"));
+        // A cancelling consumer bounds work between checks without growing its
+        // stack or affecting ordinary storage/web validation chunk sizes.
+        const auto limit = cancellation.requested ? std::min<std::size_t>(scratch_.size(), 512) : scratch_.size();
+        auto chunk = scratch_.first(std::min(limit, end - offset));
         status = exact(backend, name, offset, chunk);
         if (!status) return Result::failure(status.error());
         checksum = crc(checksum, chunk);
         offset += chunk.size();
     }
+    if (cancellation.cancelled()) return Result::failure(error(core::ErrorCode::cancelled, "file-validation-cancelled"));
     std::array<std::byte, kTrailerBytes> trailer{};
     status = exact(backend, name, end, trailer);
     if (!status) return Result::failure(status.error());
@@ -132,9 +138,10 @@ core::Result<AutomaticFileStore::Record> AutomaticFileStore::inspect_slot(
 }
 
 core::Result<AutomaticFileStore::Record> AutomaticFileStore::inspect(
-    WebAssetBackend& backend, std::string_view path) noexcept {
-    const auto first = inspect_slot(backend, path, 0);
-    const auto second = inspect_slot(backend, path, 1);
+    WebAssetBackend& backend, std::string_view path, FileReadCancellation cancellation) noexcept {
+    const auto first = inspect_slot(backend, path, 0, cancellation);
+    if (!first && first.error().code == core::ErrorCode::cancelled) return first;
+    const auto second = inspect_slot(backend, path, 1, cancellation);
     // A failed medium is not a missing file. Do not silently overwrite it or
     // combine its generations with those from another filesystem.
     for (const auto* result : {&first, &second}) {
@@ -149,7 +156,7 @@ core::Result<AutomaticFileStore::Record> AutomaticFileStore::inspect(
     return first.error().code != core::ErrorCode::not_found ? first : second;
 }
 
-core::Result<FileReadHandle> AutomaticFileStore::open(std::string_view path) noexcept {
+core::Result<FileReadHandle> AutomaticFileStore::open(std::string_view path, FileReadCancellation cancellation) noexcept {
     std::lock_guard guard(mutex_);
     using Result = core::Result<FileReadHandle>;
     if (!valid_path(path) || scratch_.empty())
@@ -159,12 +166,13 @@ core::Result<FileReadHandle> AutomaticFileStore::open(std::string_view path) noe
     if (found == readers_.end())
         return Result::failure(error(core::ErrorCode::capacity_exceeded, "reader-limit"));
     auto* backend = external_ ? external_ : internal_;
-    auto record = inspect(*backend, path);
+    auto record = inspect(*backend, path, cancellation);
     if (!record && backend != internal_ && record.error().code == core::ErrorCode::not_found) {
         backend = internal_;
-        record = inspect(*backend, path);
+        record = inspect(*backend, path, cancellation);
     }
     if (!record) return Result::failure(record.error());
+    if (cancellation.cancelled()) return Result::failure(error(core::ErrorCode::cancelled, "file-validation-cancelled"));
     if (record.value().deleted) return Result::failure(error(core::ErrorCode::not_found, "file-deleted"));
     const auto name = physical(path, record.value().slot, found->path);
     if (writer_.token && writer_.backend == backend && name == writer_.path.data())

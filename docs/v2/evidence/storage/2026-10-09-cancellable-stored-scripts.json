@@ -1,0 +1,450 @@
+{
+  "date": "2026-10-09",
+  "milestone_complete": false,
+  "pc_network_changed": false,
+  "scope": "Cancellable stored-file validation; two active SD cancellation trials and three-family storage regressions. Contended I/O, media removal and seven-board milestone remain open.",
+  "host_suites_passed": 33,
+  "new_host_case": "Cancel at every check across both generations and reader publication; no fallback or reader leaks; subsequent writes succeed.",
+  "production_builds": [
+    {
+      "profile": "ball",
+      "release_code": 34,
+      "passed": true,
+      "application_bytes": 2048240,
+      "application_delta_bytes": 624,
+      "artifacts": {
+        "blip-v2.bin": "b8f00337228539b8de37cc89d9c883269a96f4de03492a989cbf2eb34c20913b",
+        "blip-v2.elf": "09d33c9e038f2007724696be3b4b0a7def8a0debc1a48ad0dfec1f26dd344b01",
+        "blip-v2.map": "4e4c0b233a8a812f54e75f5f19a45e4e1abb1143bee2e217c231a514b191d0ae",
+        "sdkconfig": "b056eea7aa6d48a5ce37b2dd803661936d4fbf5edcc2fd085e7f75cb53e615e9",
+        "flash_args": "eab98e020c75d1d5a3774824d230c178f6851cdf0ac6154af26aa70d5cbb968a"
+      },
+      "build_log_sha256": "f823f45e4dbcdfc60a226af2cd58be3b2ce7bf67486aeb1b5b32e47b4f6a2cf8",
+      "current_static_sections": {
+        ".iram0.data": 4,
+        ".dram0.data": 24532,
+        ".dram0.bss": 131880
+      },
+      "previous_static_sections": {
+        ".iram0.data": 4,
+        ".dram0.data": 24532,
+        ".dram0.bss": 131880
+      }
+    },
+    {
+      "profile": "huzzah32",
+      "release_code": 34,
+      "passed": true,
+      "application_bytes": 1462400,
+      "application_delta_bytes": 672,
+      "artifacts": {
+        "blip-v2.bin": "9e10f72b05ab0aa183c86d370ccc87af7c782bddcc9ee83f9a4954fcf5e806d6",
+        "blip-v2.elf": "f7cf848326ac4a891767720c784019ae28be139a4266b56e73051ad0a50a26e6",
+        "blip-v2.map": "c43e69a5dd629eb8d01af82ab170f835835e854d0be0242bf99898a1708d6c9d",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54",
+        "flash_args": "f7f533cb5baf407299c5b899ed0b1fd6baea8012f87f356373b290ed9c2fdced"
+      },
+      "build_log_sha256": "cfff3ff9b06efdcc203d8f67685fd9e356be83c0815d1423a35e673a6fc693ca",
+      "current_static_sections": {
+        ".dram0.data": 23932,
+        ".dram0.bss": 140896,
+        ".iram0.data": 0
+      },
+      "previous_static_sections": {
+        ".dram0.data": 23932,
+        ".dram0.bss": 140896,
+        ".iram0.data": 0
+      }
+    },
+    {
+      "profile": "m5dial",
+      "release_code": 34,
+      "passed": true,
+      "application_bytes": 1443424,
+      "application_delta_bytes": 624,
+      "artifacts": {
+        "blip-v2.bin": "8e9ca62f042804b75cae215b2e0fede45fff8c9a082673b60909abe299967cc0",
+        "blip-v2.elf": "d8dc621cfac491dd10bcce6d9b2c25b075f162a8e460804666608608bf94c500",
+        "blip-v2.map": "4f29a2f55b069da647b094e533955e9a1d3ccf28ee5aa6afdcebe6098e1c43f2",
+        "sdkconfig": "15a8f1c085d83036e76ba1c59ac6e1e76d5fd8b84e17141c805bc3f9849f650e",
+        "flash_args": "e8d153776127bd97ee2eb200338cb948b8385c18ec3fe555e333e306950f8089"
+      },
+      "build_log_sha256": "aec31e46cd13679e6843d4e6a52c3105d5b0fb6542d0930a2f26eac6d334f4fe",
+      "current_static_sections": {
+        ".dram0.data": 29749,
+        ".dram0.bss": 136208,
+        ".iram0.data": 0
+      },
+      "previous_static_sections": {
+        ".dram0.data": 29749,
+        ".dram0.bss": 136208,
+        ".iram0.data": 0
+      }
+    },
+    {
+      "profile": "club",
+      "release_code": 34,
+      "passed": true,
+      "application_bytes": 1520832,
+      "application_delta_bytes": 656,
+      "artifacts": {
+        "blip-v2.bin": "14ca027cda8b52981141480d36ffe6ab14758831f9e7b0c93c0371f77a8e4747",
+        "blip-v2.elf": "6e08d77522d553157d326b0b4ae4549afb7dce2e0d6c558a4d960ed63eeacceb",
+        "blip-v2.map": "ad3328d724dad7743256336aeea455730b5c2896cc24eed3f6cee2b5b8d17178",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa",
+        "flash_args": "f7f533cb5baf407299c5b899ed0b1fd6baea8012f87f356373b290ed9c2fdced"
+      },
+      "build_log_sha256": "3cc6389bb08cb30218d66141cdb1e219a35df644687b7ff16887633fde97d501",
+      "current_static_sections": {
+        ".dram0.data": 23966,
+        ".dram0.bss": 124408,
+        ".iram0.data": 0
+      },
+      "previous_static_sections": {
+        ".dram0.data": 23966,
+        ".dram0.bss": 124408,
+        ".iram0.data": 0
+      }
+    },
+    {
+      "profile": "tab",
+      "release_code": 34,
+      "passed": true,
+      "application_bytes": 1526912,
+      "application_delta_bytes": 656,
+      "artifacts": {
+        "blip-v2.bin": "fd1c30773d49a8cfe3d1f6f166d3a0dccb4ff736b9d4e2c88f3798da70bafab1",
+        "blip-v2.elf": "79118f458b6d9bced57a26ef12fdae31ed76f6baf7a32a3c23386787ed3458b2",
+        "blip-v2.map": "cc3c33b9780fd9cde4953f9e6823b3f884860b56e8509d8138454eb49f32c86f",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa",
+        "flash_args": "f7f533cb5baf407299c5b899ed0b1fd6baea8012f87f356373b290ed9c2fdced"
+      },
+      "build_log_sha256": "6a9c505aab5296d35e349e797f27e813fec0f77dbbc5edc76aa0be6f8df1f670",
+      "current_static_sections": {
+        ".dram0.data": 24053,
+        ".dram0.bss": 137944,
+        ".iram0.data": 0
+      },
+      "previous_static_sections": {
+        ".dram0.data": 24053,
+        ".dram0.bss": 137944,
+        ".iram0.data": 0
+      }
+    },
+    {
+      "profile": "m5stickc",
+      "release_code": 34,
+      "passed": true,
+      "application_bytes": 1438560,
+      "application_delta_bytes": 672,
+      "artifacts": {
+        "blip-v2.bin": "5c7ebe2454ff490bf2564db22c8618456857849a316b7017a070fa45d3c3a02d",
+        "blip-v2.elf": "78dd1d741ed41b10d434caee307d9492da79971432bbe217efd4b2871d7466e1",
+        "blip-v2.map": "c22576771d1e6e96ec2be22989ee17fd6d1da47453845fb6293557581feb506b",
+        "sdkconfig": "120f4d9a39f4f45a7c99cf3e02188cf3a60db42ebbaaf4310ff79fa75437aff0",
+        "flash_args": "f7f533cb5baf407299c5b899ed0b1fd6baea8012f87f356373b290ed9c2fdced"
+      },
+      "build_log_sha256": "f6c049f3b8650e88224bcefef08727b4e98cbd9ebe964c37f1666c2971662feb",
+      "current_static_sections": {
+        ".dram0.data": 23804,
+        ".dram0.bss": 137560,
+        ".iram0.data": 0
+      },
+      "previous_static_sections": {
+        ".dram0.data": 23804,
+        ".dram0.bss": 137560,
+        ".iram0.data": 0
+      }
+    },
+    {
+      "profile": "xiao",
+      "release_code": 34,
+      "passed": true,
+      "application_bytes": 1622304,
+      "application_delta_bytes": 608,
+      "artifacts": {
+        "blip-v2.bin": "74aa7ee2db808d352daa7e7c85f6e8c2b3671004101880c9bdfddbffe1cdf346",
+        "blip-v2.elf": "dce6a1c760b47d7a1eb55b75904d3a53622a9cd27e02138431e5b5ba6351bdc5",
+        "blip-v2.map": "833cd111706cd312e0df87291b254d7941f93bcf6838a0d63a6ef1c8cb81cab7",
+        "sdkconfig": "b3aa9e358a8cd509c80fc7d186017bb2d85c79caa633244b352ba7d3a8ed5c9b",
+        "flash_args": "e8d153776127bd97ee2eb200338cb948b8385c18ec3fe555e333e306950f8089"
+      },
+      "build_log_sha256": "48ac6678ae08e6755042f0dedff315a7fff0bcc98d5d11eed0e1a6208fd00d6a",
+      "current_static_sections": {
+        ".iram0.data": 8,
+        ".dram0.data": 23372,
+        ".dram0.bss": 142160
+      },
+      "previous_static_sections": {
+        ".iram0.data": 8,
+        ".dram0.data": 23372,
+        ".dram0.bss": 142160
+      }
+    }
+  ],
+  "reports": [
+    {
+      "report": "build/m47-ball-cancel34-native-firmware.json",
+      "report_sha256": "f3850d7597acd9d487fc111461a08f751e34d8fe7c52b394915ab84251cf070f",
+      "board": "creators-ball-v2",
+      "passed": true,
+      "checks": 13,
+      "mac": "08:92:72:f6:4d:dc",
+      "port": "COM10",
+      "tool_sha256": "f5f8a08a5781e59a1f3241f43b8f94c0028991d38dc57163f4abd2979899a0bb",
+      "firmware_sha256": "b8f00337228539b8de37cc89d9c883269a96f4de03492a989cbf2eb34c20913b",
+      "initial_flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "policy_restored": true,
+      "serial_log_sha256": "63cf9f01ae0cc90fed9e41fdb94147f7bf8a5aa2d073df11348ad213813d98fb",
+      "source_snapshot_sha256": "6fd5e9dbc8653042092ecbbcbc68f40bf59f10425f9480a7e0f4e7c00aa9cb3f"
+    },
+    {
+      "report": "build/m47-ball-cancellable-stored-script.json",
+      "report_sha256": "3c52df2d7f819f77b02708536dc1e5c0aa550c66668145e71f5597f6c52871b6",
+      "board": "creators-ball-v2",
+      "passed": true,
+      "checks": 222,
+      "mac": "08:92:72:f6:4d:dc",
+      "port": "COM10",
+      "tool_sha256": "013a468404acbf49b6de04647d756f6b9ed1aa9a62eafa4f458f82887f9d9430",
+      "artifacts": {
+        "blip-v2.bin": "b8f00337228539b8de37cc89d9c883269a96f4de03492a989cbf2eb34c20913b",
+        "blip-v2.elf": "09d33c9e038f2007724696be3b4b0a7def8a0debc1a48ad0dfec1f26dd344b01",
+        "blip-v2.map": "4e4c0b233a8a812f54e75f5f19a45e4e1abb1143bee2e217c231a514b191d0ae",
+        "sdkconfig": "b056eea7aa6d48a5ce37b2dd803661936d4fbf5edcc2fd085e7f75cb53e615e9"
+      },
+      "flash_log_sha256": "99ce6d5ea8f022f190ec1a5b17ea7d2d7ff6a50f518af9e709d649d2e975b533",
+      "policy_restored": true,
+      "validation_cancel_seconds": 0.6116718999983277,
+      "worker_stack_headroom": 4012,
+      "heap_range": [
+        20780,
+        20808
+      ],
+      "medium": "sd-spi",
+      "serial_log_sha256": "86daa5d4c6f0bd6a7e88e91d5aedef234f35fd7115bb781b0906c5917df42293",
+      "source_snapshot_sha256": "6fd5e9dbc8653042092ecbbcbc68f40bf59f10425f9480a7e0f4e7c00aa9cb3f"
+    },
+    {
+      "report": "build/m47-club-cancel34-native-firmware.json",
+      "report_sha256": "62e1338af722e800f51f5b6e30f68aed4b5e4c6a06081def91c6f95b0ce71fce",
+      "board": "creators-club",
+      "passed": true,
+      "checks": 13,
+      "mac": "30:ae:a4:f3:a3:88",
+      "port": "COM15",
+      "tool_sha256": "f5f8a08a5781e59a1f3241f43b8f94c0028991d38dc57163f4abd2979899a0bb",
+      "firmware_sha256": "14ca027cda8b52981141480d36ffe6ab14758831f9e7b0c93c0371f77a8e4747",
+      "initial_flash_log_sha256": "3ace9b8fc371f54229481a48972b21f54bbc3a77a1224b86d061a74962582234",
+      "policy_restored": true,
+      "serial_log_sha256": "3443d785b8c4d70d51dac62c28e20f23c5a2959a5d16a533f9ca558a49c5abbc",
+      "source_snapshot_sha256": "6fd5e9dbc8653042092ecbbcbc68f40bf59f10425f9480a7e0f4e7c00aa9cb3f"
+    },
+    {
+      "report": "build/m47-club-cancellable-stored-script.json",
+      "report_sha256": "cc4508aa5331a60740eb277a09dcd76426f600af769e599027a605c51c015a6b",
+      "board": "creators-club",
+      "passed": true,
+      "checks": 222,
+      "mac": "30:ae:a4:f3:a3:88",
+      "port": "COM15",
+      "tool_sha256": "013a468404acbf49b6de04647d756f6b9ed1aa9a62eafa4f458f82887f9d9430",
+      "artifacts": {
+        "blip-v2.bin": "14ca027cda8b52981141480d36ffe6ab14758831f9e7b0c93c0371f77a8e4747",
+        "blip-v2.elf": "6e08d77522d553157d326b0b4ae4549afb7dce2e0d6c558a4d960ed63eeacceb",
+        "blip-v2.map": "ad3328d724dad7743256336aeea455730b5c2896cc24eed3f6cee2b5b8d17178",
+        "sdkconfig": "002a73f7a86f7125ca12401f970c7340958a8a0d7fa759f9081e1355383430fa"
+      },
+      "flash_log_sha256": "3ace9b8fc371f54229481a48972b21f54bbc3a77a1224b86d061a74962582234",
+      "policy_restored": true,
+      "validation_cancel_seconds": 0.07218740000098478,
+      "worker_stack_headroom": 3148,
+      "heap_range": [
+        40964,
+        40968
+      ],
+      "medium": "sd-spi",
+      "serial_log_sha256": "a325e6d0233bc2e353e00e0a41e5dfef3302570ee9219842e38c8f4b9f7ab0eb",
+      "source_snapshot_sha256": "6fd5e9dbc8653042092ecbbcbc68f40bf59f10425f9480a7e0f4e7c00aa9cb3f"
+    },
+    {
+      "report": "build/m47-huzzah32-cancel34-native-firmware.json",
+      "report_sha256": "2487bb9dfa53b54762257cfda474a4c09230f490148b18b4153da5fadecab5a5",
+      "board": "adafruit-huzzah32",
+      "passed": true,
+      "checks": 13,
+      "mac": "30:ae:a4:f2:d1:84",
+      "port": "COM5",
+      "tool_sha256": "f5f8a08a5781e59a1f3241f43b8f94c0028991d38dc57163f4abd2979899a0bb",
+      "firmware_sha256": "9e10f72b05ab0aa183c86d370ccc87af7c782bddcc9ee83f9a4954fcf5e806d6",
+      "initial_flash_log_sha256": "e23a78fa823670bfab4459568be56d46db85f75aabe4d8e76424691397d91b71",
+      "policy_restored": true,
+      "serial_log_sha256": "f05884602dbfab97f650099f95b7960f7c0137ca10c4185e2e1b492f0e2fb190",
+      "source_snapshot_sha256": "6fd5e9dbc8653042092ecbbcbc68f40bf59f10425f9480a7e0f4e7c00aa9cb3f"
+    },
+    {
+      "report": "build/m47-huzzah32-cancellable-stored-script.json",
+      "report_sha256": "856f3d081562a90108c1d779f76473dbbb6364ceeab37506daad55a0749c08a8",
+      "board": "adafruit-huzzah32",
+      "passed": true,
+      "checks": 215,
+      "mac": "30:ae:a4:f2:d1:84",
+      "port": "COM5",
+      "tool_sha256": "013a468404acbf49b6de04647d756f6b9ed1aa9a62eafa4f458f82887f9d9430",
+      "artifacts": {
+        "blip-v2.bin": "9e10f72b05ab0aa183c86d370ccc87af7c782bddcc9ee83f9a4954fcf5e806d6",
+        "blip-v2.elf": "f7cf848326ac4a891767720c784019ae28be139a4266b56e73051ad0a50a26e6",
+        "blip-v2.map": "c43e69a5dd629eb8d01af82ab170f835835e854d0be0242bf99898a1708d6c9d",
+        "sdkconfig": "cb4d761c1f676ef08b5600f5baf3356d29c87fd63d3ff2a2c662d7c51592cd54"
+      },
+      "flash_log_sha256": "e23a78fa823670bfab4459568be56d46db85f75aabe4d8e76424691397d91b71",
+      "policy_restored": true,
+      "worker_stack_headroom": 3568,
+      "heap_range": [
+        31328,
+        31328
+      ],
+      "medium": "internal",
+      "serial_log_sha256": "1ba9669f675ae3c5233379fa67c9c250e3cc9a328407951fadada636370a31c8",
+      "source_snapshot_sha256": "6fd5e9dbc8653042092ecbbcbc68f40bf59f10425f9480a7e0f4e7c00aa9cb3f"
+    },
+    {
+      "report": "build/m47-m5dial-cancel34-native-firmware.json",
+      "report_sha256": "17aa7e3594de224b6a818e3f7648adfa213268d659e7b9fcdffee736d1230065",
+      "board": "m5stack-m5dial",
+      "passed": true,
+      "checks": 13,
+      "mac": "b0:81:84:96:83:74",
+      "port": "COM9",
+      "tool_sha256": "f5f8a08a5781e59a1f3241f43b8f94c0028991d38dc57163f4abd2979899a0bb",
+      "firmware_sha256": "8e9ca62f042804b75cae215b2e0fede45fff8c9a082673b60909abe299967cc0",
+      "initial_flash_log_sha256": "ce498e0420b4c88fb00eded715233590cc7503709f33596c630053a611ca745d",
+      "policy_restored": true,
+      "serial_log_sha256": "46f982273e8ef99024938c5a5532255a439d5cabc819afd10b9d1fbda4b10dfe",
+      "source_snapshot_sha256": "6fd5e9dbc8653042092ecbbcbc68f40bf59f10425f9480a7e0f4e7c00aa9cb3f"
+    },
+    {
+      "report": "build/m47-m5dial-cancellable-stored-script.json",
+      "report_sha256": "c85315143189b585bd2ca49057e457370b979bf3236e9d93ed1ff46fe2dcd353",
+      "board": "m5stack-m5dial",
+      "passed": true,
+      "checks": 215,
+      "mac": "b0:81:84:96:83:74",
+      "port": "COM9",
+      "tool_sha256": "013a468404acbf49b6de04647d756f6b9ed1aa9a62eafa4f458f82887f9d9430",
+      "artifacts": {
+        "blip-v2.bin": "8e9ca62f042804b75cae215b2e0fede45fff8c9a082673b60909abe299967cc0",
+        "blip-v2.elf": "d8dc621cfac491dd10bcce6d9b2c25b075f162a8e460804666608608bf94c500",
+        "blip-v2.map": "4f29a2f55b069da647b094e533955e9a1d3ccf28ee5aa6afdcebe6098e1c43f2",
+        "sdkconfig": "15a8f1c085d83036e76ba1c59ac6e1e76d5fd8b84e17141c805bc3f9849f650e"
+      },
+      "flash_log_sha256": "ce498e0420b4c88fb00eded715233590cc7503709f33596c630053a611ca745d",
+      "policy_restored": true,
+      "worker_stack_headroom": 3224,
+      "heap_range": [
+        33212,
+        33268
+      ],
+      "medium": "internal",
+      "serial_log_sha256": "a25792baa686b6d597179d555aff82685199aa6ed28d5d4e31728bc3b835e0b3",
+      "source_snapshot_sha256": "6fd5e9dbc8653042092ecbbcbc68f40bf59f10425f9480a7e0f4e7c00aa9cb3f"
+    }
+  ],
+  "verification_logs": {
+    "build/m47-host-build-final.log": "54575bf9c44c87816dfc169b78aed3819502ef47d08e6b771c5f272b956851cf",
+    "build/m47-host-tests-final.log": "75641ca8e44c96d0b57dabf961d4e07f3613fd679954363faf3ccc92ae3f2eab",
+    "build/m47-local-catalog-check.json": "c3df042856d21f44fda96c4eca0ab0b1aabddf87413741b5ac42f2dc82bbc7a0",
+    "build/m47-final-installed-state.json": "7d2395e2f061790cee2405d2c918b68919986fead745f5e4c2c68db3fefe5af4"
+  },
+  "installed_state": {
+    "pc_network_changed": false,
+    "devices": [
+      {
+        "profile": "ball",
+        "port": "COM10",
+        "board": "creators-ball-v2",
+        "firmware": 34,
+        "firmware_state": "confirmed",
+        "name": "Creators Ball V2",
+        "medium": "sd-spi",
+        "web": 3118
+      },
+      {
+        "profile": "huzzah32",
+        "port": "COM5",
+        "board": "adafruit-huzzah32",
+        "firmware": 34,
+        "firmware_state": "confirmed",
+        "name": "HUZZAH32",
+        "medium": "internal",
+        "web": 3005
+      },
+      {
+        "profile": "m5dial",
+        "port": "COM9",
+        "board": "m5stack-m5dial",
+        "firmware": 34,
+        "firmware_state": "confirmed",
+        "name": "M5 Dial",
+        "medium": "internal",
+        "web": 3005
+      },
+      {
+        "profile": "club",
+        "port": "COM15",
+        "board": "creators-club",
+        "firmware": 34,
+        "firmware_state": "confirmed",
+        "name": "Creators Club",
+        "medium": "sd-spi",
+        "web": 3005
+      },
+      {
+        "profile": "m5stickc",
+        "port": "COM12",
+        "board": "m5stack-m5stickc",
+        "firmware": 33,
+        "firmware_state": "confirmed",
+        "name": "M5 Stick C",
+        "medium": "internal",
+        "web": 3005
+      },
+      {
+        "profile": "xiao",
+        "port": "COM13",
+        "board": "seeed-xiao-esp32c6-chip-antenna",
+        "firmware": 33,
+        "firmware_state": "confirmed",
+        "name": "XIAO C6",
+        "medium": "internal",
+        "web": 3005
+      }
+    ],
+    "absent": [
+      "creators-tab"
+    ]
+  },
+  "local_catalog": {
+    "endpoint": "http://192.168.27.176:8088/blip/update",
+    "firmware_code": 34,
+    "web_code": 3118,
+    "profiles": [
+      "ball",
+      "huzzah32",
+      "m5dial",
+      "club",
+      "tab",
+      "m5stickc",
+      "xiao"
+    ],
+    "catalog_sha256": "6827be1033a4b6989c9095135d4a50d58f0d84ccc46599fcd53abd0afd0d449d",
+    "seven_public_queries_passed": true,
+    "web_artifact_verified": true,
+    "note": "Local development publication; building/publishing the Tab profile is not hardware validation."
+  },
+  "limitations": [
+    "Cancellation cannot preempt an individual filesystem/SDK call or another consumer holding the storage mutex.",
+    "Creators Tab remains absent. Existing Stick UART burst and strict XIAO UDP failures remain open.",
+    "Browser file listing, playback/sequence consumers, MMC/NOR hardware, hotplug and sustained-I/O qualification remain open."
+  ]
+}

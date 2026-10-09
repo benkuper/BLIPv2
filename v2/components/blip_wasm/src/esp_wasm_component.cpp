@@ -389,8 +389,13 @@ void EspWasmComponent::run_worker() noexcept {
             controls_.retire();
             status = bytes ? publish_module(bytes.value()) : core::Status::failure(bytes.error());
         } else if (request.kind == Kind::load_file) {
-            const auto opened = files_->open(request.file_path.data());
+            struct FileWork { EspWasmComponent* owner; std::uint32_t epoch; } work{this, request.epoch};
+            const auto opened = files_->open(request.file_path.data(), {&work, [](void* context) noexcept {
+                const auto& current = *static_cast<const FileWork*>(context);
+                return !current.owner->started_.load() || current.owner->epoch_.load() != current.epoch;
+            }});
             status = opened ? core::Status::success() : core::Status::failure(opened.error());
+            if (!status && status.error().code == ErrorCode::cancelled) cancelled_.fetch_add(1);
             if (status && (opened.value().size < 8 || opened.value().size > kModuleBytes))
                 status = failure(ErrorCode::capacity_exceeded, "load-file", "module-size");
             // Missing or oversized files leave the current module untouched.
@@ -473,6 +478,13 @@ void EspWasmComponent::run_worker() noexcept {
                     Guard guard(admission_, portMAX_DELAY); script_admission_ = false;
                 }
             }
+        }
+        if (request.kind == Kind::load_file && status.error().code == ErrorCode::cancelled) {
+            Guard guard(admission_, portMAX_DELAY);
+            // A cancelled lookup/scan has not reused the current module. Let
+            // new-epoch actions resume unless a later replacement owns the barrier.
+            if (started_.load() && request.id >= closed_through_ && service.snapshot().state == State::loaded && controls_.generation())
+                script_admission_ = true;
         }
         worker_headroom_.store(uxTaskGetStackHighWaterMark(nullptr));
         complete(request, status, std::span<const Value>(results).first(count), elapsed(began), service.snapshot(), upload.received());

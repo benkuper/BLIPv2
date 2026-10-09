@@ -74,4 +74,7 @@ This adds named loading, exact copied guest results, early/late failure recovery
 96-byte nested paths, repeated replacement and post-reset loading checks. File
 validation can take longer than the serial client's execution-completion poll;
 this helper allows 60 seconds for file operations. Guest execution budgets are
-unchanged. Cancellation during long storage validation remains to be qualified.
+unchanged. Add `--cancel-validation` on an SD device to require an active file
+validation to cancel within one second, retain the current module and reopen
+its action admission. File validation checks cancellation between 512-byte reads;
+the callback is borrowed for the synchronous scan and consumes no persistent RAM.

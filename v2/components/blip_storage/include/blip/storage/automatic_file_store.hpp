@@ -16,6 +16,14 @@ struct FileReadHandle {
     std::size_t size{};
 };
 
+// Borrowed only during open/validation; never retained by the store. The
+// callback runs under its lock and must be a bounded, nonblocking check.
+struct FileReadCancellation {
+    void* context{};
+    bool (*requested)(void*) noexcept{};
+    [[nodiscard]] bool cancelled() const noexcept { return requested && requested(context); }
+};
+
 // Bulk files use two independently checksummed generations on every medium.
 // This also works on FAT: publishing does not depend on overwriting by rename.
 class AutomaticFileStore {
@@ -30,7 +38,8 @@ class AutomaticFileStore {
     // no readers or writer are admitted; missing media never formats a device.
     [[nodiscard]] core::Status set_external(WebAssetBackend* external) noexcept;
     [[nodiscard]] bool external() const noexcept;
-    [[nodiscard]] core::Result<FileReadHandle> open(std::string_view path) noexcept;
+    [[nodiscard]] core::Result<FileReadHandle> open(std::string_view path,
+        FileReadCancellation cancellation = {}) noexcept;
     [[nodiscard]] core::Result<std::size_t> read(FileReadHandle handle, std::size_t offset,
                                                 std::span<std::byte> output) noexcept;
     void close(FileReadHandle handle) noexcept;
@@ -73,11 +82,11 @@ class AutomaticFileStore {
         bool prepared{};
     };
     [[nodiscard]] core::Result<Record> inspect(WebAssetBackend& backend,
-                                                std::string_view path) noexcept;
+        std::string_view path, FileReadCancellation cancellation = {}) noexcept;
     [[nodiscard]] core::Result<std::uint32_t> begin_record(std::string_view path,
         std::size_t size, bool deleted) noexcept;
     [[nodiscard]] core::Result<Record> inspect_slot(WebAssetBackend& backend,
-                                                     std::string_view path, unsigned slot) noexcept;
+        std::string_view path, unsigned slot, FileReadCancellation cancellation = {}) noexcept;
     [[nodiscard]] static bool valid_path(std::string_view path) noexcept;
     [[nodiscard]] static std::string_view physical(std::string_view path, unsigned slot,
                                                    std::span<char> buffer) noexcept;

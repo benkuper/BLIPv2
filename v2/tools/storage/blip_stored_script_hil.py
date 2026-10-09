@@ -28,6 +28,7 @@ def main():
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--cycles", type=int, default=20)
     parser.add_argument("--reset", action="store_true")
+    parser.add_argument("--cancel-validation", action="store_true", help="Require active SD checksum cancellation and retained action admission")
     args = parser.parse_args()
     origin = urlsplit(args.device)
     if origin.scheme != "http" or not origin.hostname or origin.path not in ("", "/") or origin.query:
@@ -75,8 +76,7 @@ def main():
         if status != 201: report["last_file_error"] = {"status": status, "detail": detail.decode("utf-8", errors="replace")}
         check("store-" + path, status == 201)
 
-    def load_result(path):
-        token = client.action("load_file", path)[0]
+    def wait_result(token):
         deadline = time.monotonic() + 60
         while True:
             try: return client.completion(token)
@@ -84,6 +84,9 @@ def main():
                 if time.monotonic() >= deadline: raise
                 # SD checksum validation runs on the worker, independently of
                 # serial admission. Its file read can exceed a call's 2 s poll.
+
+    def load_result(path):
+        return wait_result(client.action("load_file", path)[0])
 
     def loaded(path=script):
         result = load_result(path)
@@ -122,6 +125,19 @@ def main():
             check("early-failure-preserves-module", client.get("state") == "loaded" and
                   client.get("generation") == generation and client.get("level") == 42)
             execute()  # Also proves action admission reopened on early failure.
+            if "_large" in path and args.cancel_validation:
+                cancelled_before = client.get("cancelled")
+                token = client.action("load_file", path)[0]
+                deadline = time.monotonic() + 2
+                while client.get("pending") and time.monotonic() < deadline: time.sleep(.002)
+                check("validation-cancellation-exercised", not client.action("completion", token)[0] and client.get("pending") == 0)
+                began = time.monotonic(); client.action("cancel_all")
+                check("file-validation-cancelled", wait_result(token)["error"] == "cancelled")
+                report["validation_cancel_seconds"] = time.monotonic() - began
+                check("bounded-validation-cancel", report["validation_cancel_seconds"] < 1)
+                check("cancelled-scan-preserves-module", client.get("state") == "loaded" and
+                      client.get("generation") == generation and client.get("level") == 42 and client.get("cancelled") > cancelled_before)
+                execute()
         for path in ("scripts/../bad", "playback/a.wasm", "scripts/", "scripts/a//b",
                      "scripts/a?b", "scripts/a\\b", "scripts/a\0b", "scripts/" + "x" * 89):
             response = client.receive(client.send("action", "blip.wasm", "load_file", path))

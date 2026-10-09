@@ -334,6 +334,44 @@ bool deletion_hides_internal_fallback_and_empty_files_remain_distinct() {
     }
     return true;
 }
+
+bool validation_cancellation_does_not_publish_pin_or_fall_back() {
+    MemoryVolume internal, external;
+    std::array<std::byte, 1024> scratch{};
+    AutomaticFileStore store(internal, scratch);
+    const std::vector<std::byte> value(4096, std::byte{42});
+    BLIP_CHECK(store.save("scripts/show.wasm", first));
+    BLIP_CHECK(store.set_external(&external));
+    BLIP_CHECK(store.save("scripts/show.wasm", value));
+    BLIP_CHECK(store.save("scripts/show.wasm", value));
+    struct Check { unsigned remaining; unsigned calls{}; } probe{1000};
+    const auto requested = [](void* context) noexcept {
+        auto& state = *static_cast<Check*>(context); ++state.calls;
+        return --state.remaining == 0;
+    };
+    const auto complete = store.open("scripts/show.wasm", {&probe, requested});
+    BLIP_CHECK(complete && probe.calls > 3); store.close(complete.value());
+    // Cancel at every check, including the older/newer generations, the final
+    // trailer boundary and immediately before reader publication.
+    for (unsigned at = 1; at <= probe.calls; ++at) {
+        Check check{at};
+        const auto cancelled = store.open("scripts/show.wasm", {&check, requested});
+        BLIP_CHECK(!cancelled && cancelled.error().code == ErrorCode::cancelled && check.calls == at);
+        BLIP_CHECK(store.set_external(&external));
+    }
+    // No leaked reader/writer and no fallback to the smaller internal copy.
+    BLIP_CHECK(store.set_external(&external));
+    std::array<FileReadHandle, AutomaticFileStore::kMaximumReaders> handles{};
+    for (auto& handle : handles) {
+        const auto opened = store.open("scripts/show.wasm");
+        BLIP_CHECK(opened && opened.value().size == value.size()); handle = opened.value();
+    }
+    for (auto handle : handles) store.close(handle);
+    BLIP_CHECK(store.save("scripts/show.wasm", second));
+    const auto opened = store.open("scripts/show.wasm");
+    BLIP_CHECK(opened && opened.value().size == second.size()); store.close(opened.value());
+    return true;
+}
 } // namespace
 
 int main() {
@@ -348,6 +386,7 @@ int main() {
         {"prepared candidate and reboot recovery", prepared_candidate_requires_commit_and_recovers_after_reboot},
         {"web uses shared external file storage", web_uses_external_bulk_store_and_retains_factory_and_previous_bundle},
         {"durable deletion and empty files", deletion_hides_internal_fallback_and_empty_files_remain_distinct},
+        {"cancel validation without pins or fallback", validation_cancellation_does_not_publish_pin_or_fall_back},
     };
     return run_tests(tests);
 }
