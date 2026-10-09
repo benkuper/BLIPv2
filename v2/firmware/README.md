@@ -1,5 +1,12 @@
 # Firmware application
 
+Each board publishes its human-readable type and a saved name defaulting to that
+type. Both web modes show the identity and provide a name editor. mDNS derives its
+hostname from the name plus a stable MAC suffix and follows saved changes live.
+Original-ESP32 WASM profiles keep ordinary SPI completion interrupts in flash to
+preserve a contiguous 64 KiB guest arena. Optional MMC/NOR storage providers are
+included only when selected; current external-media boards use SD SPI.
+
 This is the ESP-IDF 6.0.2 application composition root. It remains intentionally
 thin while composing the registry, diagnostics, storage, serial control, and Wi-Fi
 services implemented by the component libraries.
@@ -15,6 +22,24 @@ python v2/tests/host/validate_firmware_build.py --build-dir build/esp32 --target
 Replace `esp32` with `esp32s3` or `esp32c6` for the other profiles. Generated
 configuration stays in the selected build directory. The dependency resolver
 uses a separate committed lock for each target.
+
+The full web interface is packaged directly into `storage.bin` during the
+build. A normal `idf.py ... -p PORT flash` installs it with the firmware; no
+manual file upload or separate web build is needed. The application binary
+contains no copy of the full interface, so it does not occupy either OTA slot.
+Application-only OTA preserves the independently versioned filesystem bundle.
+
+Use `-DBLIP_FLASH_WEB_UI=OFF` to create an empty factory filesystem instead.
+The device then serves its small gzip-compressed first-run page, downloads the
+interface from the configured public release endpoint, installs it atomically
+and refreshes into the full app. `/firstrun` and `/setup` remain available for
+retry and network setup. Both factory modes use the same application binary.
+
+Plain HTTP and no additional application authentication are the standard
+private show-network defaults. Optional `-DBLIP_ENABLE_RELEASE_TLS=ON` builds
+add HTTPS, its CA bundle and clock synchronization. See
+[ADR-0020](../../docs/v2/adr/0020-private-show-network-defaults.md) and the
+[local release simulator](../tools/ota/RELEASE_SERVER.md).
 
 Art-Net discovery/DMX and DDP pixel input are enabled by default. Pass
 `-DBLIP_ENABLE_ARTNET=OFF` or `-DBLIP_ENABLE_DDP=OFF` to `idf.py` to exclude
@@ -57,6 +82,13 @@ ESP32 build directory. Its fixed SK9822 output uses SPI2 on GPIO25/GPIO26.
 
 The startup task has an 8 KiB bounded stack. ESP-IDF releases this transient
 stack after `app_main` returns; runtime components do not retain it.
+
+Bulk storage automatically prefers mounted media declared by the board manifest.
+The Ball's SD-protocol onboard storage uses software SPI so its HD108 DMA host
+stays available; Club/Tab SD use SPI3. Other boards retain internal LittleFS.
+Web assets, scripts, playback and sequences share the same bounded file service;
+see the [file API and hardware checks](../tools/storage/README.md). The factory
+UI is copied to external storage through this service when available.
 
 The composition root will remain thin: reusable production behavior belongs in
 the component directories under [`../components/`](../components/).

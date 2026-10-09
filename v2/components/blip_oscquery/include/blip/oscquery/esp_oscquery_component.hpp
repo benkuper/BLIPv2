@@ -7,9 +7,11 @@
 #include "blip/oscquery/legacy_osc.hpp"
 #include "blip/oscquery/osc.hpp"
 #include "blip/ota/update_service.hpp"
+#include "blip/ota/esp_release_component.hpp"
 #include "blip/resources/board_manifest.hpp"
 #include "blip/resources/snapshot.hpp"
 #include "blip/storage/web_asset_store.hpp"
+#include "blip/storage/automatic_file_store.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -29,7 +31,8 @@ class EspOscQueryComponent final : public core::Component, public network::HttpR
 
     EspOscQueryComponent(const core::RegistryView& registry, core::ControlService& controls,
                          network::EspWifiComponent& wifi, storage::WebAssetStore& web_assets,
-                         ota::UpdateService& updates, resources::DeviceBroker& resources,
+                         storage::AutomaticFileStore& files,
+                         ota::UpdateService& updates, ota::EspReleaseComponent& releases, resources::DeviceBroker& resources,
                          resources::BoardManifest board) noexcept;
 
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
@@ -51,9 +54,12 @@ class EspOscQueryComponent final : public core::Component, public network::HttpR
     [[nodiscard]] esp_err_t handle_asset_status(httpd_req_t* request) noexcept;
     [[nodiscard]] esp_err_t handle_asset_upload(httpd_req_t* request) noexcept;
     [[nodiscard]] esp_err_t handle_update_status(httpd_req_t* request) noexcept;
+    [[nodiscard]] esp_err_t handle_release_status(httpd_req_t* request) noexcept;
+    [[nodiscard]] esp_err_t handle_release_action(httpd_req_t* request) noexcept;
     [[nodiscard]] esp_err_t handle_resource_status(httpd_req_t* request) noexcept;
     [[nodiscard]] esp_err_t handle_resource_reassignment(httpd_req_t* request) noexcept;
     [[nodiscard]] esp_err_t handle_firmware_upload(httpd_req_t* request) noexcept;
+    [[nodiscard]] esp_err_t handle_file(httpd_req_t* request) noexcept;
     [[nodiscard]] esp_err_t handle_websocket(httpd_req_t* request) noexcept;
     [[nodiscard]] std::string_view local_ip() noexcept;
 
@@ -64,7 +70,9 @@ class EspOscQueryComponent final : public core::Component, public network::HttpR
     core::ControlService* controls_{};
     network::EspWifiComponent* wifi_{};
     storage::WebAssetStore* web_assets_{};
+    storage::AutomaticFileStore* files_{};
     ota::UpdateService* updates_{};
+    ota::EspReleaseComponent* releases_{};
     resources::DeviceBroker* resources_{};
     resources::BoardManifest board_{};
     std::array<char, 18> device_id_{};

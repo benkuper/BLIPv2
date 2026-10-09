@@ -46,6 +46,7 @@ class TextSink {
 
 [[nodiscard]] core::Status write_oscquery_host_info(const DeviceIdentity& identity,
                                                     TextSink& sink) noexcept;
+[[nodiscard]] bool write_json_string(std::string_view text, TextSink& sink) noexcept;
 
 [[nodiscard]] core::Status write_oscquery_tree(const core::RegistryView& registry,
                                                core::ControlService& controls, bool include_config,

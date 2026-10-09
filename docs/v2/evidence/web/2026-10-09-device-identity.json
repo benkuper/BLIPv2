@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-09",
+  "milestone_complete": false,
+  "pc_network_changed": false,
+  "identity_trials": [
+    {
+      "board": "creators-ball-v2",
+      "port": "COM10",
+      "mac": "08:92:72:f6:4d:dc",
+      "passed": true,
+      "firmware_sha256": "d56fc57d1f03665601b6c843a3f6f8c562be6ad3a4db8acaae05662d547dc2e9",
+      "flash_log_sha256": "f1544b0fab24a24c18eb24be8743c3af5db3dc5cd9b1ee761e6e6a66073af659",
+      "tool_sha256": "1f952160e3a7d20da8960e2cfccb57f0aa940157db7d44c7e9c0073010a381fa",
+      "checks_passed": 19,
+      "report_path": "build/m40-identity-ball-hil.json",
+      "report_sha256": "61f0e3e08ad81dc72b744d7b2045ac2fa8edeb77fb4ce6027c07206686d99f20",
+      "original_name": "Creators Ball V2",
+      "local_firmware_archive": "build/m40-identity-archives/ball/blip-v2.bin"
+    },
+    {
+      "board": "adafruit-huzzah32",
+      "port": "COM5",
+      "mac": "30:ae:a4:f2:d1:84",
+      "passed": true,
+      "firmware_sha256": "76651e1fde733722ec548520d983662b330d6285e41b9bc5397a6ccd7214e048",
+      "flash_log_sha256": "34a85897a87e5eaed005f5564a985de7483363d5555ab68e0297d5ad1a5450bd",
+      "tool_sha256": "1f952160e3a7d20da8960e2cfccb57f0aa940157db7d44c7e9c0073010a381fa",
+      "checks_passed": 19,
+      "report_path": "build/m40-identity-huzzah32-hil.json",
+      "report_sha256": "256c8d99e9521331a79f1c7e195abd00bdcea35a21c10e0eca443b020d26f4f0",
+      "original_name": "HUZZAH32",
+      "local_firmware_archive": "build/m40-identity-archives/huzzah32/blip-v2.bin"
+    },
+    {
+      "board": "m5stack-m5dial",
+      "port": "COM9",
+      "mac": "b0:81:84:96:83:74",
+      "passed": true,
+      "firmware_sha256": "c979e58daacd8c95ba0a1b61eab9dff2dbfe2044538a23187dcc97a666305522",
+      "flash_log_sha256": "4344afd74c6807b2736e250c54b67bfb958e665224bcb9f4965387640b139987",
+      "tool_sha256": "1f952160e3a7d20da8960e2cfccb57f0aa940157db7d44c7e9c0073010a381fa",
+      "checks_passed": 19,
+      "report_path": "build/m40-identity-m5dial-hil.json",
+      "report_sha256": "2f8223f84530213180b0e7caebe837d55849c579e8717ac86a34eb523628995c",
+      "original_name": "M5 Dial",
+      "local_firmware_archive": "build/m40-identity-archives/m5dial/blip-v2.bin"
+    },
+    {
+      "board": "creators-club",
+      "port": "COM15",
+      "mac": "30:ae:a4:f3:a3:88",
+      "passed": true,
+      "firmware_sha256": "23b2a81dee06258b5d5215d27c3bc31e07c6e54260bd7bfc7bd2b3fc8d5e5ed8",
+      "flash_log_sha256": "992f54c4c117f003e916043f27fdb326551f8ff53133c6db7afc2dd6771e5ad6",
+      "tool_sha256": "1f952160e3a7d20da8960e2cfccb57f0aa940157db7d44c7e9c0073010a381fa",
+      "checks_passed": 19,
+      "report_path": "build/m40-identity-club-hil.json",
+      "report_sha256": "5bfeb2bbc32711a0f53268fc72ef687c6e3b5b15c20733d90ee71809e18c4e9b",
+      "original_name": "Creators Club",
+      "local_firmware_archive": "build/m40-identity-archives/club/blip-v2.bin"
+    },
+    {
+      "board": "seeed-xiao-esp32c6-chip-antenna",
+      "port": "COM13",
+      "mac": "10:51:db:1a:a6:68",
+      "passed": true,
+      "firmware_sha256": "009fc6ee35592add28c5dc59e68d8ebc870d456e5f0e1160502a69a39e9718bf",
+      "flash_log_sha256": "81494f941f7f12013d18d758720c1e7acc2858283f34ec502a98e47ae57896e1",
+      "tool_sha256": "1f952160e3a7d20da8960e2cfccb57f0aa940157db7d44c7e9c0073010a381fa",
+      "checks_passed": 19,
+      "report_path": "build/m40-identity-xiao-hil.json",
+      "report_sha256": "cb452db347ea09ccedbad1f5ef04e87c6d731306c218e62e30dbbf2cea5c7ecb",
+      "original_name": "XIAO C6",
+      "local_firmware_archive": "build/m40-identity-archives/xiao/blip-v2.bin"
+    },
+    {
+      "board": "m5stack-m5stickc",
+      "port": "COM12",
+      "mac": "94:b9:7e:8b:b7:84",
+      "passed": true,
+      "firmware_sha256": "823b5da87ad9b2665fd23f12c17e0651e3786f097c25cc4c8f9f3108f3116b11",
+      "flash_log_sha256": "2eeab2979678fc5aa56f0d5b11846bea8b33ec53b7cdf43e830b787c2494d541",
+      "tool_sha256": "1f952160e3a7d20da8960e2cfccb57f0aa940157db7d44c7e9c0073010a381fa",
+      "checks_passed": 19,
+      "report_path": "build/m40-identity-m5stickc-hil.json",
+      "report_sha256": "ec42ea2d0be09356ecc598b24ee91a05b5e271403cc1b3834815ea3b264e7c38",
+      "original_name": "M5 Stick C",
+      "local_firmware_archive": "build/m40-identity-archives/m5stickc/blip-v2.bin"
+    }
+  ],
+  "blocked_board": {
+    "board": "creators-tab",
+    "port": "COM14",
+    "mac": "50:02:91:9f:8e:d0",
+    "reason": "ROM and stub cannot read flash ID (ffffff); ROM boot reports flash read err, 1000"
+  },
+  "remaining": [
+    "Tab flash access and hardware qualification",
+    "Latest full-image milestone regression across all seven boards",
+    "Simultaneous browser/native-update traffic and firmware OTA qualification",
+    "Factory empty-filesystem first-run download qualification"
+  ],
+  "native_web_update": {
+    "passed": true,
+    "checks_passed": 10,
+    "report_path": "build/m40-ball-native-web-update-bounded.json",
+    "report_sha256": "c160e21d9781e2ef58a0af4e4c1254416d6a53c43a5d9c380bd81b36349d8813",
+    "worker_stack_headroom": 2036,
+    "web_update_rebooted": false,
+    "firmware_sha256": "dba4c070babf4e71facb4c398fb735db13e9ebb94e44e3d1e462995cd9a418c0",
+    "bundle_sha256": "07608cf59835de0348af55b8a7640de0a51949c9bd9b95df179efabef9aefb2c"
+  },
+  "automatic_file_storage": {
+    "passed": true,
+    "checks_passed": 51,
+    "report_path": "build/m40-storage-ball-hil.json",
+    "report_sha256": "aad974a99c6164e1922e11bccd7b52da7055c4f437ee519c3e6b9531d9235f75"
+  },
+  "browser_validation": {
+    "board": "creators-ball-v2",
+    "passed": true,
+    "checks_passed": 19,
+    "report_path": "build/m40-identity-ball-browser-bounded.json",
+    "report_sha256": "0768df270d955536f19016dab9c1adef711f72129052318ece13038b0e7c02ba",
+    "web_assets": {
+      "format": 1,
+      "bundle_version": 3003,
+      "assets": 11,
+      "bytes": 25006,
+      "crc32": "f7e20870"
+    },
+    "browser_version": "154.0.4258.62",
+    "pc_network_changed": false
+  }
+}

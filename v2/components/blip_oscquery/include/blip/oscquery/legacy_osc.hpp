@@ -21,6 +21,7 @@ class LegacyOscEndpoint {
   public:
     LegacyOscEndpoint(const core::RegistryView& registry, core::ControlService& controls,
                       DeviceIdentity identity) noexcept;
+    void set_identity(DeviceIdentity identity) noexcept { identity_ = identity; }
 
     [[nodiscard]] core::Status handle(const OscMessage& request, std::string_view local_ip,
                                       bool udp_feedback, OscMessage& response,

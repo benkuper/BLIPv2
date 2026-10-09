@@ -40,7 +40,7 @@ flowchart LR
 | `1.5` | Scheduler and bounded event bus | `1.2`, ADR-0003, ADR-0004 | task classes, bounded queues, overflow metrics |
 | `GA` | Prove common core on ESP32/S3/C6 | `1.1`–`1.5` | Gate A evidence on one reference board per target |
 | `2.1` | Versioned atomic NVS settings | `GA`, ADR-0005 | per-component records and two-generation commit |
-| `2.2` | LittleFS and optional SD storage services | `1.4`, `2.1` | atomic file replacement and storage capability |
+| `2.2` | Automatic internal/external file storage | `1.4`, `2.1` | common web/script/playback/sequence files, mounted-media selection and atomic recovery |
 | `2.3` | Settings migration and V1 import | `2.1`, `0.2`, ADR-0006 | idempotent V1 importer with retained source blob |
 | `2.4` | Diagnostics, metrics, crash records, safe mode | `1.5`, `2.1` | structured diagnostics and boot-loop recovery |
 | `2.5` | Versioned transport envelope and Serial/USB | `1.3`, `1.5`, `0.2` | transport-neutral message contract and legacy serial adapter |
@@ -48,13 +48,13 @@ flowchart LR
 | `2.7` | OSC UDP and OSCQuery HTTP/WebSocket | `1.3`, `2.5`, `2.6`, `0.2` | registry-derived discovery and legacy OSC adapter |
 | `3.1` | Schema-driven web shell | `1.3`, `2.7` | generic controls generated from descriptor schema |
 | `3.2` | Filesystem manager and web asset bundles | `2.2`, `3.1` | independently versioned/verified UI assets |
-| `3.3` | A/B OTA and rollback | `2.4`, `2.6` | signed/profile-checked update and boot confirmation |
+| `3.3` | A/B OTA and rollback | `2.4`, `2.6`, ADR-0020 | profile/checksum-checked update and boot confirmation; optional signing |
 | `3.4` | LED transport qualification ADR and native RMT functional vertical slice | `1.4`, `1.5`, `2.7` | measured per-target transport guidance, first output driver and registry-exposed strip; RMT baseline is non-binding for production |
 | `3.5` | Browser installer manifests | `3.2`, `3.3` | factory/install bundle and browser flow |
 | `3.6` | Pin reservation inspector and conflict-safe editor | `1.3`, `1.4`, `2.1`, `3.1` | complete pin/claim schema, atomic reassignment, and shared-bus-aware controls |
 | `3.7` | Simple/Advanced device web interface and presentation metadata | `3.1`, `3.6`, `6.6` for dynamic refresh | polished main controls and graphical sensors; exhaustive topic/component configuration |
-| `3.8` | Release catalog and firmware/web update center | `3.2`, `3.3`, `3.5`, `3.7` | authenticated device-specific catalog, independent versions, compatibility checks and progress |
-| `3.9` | Device-side HTTPS self-update service | `3.8`, `2.1`, `2.6` | bounded checks/downloads without an open browser, policy, atomic assets and firmware rollback |
+| `3.8` | Release catalog and firmware/web update center | `3.2`, `3.3`, `3.5`, `3.7` | public device-specific catalog, independent versions, compatibility checks and progress |
+| `3.9` | Device-side self-update service | `3.8`, `2.1`, `2.6` | bounded HTTP checks/downloads without an open browser, optional TLS, policy, atomic assets and firmware rollback |
 | `GB` | Prove install-to-rollback vertical slice | `3.1`–`3.9` | Gate B evidence, including Simple/Advanced UI, self-updates, exclusive-pin conflict prevention and legal I2C sharing |
 
 ## Milestones 4–6

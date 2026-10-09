@@ -5,6 +5,7 @@
 #include "blip/network/wifi_config.hpp"
 #include "blip/network/wifi_state_machine.hpp"
 #include "blip/storage/settings_store.hpp"
+#include "blip/storage/device_identity_component.hpp"
 #include "esp_event.h"
 #include "esp_http_server.h"
 #include "esp_netif.h"
@@ -35,7 +36,9 @@ class EspWifiComponent final : public core::Component {
     static constexpr std::size_t kWorkerTaskStackWords =
         kWorkerTaskStackBytes / sizeof(StackType_t);
 
-    explicit EspWifiComponent(storage::SettingsStore& settings) noexcept;
+    EspWifiComponent(storage::SettingsStore& settings, storage::DeviceIdentityComponent& identity) noexcept;
+    [[nodiscard]] storage::DeviceNameSnapshot device_name() const noexcept { return identity_->snapshot(); }
+    [[nodiscard]] std::string_view device_type() const noexcept { return identity_->type(); }
 
     [[nodiscard]] const core::ComponentDescriptor& descriptor() const noexcept override;
     [[nodiscard]] core::Status start(const core::StartContext&) noexcept override;
@@ -96,6 +99,7 @@ class EspWifiComponent final : public core::Component {
     [[nodiscard]] core::Status start_portal_locked() noexcept;
     void stop_portal_locked() noexcept;
     [[nodiscard]] core::Status start_discovery_locked() noexcept;
+    [[nodiscard]] core::Status update_discovery_name_locked() noexcept;
     void stop_discovery_locked() noexcept;
     [[nodiscard]] core::Status provision(std::string_view ssid, std::string_view password,
                                          bool defer_radio) noexcept;
@@ -119,6 +123,8 @@ class EspWifiComponent final : public core::Component {
     static const core::ComponentDescriptor descriptor_;
 
     storage::SettingsStore* settings_{};
+    storage::DeviceIdentityComponent* identity_{};
+    std::uint32_t advertised_identity_revision_{};
     WifiConfig config_{};
     RadioBootProfile active_boot_profile_{RadioBootProfile::wifi_loaded};
     WifiConfig pending_config_{};

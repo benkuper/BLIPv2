@@ -20,6 +20,8 @@
 | [0016](0016-wasm-owned-script-controls.md) | Owned values/queues, retirement and fixed guest callback buffer | Store/runtime query qualified; production wiring pending |
 | [0017](0017-wasm-live-controls-upload-storage.md) | Production declaration publication, ordered script actions and upload-sized storage | Accepted for publication/actions; guest imports/events/web refresh remain open |
 | [0018](0018-device-web-presentation.md) | Simple/Advanced modes, presentation hints, graphical readings and live schema refresh | Three-family browser foundation qualified; update system and remaining 6.6 surfaces open |
+| [0019](0019-device-release-catalog.md) | Device-specific release identity, catalog and packaging | Contract/image qualified; transport policy superseded by 0020 |
+| [0020](0020-private-show-network-defaults.md) | Lean private show-network defaults and optional security features | Accepted by explicit user direction |
 
 Accepted ADRs are immutable contracts. A material change is recorded by a new
 ADR with `Supersedes`/`Superseded by` links.

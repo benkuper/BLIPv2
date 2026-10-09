@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <span>
 #include <string_view>
+#include <mutex>
 
 namespace blip::storage {
 
@@ -67,6 +68,11 @@ class WebAssetBackend {
     [[nodiscard]] virtual core::Status begin_write(std::string_view path) noexcept = 0;
     [[nodiscard]] virtual core::Status append_write(std::span<const std::byte> value) noexcept = 0;
     [[nodiscard]] virtual core::Status finish_write() noexcept = 0;
+    // Reopen a closed staging file for a small durable commit trailer.
+    [[nodiscard]] virtual core::Status resume_write(std::string_view) noexcept {
+        return core::Status::failure({core::ErrorDomain::storage, core::ErrorCode::invalid_state,
+                                      {}, "file-resume", "unsupported"});
+    }
     virtual void abort_write() noexcept = 0;
     [[nodiscard]] virtual core::Status replace(std::string_view source,
                                                std::string_view destination) noexcept = 0;
@@ -97,8 +103,11 @@ class WebAssetStore {
     [[nodiscard]] core::Result<std::size_t> read(const WebAsset& asset, std::size_t offset,
                                                  std::span<std::byte> output) noexcept;
 
-    [[nodiscard]] bool active() const noexcept { return active_; }
-    [[nodiscard]] const WebAssetBundleInfo& info() const noexcept { return info_; }
+    // Hold this lock from find() through the last read() when using the borrowed
+    // asset pointer, and across a complete upload to retain transaction ownership.
+    [[nodiscard]] std::recursive_mutex& mutex() const noexcept { return mutex_; }
+    [[nodiscard]] bool active() const noexcept { std::lock_guard guard(mutex_); return active_; }
+    [[nodiscard]] WebAssetBundleInfo info() const noexcept { std::lock_guard guard(mutex_); return info_; }
 
   private:
     [[nodiscard]] core::Result<WebAssetBundleInfo> validate(std::string_view storage_path,
@@ -111,6 +120,7 @@ class WebAssetStore {
     [[nodiscard]] core::Status install_complete(std::span<const std::byte> bundle) noexcept;
 
     WebAssetBackend* backend_{};
+    mutable std::recursive_mutex mutex_{};
     std::span<std::byte> scratch_{};
     std::array<WebAsset, kMaxWebAssets> entries_{};
     WebAssetBundleInfo info_{};

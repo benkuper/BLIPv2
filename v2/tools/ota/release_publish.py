@@ -11,7 +11,7 @@ import struct
 import tempfile
 import sys
 from urllib.parse import urlsplit
-from release_server import ReleaseIndex, validate_release, https_url, ascii_text, load_index
+from release_server import ReleaseIndex, validate_release, release_url, ascii_text, load_index
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "web"))
 from pack_web_assets import verify_bundle
 
@@ -95,7 +95,7 @@ def atomic_copy(source, destination):
 
 
 def publish(firmware, web, base_url, channel, firmware_minimum_web, web_minimum_firmware, catalog, artifacts):
-    https_url(base_url)
+    release_url(base_url)
     if urlsplit(base_url).query or not urlsplit(base_url).path.rstrip("/").endswith("/blip/releases"):
         raise ValueError("base URL must end in /blip/releases with no query")
     ascii_text(channel, 15)
@@ -148,7 +148,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--firmware", type=Path, required=True)
     parser.add_argument("--web", type=Path)
-    parser.add_argument("--base-url", default="https://www.goldengeek.org/blip/releases")
+    parser.add_argument("--base-url", default="http://www.goldengeek.org/blip/releases")
     parser.add_argument("--channel", default="stable")
     parser.add_argument("--firmware-minimum-web", type=int, default=0)
     parser.add_argument("--web-minimum-firmware", type=int, default=1)

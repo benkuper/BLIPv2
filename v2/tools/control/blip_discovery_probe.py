@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import ipaddress
 import json
+import re
 import socket
 import time
 import urllib.request
@@ -163,7 +164,8 @@ def main():
         assert found[OSCQUERY]["port"] == 80 and found[OSC]["server"] == found[OSCQUERY]["server"]
         assert found[OSCQUERY]["txt"].get("path") == "/"
         suffix = info["DEVICE_ID"].replace(":", "").lower()
-        assert found[OSC]["server"] == f"blip-{suffix}.local."
+        stem = re.sub(r"[^a-z0-9]+", "-", info["NAME"].lower()).strip("-")[:50].rstrip("-") or "blip"
+        assert found[OSC]["server"] == f"{stem}-{suffix}.local."
         report["phase"] = "osc_udp"
         report["osc"] = osc_ping(host, found[OSC]["port"], info["DEVICE_ID"])
         report["phase"] = "oscquery_tree"

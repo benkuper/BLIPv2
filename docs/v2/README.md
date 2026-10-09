@@ -47,6 +47,10 @@ host interruption simulation from hardware qualification.
 
 ## Decision status
 
+[ADR-0020](adr/0020-private-show-network-defaults.md) records the user's firmware-wide
+policy: lean private show-network defaults, optional encryption/access control,
+and local update simulation followed by later user-managed online deployment.
+
 All ADRs in this milestone are **Accepted**. A later change requires a new ADR
 that supersedes the old one; editing an accepted decision in place is reserved
 for spelling and clarification that do not change its contract.

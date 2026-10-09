@@ -11,6 +11,8 @@
 
 ## Connected test boards
 
+- Milestone completion must be validated on all seven connected device types: Creators Club, Creators Tab, Creators Ball V2, HUZZAH32, XIAO C6, M5StickC, and M5Dial. Routine development checks may target affected boards; builds alone do not count as hardware validation. Record per-board results and outstanding failures before claiming a milestone complete. Reverify serial ports and device identities rather than assuming port assignments remain stable.
+- Device identity must expose the human-readable board type and a persisted, editable name defaulting to that type. Display both in the web interface. mDNS hostnames derive from the name with a stable uniqueness suffix, and discovery must follow saved name changes.
 - The user authorizes flashing the connected boards and does not require backups or restoration of their previous firmware. Leave validated test firmware installed unless a particular test or a later user instruction requires another image.
 - Creators Ball V2 has 8 MiB flash (esptool `8MB`), recorded as `flash_bytes: 8388608` in its board manifest. Use its `sdkconfig.ball-8mb.defaults` and `partitions-8mb.csv` for factory/full flashes, and honor the generated flash arguments rather than assuming the XIAO C6's 4 MB layout.
 - The M5Dial's native USB can remain in download mode after a flash/reset. Use esptool's default stub-assisted `run` and verify application readiness over serial. `--no-stub run` did not reliably start this test board. Production S3 builds use `sdkconfig.esp32s3.defaults` to select the native USB console; flash the matching bootloader when changing console configuration.

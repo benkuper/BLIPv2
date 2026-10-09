@@ -1,9 +1,9 @@
 # BLIP schema-driven web shell
 
-This dependency-free browser application builds its entire control surface from
-the device's live OSCQuery tree. It contains no component IDs, OSC paths, or
-component-specific panels. Registry additions therefore appear without web
-source changes.
+This dependency-free browser application builds its component controls from
+the device's live OSCQuery tree. Registry additions appear without web source
+changes. Its update center separately shows installed/published firmware and
+interface versions, download progress, cancellation and independent installs.
 
 Simple mode opens by default with component-declared main controls, switches,
 sliders and real recent-reading graphs/meters. Advanced exposes all published
@@ -48,7 +48,10 @@ npm run build --prefix v2/web
 
 The maintenance panel accepts a raw target-matched ESP-IDF application image,
 derives its project/version metadata and SHA-256 in the browser, and uploads it
-to the A/B OTA endpoint. Factory flashing uses the separate complete images and
+to the A/B OTA endpoint. Hashing also works on device HTTP origins without
+SubtleCrypto; it yields while processing larger images. The device checks the
+embedded board/layout/profile identity before writing an uploaded app.
+Factory flashing uses the separate complete images and
 manifests under [`../installer/`](../installer/README.md).
 
 The packer can also produce and atomically upload a separately versioned bundle
@@ -62,8 +65,11 @@ python v2/tools/web/pack_web_assets.py --source v2/web `
 ## Scope boundary
 
 Work package 3.1 defines the source shell and its registry/OSCQuery contract.
-Work package 3.2 deterministically compresses it, embeds a recovery copy, serves
-the active LittleFS bundle, and accepts verified atomic replacements. Bundle
+Work package 3.2 introduced deterministic compression, filesystem serving,
+and verified atomic replacement. Current
+builds write that bundle directly into the factory filesystem and omit the full
+UI from the application binary. Only the small first-run downloader is compiled
+into firmware; an empty factory filesystem can download the UI online. Bundle
 updates are not cryptographically signed in this package. The current
 HTTP/WebSocket control and asset-update surfaces are unauthenticated and
 intended only for a trusted local network.

@@ -62,6 +62,12 @@ class Component {
         return Status::failure(
             {ErrorDomain::control, ErrorCode::not_found, descriptor().id, "read-parameter", id});
     }
+    // Mutable string owners override this and copy while holding their own
+    // guard. The caller's response storage outlives dispatch/serialization.
+    [[nodiscard]] virtual Status read_parameter_owned(std::string_view id, ScalarValue& value,
+                                                       std::span<char>) noexcept {
+        return read_parameter(id, value);
+    }
     [[nodiscard]] virtual Status write_parameter(std::string_view id, const ScalarValue&) noexcept {
         return Status::failure(
             {ErrorDomain::control, ErrorCode::not_found, descriptor().id, "write-parameter", id});

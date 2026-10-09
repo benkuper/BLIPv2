@@ -60,7 +60,7 @@ namespace {
 
 constexpr char kTag[] = "blip_wifi";
 constexpr std::array<std::string_view, 2> kProvidedServices{"transport.wifi", "network.http"};
-constexpr std::array<std::string_view, 2> kRequiredServices{"storage.settings", "power.cpu"};
+constexpr std::array<std::string_view, 3> kRequiredServices{"storage.settings", "power.cpu", "device.identity"};
 constexpr std::array<std::string_view, 1> kRadioAlternatives{"radio0"};
 constexpr std::array<core::ResourceRequest, 1> kResources{{
     {core::ResourceClass::radio, "wifi", core::OwnershipMode::multiplexed, kRadioAlternatives, 0, 1,
@@ -386,8 +386,8 @@ void saturating_increment(std::atomic<std::uint32_t>& value) noexcept {
 
 const core::ComponentDescriptor EspWifiComponent::descriptor_{wifi_descriptor()};
 
-EspWifiComponent::EspWifiComponent(storage::SettingsStore& settings) noexcept
-    : settings_(&settings) {}
+EspWifiComponent::EspWifiComponent(storage::SettingsStore& settings, storage::DeviceIdentityComponent& identity) noexcept
+    : settings_(&settings), identity_(&identity) {}
 
 const core::ComponentDescriptor& EspWifiComponent::descriptor() const noexcept {
     return descriptor_;
@@ -693,11 +693,26 @@ core::Status EspWifiComponent::start_portal_locked() noexcept {
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr,
     };
+    const httpd_uri_t release_action_uri{
+        .uri = "/api/releases/*", .method = HTTP_POST, .handler = root_handler, .user_ctx = this,
+        .is_websocket = false, .handle_ws_control_frames = false, .supported_subprotocol = nullptr,
+    };
+    const httpd_uri_t file_upload_uri{
+        .uri = "/api/files/*", .method = HTTP_PUT, .handler = root_handler, .user_ctx = this,
+        .is_websocket = false, .handle_ws_control_frames = false, .supported_subprotocol = nullptr,
+    };
+    const httpd_uri_t file_delete_uri{
+        .uri = "/api/files/*", .method = HTTP_DELETE, .handler = root_handler, .user_ctx = this,
+        .is_websocket = false, .handle_ws_control_frames = false, .supported_subprotocol = nullptr,
+    };
     if (httpd_register_uri_handler(portal_, &root) != ESP_OK ||
         httpd_register_uri_handler(portal_, &provision_uri) != ESP_OK ||
         httpd_register_uri_handler(portal_, &web_asset_update_uri) != ESP_OK ||
         httpd_register_uri_handler(portal_, &firmware_update_uri) != ESP_OK ||
-        httpd_register_uri_handler(portal_, &resource_reassignment_uri) != ESP_OK) {
+        httpd_register_uri_handler(portal_, &resource_reassignment_uri) != ESP_OK ||
+        httpd_register_uri_handler(portal_, &release_action_uri) != ESP_OK ||
+        httpd_register_uri_handler(portal_, &file_upload_uri) != ESP_OK ||
+        httpd_register_uri_handler(portal_, &file_delete_uri) != ESP_OK) {
         stop_portal_locked();
         return core::Status::failure(
             wifi_error(core::ErrorCode::start_failed, "start-portal", "handler-register-failed"));
@@ -712,23 +727,13 @@ core::Status EspWifiComponent::start_portal_locked() noexcept {
 core::Status EspWifiComponent::start_discovery_locked() noexcept {
     if (mdns_started_ || portal_ == nullptr || advertised_osc_port_ == 0U)
         return core::Status::success();
-    std::array<std::uint8_t, 6> mac{};
-    std::array<char, 18> hostname{};
-    std::array<char, 21> instance{};
-    if (esp_read_mac(mac.data(), ESP_MAC_WIFI_STA) != ESP_OK)
-        return platform_status(ESP_FAIL, "discovery", "read-mac");
-    std::snprintf(hostname.data(), hostname.size(), "blip-%02x%02x%02x%02x%02x%02x", mac[0], mac[1],
-                  mac[2], mac[3], mac[4], mac[5]);
-    std::snprintf(instance.data(), instance.size(), "BLIP V2 %02X%02X%02X%02X%02X%02X", mac[0],
-                  mac[1], mac[2], mac[3], mac[4], mac[5]);
     auto result = mdns_init();
     if (result != ESP_OK)
         return platform_status(result, "discovery", "mdns-init");
     mdns_started_ = true;
     mdns_txt_item_t txt[]{{"path", "/"}};
-    result = mdns_hostname_set(hostname.data());
-    if (result == ESP_OK)
-        result = mdns_instance_name_set(instance.data());
+    const auto named = update_discovery_name_locked();
+    if (!named) { stop_discovery_locked(); return named; }
     if (result == ESP_OK)
         result = mdns_service_add(nullptr, "_osc", "_udp", advertised_osc_port_, nullptr, 0);
     if (result == ESP_OK)
@@ -737,6 +742,21 @@ core::Status EspWifiComponent::start_discovery_locked() noexcept {
         stop_discovery_locked();
         return platform_status(result, "discovery", "mdns-services");
     }
+    return core::Status::success();
+}
+
+core::Status EspWifiComponent::update_discovery_name_locked() noexcept {
+    std::array<std::uint8_t, 6> mac{};
+    std::array<char, 64> hostname{};
+    const auto name = identity_->snapshot();
+    if (esp_read_mac(mac.data(), ESP_MAC_WIFI_STA) != ESP_OK)
+        return platform_status(ESP_FAIL, "discovery", "read-mac");
+    const auto named = storage::device_hostname(name.name.data(), mac, hostname);
+    if (!named) return named;
+    auto result = mdns_hostname_set(hostname.data());
+    if (result == ESP_OK) result = mdns_instance_name_set(name.name.data());
+    if (result != ESP_OK) return platform_status(result, "discovery", "mdns-name");
+    advertised_identity_revision_ = name.revision;
     ESP_LOGI(kTag, "discovery host=%s.local OSC=%u OSCQuery=80", hostname.data(),
              static_cast<unsigned>(advertised_osc_port_));
     return core::Status::success();
@@ -1339,6 +1359,9 @@ void EspWifiComponent::tick() noexcept {
         const std::uint64_t now_ms = static_cast<std::uint64_t>(esp_timer_get_time()) / 1000U;
         process_transition_locked(state_machine_.tick(now_ms));
         update_signal_locked();
+        if (mdns_started_ && advertised_identity_revision_ != identity_->snapshot().revision) {
+            static_cast<void>(update_discovery_name_locked());
+        }
         unlock();
     }
 }

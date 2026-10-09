@@ -20,6 +20,7 @@ wire protocols, or public OSC paths.
 | --- | --- |
 | [2.1](2.1-versioned-nvs-settings.md) | Versioned per-component NVS records with two-slot interrupted-save recovery |
 | [2.2](2.2-atomic-file-storage.md) | Versioned atomic LittleFS files and an optional two-slot SD service with bounded recovery |
+| [2.2 media extension](2.2-automatic-media-storage.md) | Automatic external/internal bulk files for web assets, scripts, playback and sequences; integration/qualification in progress |
 | [2.3](2.3-settings-migration-v1-import.md) | Ordered V2 schema migrations; prior V1 import evidence retained as historical record |
 | [2.4](2.4-diagnostics-safe-mode.md) | Bounded structured diagnostics, retained coredumps, and physically qualified boot-loop recovery |
 | [2.5](2.5-serial-transport.md) | Versioned common envelope, bounded Serial/USB control, host CLI, and normal/recovery hardware qualification |
@@ -36,8 +37,10 @@ wire protocols, or public OSC paths.
 | [3.4](3.4-native-rmt-strip.md) | Native single-strip RMT vertical slice and qualification boundary |
 | [3.5](3.5-browser-installer.md) | Browser-compatible factory artifacts and on-device firmware update flow |
 | [3.6](3.6-pin-reservation-ui.md) | Complete pin/reservation inspection with conflict-safe reassignment and shared-bus handling |
-| [3.7–3.9](3.7-device-web-and-self-update.md) | Required Simple/Advanced graphical web app and device-specific firmware/web self-updates; implementation pending |
+| [3.7–3.9](3.7-device-web-and-self-update.md) | Required Simple/Advanced graphical web app and device-specific firmware/web self-updates; implementation checkpoints below, full qualification open |
 | [3.7 browser foundation](3.7-simple-advanced-foundation.md) | Simple/Advanced modes, real graphs and automatic script-schema refresh; seven builds and three-family device-served browser trials passed; remaining diagnostic/scalar surfaces and self-updates open |
+| [3.7 device identity](3.7-device-identity.md) | Editable saved names, board type, live name-based mDNS and web identity; six-board identity trials passed, Tab access and full milestone qualification open |
+| [3.8/3.9 native updates and first run](3.8-native-update-and-first-run.md) | Independent website updates, filesystem-only full UI and automatic first run; HUZZAH32 browser/native OTA and mismatch checks passed, seven-board/recovery/coexistence qualification open |
 
 ## Milestone 4
 

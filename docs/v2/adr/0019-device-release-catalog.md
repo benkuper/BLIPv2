@@ -3,6 +3,9 @@
 - Date: 2026-10-08
 - Status: Accepted for the release contract; device worker/installation qualification open
 - Related: work packages 3.8, 3.9 and 8.5
+- Superseded by: [ADR-0020](0020-private-show-network-defaults.md) for mandatory
+  HTTPS/authentication, production signing and live deployment requirements;
+  the catalog, identity, bounds and integrity contracts remain in effect.
 
 The default endpoint is `https://www.goldengeek.org/blip/update`. Devices add
 percent-encoded GET fields: `schema=1`, `project`, `board`, `target`, `layout`,

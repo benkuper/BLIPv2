@@ -13,6 +13,7 @@ constexpr ReleaseIdentity identity{"blip-v2", "creators-ball-v2", "esp32c6", "ot
 std::array<std::byte, kReleaseImagePrefixBytes> image() {
     std::array<std::byte, kReleaseImagePrefixBytes> bytes{};
     bytes[0] = std::byte{0xe9};
+    bytes[12] = std::byte{13};
     const std::uint32_t magic = 0xabcd5432U;
     std::memcpy(bytes.data() + 32, &magic, sizeof(magic));
     std::memcpy(bytes.data() + 48, identity.firmware_version.data(), identity.firmware_version.size());
@@ -29,7 +30,7 @@ ReleaseArtifact artifact() {
 bool compatible_binary_and_all_identity_fields() {
     const auto bytes = image(); const auto release = artifact();
     BLIP_CHECK(validate_firmware_release_prefix(bytes, identity, release));
-    for (std::size_t offset : {0U, 32U, 48U, 80U, 288U, 296U, 300U, 304U, 308U, 312U,
+    for (std::size_t offset : {0U, 12U, 32U, 48U, 80U, 288U, 296U, 300U, 304U, 308U, 312U,
                               316U, 348U, 412U, 428U, 460U}) {
         auto corrupt = bytes; corrupt[offset] ^= std::byte{1};
         BLIP_CHECK(!validate_firmware_release_prefix(corrupt, identity, release));
@@ -49,6 +50,24 @@ bool bounded_prefix_and_canonical_text() {
     BLIP_CHECK(!validate_firmware_release_prefix(bytes, identity, absent));
     auto wrong = identity; wrong.target = "";
     BLIP_CHECK(!validate_firmware_release_prefix(bytes, wrong, release));
+    return true;
+}
+bool manual_upload_requires_embedded_board_identity() {
+    const auto bytes = image();
+    BLIP_CHECK(validate_manual_firmware_prefix(bytes, identity, identity.firmware_version));
+    auto running = identity; running.firmware_code = 100;
+    BLIP_CHECK(validate_manual_firmware_prefix(bytes, running, identity.firmware_version));
+    running.board = "another-c6";
+    BLIP_CHECK(!validate_manual_firmware_prefix(bytes, running, identity.firmware_version));
+    for (std::size_t offset : {12U, 288U, 296U, 304U, 308U, 312U, 316U, 348U, 412U, 428U, 460U}) {
+        auto wrong = bytes; wrong[offset] ^= std::byte{1};
+        BLIP_CHECK(!validate_manual_firmware_prefix(wrong, identity, identity.firmware_version));
+    }
+    auto zero_code = bytes;
+    std::fill_n(zero_code.begin() + kEspAppDescriptorEnd + 12, 4, std::byte{});
+    BLIP_CHECK(!validate_manual_firmware_prefix(zero_code, identity, identity.firmware_version));
+    BLIP_CHECK(!validate_manual_firmware_prefix(std::span{bytes}.first(bytes.size() - 1), identity, identity.firmware_version));
+    BLIP_CHECK(!validate_manual_firmware_prefix(bytes, identity, "wrong-version"));
     return true;
 }
 } // namespace
@@ -71,6 +90,7 @@ int main(int argc, char** argv) {
         return validate_firmware_release_prefix(prefix, expected, candidate) ? 0 : 1;
     }
     const TestCase cases[]{{"embedded binary identity", compatible_binary_and_all_identity_fields},
-                           {"bounded prefix and canonical strings", bounded_prefix_and_canonical_text}};
+                           {"bounded prefix and canonical strings", bounded_prefix_and_canonical_text},
+                           {"manual firmware board identity", manual_upload_requires_embedded_board_identity}};
     return run_tests(cases);
 }

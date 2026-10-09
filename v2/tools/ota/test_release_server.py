@@ -10,7 +10,7 @@ from pathlib import Path
 from urllib.request import urlopen
 from urllib.error import HTTPError
 from urllib.parse import urlencode
-from release_server import ReleaseIndex, unique_object, https_url, handler
+from release_server import ReleaseIndex, unique_object, release_url, handler
 
 IDENTITY = {"project": "blip-v2", "board": "creators-ball-v2", "target": "esp32c6", "layout": "ota-8mb-v1",
             "profile": "minimal", "channel": "stable", "flash_bytes": 8388608, "features": 123, "api": 1}
@@ -49,16 +49,18 @@ class ReleaseServerTests(unittest.TestCase):
         release = {**IDENTITY, "firmware": ARTIFACT, "web": None}
         with self.assertRaises(ValueError):
             ReleaseIndex({"schema": 1, "releases": [release, release]})
-        for change in ({"bytes": 0}, {"code": True}, {"sha256": "x" * 64}, {"url": "http://example/app"}, {"extra": 1}):
+        for change in ({"bytes": 0}, {"code": True}, {"sha256": "x" * 64}, {"url": "ftp://example/app"}, {"extra": 1}):
             with self.assertRaises(ValueError):
                 self.index(firmware={**ARTIFACT, **change})
 
-    def test_https_policy_matches_device(self):
-        for url in ("http://example/app", "https://user:pass@example/app", "https://example/app#fragment",
+    def test_transport_policy_matches_device(self):
+        for url in ("ftp://example/app", "https://user:pass@example/app", "https://example/app#fragment",
                     "https:///app", "https://example:0/app", "https://example:99999/app", "https://example/ bad", "https://example/%zz"):
             with self.assertRaises(ValueError):
-                https_url(url)
-        self.assertEqual(https_url("https://127.0.0.1:8443/artifact%20one.bin"), "https://127.0.0.1:8443/artifact%20one.bin")
+                release_url(url)
+        self.assertEqual(release_url("https://127.0.0.1:8443/artifact%20one.bin"), "https://127.0.0.1:8443/artifact%20one.bin")
+        self.assertEqual(release_url("http://127.0.0.1:8088/artifact.bin"), "http://127.0.0.1:8088/artifact.bin")
+        self.index(firmware={**ARTIFACT, "url": "http://example/app"})
 
     def test_handler_files_errors_and_cpp_contract(self):
         with tempfile.TemporaryDirectory() as directory:

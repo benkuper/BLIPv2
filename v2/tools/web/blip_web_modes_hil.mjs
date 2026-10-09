@@ -30,12 +30,18 @@ page.on("response", response => { if (response.status() >= 400) requests.push({ 
 const check = (name, condition) => { report.checks.push({ name, passed: Boolean(condition) }); assert.ok(condition, name); };
 const tree = async () => (await page.request.get(`${options.device}/?config=1`)).json();
 let loaded = false;
+let originalName = null;
+async function renameDevice(name) {
+  await page.locator("#device-name-input").fill(name);
+  await page.locator("#device-name-form button").click();
+  await page.waitForFunction(expected => document.querySelector("#device-name").textContent === expected, name);
+}
 function moduleOperation(operation) {
   const code = `import sys; sys.path.insert(0,'v2/tools/control'); from blip_script_controls_hil import fixture; from blip_wasm_hil import Client; c=Client(${JSON.stringify(options.port)}); r=c.upload(fixture()) if '${operation}'=='load' else c.work('unload'); c.connection.close(); assert r['error']=='none',r`;
   execFileSync(options.python, ["-c", code], { timeout: 30000 });
 }
 try {
-  const bundle = await readFile("v2/components/blip_storage/factory_web.bundle");
+  const bundle = await readFile(options.bundle ?? "v2/components/blip_storage/factory_web.bundle");
   const assets = await (await page.request.get(`${options.device}/api/web-assets`)).json();
   report.web_assets = assets;
   check("installed-web-bundle", assets.bundle_version === bundle.readUInt32LE(8) && assets.bytes === bundle.length &&
@@ -43,6 +49,15 @@ try {
   await page.goto(pageUrl, { waitUntil: "networkidle", timeout: 30000 });
   await page.locator("#connection-status").filter({ hasText: /^Live$/ }).waitFor();
   const model = buildControlModel(await tree());
+  const host = await (await page.request.get(`${options.device}/?HOST_INFO`)).json();
+  originalName = host.NAME;
+  check("device-name-and-type-visible", await page.locator("#device-name").innerText() === host.NAME &&
+    (await page.locator("#device-meta").innerText()).includes(host.DEVICE_TYPE));
+  check("name-editor-in-simple-mode", await page.locator("#device-name-form").isVisible());
+  await renameDevice("Browser Stage " + host.DEVICE_ID.replaceAll(":", "").slice(-4));
+  check("browser-renames-saved-identity", (await (await page.request.get(`${options.device}/?HOST_INFO`)).json()).NAME ===
+    await page.locator("#device-name-input").inputValue());
+  await renameDevice(originalName);
   report.component_count = model.components.length; report.control_count = model.index.size;
   check("simple-default", await page.locator("#simple-mode").getAttribute("aria-pressed") === "true");
   check("declared-primary-coverage", await page.locator(".control-row").count() === presentationModel(model, "simple").index.size);
@@ -50,6 +65,7 @@ try {
   check("actual-polled-graph", true);
   await page.screenshot({ path: `${options.report}.simple.png`, fullPage: true });
   await page.locator("#advanced-mode").click();
+  check("name-editor-in-advanced-mode", await page.locator("#device-name-form").isVisible());
   check("advanced-all-controls", await page.locator(".control-row").count() === model.index.size);
   await page.locator("#advanced-mode").focus();
   await page.keyboard.press("Tab");
@@ -92,6 +108,19 @@ try {
   throw error;
 }
 finally {
+  if (originalName !== null) {
+    try { await renameDevice(originalName); }
+    catch (error) {
+      report.passed = false; report.identity_restore_error = error.message;
+      if (options.port && options.python) {
+        try {
+          const code = `import sys; sys.path.insert(0,'v2/tools/control'); from blip_wasm_hil import Client; c=Client(${JSON.stringify(options.port)}); c.request('set','blip.device.identity','name',${JSON.stringify(originalName)}); assert c.get('name','blip.device.identity')==${JSON.stringify(originalName)}; c.connection.close()`;
+          execFileSync(options.python, ["-c", code], { timeout: 15000 });
+          report.identity_restored_over_serial = true;
+        } catch (restoreError) { report.serial_restore_error = restoreError.message; }
+      }
+    }
+  }
   if (loaded) moduleOperation("unload");
   await mkdir(dirname(resolve(options.report)), { recursive: true });
   await writeFile(options.report, JSON.stringify(report, null, 2) + "\n");

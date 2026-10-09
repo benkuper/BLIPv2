@@ -696,6 +696,10 @@ class TreeWriter {
 
 } // namespace
 
+bool write_json_string(std::string_view text, TextSink& sink) noexcept {
+    return Writer(sink).quoted(text);
+}
+
 core::Status write_oscquery_host_info(const DeviceIdentity& identity, TextSink& sink) noexcept {
     Writer writer{sink};
     if (!writer.append("{\"EXTENSIONS\":{\"ACCESS\":true,\"CLIPMODE\":false,"

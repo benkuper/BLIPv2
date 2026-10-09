@@ -1,6 +1,7 @@
 #include "blip/core/descriptor_json.hpp"
 #include "blip/core/fixed_vector.hpp"
 #include "blip/core/registry.hpp"
+#include "blip/core/control.hpp"
 #include "test_harness.hpp"
 
 #include <array>
@@ -137,6 +138,42 @@ bool ordering_and_stable_ties() {
     BLIP_CHECK(log[3].component == "test.a" && log[3].operation == "start");
     BLIP_CHECK(log[4].component == "test.z" && log[4].operation == "start");
     BLIP_CHECK(log[5].component == "test.b" && log[5].operation == "start");
+    return true;
+}
+
+bool static_control_reads_copy_under_owner_guard() {
+    class OwnedReader final : public Component {
+      public:
+        explicit OwnedReader(const ComponentDescriptor& descriptor) : descriptor_(&descriptor) {}
+        const ComponentDescriptor& descriptor() const noexcept override { return *descriptor_; }
+        Status start(const StartContext&) noexcept override { return Status::success(); }
+        Status stop() noexcept override { return Status::success(); }
+        Status read_parameter_owned(std::string_view, ScalarValue& value, std::span<char> storage) noexcept override {
+            if (storage.size() < text.size()) return component_error(descriptor_->id, ErrorCode::capacity_exceeded, "read");
+            std::copy(text.begin(), text.end(), storage.begin());
+            value = ScalarValue::from_string({storage.data(), text.size()});
+            text.fill('x'); // Owner may mutate immediately after releasing its guard.
+            return Status::success();
+        }
+        std::array<char, 5> text{'r', 'e', 'a', 'd', 'y'};
+      private:
+        const ComponentDescriptor* descriptor_;
+    };
+    constexpr std::array<ParameterDescriptor, 1> parameters{{{"status", "Status", ValueType::string,
+        blip::core::Access::read_only, false, ScalarValue::from_string(""), {}, ""}}};
+    auto schema = descriptor("test.owned-read"); schema.parameters = parameters;
+    OwnedReader component(schema);
+    Registry<1> registry;
+    BLIP_CHECK(registry.add(component) && registry.validate() && registry.start_all().ok());
+    blip::core::RegistryControlService<1> controls(registry);
+    BLIP_CHECK(controls.start({}));
+    blip::core::ControlResponse response;
+    BLIP_CHECK(controls.execute({blip::core::ControlOperation::read_parameter, schema.id, "status", {}}, response));
+    BLIP_CHECK(response.value_count == 1 && response.values[0].string == "ready" && response.owns(response.values[0].string));
+    const auto copied = response;
+    BLIP_CHECK(controls.execute({blip::core::ControlOperation::read_parameter, schema.id, "status", {}}, response));
+    BLIP_CHECK(response.values[0].string == "xxxxx" && copied.values[0].string == "ready" && copied.owns(copied.values[0].string));
+    BLIP_CHECK(registry.stop_all());
     return true;
 }
 
@@ -434,6 +471,7 @@ bool complete_descriptor_json() {
 int main() {
     const TestCase tests[]{
         {"registry ordering and stable ties", ordering_and_stable_ties},
+        {"static read strings copied while owner holds its guard", static_control_reads_copy_under_owner_guard},
         {"registry duplicate and capacity", duplicate_and_capacity},
         {"missing dependency without callbacks", missing_dependency_has_no_callbacks},
         {"dependency cycle", dependency_cycle},

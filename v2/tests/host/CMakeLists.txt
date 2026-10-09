@@ -38,6 +38,7 @@ add_test(NAME blip_diagnostics_tests COMMAND blip_diagnostics_tests)
 add_library(blip_ota_host STATIC
     ../../components/blip_ota/src/update_service.cpp
     ../../components/blip_ota/src/release_catalog.cpp
+    ../../components/blip_ota/src/release_policy.cpp
 )
 target_include_directories(blip_ota_host PUBLIC ../../components/blip_ota/include)
 target_link_libraries(blip_ota_host PUBLIC blip_core_host)
@@ -198,7 +199,11 @@ endif()
 add_test(NAME blip_scheduler_tests COMMAND blip_scheduler_tests)
 
 add_library(blip_storage_host STATIC
+    ../../components/blip_storage/src/device_identity_component.cpp
     ../../components/blip_storage/src/atomic_file_store.cpp
+    ../../components/blip_storage/src/automatic_file_store.cpp
+    ../../components/blip_storage/src/automatic_web_backend.cpp
+    ../../components/blip_storage/src/sd_spi_card.cpp
     ../../components/blip_storage/src/imported_settings.cpp
     ../../components/blip_storage/src/legacy_import_coordinator.cpp
     ../../components/blip_storage/src/legacy_settings_importer.cpp
@@ -212,6 +217,15 @@ target_link_libraries(blip_storage_host PUBLIC blip_core_host Threads::Threads)
 target_compile_features(blip_storage_host PUBLIC cxx_std_20)
 
 add_executable(blip_storage_tests blip_storage_tests.cpp)
+add_executable(blip_device_identity_tests blip_device_identity_tests.cpp)
+target_link_libraries(blip_device_identity_tests PRIVATE blip_storage_host)
+target_include_directories(blip_device_identity_tests PRIVATE ../../components/blip_resources/include)
+if(MSVC)
+    target_compile_options(blip_device_identity_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_device_identity_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_device_identity_tests COMMAND blip_device_identity_tests)
 target_link_libraries(blip_storage_tests PRIVATE blip_storage_host)
 if(MSVC)
     target_compile_options(blip_storage_host PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
@@ -230,6 +244,26 @@ else()
     target_compile_options(blip_file_storage_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
 endif()
 add_test(NAME blip_file_storage_tests COMMAND blip_file_storage_tests)
+
+add_executable(blip_automatic_storage_tests blip_automatic_storage_tests.cpp)
+target_link_libraries(blip_automatic_storage_tests PRIVATE blip_storage_host)
+target_compile_definitions(blip_automatic_storage_tests PRIVATE
+    BLIP_FACTORY_WEB_BUNDLE="${CMAKE_CURRENT_SOURCE_DIR}/../../components/blip_storage/factory_web.bundle")
+if(MSVC)
+    target_compile_options(blip_automatic_storage_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_automatic_storage_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_automatic_storage_tests COMMAND blip_automatic_storage_tests)
+
+add_executable(blip_sd_spi_tests blip_sd_spi_tests.cpp)
+target_link_libraries(blip_sd_spi_tests PRIVATE blip_storage_host)
+if(MSVC)
+    target_compile_options(blip_sd_spi_tests PRIVATE /W4 /WX /GR- /D_HAS_EXCEPTIONS=0)
+else()
+    target_compile_options(blip_sd_spi_tests PRIVATE -Wall -Wextra -Werror -fno-exceptions -fno-rtti)
+endif()
+add_test(NAME blip_sd_spi_tests COMMAND blip_sd_spi_tests)
 
 add_executable(blip_web_asset_tests blip_web_asset_tests.cpp)
 target_link_libraries(blip_web_asset_tests PRIVATE blip_storage_host)

@@ -36,4 +36,8 @@ static_assert(offsetof(FirmwareReleaseDescriptor, profile) == 172);
 }
 [[nodiscard]] core::Status validate_firmware_release_prefix(std::span<const std::byte> prefix,
     const ReleaseIdentity& identity, const ReleaseArtifact& artifact) noexcept;
+// Local uploads may reinstall an existing release; board/layout/profile identity
+// remains mandatory even when no website catalog supplies its release code.
+[[nodiscard]] core::Status validate_manual_firmware_prefix(std::span<const std::byte> prefix,
+    const ReleaseIdentity& identity, std::string_view version) noexcept;
 } // namespace blip::ota

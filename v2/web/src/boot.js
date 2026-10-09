@@ -1,7 +1,7 @@
 // The device has four HTTP sessions. Load the module graph in dependency order
 // so a browser's six parallel module requests cannot evict an active response.
 try {
-  for (const module of ["osc", "model", "resources", "firmware", "client", "view", "app"])
+  for (const module of ["osc", "model", "resources", "firmware", "client", "view", "updates", "app"])
     await import(`./${module}.js`);
 } catch {
   const notice = document.querySelector("#notice");

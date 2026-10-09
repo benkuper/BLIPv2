@@ -49,7 +49,9 @@ class ReleasePublishTests(unittest.TestCase):
         identity, code, version = firmware_metadata(self.image)
         self.assertEqual((identity["board"], identity["flash_bytes"], identity["features"], code, version),
                          ("creators-ball-v2", 8388608, 123, 2, "0.1.0"))
-        self.assertEqual(web_metadata(self.web), (2000, "0.2.0"))
+        web_version = json.loads((ROOT / "v2/web/package.json").read_text(encoding="utf8"))["version"]
+        major, minor, patch = map(int, web_version.split("."))
+        self.assertEqual(web_metadata(self.web), (major * 1000000 + minor * 1000 + patch, web_version))
         for offset in (0, 12, 32, 80, 288, 296, 312, 428):
             with self.subTest(offset=offset):
                 data = firmware(); data[offset] ^= 1

@@ -1,4 +1,5 @@
 #include "blip/ota/release_catalog.hpp"
+#include "blip/ota/release_policy.hpp"
 #include "test_harness.hpp"
 #include <string>
 #include <iostream>
@@ -50,11 +51,12 @@ bool malformed_input_and_urls_fail_closed() {
     auto corrupt = valid; corrupt.replace(corrupt.find("012345"), 6, "xxxxxx");
     BLIP_CHECK(!decode_release_catalog(corrupt, catalog));
     BLIP_CHECK(!decode_release_catalog(std::string(4097, ' '), catalog));
-    for (const auto url : {"http://example/app", "https://user:pass@example/app", "https://example/app#fragment",
+    for (const auto url : {"ftp://example/app", "https://user:pass@example/app", "https://example/app#fragment",
          "https:///app", "https://example:0/app", "https://example:99999/app", "https://example/ bad", "https://example/%zz"})
-        BLIP_CHECK(!valid_release_https_url(url));
-    BLIP_CHECK(valid_release_https_url("https://www.goldengeek.org/blip/update?schema=1"));
-    BLIP_CHECK(valid_release_https_url("https://127.0.0.1:8443/artifact%20one.bin"));
+        BLIP_CHECK(!valid_release_url(url));
+    BLIP_CHECK(valid_release_url("https://www.goldengeek.org/blip/update?schema=1"));
+    BLIP_CHECK(valid_release_url("https://127.0.0.1:8443/artifact%20one.bin"));
+    BLIP_CHECK(valid_release_url("http://127.0.0.1:8088/artifact.bin"));
     return true;
 }
 bool independent_artifacts_and_public_query() {
@@ -68,7 +70,7 @@ bool independent_artifacts_and_public_query() {
     std::array<char, 1024> query{}; std::size_t count = 999;
     BLIP_CHECK(build_release_query(kDefaultReleaseEndpoint, identity, query, count));
     const std::string_view url{query.data(), count};
-    BLIP_CHECK(url.starts_with("https://www.goldengeek.org/blip/update?schema=1&project=blip-v2"));
+    BLIP_CHECK(url.starts_with("http://www.goldengeek.org/blip/update?schema=1&project=blip-v2"));
     BLIP_CHECK(url.find("&board=creators-ball-v2") != url.npos && url.find("&fw_code=1") != url.npos && url.find("&web_code=2000") != url.npos);
     BLIP_CHECK(url.find("password") == url.npos && url.find("ssid") == url.npos && url.find("mac") == url.npos);
     BLIP_CHECK(!build_release_query(kDefaultReleaseEndpoint, identity, std::span<char>{query}.first(20), count) && count == 0);
@@ -81,6 +83,30 @@ bool independent_artifacts_and_public_query() {
     BLIP_CHECK(!build_release_query(kDefaultReleaseEndpoint, escaped, query, count) && count == 0);
     const std::string oversized(32, 'x'); escaped = identity; escaped.project = oversized;
     BLIP_CHECK(!build_release_query(kDefaultReleaseEndpoint, escaped, query, count) && count == 0);
+    return true;
+}
+bool persisted_release_policy_is_bounded_and_canonical() {
+    auto policy = default_release_policy();
+    BLIP_CHECK(policy.endpoint.view() == kDefaultReleaseEndpoint && policy.channel.view() == "stable");
+    std::array<std::byte, kReleasePolicyBytes> bytes{};
+    BLIP_CHECK(encode_release_policy(policy, bytes));
+    ReleasePolicy decoded;
+    BLIP_CHECK(decode_release_policy(bytes, decoded) && decoded.interval_hours == 24 && !decoded.automatic_firmware);
+    BLIP_CHECK(policy.endpoint.assign("https://192.168.27.176:8443/blip/update") && policy.channel.assign("beta"));
+    policy.interval_hours = 168; policy.automatic_web = true;
+    BLIP_CHECK(encode_release_policy(policy, bytes) && decode_release_policy(bytes, decoded));
+    BLIP_CHECK(decoded.endpoint.view() == policy.endpoint.view() && decoded.channel.view() == "beta" && decoded.automatic_web);
+    for (const auto index : {0U, 6U, 11U, 331U, 347U}) {
+        auto corrupt = bytes; corrupt[index] = std::byte{1};
+        BLIP_CHECK(!decode_release_policy(corrupt, decoded) && decoded.endpoint.view().empty());
+    }
+    auto corrupt = bytes; corrupt[5] = std::byte{4}; BLIP_CHECK(!decode_release_policy(corrupt, decoded));
+    corrupt = bytes; corrupt[4] = std::byte{169}; BLIP_CHECK(!decode_release_policy(corrupt, decoded));
+    std::fill(corrupt.begin() + 332, corrupt.end(), std::byte{'x'}); BLIP_CHECK(!decode_release_policy(corrupt, decoded));
+    BLIP_CHECK(!decode_release_policy(std::span<const std::byte>(bytes).first(347), decoded));
+    BLIP_CHECK(policy.endpoint.assign("ftp://example.org")); BLIP_CHECK(!encode_release_policy(policy, bytes));
+    policy = default_release_policy(); policy.interval_hours = 169; BLIP_CHECK(!encode_release_policy(policy, bytes));
+    policy = default_release_policy(); BLIP_CHECK(policy.channel.assign("bad channel")); BLIP_CHECK(!encode_release_policy(policy, bytes));
     return true;
 }
 } // namespace
@@ -96,6 +122,7 @@ int main(int argc, char** argv) {
         {"owned catalog and exact compatibility", owned_decode_and_compatibility},
         {"strict catalog parsing and HTTPS URLs", malformed_input_and_urls_fail_closed},
         {"independent artifacts and public GET metadata", independent_artifacts_and_public_query},
+        {"bounded persistent release policy", persisted_release_policy_is_bounded_and_canonical},
     };
     return run_tests(cases);
 }

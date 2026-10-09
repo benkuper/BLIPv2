@@ -48,15 +48,13 @@ export class DeviceClient {
     const treeUrl = new URL(this.root);
     treeUrl.search = includeConfig ? "config=1" : "config=0";
     const resourceUrl = new URL("/api/resources", this.root);
-    const [hostResponse, treeResponse, resourceResponse] = await Promise.all([
-      this.fetchImpl(hostUrl, { cache: "no-store" }),
-      this.fetchImpl(treeUrl, { cache: "no-store" }),
-      this.fetchImpl(resourceUrl, { cache: "no-store" }),
-    ]);
+    // Consume each response before opening the next. Small boards share their
+    // TCP buffers with BLE, storage and the update downloader.
+    const host = await boundedJson(await this.fetchImpl(hostUrl, { cache: "no-store" }), MAX_HOST_INFO_BYTES);
+    const tree = await boundedJson(await this.fetchImpl(treeUrl, { cache: "no-store" }), MAX_TREE_BYTES);
+    const resources = await boundedJson(await this.fetchImpl(resourceUrl, { cache: "no-store" }), MAX_RESOURCE_BYTES);
     return {
-      host: await boundedJson(hostResponse, MAX_HOST_INFO_BYTES),
-      tree: await boundedJson(treeResponse, MAX_TREE_BYTES),
-      resources: await boundedJson(resourceResponse, MAX_RESOURCE_BYTES),
+      host, tree, resources,
     };
   }
 
@@ -79,6 +77,16 @@ export class DeviceClient {
   async loadTree() {
     const url = new URL(this.root); url.search = "config=1";
     return boundedJson(await this.fetchImpl(url, { cache: "no-store" }), MAX_TREE_BYTES);
+  }
+
+  async loadReleases() {
+    return boundedJson(await this.fetchImpl(new URL("/api/releases", this.root), { cache: "no-store" }), 4096);
+  }
+
+  async release(action) {
+    if (!["check", "firmware", "web", "cancel"].includes(action)) throw new TypeError("Unknown update action");
+    const response = await this.fetchImpl(new URL(`/api/releases/${action}`, this.root), { method: "POST", cache: "no-store" });
+    if (response.status !== 202) throw new Error(`Update request failed (HTTP ${response.status}): ${(await response.text()).slice(0, 256)}`);
   }
 
   open({ onMessage, onState, onError } = {}) {

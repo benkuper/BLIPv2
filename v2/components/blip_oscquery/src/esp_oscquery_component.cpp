@@ -1,9 +1,11 @@
 #include "blip/oscquery/esp_oscquery_component.hpp"
+#include "blip/ota/release_image.hpp"
 
 #include "blip/oscquery/oscquery.hpp"
 #include "esp_log.h"
 #include "esp_mac.h"
 #include "esp_system.h"
+#include "esp_timer.h"
 #include "lwip/inet.h"
 #include "lwip/sockets.h"
 
@@ -18,9 +20,23 @@ namespace blip::oscquery {
 namespace {
 
 constexpr char kTag[] = "blip_oscquery";
+class ManualTransferScope {
+  public:
+    explicit ManualTransferScope(ota::EspReleaseComponent& releases) noexcept
+        : releases_(&releases), status_(releases.begin_manual_transfer()) {}
+    ManualTransferScope(const ManualTransferScope&) = delete;
+    ManualTransferScope& operator=(const ManualTransferScope&) = delete;
+    ~ManualTransferScope() { if (status_) releases_->end_manual_transfer(); }
+    [[nodiscard]] const core::Status& status() const noexcept { return status_; }
+  private:
+    ota::EspReleaseComponent* releases_;
+    core::Status status_;
+};
 constexpr std::array<std::string_view, 2> kProvidedServices{"transport.osc", "discovery.oscquery"};
-constexpr std::array<std::string_view, 4> kRequiredServices{"control.dispatch", "network.http",
-                                                            "storage.web_assets", "firmware.ota"};
+constexpr std::array<std::string_view, 5> kRequiredServices{"control.dispatch", "network.http",
+                                                            "storage.web_assets", "firmware.ota", "firmware.release-check"};
+extern const char kFirstRunStart[] asm("_binary_first_run_html_start");
+extern const char kFirstRunEnd[] asm("_binary_first_run_html_end");
 constexpr std::array<core::MetadataEntry, 5> kMetadata{{
     {"ui_topic", "Connectivity"},
     {"legacy_path", "/comm/osc"},
@@ -307,13 +323,15 @@ EspOscQueryComponent::EspOscQueryComponent(const core::RegistryView& registry,
                                            core::ControlService& controls,
                                            network::EspWifiComponent& wifi,
                                            storage::WebAssetStore& web_assets,
+                                           storage::AutomaticFileStore& files,
                                            ota::UpdateService& updates,
+                                           ota::EspReleaseComponent& releases,
                                            resources::DeviceBroker& resources,
                                            resources::BoardManifest board) noexcept
-    : registry_(&registry), controls_(&controls), wifi_(&wifi), web_assets_(&web_assets),
-      updates_(&updates), resources_(&resources), board_(board),
+    : registry_(&registry), controls_(&controls), wifi_(&wifi), web_assets_(&web_assets), files_(&files),
+      updates_(&updates), releases_(&releases), resources_(&resources), board_(board),
       identity_{
-          {device_id_.data(), device_id_.size() - 1U}, "BLIP V2", "BLIP V2", "0.1.0", kOscPort},
+          {device_id_.data(), device_id_.size() - 1U}, wifi.device_type(), wifi.device_type(), "0.1.0", kOscPort},
       udp_endpoint_(registry, controls, identity_),
       websocket_endpoint_(registry, controls, identity_) {}
 
@@ -455,6 +473,9 @@ void EspOscQueryComponent::handle_udp_packet(std::span<const std::byte> packet, 
     }
     OscMessage response{};
     bool reply{};
+    const auto name = wifi_->device_name();
+    auto identity = identity_; identity.name = name.name.data();
+    udp_endpoint_.set_identity(identity);
     const auto status = udp_endpoint_.handle(decoded.value(), local_ip(), true, response, reply);
     if (!status) {
         saturating_increment(rejected_packets_);
@@ -498,6 +519,15 @@ esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
     const std::size_t query_separator = request_uri.find('?');
     const std::string_view path = request_uri.substr(0U, query_separator);
     const std::string_view query_text{query.data(), query_size};
+    if (path == "/api/releases" && query_text.empty()) return handle_release_status(request);
+    if (path.starts_with("/api/files/") && query_text.empty()) return handle_file(request);
+    if ((path == "/firstrun" || path == "/firstrun/") ||
+        (path == "/" && query_text.empty() && request_accepts_html(request) && !web_assets_->active())) {
+        httpd_resp_set_type(request, "text/html; charset=utf-8");
+        httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+        httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
+        return httpd_resp_send(request, kFirstRunStart, kFirstRunEnd - kFirstRunStart);
+    }
     switch (route_http_get(path, !query_text.empty(), request_accepts_html(request))) {
     case HttpGetSurface::web_asset:
         return handle_asset_get(request, path);
@@ -518,7 +548,9 @@ esp_err_t EspOscQueryComponent::handle_http_get(httpd_req_t* request) noexcept {
     HttpChunkSink sink{request};
     core::Status status = core::Status::success();
     if (query_text == "HOST_INFO") {
-        status = write_oscquery_host_info(identity_, sink);
+        const auto name = wifi_->device_name();
+        auto identity = identity_; identity.name = name.name.data();
+        status = write_oscquery_host_info(identity, sink);
     } else if (query_text.empty() || query_text == "config=1" || query_text == "config=0") {
         status = write_oscquery_tree(*registry_, *controls_, query_text != "config=0", sink);
     } else {
@@ -534,6 +566,45 @@ esp_err_t EspOscQueryComponent::handle_resource_status(httpd_req_t* request) noe
     HttpChunkSink sink{request};
     const auto status = resources::write_resource_snapshot(*resources_, board_, sink);
     return status ? sink.finish() : ESP_FAIL;
+}
+
+esp_err_t EspOscQueryComponent::handle_release_status(httpd_req_t* request) noexcept {
+    const auto progress = releases_->progress();
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    HttpChunkSink sink{request};
+    std::array<char, 384> numbers{};
+    const auto count = std::snprintf(numbers.data(), numbers.size(),
+        "{\"busy\":%s,\"firmware_available\":%s,\"web_available\":%s,\"web_ready\":%s,"
+        "\"received\":%lu,\"expected\":%lu,\"installed_firmware\":%lu,\"installed_web\":%lu,\"http_status\":%d,\"state\":",
+        progress.busy ? "true" : "false", progress.firmware_available ? "true" : "false",
+        progress.web_available ? "true" : "false", web_assets_->active() ? "true" : "false",
+        static_cast<unsigned long>(progress.received), static_cast<unsigned long>(progress.expected),
+        static_cast<unsigned long>(progress.installed_firmware), static_cast<unsigned long>(progress.installed_web), progress.http_status);
+    if (count <= 0 || static_cast<std::size_t>(count) >= numbers.size() ||
+        !sink.write({numbers.data(), static_cast<std::size_t>(count)}) ||
+        !write_json_string(progress.state, sink) || !sink.write(",\"error\":") || !write_json_string(progress.error, sink) ||
+        !sink.write(",\"firmware_candidate\":") || !write_json_string(progress.firmware_candidate.view(), sink) ||
+        !sink.write(",\"firmware_version\":") || !write_json_string(progress.firmware_version, sink) ||
+        !sink.write(",\"web_candidate\":") || !write_json_string(progress.web_candidate.view(), sink) || !sink.write("}")) return ESP_FAIL;
+    return sink.finish();
+}
+esp_err_t EspOscQueryComponent::handle_release_action(httpd_req_t* request) noexcept {
+    if (request->content_len) return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "action has no body");
+    const std::string_view path(request->uri);
+    auto status = core::Status::success();
+    if (path == "/api/releases/check") status = releases_->request(ota::ReleaseOperation::check);
+    else if (path == "/api/releases/firmware") status = releases_->request(ota::ReleaseOperation::firmware);
+    else if (path == "/api/releases/web") status = releases_->request(ota::ReleaseOperation::web);
+    else if (path == "/api/releases/first-run") status = releases_->request(ota::ReleaseOperation::first_run);
+    else if (path == "/api/releases/cancel") {
+        std::size_t count{};
+        status = releases_->invoke_action("cancel", {}, {}, count);
+    } else return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "unknown release action");
+    if (!status) return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, status.error().detail.data());
+    httpd_resp_set_status(request, "202 Accepted");
+    httpd_resp_set_type(request, "application/json");
+    return httpd_resp_send(request, "{\"accepted\":true}", HTTPD_RESP_USE_STRLEN);
 }
 
 esp_err_t EspOscQueryComponent::handle_resource_reassignment(httpd_req_t* request) noexcept {
@@ -631,6 +702,9 @@ esp_err_t EspOscQueryComponent::handle_update_status(httpd_req_t* request) noexc
 }
 
 esp_err_t EspOscQueryComponent::handle_firmware_upload(httpd_req_t* request) noexcept {
+    ManualTransferScope transfer(*releases_);
+    if (!transfer.status()) return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "device update active");
+    std::lock_guard guard(updates_->mutex());
     std::array<char, 65> sha_text{};
     std::array<char, 32> project_text{};
     std::array<char, 32> version_text{};
@@ -654,11 +728,33 @@ esp_err_t EspOscQueryComponent::handle_firmware_upload(httpd_req_t* request) noe
     }
     const ota::UpdateManifest manifest{
         request->content_len, digest.value(), project, version, target, profile};
+    if (manifest.image_size < ota::kReleaseImagePrefixBytes ||
+        project != releases_->identity().project || target != releases_->identity().target ||
+        profile != releases_->identity().profile) {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "image identity rejected");
+    }
+    // Inspect the bounded prefix before opening/erasing the inactive app slot.
+    static_assert(ota::kReleaseImagePrefixBytes <= std::tuple_size_v<decltype(http_asset_buffer_)>);
+    std::size_t prefix_received{}, prefix_timeouts{};
+    while (prefix_received < ota::kReleaseImagePrefixBytes) {
+        const int received = httpd_req_recv(request,
+            reinterpret_cast<char*>(http_asset_buffer_.data()) + prefix_received,
+            ota::kReleaseImagePrefixBytes - prefix_received);
+        if (received == HTTPD_SOCK_ERR_TIMEOUT && prefix_timeouts++ < 8U) continue;
+        if (received <= 0) return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "incomplete image prefix");
+        prefix_timeouts = 0; prefix_received += static_cast<std::size_t>(received);
+    }
+    if (!ota::validate_manual_firmware_prefix(
+            std::span<const std::byte>(http_asset_buffer_).first(prefix_received), releases_->identity(), version)) {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "image board or layout rejected");
+    }
     auto status = updates_->begin(manifest);
     if (!status) {
         return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "update rejected");
     }
-    std::size_t received_total{};
+    status = updates_->append(std::span<const std::byte>(http_asset_buffer_).first(prefix_received));
+    if (!status) return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "flash prefix write failed");
+    std::size_t received_total{prefix_received};
     std::size_t timeouts{};
     while (received_total < manifest.image_size) {
         const std::size_t requested =
@@ -703,6 +799,7 @@ esp_err_t EspOscQueryComponent::handle_firmware_upload(httpd_req_t* request) noe
 
 esp_err_t EspOscQueryComponent::handle_asset_get(httpd_req_t* request,
                                                  std::string_view path) noexcept {
+    std::lock_guard guard(web_assets_->mutex());
     const auto* asset = web_assets_->find(path);
     if (asset == nullptr) {
         return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "asset not found");
@@ -743,6 +840,7 @@ esp_err_t EspOscQueryComponent::handle_asset_get(httpd_req_t* request,
 }
 
 esp_err_t EspOscQueryComponent::handle_asset_status(httpd_req_t* request) noexcept {
+    std::lock_guard guard(web_assets_->mutex());
     if (!web_assets_->active()) {
         return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "assets unavailable");
     }
@@ -765,6 +863,9 @@ esp_err_t EspOscQueryComponent::handle_asset_status(httpd_req_t* request) noexce
 }
 
 esp_err_t EspOscQueryComponent::handle_asset_upload(httpd_req_t* request) noexcept {
+    ManualTransferScope transfer(*releases_);
+    if (!transfer.status()) return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "device update active");
+    std::lock_guard guard(web_assets_->mutex());
     const std::size_t expected = request->content_len;
     auto status = web_assets_->begin_install(expected);
     if (!status) {
@@ -836,6 +937,9 @@ esp_err_t EspOscQueryComponent::handle_websocket(httpd_req_t* request) noexcept 
         decode_osc_message({websocket_packet_.data(), static_cast<std::size_t>(frame.len)});
     OscMessage response{};
     bool should_reply{};
+    const auto name = wifi_->device_name();
+    auto identity = identity_; identity.name = name.name.data();
+    websocket_endpoint_.set_identity(identity);
     if (!decoded ||
         !websocket_endpoint_.handle(decoded.value(), local_ip(), false, response, should_reply)) {
         saturating_increment(rejected_packets_);
@@ -867,6 +971,67 @@ esp_err_t EspOscQueryComponent::handle_websocket(httpd_req_t* request) noexcept 
     return httpd_ws_send_frame(request, &reply);
 }
 
+esp_err_t EspOscQueryComponent::handle_file(httpd_req_t* request) noexcept {
+    constexpr std::string_view prefix{"/api/files/"};
+    const std::string_view uri{request->uri};
+    const auto path = uri.substr(prefix.size());
+    if (uri.find('?') != uri.npos ||
+        !(path.starts_with("scripts/") || path.starts_with("playback/") || path.starts_with("sequences/")))
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "invalid file namespace");
+    ManualTransferScope transfer(*releases_);
+    if (!transfer.status()) return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "device update active");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    if (request->method == HTTP_DELETE) {
+        if (request->content_len) return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "delete has no body");
+        const auto removed = files_->erase(path);
+        if (!removed) return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, removed.error().detail.data());
+        return httpd_resp_sendstr(request, "deleted");
+    }
+    if (request->method == HTTP_PUT) {
+        const auto started = files_->begin(path, request->content_len);
+        if (!started) return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, started.error().detail.data());
+        std::size_t remaining = request->content_len;
+        const auto deadline = esp_timer_get_time() + 120'000'000;
+        while (remaining && esp_timer_get_time() < deadline) {
+            const auto count = std::min(remaining, http_asset_buffer_.size());
+            const int received = httpd_req_recv(request, reinterpret_cast<char*>(http_asset_buffer_.data()), count);
+            if (received == HTTPD_SOCK_ERR_TIMEOUT) continue;
+            if (received <= 0) break;
+            const auto appended = files_->append(started.value(), std::span(http_asset_buffer_).first(received));
+            if (!appended) {
+                files_->cancel(started.value());
+                return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "file write failed");
+            }
+            remaining -= static_cast<std::size_t>(received);
+        }
+        if (remaining) {
+            files_->cancel(started.value());
+            return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "incomplete file");
+        }
+        const auto completed = files_->finish(started.value());
+        if (!completed) return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "file commit failed");
+        httpd_resp_set_status(request, "201 Created");
+        return httpd_resp_sendstr(request, "stored");
+    }
+    if (request->method != HTTP_GET) return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "file method");
+    const auto opened = files_->open(path);
+    if (!opened) return httpd_resp_send_err(request,
+        opened.error().code == core::ErrorCode::not_found ? HTTPD_404_NOT_FOUND : HTTPD_400_BAD_REQUEST,
+        opened.error().detail.data());
+    httpd_resp_set_type(request, "application/octet-stream");
+    std::size_t offset{};
+    esp_err_t result = ESP_OK;
+    while (offset < opened.value().size) {
+        const auto read = files_->read(opened.value(), offset, http_asset_buffer_);
+        if (!read || !read.value()) { result = ESP_FAIL; break; }
+        result = httpd_resp_send_chunk(request, reinterpret_cast<const char*>(http_asset_buffer_.data()), read.value());
+        if (result != ESP_OK) break;
+        offset += read.value();
+    }
+    files_->close(opened.value());
+    return result == ESP_OK ? httpd_resp_send_chunk(request, nullptr, 0) : result;
+}
+
 esp_err_t EspOscQueryComponent::handle_http_root(httpd_req_t* request) noexcept {
     active_http_callbacks_.fetch_add(1U);
     const int socket = httpd_req_to_sockfd(request);
@@ -875,6 +1040,9 @@ esp_err_t EspOscQueryComponent::handle_http_root(httpd_req_t* request) noexcept 
     esp_err_t result{};
     if (websocket) {
         result = handle_websocket(request);
+    } else if ((request->method == HTTP_PUT || request->method == HTTP_DELETE) &&
+               std::string_view{request->uri}.starts_with("/api/files/")) {
+        result = handle_file(request);
     } else if (request->method == HTTP_PUT && std::string_view{request->uri} == "/api/web-assets") {
         result = handle_asset_upload(request);
     } else if (request->method == HTTP_PUT && std::string_view{request->uri} == "/api/firmware") {
@@ -882,6 +1050,8 @@ esp_err_t EspOscQueryComponent::handle_http_root(httpd_req_t* request) noexcept 
     } else if (request->method == HTTP_POST &&
                std::string_view{request->uri} == "/api/resources/reassign") {
         result = handle_resource_reassignment(request);
+    } else if (request->method == HTTP_POST && std::string_view{request->uri}.starts_with("/api/releases/")) {
+        result = handle_release_action(request);
     } else {
         result = handle_http_get(request);
     }

@@ -1,4 +1,4 @@
-"""Portable HTTPS handler for /blip/update and published release artifacts."""
+"""Public HTTP release handler, with optional TLS, for catalogs and artifacts."""
 from __future__ import annotations
 import argparse
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -28,17 +28,17 @@ def ascii_text(value, maximum):
     return value
 
 
-def https_url(value):
+def release_url(value):
     ascii_text(value, 319)
     parts = urlsplit(value)
-    if (parts.scheme != "https" or not parts.hostname or parts.username is not None or parts.password is not None
+    if (parts.scheme not in ("http", "https") or not parts.hostname or parts.username is not None or parts.password is not None
             or parts.fragment or any(c in value for c in " @#\\") or re.search(r"%(?![0-9a-fA-F]{2})", value)):
-        raise ValueError("invalid HTTPS artifact URL")
+        raise ValueError("invalid HTTP(S) artifact URL")
     if parts.port is not None and not 1 <= parts.port <= 65535:
-        raise ValueError("invalid HTTPS port")
+        raise ValueError("invalid HTTP(S) port")
     if len(parts.hostname) > 253 or any(not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?", label)
                                       for label in parts.hostname.split(".")):
-        raise ValueError("invalid HTTPS hostname")
+        raise ValueError("invalid HTTP(S) hostname")
     return value
 
 
@@ -90,7 +90,7 @@ def validate_release(release):
         if not artifact["code"] or not (492 if kind == "firmware" else 48) <= artifact["bytes"] <= (8 * 1024 * 1024 if kind == "firmware" else 256 * 1024):
             raise ValueError("invalid artifact code/size")
         ascii_text(artifact["version"], 31)
-        https_url(artifact["url"])
+        release_url(artifact["url"])
         if not isinstance(artifact["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", artifact["sha256"]) or artifact["sha256"] == "0" * 64:
             raise ValueError("invalid artifact SHA-256")
     encoded = json.dumps({"schema": 1, **release}, separators=(",", ":"), ensure_ascii=True).encode()
@@ -202,18 +202,22 @@ def main():
     parser.add_argument("--catalog", type=Path, required=True)
     parser.add_argument("--artifacts", type=Path)
     parser.add_argument("--listen", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8443)
-    parser.add_argument("--cert", type=Path, required=True)
-    parser.add_argument("--key", type=Path, required=True)
+    parser.add_argument("--port", type=int, default=8088)
+    parser.add_argument("--cert", type=Path, help="Optional TLS certificate; requires --key")
+    parser.add_argument("--key", type=Path, help="Optional TLS server key; requires --cert")
     args = parser.parse_args()
     load_index(args.catalog)
-    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.minimum_version = ssl.TLSVersion.TLSv1_2
-    context.load_cert_chain(args.cert, args.key)
+    if bool(args.cert) != bool(args.key): parser.error("--cert and --key must be supplied together")
+    context = None
+    if args.cert:
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+        context.load_cert_chain(args.cert, args.key)
     class HttpsServer(HTTPServer):
         def get_request(self):
             connection, address = super().get_request()
             connection.settimeout(10)
+            if context is None: return connection, address
             try:
                 return context.wrap_socket(connection, server_side=True), address
             except Exception:

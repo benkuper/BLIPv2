@@ -272,6 +272,25 @@ core::Status PosixFileBackend::append_write(std::span<const std::byte> value) no
     return core::Status::success();
 }
 
+core::Status PosixFileBackend::resume_write(std::string_view path) noexcept {
+    if (write_file_ != nullptr) {
+        return core::Status::failure(errno_error("file-resume", EINVAL));
+    }
+    std::array<char, kMaxFullPathBytes> resolved{};
+    if (!full_path(path, resolved)) {
+        return core::Status::failure(errno_error("file-resume", EINVAL));
+    }
+    // Do not create a missing staging generation while attempting a commit.
+    write_file_ = std::fopen(resolved.data(), "r+b");
+    if (write_file_ == nullptr) return core::Status::failure(errno_error("file-resume", errno));
+    if (std::fseek(write_file_, 0, SEEK_END) != 0) {
+        const auto value = errno;
+        abort_write();
+        return core::Status::failure(errno_error("file-resume-seek", value));
+    }
+    return core::Status::success();
+}
+
 core::Status PosixFileBackend::finish_write() noexcept {
     if (write_file_ == nullptr) {
         return core::Status::failure({core::ErrorDomain::storage,

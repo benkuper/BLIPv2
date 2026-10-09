@@ -11,6 +11,22 @@ class ClosedSocket {
   close() {}
 }
 
+test("release checks and independent installations use bounded same-device endpoints", async () => {
+  const calls = [];
+  const client = new DeviceClient({ baseUrl: "http://192.0.2.8", WebSocketImpl: ClosedSocket,
+    fetchImpl: async (url, options) => {
+      calls.push([url.href, options.method ?? "GET"]);
+      return options.method === "POST" ? new Response('{"accepted":true}', { status: 202 }) : response({ state: "current" });
+    } });
+  assert.equal((await client.loadReleases()).state, "current");
+  await client.release("check"); await client.release("web"); await client.release("firmware"); await client.release("cancel");
+  await assert.rejects(() => client.release("erase"), /Unknown update action/);
+  assert.deepEqual(calls.map(([url]) => new URL(url).pathname), ["/api/releases", "/api/releases/check", "/api/releases/web", "/api/releases/firmware", "/api/releases/cancel"]);
+  const oversized = new DeviceClient({ baseUrl: "http://192.0.2.8", WebSocketImpl: ClosedSocket,
+    fetchImpl: async () => new Response("x".repeat(4097)) });
+  await assert.rejects(() => oversized.loadReleases(), /too large/);
+});
+
 test("native fetch keeps its global receiver for polling and connection", async () => {
   const client = new DeviceClient({ baseUrl: "http://192.0.2.8", WebSocketImpl: ClosedSocket,
     fetchImpl: function () { assert.equal(this, globalThis); return Promise.resolve(response({ CONTENTS: {} })); } });
@@ -47,6 +63,20 @@ test("client requests host info and the selected registry view", async () => {
     "http://192.0.2.8/api/resources",
   ]);
   assert.throws(() => client.send("/test"), /offline/);
+});
+
+test("initial connection consumes each JSON body before opening another request", async () => {
+  let pending = false;
+  const client = new DeviceClient({ baseUrl: "http://192.0.2.8", WebSocketImpl: ClosedSocket,
+    fetchImpl: async () => {
+      assert.equal(pending, false, "response body still occupies device TCP buffers");
+      pending = true;
+      return { ok: true, headers: new Headers(), text: async () => {
+        await new Promise(resolve => setTimeout(resolve, 1)); pending = false; return "{}";
+      } };
+    } });
+  await client.load();
+  assert.equal(pending, false);
 });
 
 test("device query parameter supports a separately hosted shell", () => {

@@ -19,6 +19,7 @@
 #include "blip/network/esp_wifi_component.hpp"
 #include "blip/oscquery/esp_oscquery_component.hpp"
 #include "blip/ota/esp_ota_component.hpp"
+#include "blip/ota/esp_release_component.hpp"
 #include "blip/resources/broker.hpp"
 #include "blip/resources/board_manifest.hpp"
 #include "blip/storage/littlefs_storage_component.hpp"
@@ -214,9 +215,11 @@ BootstrapComponent recovery_component{true};
 blip::core::EspDiagnosticsComponent diagnostics_component{};
 blip::pm::EspPowerManagerComponent power_manager_component{};
 blip::storage::NvsSettingsComponent settings_component{};
-blip::storage::LittleFsStorageComponent file_storage_component{};
-blip::network::EspWifiComponent wifi_component{settings_component.settings()};
 constexpr auto board_manifest = blip::resources::selected_board_manifest();
+blip::storage::DeviceIdentityComponent identity_component{
+    settings_component.settings(), blip::resources::board_display_name(board_manifest)};
+blip::storage::LittleFsStorageComponent file_storage_component{board_manifest.storage};
+blip::network::EspWifiComponent wifi_component{settings_component.settings(), identity_component};
 blip::resources::DeviceBroker resource_broker{};
 #if defined(CONFIG_IDF_TARGET_ESP32) && defined(BLIP_ENABLE_CLASSIC_BT)
 // Bluedroid reserves more fixed DRAM than NimBLE. Construct these large
@@ -243,6 +246,8 @@ blip::core::RegistryControlService<20> control_component{registry};
 blip::wasm::WamrRuntime wasm_runtime{};
 blip::wasm::EspWasmComponent wasm_component{wasm_runtime};
 #endif
+blip::ota::EspReleaseComponent release_component{firmware_release_identity(0), wifi_component,
+    file_storage_component.web_assets(), settings_component.settings(), ota_component.updates()};
 #if defined(BLIP_ENABLE_FLEET)
 blip::fleet::EspFleetComponent fleet_component{
     control_component, settings_component.settings(), wifi_component};
@@ -267,8 +272,8 @@ blip::transport::EspEspNowTransportComponent espnow_transport_component{
 blip::oscquery::EspOscQueryComponent* oscquery_component{};
 #else
 blip::oscquery::EspOscQueryComponent oscquery_storage{
-    registry, control_component, wifi_component, file_storage_component.web_assets(),
-    ota_component.updates(), resource_broker, board_manifest};
+    registry, control_component, wifi_component, file_storage_component.web_assets(), file_storage_component.files(),
+    ota_component.updates(), release_component, resource_broker, board_manifest};
 blip::oscquery::EspOscQueryComponent* oscquery_component{&oscquery_storage};
 #endif
 
@@ -335,6 +340,7 @@ void reject_pending_update() noexcept {
         if (!file_storage_status) {
             return false;
         }
+        if (!registry.add(identity_component)) return false;
         const auto wifi_status = registry.add(wifi_component);
         if (!wifi_status) {
             return false;
@@ -369,6 +375,7 @@ void reject_pending_update() noexcept {
         if (!ota_status) {
             return false;
         }
+        if (!registry.add(release_component)) return false;
         const auto oscquery_status = registry.add(*oscquery_component);
         if (!oscquery_status) {
             return false;
@@ -510,8 +517,8 @@ extern "C" void app_main() {
     (defined(BLIP_ENABLE_BLE) || defined(BLIP_ENABLE_CLASSIC_BT))
     if (!safe_mode) {
         oscquery_component = new (std::nothrow) blip::oscquery::EspOscQueryComponent{
-            registry, control_component, wifi_component, file_storage_component.web_assets(),
-            ota_component.updates(), resource_broker, board_manifest};
+            registry, control_component, wifi_component, file_storage_component.web_assets(), file_storage_component.files(),
+            ota_component.updates(), release_component, resource_broker, board_manifest};
         if (oscquery_component == nullptr) {
             ESP_LOGE(kTag, "BLIP_V2_OSCQUERY_ALLOCATION_FAILED");
             reject_pending_update();

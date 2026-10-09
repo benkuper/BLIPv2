@@ -210,7 +210,7 @@ class RegistryControlService final : public Component, public ControlService {
             return failure(ErrorCode::invalid_argument, request.component_id, "read-parameter",
                            "values-not-allowed");
         }
-        auto status = entry.instance->read_parameter(request.control_id, response.values[0]);
+        auto status = entry.instance->read_parameter_owned(request.control_id, response.values[0], response.string_storage);
         if (!status) {
             return status;
         }

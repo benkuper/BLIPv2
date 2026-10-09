@@ -8,7 +8,7 @@
 
 namespace blip::ota {
 constexpr std::size_t kMaximumReleaseCatalogBytes = 4096;
-constexpr std::string_view kDefaultReleaseEndpoint = "https://www.goldengeek.org/blip/update";
+constexpr std::string_view kDefaultReleaseEndpoint = "http://www.goldengeek.org/blip/update";
 
 template <std::size_t Capacity> struct ReleaseText {
     std::array<char, Capacity + 1> bytes{};
@@ -48,7 +48,7 @@ struct ReleaseCatalog {
                                                     std::uint32_t maximum_web_bytes) noexcept;
 [[nodiscard]] core::Status build_release_query(std::string_view endpoint, const ReleaseIdentity&,
                                                std::span<char> output, std::size_t& written) noexcept;
-[[nodiscard]] bool valid_release_https_url(std::string_view url) noexcept;
+[[nodiscard]] bool valid_release_url(std::string_view url) noexcept;
 [[nodiscard]] bool firmware_update_available(const ReleaseCatalog& catalog, const ReleaseIdentity& identity) noexcept;
 [[nodiscard]] bool web_update_available(const ReleaseCatalog& catalog, const ReleaseIdentity& identity) noexcept;
 } // namespace blip::ota

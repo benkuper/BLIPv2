@@ -161,14 +161,14 @@ class QueryWriter {
 };
 } // namespace
 
-bool valid_release_https_url(std::string_view url) noexcept {
-    if (!url.starts_with("https://") || url.size() > 319 || url.find_first_of("@#\\") != url.npos) return false;
+bool valid_release_url(std::string_view url) noexcept {
+    if ((!url.starts_with("https://") && !url.starts_with("http://")) || url.size() > 319 || url.find_first_of("@#\\") != url.npos) return false;
     for (std::size_t i = 0; i < url.size(); ++i) {
         const auto c = static_cast<unsigned char>(url[i]);
         if (c <= 0x20 || c >= 0x7f) return false;
         if (c == '%') { if (url.size() - i < 3 || hex(url[i + 1]) < 0 || hex(url[i + 2]) < 0) return false; i += 2; }
     }
-    const auto remainder = url.substr(8);
+    const auto remainder = url.substr(url.starts_with("https://") ? 8 : 7);
     const auto authority = remainder.substr(0, remainder.find_first_of("/?"));
     auto host = authority;
     const auto colon = authority.find(':');
@@ -206,7 +206,7 @@ core::Status validate_release_catalog(const ReleaseCatalog& catalog, const Relea
     for (const auto* artifact : {&catalog.firmware, &catalog.web}) {
         if (!artifact->present) continue;
         const bool firmware = artifact == &catalog.firmware;
-        if (!artifact->code || artifact->version.view().empty() || !valid_release_https_url(artifact->url.view()) ||
+        if (!artifact->code || artifact->version.view().empty() || !valid_release_url(artifact->url.view()) ||
             artifact->bytes < (firmware ? kReleaseImagePrefixBytes : 48) ||
             artifact->bytes > (firmware ? maximum_firmware_bytes : maximum_web_bytes) ||
             std::all_of(artifact->sha256.begin(), artifact->sha256.end(), [](std::byte byte) { return byte == std::byte{}; }))
@@ -228,7 +228,7 @@ core::Status build_release_query(std::string_view endpoint, const ReleaseIdentit
             const auto byte = static_cast<unsigned char>(c); return byte >= 0x20 && byte < 0x7f;
         });
     };
-    if (!valid_release_https_url(endpoint) || !text_valid(identity.project, 31) || !text_valid(identity.board, 63) ||
+    if (!valid_release_url(endpoint) || !text_valid(identity.project, 31) || !text_valid(identity.board, 63) ||
         !text_valid(identity.target, 15) || !text_valid(identity.layout, 31) || !text_valid(identity.profile, 31) ||
         !text_valid(identity.channel, 15) || !text_valid(identity.firmware_version, 31) || !identity.api || !identity.flash_bytes)
         return failure(core::ErrorCode::invalid_argument, "invalid-release-query-identity");

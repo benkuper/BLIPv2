@@ -1,0 +1,137 @@
+{
+  "date": "2026-10-09",
+  "milestone_complete": false,
+  "pc_network_changed": false,
+  "reports": [
+    {
+      "report_path": "build/m41-huzzah32-first-run-browser-ota.json",
+      "report_sha256": "00ad96d0b9cccd98036f4254daa81e3cea4df4ca764884035951bd53f1181564",
+      "checks_passed": 16,
+      "firmware_sha256": "868f354f581c0d8008d28dd497c7152dc85589bf92c8fd17d71d0d2f86836dfe",
+      "checker_sha256": "b5169fb62da7f4b8ab1bf657941681ede9703c7bb31d47ead3f9cbcc4adfb97a"
+    },
+    {
+      "report_path": "build/m41-huzzah32-native-firmware-update.json",
+      "report_sha256": "dc97b70ef4eb33d122c2aba0b998f1a5656012698072ebf8dc288868f715e7a6",
+      "checks_passed": 12,
+      "firmware_sha256": "ec7a49a1013473190647b1f373d6e7854e6accb90282d5db9a808248da0c5604",
+      "checker_sha256": "4fe1af37e7f5e07709f13d47368d6346af355eb2e0c19a68c398097f02cac439"
+    },
+    {
+      "report_path": "build/m41-huzzah32-manual-ota-identity.json",
+      "report_sha256": "14c87c90e546ecae9a43a93f530acc06a764be141d4f9a399ec765bac49c00be",
+      "checks_passed": 23,
+      "firmware_sha256": "ec7a49a1013473190647b1f373d6e7854e6accb90282d5db9a808248da0c5604",
+      "checker_sha256": "98c659f6ffeea490f4aee888f6cc195b265187c1edcab8a1b5d8fe0d3e3ed230"
+    }
+  ],
+  "first_run": {
+    "app_bytes": 1455776,
+    "identical_preloaded_and_empty_app": true,
+    "firmware_sha256": "868f354f581c0d8008d28dd497c7152dc85589bf92c8fd17d71d0d2f86836dfe",
+    "local_archive": "build/m41-huzzah32-empty-validated",
+    "web_code": 3004,
+    "web_bytes": 26313,
+    "ui_installs_without_reboot": true,
+    "manual_ota_boot_confirmed": true,
+    "empty_storage_reflash_log_sha256": "7ce118a56aa0b6763d20585f61a59e3e0735e0e9f39fa1ddca9bfa23a186b225"
+  },
+  "native_upgrade": {
+    "board": "adafruit-huzzah32",
+    "port": "COM5",
+    "mac": "30:ae:a4:f2:d1:84",
+    "before_code": 1,
+    "after_code": 2,
+    "software_reboots": 1,
+    "original_update_policy_restored": true
+  },
+  "manual_identity_rejection": [
+    "board",
+    "layout",
+    "flash-size",
+    "features",
+    "api",
+    "profile",
+    "target",
+    "chip-header",
+    "marker",
+    "version",
+    "short"
+  ],
+  "checks": {
+    "host_suites": 33,
+    "web_tests": 31,
+    "release_server_tests": 9
+  },
+  "builds": [
+    {
+      "profile": "ball",
+      "firmware_sha256": "8c043e6ae359d1ef27cc96779eb02b3c8a8e5d141794e55c9efc42f661443c99",
+      "firmware_bytes": 2041552,
+      "build_log_sha256": "e1a17500fb163d62a98f4734dee828d6b9908e211f10311adaea6c74413d6d5b",
+      "hardware_qualified_this_checkpoint": false,
+      "sdkconfig_sha256": "39edeb9ae427356007a1cf3c79f6c961ad4e5f42d83c1db5d4712088bf177951",
+      "CMakeCache.txt_sha256": "4a5f335917aec1ba85b92cd0d7503782aa2f202ad0bd3eec949589e8ba14836e"
+    },
+    {
+      "profile": "huzzah32",
+      "firmware_sha256": "ec7a49a1013473190647b1f373d6e7854e6accb90282d5db9a808248da0c5604",
+      "firmware_bytes": 1456480,
+      "build_log_sha256": "ab857063fab9db481c0eba280d79cca9e4f13089bee6948c23437905ac5ef835",
+      "hardware_qualified_this_checkpoint": true,
+      "sdkconfig_sha256": "5a8a96d75da9b2d2962949acddc5afe02d018883b4c3d761469196799712a009",
+      "CMakeCache.txt_sha256": "abdcedc3dfacf8c044e2dfe17a62ed2e042dedeb72bf3560614066e5b5843d0b"
+    },
+    {
+      "profile": "m5dial",
+      "firmware_sha256": "460f8e172fb47173b59f60833ace9155784e95ff77a66a9011f14e6a1f73a760",
+      "firmware_bytes": 1437392,
+      "build_log_sha256": "5a05aa107883d80e589444999fe33703342d5165e324d90de278abd12998b6cf",
+      "hardware_qualified_this_checkpoint": false,
+      "sdkconfig_sha256": "61f69123e1e775f6ae224ce0895b551db9f74878a071eb5dc011918a54e4fb2c",
+      "CMakeCache.txt_sha256": "fd3f8929d16b6f742edd722af7aba29f9df35a9970a233d1e92abad093a16ef1"
+    },
+    {
+      "profile": "club",
+      "firmware_sha256": "9190c06de995944e859293bbafa369315e53c7cad3aebd5801d67d535344c970",
+      "firmware_bytes": 1514832,
+      "build_log_sha256": "655ddf3ca40fd222763487958dfbeb990e5c11081c5b07ea8bd253e931624de0",
+      "hardware_qualified_this_checkpoint": false,
+      "sdkconfig_sha256": "9503d26359f03c17bf54529846da5cd56f83947859b467fb6416bc79b96f0223",
+      "CMakeCache.txt_sha256": "1c12fa19ab93b65e7c461fef48a317abb2a968a1a989dbf59b398b91f7dbf32d"
+    },
+    {
+      "profile": "tab",
+      "firmware_sha256": "3b167e8c382908ab0bf30876a9de93ea2e6647304fe34528058485a0f34099d9",
+      "firmware_bytes": 1520864,
+      "build_log_sha256": "49ba9f40740bbed006e0b12a3f4f6205cb772f45b727da9d70a1cd257b7bed2d",
+      "hardware_qualified_this_checkpoint": false,
+      "sdkconfig_sha256": "9503d26359f03c17bf54529846da5cd56f83947859b467fb6416bc79b96f0223",
+      "CMakeCache.txt_sha256": "a954340e57741ae2548ea736a2dd3dd8c171cef3aa4964519f61178573ab78da"
+    },
+    {
+      "profile": "m5stickc",
+      "firmware_sha256": "7b3fa5ef467a12f4391f05e90212748373d3290cd283e0f25641246fe2c1d6e6",
+      "firmware_bytes": 1432592,
+      "build_log_sha256": "6755231565ca4e50ad1a692d821c6e60d7c137904d57c777ce0a11c64afbeff1",
+      "hardware_qualified_this_checkpoint": false,
+      "sdkconfig_sha256": "1452d65341313702e76ef54ff46d2d2ba7121b4085fd56f4f771b50cddac1581",
+      "CMakeCache.txt_sha256": "21f7cb0089da5402df139318ce4ff838e4bd2050103fd215208d29bdcef68e93"
+    },
+    {
+      "profile": "xiao",
+      "firmware_sha256": "e93cff872a12a60f1cd41d8e55ac8650925d02dbaf0e9e13a8f012106dff49f3",
+      "firmware_bytes": 1615840,
+      "build_log_sha256": "7f80c19140ee9f086362fc0dd93edca06490e822064323db61d1391909630c28",
+      "hardware_qualified_this_checkpoint": false,
+      "sdkconfig_sha256": "554834358586dc0b0631a652cd3f90e6a38695a1b7047377cfefe973231711bf",
+      "CMakeCache.txt_sha256": "d4890a88894ad9fb6fddbb09b7845616aff83c61ccdba11dc7839b29163b029c"
+    }
+  ],
+  "remaining": [
+    "All-seven-board hardware milestone regression; Creators Tab flash access remains failed",
+    "First-run and firmware-update interruption/cancellation/corruption recovery qualification across ESP32, S3 and C6",
+    "Simultaneous native updates, browser polling, lighting, BLE and fleet traffic qualification",
+    "Automatic external storage qualification beyond Ball and application file consumers"
+  ]
+}

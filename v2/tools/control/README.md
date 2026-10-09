@@ -1,5 +1,13 @@
 # BLIP serial control utility
 
+Device names are exposed as `blip.device.identity/name` (saved, editable UTF-8)
+and `blip.device.identity/type` (read-only board type). `blip_device_identity_hil.py`
+qualifies serial/HTTP identity, live mDNS renaming and reboot persistence on an
+already provisioned shared network. It requires `pyserial` and `zeroconf`, takes
+`--port`, `--type`, `--mac`, `--build`, `--flash-log`, and `--report`, and restores
+the original device name. It never changes the PC's Wi-Fi connection. Milestones
+must run on all seven board types; reverify ports and MACs before flashing.
+
 The utility sends the COBS-framed BLIP envelope v1 over UART or native USB
 Serial/JTAG. It needs Python 3.10 or newer and pyserial for hardware access.
 

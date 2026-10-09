@@ -1,12 +1,14 @@
 #pragma once
 
 #include "blip/core/error.hpp"
+#include "blip/ota/sha256.hpp"
 
 #include <array>
 #include <cstddef>
 #include <cstdint>
 #include <span>
 #include <string_view>
+#include <mutex>
 
 namespace blip::ota {
 
@@ -67,13 +69,15 @@ class UpdateService {
     [[nodiscard]] core::Status reject_boot() noexcept;
     void refresh_boot_state() noexcept;
 
-    [[nodiscard]] const UpdateStatus& status() const noexcept { return status_; }
+    [[nodiscard]] UpdateStatus status() const noexcept { std::lock_guard guard(mutex_); return status_; }
+    [[nodiscard]] std::recursive_mutex& mutex() const noexcept { return mutex_; }
 
   private:
     [[nodiscard]] core::Status validate_descriptor() const noexcept;
 
-    class Sha256;
+    using Sha256 = ArtifactSha256;
     UpdateBackend* backend_{};
+    mutable std::recursive_mutex mutex_{};
     std::string_view project_{};
     std::string_view target_{};
     std::string_view profile_{};

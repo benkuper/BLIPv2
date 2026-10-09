@@ -8,13 +8,35 @@
 
 namespace blip::resources {
 
+enum class StorageMediaKind : std::uint8_t { none, sd_spi, sd_mmc, spi_nor };
+struct BoardStorage {
+    StorageMediaKind kind{StorageMediaKind::none};
+    // 0 selects software SPI; 2/3 select the corresponding hardware host.
+    // For MMC, mosi/miso denote CMD/D0 and clock is CLK (one-bit mode).
+    unsigned host{};
+    std::int16_t mosi{-1}, miso{-1}, clock{-1}, select{-1}, power{-1};
+    bool power_level{};
+};
+
 struct BoardManifest {
     std::string_view id{};
     std::string_view target{};
     std::span<const ResourceSpec> pins{};
     std::int16_t default_led_gpio{};
     std::string_view antenna{};
+    BoardStorage storage{};
 };
+
+[[nodiscard]] constexpr std::string_view board_display_name(const BoardManifest& board) noexcept {
+    if (board.id == "creators-club") return "Creators Club";
+    if (board.id == "creators-tab") return "Creators Tab";
+    if (board.id == "creators-ball-v2") return "Creators Ball V2";
+    if (board.id == "adafruit-huzzah32") return "HUZZAH32";
+    if (board.id == "seeed-xiao-esp32c6-chip-antenna") return "XIAO C6";
+    if (board.id == "m5stack-m5stickc") return "M5 Stick C";
+    if (board.id == "m5stack-m5dial") return "M5 Dial";
+    return "BLIP";
+}
 
 namespace detail {
 constexpr auto kIo = kGpioInput | kGpioOutput | kGpioPwm | kGpioInterrupt | kGpioRmt;
@@ -289,7 +311,10 @@ constexpr std::array kM5StickCPins{
         false,
 #endif
         "Creators Ball V2 requires ESP32-C6");
-    return {"creators-ball-v2", "esp32c6", detail::kCreatorsBallV2Pins, 3, "pcb"};
+    // V1 uses SD.begin on this onboard storage, despite its FLASH name. C6's
+    // single user SPI host is reserved for HD108 DMA on GPIO2/3.
+    return {"creators-ball-v2", "esp32c6", detail::kCreatorsBallV2Pins, 3, "pcb",
+            {StorageMediaKind::sd_spi, 0, 4, 5, 8, 15, -1, false}};
 #elif defined(BLIP_BOARD_CREATORS_TAB)
     static_assert(
 #if defined(CONFIG_IDF_TARGET_ESP32)
@@ -298,7 +323,8 @@ constexpr std::array kM5StickCPins{
         false,
 #endif
         "Creators Tab requires ESP32");
-    return {"creators-tab", "esp32", detail::kCreatorsTabPins, 25, "pcb"};
+    return {"creators-tab", "esp32", detail::kCreatorsTabPins, 25, "pcb",
+            {StorageMediaKind::sd_spi, 3, 13, 19, 14, 15, 33, false}};
 #elif defined(BLIP_BOARD_CREATORS_CLUB)
     static_assert(
 #if defined(CONFIG_IDF_TARGET_ESP32)
@@ -307,7 +333,8 @@ constexpr std::array kM5StickCPins{
         false,
 #endif
         "Creators Club requires ESP32");
-    return {"creators-club", "esp32", detail::kCreatorsClubPins, 25, "pcb"};
+    return {"creators-club", "esp32", detail::kCreatorsClubPins, 25, "pcb",
+            {StorageMediaKind::sd_spi, 3, 13, 19, 14, 15, 16, false}};
 #elif defined(BLIP_BOARD_M5STICKC)
     static_assert(
 #if defined(CONFIG_IDF_TARGET_ESP32)

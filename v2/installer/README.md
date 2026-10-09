@@ -5,6 +5,11 @@ Launchpad TOML configuration, SHA-256 provenance, and the HTTPS-hosted installer
 page. The generic three-target package uses the 4 MiB layout with initialized
 LittleFS at `0x340000`; OTA application uploads do not touch that partition.
 
+Current firmware builds automatically pack the full web interface into the
+factory LittleFS image. It is flashed in the same operation, without an
+embedded duplicate in either application slot. `BLIP_FLASH_WEB_UI=OFF` produces
+an empty filesystem and uses the firmware's small first-run downloader instead.
+
 Run after all three ESP-IDF builds complete:
 
 ```powershell

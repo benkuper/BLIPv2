@@ -33,6 +33,12 @@
             <p id="device-meta" class="device-meta">
               Light, motion and everything in between. Connect to get started.
             </p>
+            <form id="device-name-form" class="device-name-form" hidden>
+              <label for="device-name-input">Device name</label>
+              <div><input id="device-name-input" type="text" maxlength="63" required autocomplete="off" />
+              <button type="submit" class="apply-button">Save name</button></div>
+              <p id="device-name-status" role="status" aria-live="polite"></p>
+            </form>
           </div>
           <button id="connect-button" class="primary-button" type="button">Connect</button>
         </section>
@@ -51,6 +57,21 @@
 
         <p id="notice" class="notice" role="status" hidden></p>
         <section id="controls" class="control-grid" aria-label="Device controls"></section>
+
+        <section id="update-center" class="update-center" aria-labelledby="updates-heading">
+          <div class="update-title"><div><p class="eyebrow">Keep creating</p><h2 id="updates-heading">Device updates</h2></div>
+            <button data-update-action="check" class="secondary-button" type="button" disabled>Check for updates</button></div>
+          <div class="update-artifacts">
+            <article><span class="update-icon" aria-hidden="true">◈</span><div><h3>Firmware</h3><p data-firmware-version>Connecting…</p><small data-firmware-candidate></small></div>
+              <button data-update-action="firmware" class="primary-button" type="button" disabled>Install firmware</button></article>
+            <article><span class="update-icon" aria-hidden="true">▤</span><div><h3>Web interface</h3><p data-web-version>Connecting…</p><small data-web-candidate></small></div>
+              <button data-update-action="web" class="primary-button" type="button" disabled>Install interface</button></article>
+          </div>
+          <progress aria-label="Update download" hidden></progress>
+          <div class="update-footer"><p data-update-status role="status" aria-live="polite">Waiting for your device</p>
+            <button data-update-action="cancel" class="secondary-button" type="button" disabled>Cancel</button></div>
+          <p class="update-note">Firmware installation restarts your BLIP. Interface installation refreshes this page.</p>
+        </section>
 
         <section class="firmware-panel advanced-only" aria-labelledby="reservations-heading" hidden>
           <div>

@@ -263,6 +263,7 @@ core::Result<WebAssetBundleInfo> WebAssetStore::validate(std::string_view storag
 }
 
 core::Result<WebAssetBundleInfo> WebAssetStore::load_active() noexcept {
+    std::lock_guard guard(mutex_);
     active_ = false;
     info_ = {};
     const auto result = validate(kActivePath, true);
@@ -275,6 +276,7 @@ core::Result<WebAssetBundleInfo> WebAssetStore::load_active() noexcept {
 }
 
 core::Status WebAssetStore::begin_install(std::size_t expected_size) noexcept {
+    std::lock_guard guard(mutex_);
     if (installing_ || expected_size < kWebAssetBundleHeaderBytes ||
         expected_size > kMaxWebAssetBundleBytes) {
         return core::Status::failure(asset_error(
@@ -293,6 +295,7 @@ core::Status WebAssetStore::begin_install(std::size_t expected_size) noexcept {
 }
 
 core::Status WebAssetStore::append_install(std::span<const std::byte> chunk) noexcept {
+    std::lock_guard guard(mutex_);
     if (!installing_ || chunk.empty() || received_size_ + chunk.size() > expected_size_) {
         return core::Status::failure(asset_error(core::ErrorCode::invalid_state, "bundle-append",
                                                  installing_ ? "size-mismatch" : "not-started"));
@@ -307,6 +310,7 @@ core::Status WebAssetStore::append_install(std::span<const std::byte> chunk) noe
 }
 
 core::Result<WebAssetBundleInfo> WebAssetStore::finish_install() noexcept {
+    std::lock_guard guard(mutex_);
     if (!installing_ || received_size_ != expected_size_) {
         cancel_install();
         return core::Result<WebAssetBundleInfo>::failure(
@@ -337,6 +341,7 @@ core::Result<WebAssetBundleInfo> WebAssetStore::finish_install() noexcept {
 }
 
 void WebAssetStore::cancel_install() noexcept {
+    std::lock_guard guard(mutex_);
     if (installing_) {
         backend_->abort_write();
     }
@@ -360,6 +365,7 @@ core::Status WebAssetStore::install_complete(std::span<const std::byte> bundle) 
 }
 
 core::Status WebAssetStore::ensure_factory(std::span<const std::byte> bundle) noexcept {
+    std::lock_guard guard(mutex_);
     const auto cleanup_status = backend_->remove(kUploadPath);
     if (!cleanup_status) {
         return cleanup_status;
@@ -384,6 +390,7 @@ core::Status WebAssetStore::ensure_factory(std::span<const std::byte> bundle) no
 }
 
 const WebAsset* WebAssetStore::find(std::string_view request_path) const noexcept {
+    std::lock_guard guard(mutex_);
     if (!active_) {
         return nullptr;
     }
@@ -400,6 +407,7 @@ const WebAsset* WebAssetStore::find(std::string_view request_path) const noexcep
 
 core::Result<std::size_t> WebAssetStore::read(const WebAsset& asset, std::size_t offset,
                                               std::span<std::byte> output) noexcept {
+    std::lock_guard guard(mutex_);
     if (!active_ || offset > asset.stored_size) {
         return core::Result<std::size_t>::failure(
             asset_error(core::ErrorCode::invalid_argument, "asset-read", "offset"));

@@ -2,6 +2,7 @@
   "schema_version": 1,
   "id": "creators-club",
   "target": "esp32",
+  "storage": {"type":"sd-spi","host":3,"mosi":13,"miso":19,"clock":14,"select":15,"power":16,"power_level":false,"namespace":"blip-v2"},
   "sources": ["https://github.com/Golden-Geek/BLIP/blob/1507f440b3ae635686d2bf759ecc742b391f08a7/configs/creators.ini"],
   "pins": [
     {"id":"gpio.0","label":"Boot / GPIO0","gpio":0,"capabilities":["input"],"electrical":"boot strap","reserved_for":"system.boot","reason":"boot-strap-pin","selectable":false},

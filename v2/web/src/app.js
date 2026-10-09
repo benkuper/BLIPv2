@@ -3,6 +3,7 @@ import { buildControlModel, describeHost, presentationModel, modelShapeKey } fro
 import { normalizeResourceSnapshot } from "./resources.js";
 import { ControlView, ReservationView } from "./view.js";
 import { uploadFirmware } from "./firmware.js";
+import { UpdatePanel } from "./updates.js";
 
 const controlsRoot = document.querySelector("#controls");
 const emptyTemplate = document.querySelector("#empty-state-template");
@@ -11,6 +12,9 @@ const connectionDot = document.querySelector("#connection-dot");
 const connectionStatus = document.querySelector("#connection-status");
 const deviceName = document.querySelector("#device-name");
 const deviceMeta = document.querySelector("#device-meta");
+const deviceNameForm = document.querySelector("#device-name-form");
+const deviceNameInput = document.querySelector("#device-name-input");
+const deviceNameStatus = document.querySelector("#device-name-status");
 const notice = document.querySelector("#notice");
 const search = document.querySelector("#control-search");
 const simpleButton = document.querySelector("#simple-mode");
@@ -27,8 +31,12 @@ const reservationSearch = document.querySelector("#reservation-search");
 let client = null;
 let mode = "simple", topic = "All", model = { components: [], index: new Map() };
 let shape = "", refreshTimer, refreshFailures = 0;
+let nameControl = null;
+const updatePanel = new UpdatePanel({ document, root: document.querySelector("#update-center") });
 
 function present() {
+  nameControl = model.components.find(component => component.id === "blip.device.identity")?.controls.find(control => control.id === "name") ?? null;
+  deviceNameForm.hidden = nameControl === null;
   view.setMode(mode);
   view.setModel(presentationModel(model, mode, topic));
   simpleButton.setAttribute("aria-pressed", String(mode === "simple"));
@@ -48,6 +56,11 @@ function present() {
 function receive(message) {
   const control = model.index.get(message.address);
   if (control?.kind === "parameter" && message.values.length === 1) control.value = message.values[0].value;
+  if (control === nameControl && typeof control.value === "string") {
+    deviceName.textContent = control.value;
+    if (document.activeElement !== deviceNameInput) deviceNameInput.value = control.value;
+    if (deviceNameInput.value === control.value) deviceNameStatus.textContent = "Saved on device";
+  }
   view.applyMessage(message);
 }
 
@@ -132,6 +145,10 @@ async function connect() {
     const { host, tree, resources } = await current.load(true);
     const identity = describeHost(host);
     model = buildControlModel(tree); shape = modelShapeKey(model);
+    nameControl = model.components.find(component => component.id === "blip.device.identity")?.controls.find(control => control.id === "name") ?? null;
+    deviceNameForm.hidden = nameControl === null;
+    deviceNameInput.value = nameControl?.value ?? identity.name;
+    deviceNameStatus.textContent = "";
     const resourceSnapshot = normalizeResourceSnapshot(resources);
     deviceName.textContent = identity.name;
     deviceMeta.textContent = `${identity.type} · ${identity.id} · firmware ${identity.version}`;
@@ -149,6 +166,7 @@ async function connect() {
     refreshFailures = 0;
     sampleStatus.textContent = "Live readings · sampled every 3 seconds";
     scheduleRefresh(current);
+    updatePanel.connect(current);
   } catch (error) {
     showError(error);
     connectButton.textContent = "Retry";
@@ -158,6 +176,20 @@ async function connect() {
 }
 
 connectButton.addEventListener("click", connect);
+deviceNameForm.addEventListener("submit", event => {
+  event.preventDefault();
+  if (!nameControl) return;
+  const name = deviceNameInput.value.trim();
+  if (!name || new TextEncoder().encode(name).length > 63 || /[\u0000-\u001f\u007f-\u009f\u2028\u2029]/u.test(name)) {
+    deviceNameStatus.textContent = "Use a name of 1–63 UTF-8 bytes without control characters.";
+    return;
+  }
+  try {
+    client.send(nameControl.path, [{ type: "string", value: name }]);
+    deviceNameInput.value = name;
+    deviceNameStatus.textContent = "Saving…";
+  } catch (error) { deviceNameStatus.textContent = error.message; }
+});
 simpleButton.addEventListener("click", () => { mode = "simple"; topic = "All"; present(); });
 advancedButton.addEventListener("click", () => { mode = "advanced"; topic = "All"; present(); });
 search.addEventListener("input", () => view.setFilter(search.value));

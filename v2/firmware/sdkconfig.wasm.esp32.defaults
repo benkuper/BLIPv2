@@ -2,3 +2,7 @@
 # Native/VM stacks and engine metadata remain in normal DRAM.
 CONFIG_FREERTOS_UNICORE=y
 CONFIG_ESP32_IRAM_AS_8BIT_ACCESSIBLE_MEMORY=y
+# Preserve a contiguous 64 KiB guest arena on boards with clocked SPI outputs.
+# Their SPI buses do not request ESP_INTR_FLAG_IRAM; completion interrupts can
+# already pause during internal-flash writes. Keep the SPI ISR in flash.
+CONFIG_SPI_MASTER_ISR_IN_IRAM=n
